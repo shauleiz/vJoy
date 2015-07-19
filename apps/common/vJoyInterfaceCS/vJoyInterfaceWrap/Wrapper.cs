@@ -171,6 +171,32 @@ namespace vJoyInterfaceWrap
             [FieldOffset(21)]
             public Byte DirY; // Y direction: Positive values are below the center (Y); Negative are Two's complement
         }
+        [StructLayout(LayoutKind.Explicit)]
+        public struct FFB_EFF_REPORT
+        {
+            [FieldOffset(0)]
+            public Byte EffectBlockIndex;
+            [FieldOffset(4)]
+            public FFBEType EffectType;
+            [FieldOffset(8)]
+            public UInt16 Duration;// Value in milliseconds. 0xFFFF means infinite
+            [FieldOffset(10)]
+            public UInt16 TrigerRpt;
+            [FieldOffset(12)]
+            public UInt16 SamplePrd;
+            [FieldOffset(14)]
+            public Byte Gain;
+            [FieldOffset(15)]
+            public Byte TrigerBtn;
+            [FieldOffset(16)]
+            public bool Polar; // How to interpret force direction Polar (0-360°) or Cartesian (X,Y)
+            [FieldOffset(20)]
+            public Byte Direction; // Polar direction: (0x00-0xFF correspond to 0-360°)
+            [FieldOffset(20)]
+            public Byte DirX; // X direction: Positive values are To the right of the center (X); Negative are Two's complement
+            [FieldOffset(21)]
+            public Byte DirY; // Y direction: Positive values are below the center (Y); Negative are Two's complement
+        }
 
         [StructLayout(LayoutKind.Explicit)]
         public struct FFB_EFF_OP
@@ -393,6 +419,9 @@ namespace vJoyInterfaceWrap
         [DllImport("vJoyInterface.dll", EntryPoint = "Ffb_h_Eff_Const")]
         private static extern UInt32 _Ffb_h_Eff_Const(IntPtr Packet, ref FFB_EFF_CONST Effect);
 
+        [DllImport("vJoyInterface.dll", EntryPoint = "Ffb_h_Eff_Report")]
+        private static extern UInt32 _Ffb_h_Eff_Report(IntPtr Packet, ref FFB_EFF_REPORT Effect);
+
         [DllImport("vJoyInterface.dll", EntryPoint = "Ffb_h_DevCtrl")]
         private static extern UInt32 _Ffb_h_DevCtrl(IntPtr Packet, ref FFB_CTRL Control);
 
@@ -525,8 +554,9 @@ namespace vJoyInterfaceWrap
             return res;
         }
         public UInt32 Ffb_h_EBI(IntPtr Packet, ref Int32 Index) { return _Ffb_h_EBI( Packet, ref  Index);}
-        public UInt32 Ffb_h_Eff_Const(IntPtr Packet, ref FFB_EFF_CONST Effect) {return _Ffb_h_Eff_Const( Packet, ref  Effect);}
-        public UInt32 Ffb_h_DevCtrl(IntPtr Packet, ref FFB_CTRL Control) { return _Ffb_h_DevCtrl( Packet, ref  Control); }
+        public UInt32 Ffb_h_Eff_Const(IntPtr Packet, ref FFB_EFF_CONST Effect) { return _Ffb_h_Eff_Const(Packet, ref  Effect); }
+        public UInt32 Ffb_h_Eff_Report(IntPtr Packet, ref FFB_EFF_REPORT Effect) { return _Ffb_h_Eff_Report(Packet, ref  Effect); }
+        public UInt32 Ffb_h_DevCtrl(IntPtr Packet, ref FFB_CTRL Control) { return _Ffb_h_DevCtrl(Packet, ref  Control); }
         public UInt32 Ffb_h_EffOp(IntPtr Packet, ref FFB_EFF_OP Operation) { return _Ffb_h_EffOp( Packet, ref  Operation);}
         public UInt32 Ffb_h_DevGain(IntPtr Packet, ref Byte Gain) { return _Ffb_h_DevGain( Packet, ref  Gain);}
         public UInt32 Ffb_h_Eff_Cond(IntPtr Packet, ref FFB_EFF_COND Condition) { return _Ffb_h_Eff_Cond( Packet, ref  Condition); }
