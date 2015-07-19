@@ -1,0 +1,31 @@
+#include <windows.h>
+#include <ntverp.h>
+#include <public.h>
+
+
+#undef	VER_PRODUCTNAME_STR
+#undef	VER_COMPANYNAME_STR
+#undef	VER_FILEVERSION_STR
+#undef	VER_PRODUCTVERSION_STR
+
+#define VER_FILETYPE                VFT_DRV
+#define VER_FILESUBTYPE             VFT2_DRV_SYSTEM
+#define VER_FILEDESCRIPTION_STR     "KMDF Virtual Joystick Driver"
+#define VER_INTERNALNAME_STR        "vJoy.sys"
+#define VER_ORIGINALFILENAME_STR    "vJoy.sys"
+#define VER_PRODUCTNAME_STR			"vJoy"
+#define VER_COMPANYNAME_STR			"Shaul Eizikovich"
+#define VER_FILEVERSION				VER_X_,VER_H_,VER_M_,VER_L_
+#define VER_PRODUCTVERSION_STR		LVER_PRODUCTVERSION_STR " (" BUILD_ALT_DIR ")"
+
+#if defined(RC_INVOKED) && !defined(WIN16)
+#define VER_LEGALCOPYRIGHT_STR L"\251 Shaul Eizikovich. All rights reserved."
+#else
+#define VER_LEGALCOPYRIGHT_STR "Copyright (c) Shaul Eizikovich. All rights reserved."
+#endif
+
+#define VER_FILEVERSION_STR	SERIALNUMBER_STR
+#include "common.ver"
+#include "errcodes.rc"
+
+

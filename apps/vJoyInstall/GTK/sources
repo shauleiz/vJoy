@@ -1,0 +1,41 @@
+TARGETNAME=vJoyInstall
+TARGETTYPE=DYNLINK
+UMTYPE=console
+UMENTRY=DllMain
+UMBASE=0x400000
+
+C_DEFINES=$(C_DEFINES) -DBUILD_ALT_DIR=\"$(BUILD_ALT_DIR)\" -DGTK
+_NT_TARGET_VERSION= $(_NT_TARGET_VERSION_WINXP)
+
+
+TARGETLIBS=\
+        $(SDK_LIB_PATH)\advapi32.lib  \
+        $(SDK_LIB_PATH)\kernel32.lib  \
+        $(SDK_LIB_PATH)\ntdll.lib     \
+        $(SDK_LIB_PATH)\ole32.lib     \
+        $(SDK_LIB_PATH)\setupapi.lib  \
+        $(SDK_LIB_PATH)\shell32.lib   \
+        $(SDK_LIB_PATH)\user32.lib    \
+
+           
+           
+SOURCES= \
+        ../vJoyInstallLib.cpp \
+         vJoyInstall.rc \
+         wrapper.cpp \
+
+INCLUDES=\
+		..\..\..\inc \
+
+LIB_DIR=\
+		..\..\..\lib
+
+USE_MSVCRT=1
+
+NTTARGETFILE0= svn_version.h 
+NTTARGETFILE2=	\
+		$(LIB_DIR)\$(O)\$(TARGETNAME).dll\
+		$(LIB_DIR)\$(O)\$(TARGETNAME).lib\
+		$(INCLUDES)\wrapper.h
+		
+         

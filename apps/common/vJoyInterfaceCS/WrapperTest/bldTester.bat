@@ -1,0 +1,20 @@
+echo on
+if "%BUILD_ALT_DIR%" == "fre_wxp_x86" (goto :fre_wxp_x86)
+if "%BUILD_ALT_DIR%" == "chk_wxp_x86" (goto :chk_wxp_x86)
+goto :eof
+
+:fre_wxp_x86
+SET OUTDIR=objfre_wxp_x86\i386
+SET REFDIR=..\vJoyInterfaceWrap\%OUTDIR%
+mkdir %OUTDIR%
+IF DEFINED VS90COMNTOOLS "%VS90COMNTOOLS%\vsvars32.bat" & Csc.exe /noconfig /nowarn:1701,1702 /errorreport:prompt /warn:4 /define:TRACE /reference:C:\Windows\Microsoft.NET\Framework\v2.0.50727\System.Data.dll /reference:C:\Windows\Microsoft.NET\Framework\v2.0.50727\System.Deployment.dll /reference:C:\Windows\Microsoft.NET\Framework\v2.0.50727\System.dll /reference:C:\Windows\Microsoft.NET\Framework\v2.0.50727\System.Drawing.dll /reference:C:\Windows\Microsoft.NET\Framework\v2.0.50727\System.Windows.Forms.dll /reference:C:\Windows\Microsoft.NET\Framework\v2.0.50727\System.Xml.dll /reference:%REFDIR%\vJoyInterfaceWrap.dll /debug:pdbonly /filealign:512 /optimize+ /out:%OUTDIR%\WrapperTest.exe  /target:winexe TesterForm.cs TesterForm.Designer.cs Program.cs Properties\AssemblyInfo.cs Properties\Resources.Designer.cs Properties\Settings.Designer.cs
+IF DEFINED VS110COMNTOOLS "%VS110COMNTOOLS%\vsvars32.bat" & Csc.exe /noconfig /nowarn:1701,1702 /errorreport:prompt /warn:4 /define:TRACE /reference:C:\Windows\Microsoft.NET\Framework\v2.0.50727\System.Data.dll /reference:C:\Windows\Microsoft.NET\Framework\v2.0.50727\System.Deployment.dll /reference:C:\Windows\Microsoft.NET\Framework\v2.0.50727\System.dll /reference:C:\Windows\Microsoft.NET\Framework\v2.0.50727\System.Drawing.dll /reference:C:\Windows\Microsoft.NET\Framework\v2.0.50727\System.Windows.Forms.dll /reference:C:\Windows\Microsoft.NET\Framework\v2.0.50727\System.Xml.dll /reference:%REFDIR%\vJoyInterfaceWrap.dll /debug:pdbonly /filealign:512 /optimize+ /out:%OUTDIR%\WrapperTest.exe  /target:winexe TesterForm.cs TesterForm.Designer.cs Program.cs Properties\AssemblyInfo.cs Properties\Resources.Designer.cs Properties\Settings.Designer.cs
+goto :eof
+
+:chk_wxp_x86
+SET OUTDIR=objchk_wxp_x86\i386
+mkdir %OUTDIR%
+IF DEFINED VS90COMNTOOLS "%VS90COMNTOOLS%\vsvars32.bat" & Csc.exe /noconfig /nowarn:1701,1702 /errorreport:prompt /warn:4 /define:DEBUG;TRACE /reference:C:\Windows\Microsoft.NET\Framework\v2.0.50727\System.Data.dll /reference:C:\Windows\Microsoft.NET\Framework\v2.0.50727\System.Deployment.dll /reference:C:\Windows\Microsoft.NET\Framework\v2.0.50727\System.dll /reference:C:\Windows\Microsoft.NET\Framework\v2.0.50727\System.Drawing.dll /reference:C:\Windows\Microsoft.NET\Framework\v2.0.50727\System.Windows.Forms.dll /reference:C:\Windows\Microsoft.NET\Framework\v2.0.50727\System.Xml.dll /reference:C:\WinDDK\vjoy-2\apps\common\vJoyInterfaceCS\WrapperTest\..\vJoyInterfaceWrap\bin\Debug\vJoyInterfaceWrap.dll /debug+ /debug:full /filealign:512 /optimize- /out:%OUTDIR%\WrapperTest.exe  /target:winexe TesterForm.cs TesterForm.Designer.cs Program.cs Properties\AssemblyInfo.cs Properties\Resources.Designer.cs Properties\Settings.Designer.cs
+IF DEFINED VS110COMNTOOLS "%VS110COMNTOOLS%\vsvars32.bat" & Csc.exe /noconfig /nowarn:1701,1702 /errorreport:prompt /warn:4 /define:DEBUG;TRACE /reference:C:\Windows\Microsoft.NET\Framework\v2.0.50727\System.Data.dll /reference:C:\Windows\Microsoft.NET\Framework\v2.0.50727\System.Deployment.dll /reference:C:\Windows\Microsoft.NET\Framework\v2.0.50727\System.dll /reference:C:\Windows\Microsoft.NET\Framework\v2.0.50727\System.Drawing.dll /reference:C:\Windows\Microsoft.NET\Framework\v2.0.50727\System.Windows.Forms.dll /reference:C:\Windows\Microsoft.NET\Framework\v2.0.50727\System.Xml.dll /reference:C:\WinDDK\vjoy-2\apps\common\vJoyInterfaceCS\WrapperTest\..\vJoyInterfaceWrap\bin\Debug\vJoyInterfaceWrap.dll /debug+ /debug:full /filealign:512 /optimize- /out:%OUTDIR%\WrapperTest.exe  /target:winexe TesterForm.cs TesterForm.Designer.cs Program.cs Properties\AssemblyInfo.cs Properties\Resources.Designer.cs Properties\Settings.Designer.cs
+
+:eof

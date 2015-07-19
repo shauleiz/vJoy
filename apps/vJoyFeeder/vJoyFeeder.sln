@@ -1,0 +1,40 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 2013
+VisualStudioVersion = 12.0.31101.0
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "vJoyFeeder", "vJoyFeeder.vcxproj", "{3A9A3360-5D3F-4ADC-A4D3-4E6AEB9FCF06}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{4D0ADD67-3521-4C09-9CEF-79F747AF3E60}"
+	ProjectSection(SolutionItems) = preProject
+		Performance1.psess = Performance1.psess
+	EndProjectSection
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Debug|Win32 = Debug|Win32
+		Debug|x64 = Debug|x64
+		Release|Any CPU = Release|Any CPU
+		Release|Win32 = Release|Win32
+		Release|x64 = Release|x64
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{3A9A3360-5D3F-4ADC-A4D3-4E6AEB9FCF06}.Debug|Any CPU.ActiveCfg = Debug|x64
+		{3A9A3360-5D3F-4ADC-A4D3-4E6AEB9FCF06}.Debug|Win32.ActiveCfg = Debug|Win32
+		{3A9A3360-5D3F-4ADC-A4D3-4E6AEB9FCF06}.Debug|Win32.Build.0 = Debug|Win32
+		{3A9A3360-5D3F-4ADC-A4D3-4E6AEB9FCF06}.Debug|x64.ActiveCfg = Debug|x64
+		{3A9A3360-5D3F-4ADC-A4D3-4E6AEB9FCF06}.Debug|x64.Build.0 = Debug|x64
+		{3A9A3360-5D3F-4ADC-A4D3-4E6AEB9FCF06}.Release|Any CPU.ActiveCfg = Release|x64
+		{3A9A3360-5D3F-4ADC-A4D3-4E6AEB9FCF06}.Release|Win32.ActiveCfg = Release|Win32
+		{3A9A3360-5D3F-4ADC-A4D3-4E6AEB9FCF06}.Release|Win32.Build.0 = Release|Win32
+		{3A9A3360-5D3F-4ADC-A4D3-4E6AEB9FCF06}.Release|x64.ActiveCfg = Release|x64
+		{3A9A3360-5D3F-4ADC-A4D3-4E6AEB9FCF06}.Release|x64.Build.0 = Release|x64
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(Performance) = preSolution
+		HasPerformanceSessions = true
+	EndGlobalSection
+EndGlobal

@@ -1,0 +1,73 @@
+TARGETNAME=vJoy
+TARGETTYPE=DRIVER
+
+
+KMDF_VERSION_MAJOR=1
+# Support for older versions of KMDF
+KMDF_VERSION=1
+
+
+
+
+TARGETLIBS=$(DDK_LIB_PATH)\hidclass.lib \
+           $(DDK_LIB_PATH)\ntstrsafe.lib
+
+INCLUDES=$(INCLUDES);..\..\inc
+
+
+SOURCES= \
+     driver.c  \
+        hid.c  \
+        usb.c  \
+	rawpdo.c \
+	vjoy.rc \
+	errcodes.mc \
+
+INF_NAME=vjoy
+NTTARGETFILE0=$(OBJ_PATH)\$(O)\$(INF_NAME).inf
+PASS0_BINPLACE=$(NTTARGETFILE0)
+
+SHIM_NAME=hidkmdf
+SHIM_X64=hidkmdf_wlh_amd64.sys
+SHIM_X86=hidkmdf_wxp_x86.sys
+INSTALL_DIR=..\..\install
+SHIM_DIR=..\hidmapper
+WDFCOINST_BASE=WdfCoInstaller
+WUDFUPDATE_BASE=WUDFUpdate_
+NTTARGETFILE2=	\
+		$(INSTALL_DIR)\$(O)\$(INF_NAME).inf \
+		$(INSTALL_DIR)\$(O)\$(TARGETNAME).sys \
+		$(INSTALL_DIR)\$(O)\$(WDFCOINST_BASE).dll \
+		$(INSTALL_DIR)\$(O)\$(WUDFUPDATE_BASE).dll \
+		$(INSTALL_DIR)\$(O)\$(SHIM_NAME).sys
+
+#
+# Comment the below line to disable tracing. All the debug traces
+# will be sent to the kernel-debugger.
+#### ENABLE_EVENT_TRACING=1
+
+C_DEFINES = $(C_DEFINES) -DBUILD_ALT_DIR=\"$(BUILD_ALT_DIR)\"
+
+!IFDEF ENABLE_EVENT_TRACING
+
+C_DEFINES = $(C_DEFINES) -DEVENT_TRACING
+
+#
+# Generate WPP tracing code
+# $(SOURCES)   -- run software preprocessor on files listed in SOURCES
+# -km          -- use kernel mode
+# -func        -- define function we'll use for tracing
+#                 This would map all TraceEvents calls to 
+#                 DoTraceMessage.
+#
+RUN_WPP= $(SOURCES)                             \
+         -km                                    \
+         -func:TraceEvents(LEVEL,FLAGS,MSG,...) \
+         -gen:{km-WdfDefault.tpl}*.tmh       
+!ENDIF
+
+TARGET_DESTINATION=wdf
+
+# Temporarily excuse usage of serviceability impairing macros in code...
+ALLOW_DATE_TIME=1
+

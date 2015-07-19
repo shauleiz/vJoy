@@ -1,0 +1,15 @@
+#include <windows.h>
+#include <ntverp.h>
+
+#undef	VER_PRODUCTVERSION_STR
+
+#define VER_FILETYPE                VFT_DRV
+#define VER_FILESUBTYPE             VFT2_DRV_SYSTEM
+#define VER_FILEDESCRIPTION_STR     "Filter Driver for HID-KMDF Interface"
+#define VER_INTERNALNAME_STR        "HIDKMDF.SYS"
+#define VER_ORIGINALFILENAME_STR    "HIDKMDF.SYS"
+#define VER_PRODUCTVERSION_STR		LVER_PRODUCTVERSION_STR " (" BUILD_ALT_DIR ")"
+
+#include "common.ver"
+
+

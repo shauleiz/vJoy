@@ -1,0 +1,21 @@
+#
+echo "Creating testdll" 
+
+
+
+# Convert source file to UNIX format
+
+dos2unix  testdll.c; 
+
+
+
+# Compile (With debug informatio (-g)  )
+
+g++ -g -c   testdll.c -o testdll.o ;  
+
+
+
+# Link object file with the DLL interface into an executable (testdll.exe)
+
+gcc -o ./objfre_wxp_x86/i386/testdll.exe testdll.o  ./objfre_wxp_x86/i386/vjoyinstall.lib
+gcc -o ./objchk_wxp_x86/i386/testdll.exe testdll.o  ./objchk_wxp_x86/i386/vjoyinstall.lib

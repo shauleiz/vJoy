@@ -1,0 +1,107 @@
+#!/bin/bash
+##################################################################
+#
+# Create GTK+ GUI for vJoy Installer
+# 
+# Should be executed in MinGW 64 bit environment
+#
+# To create 32-bit target - Use GTK+ 2.16 (32-bit)
+# To create 64-bit target - Use GTK+ 2.22 (64-bit)
+#
+# 
+#################################################################
+
+# Syntax:
+#        buildgtk -32|-64
+#
+# 
+#################################################################
+
+# Get Parameters 
+if [ "$1" = "-32" ]; then
+ ARCH="x86"
+ echo "Creating 32-bit (release) install.exe"
+elif [ "$1" = "-64" ]; then
+ ARCH="x64"
+ echo "Creating 64-bit (release) install.exe"
+else
+ echo "Syntax: buildgtk -32|-64"
+ exit
+fi
+
+###  Set internal variables 
+
+# 32-bit
+if [ "$ARCH" = "x86" ]; then
+CC="gcc"
+WINDRES="windres"
+GTK=/c/MinGW/gtk216
+TARGET=./objfre_wxp_x86/i386
+PATH=$GTK/bin:/c/mingw/bin:$PATH
+GTKPKG=$(pkg-config --cflags gtk+-2.0 gmodule-2.0)
+GTKLIBS=$(pkg-config --libs gtk+-2.0 gmodule-2.0)
+MACHINEFLG="-m32 "
+LIBFILE="vjoyinstall.lib"
+SEDFILE=./setup_x86.SED
+fi
+
+# 64-bit
+if [ "$ARCH" = "x64" ]; then
+CC="x86_64-w64-mingw32-gcc"
+DLLTOOL="x86_64-w64-mingw32-dlltool"
+WINDRES="x86_64-w64-mingw32-windres"
+GTK="/c/MinGW_w64/gtk222"
+TARGET=./objfre_wlh_amd64/amd64
+GTKINC=$GTK/include
+GTKLIB=$GTK/lib
+GTKPKG="-mms-bitfields -I$GTKINC/gtk-2.0 -I$GTKINC -I$GTKINC/atk-1.0\
+ -I$GTKINC/cairo -I$GTKINC/pango-1.0 -I$GTKINC/glib-2.0\
+ -I$GTKLIB/glib-2.0/include -I$GTKLIB/gtk-2.0/include -I$GTKINC/gdk-pixbuf-2.0"
+GTKLIBS="-L$GTKLIB -lgtk-win32-2.0 -lgdk-win32-2.0 -latk-1.0 -lgio-2.0\
+ -lgdk_pixbuf-2.0 -lpangowin32-1.0 -lgdi32 -lpangocairo-1.0 -lpango-1.0 -lcairo -lgobject-2.0\
+ -lgthread-2.0 -lgmodule-2.0 -lglib-2.0 -lintl"
+MACHINEFLG=" "
+LIBFILE="tmp.lib"
+SEDFILE=./setup_x64.SED
+fi
+
+# Check that input files exist
+if [ ! -d $TARGET ]; then
+ echo " ERROR: Dirctory $TARGET is missing - run \"BUILD -egcZ\" first"
+ exit
+fi
+
+# Convert source file to UNIX format
+dos2unix  install.c install.h; 
+
+# Compile (With debug information (-g)  )
+echo "*** Compiling"
+$CC $MACHINEFLG -g  -c   install.c  -o $TARGET/install.o      $GTKPKG;  
+# Compile resource file (version, manifest & icon)
+$WINDRES Install.rc -O coff -o $TARGET/install.res
+
+# Link object files with the DLL interface and resources into an executable (install.exe)
+echo "*** linking"
+
+# Create a temporary .LIB file fro DLL
+if [ "$ARCH" = "x64" ]; then
+  if [ ! -f $TARGET/vJoyInstall.dll ]; then
+   echo " ERROR: file $TARGET/vJoyInstall.dll is missing - run \"BUILD -egcZ\" first"
+   exit
+  fi
+  $DLLTOOL -d vJoyInstall.def -D $TARGET/vJoyInstall.dll -l $TARGET/$LIBFILE
+fi
+
+# Link All
+$CC  $MACHINEFLG -g -o $TARGET/install.exe $TARGET/install.o  $TARGET/install.res $TARGET/$LIBFILE -mwindows  $GTKLIBS
+
+############### Debug only #############
+#cp $TARGET/install.exe ./TMP/install.exe
+#exit
+########################################
+
+# Create Package named Setup and mark it as "run as admin"
+iexpress $SEDFILE
+mt.exe   -nologo -manifest Install.exe.manifest -outputresource:$TARGET/setup.exe
+
+exit

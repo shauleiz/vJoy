@@ -1,0 +1,62 @@
+#include <windows.h>
+
+#include <svn_version.h>
+#include <..\..\inc\public.h>
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Version
+//
+#define VERSION_BUILD               SVN_REVISION
+#define FILEDESC_STR1				"Installer for Joy KMDF driver"
+
+#ifdef AMD64
+#define BITNESS_STR					"X64"
+#else
+#define BITNESS_STR					"X32"
+#endif
+
+#ifdef _DEBUG
+#define CONF_STR					"d"
+#else
+#define CONF_STR					""
+#endif
+
+#define FILEDESC_STR				FILEDESC_STR1 " [" BITNESS_STR CONF_STR "]"
+
+VS_VERSION_INFO VERSIONINFO
+FILEVERSION VER_H_, VER_M_, VER_L_, SVN_REVISION
+PRODUCTVERSION 6, 3, 9600, 17298
+FILEFLAGSMASK 0x3fL
+#ifdef _DEBUG
+FILEFLAGS 0x9L
+#else
+FILEFLAGS 0x8L
+#endif
+FILEOS 0x40004L
+FILETYPE 0x1L
+FILESUBTYPE 0x0L
+BEGIN
+BLOCK "StringFileInfo"
+BEGIN
+BLOCK "040904B0"
+BEGIN
+VALUE "CompanyName", VENDOR_STR_ID
+VALUE "FileDescription", FILEDESC_STR
+VALUE "FileVersion", "0.0.0"
+VALUE "InternalName", "vJoyInstall.exe"
+VALUE "LegalCopyright", "© Shaul Eizikovich. All rights reserved."
+VALUE "OriginalFilename", "vJoyInstall.exe"
+VALUE "ProductName", PRODUCT_STR_ID
+VALUE "ProductVersion", SERIALNUMBER_STR
+END
+END
+BLOCK "VarFileInfo"
+BEGIN
+VALUE "Translation", 0x409, 1200
+END
+END
+/////////////////////////////////////////////////////////////////////////////
+
+

@@ -1,0 +1,31 @@
+TARGETNAME=vJoyClient
+TARGETTYPE=PROGRAM
+UMTYPE=console
+UMENTRY=main
+UMBASE=0x400000
+
+_NT_TARGET_VERSION= $(_NT_TARGET_VERSION_WINXP)
+
+INCLUDES=$(INCLUDES);.\;..\..\inc
+
+TARGETLIBS=\
+        $(SDK_LIB_PATH)\advapi32.lib  \
+        $(SDK_LIB_PATH)\kernel32.lib  \
+        $(SDK_LIB_PATH)\ntdll.lib     \
+        $(SDK_LIB_PATH)\ole32.lib     \
+        $(SDK_LIB_PATH)\setupapi.lib  \
+        $(SDK_LIB_PATH)\shell32.lib   \
+        ..\..\lib\$(O)\vJoyInterface.lib \
+        $(SDK_LIB_PATH)\user32.lib
+           
+           
+SOURCES= stdafx.cpp \
+         vJoyClient.cpp \
+
+NTTARGETFILE2=	\
+		.\$O\vJoyInterface.lib \
+		.\$O\vJoyInterface.dll
+
+USE_MSVCRT=1
+         
+_NT_TARGET_VERSION=$(_NT_TARGET_VERSION_WINXP)

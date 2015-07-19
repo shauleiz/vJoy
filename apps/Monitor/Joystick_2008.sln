@@ -1,0 +1,42 @@
+Microsoft Visual Studio Solution File, Format Version 10.00
+# Visual C++ Express 2008
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Joystick", "Joystick_2008.vcproj", "{43E20DBD-F46C-467E-A2D0-73B3708C4B72}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Stub", "..\Stub\Stub.vcproj", "{F848E1DD-0135-4918-9AB7-A3B075E07C89}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Win32 = Debug|Win32
+		Debug|x64 = Debug|x64
+		Profile|Win32 = Profile|Win32
+		Profile|x64 = Profile|x64
+		Release|Win32 = Release|Win32
+		Release|x64 = Release|x64
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{43E20DBD-F46C-467E-A2D0-73B3708C4B72}.Debug|Win32.ActiveCfg = Debug|Win32
+		{43E20DBD-F46C-467E-A2D0-73B3708C4B72}.Debug|Win32.Build.0 = Debug|Win32
+		{43E20DBD-F46C-467E-A2D0-73B3708C4B72}.Debug|x64.ActiveCfg = Debug|x64
+		{43E20DBD-F46C-467E-A2D0-73B3708C4B72}.Debug|x64.Build.0 = Debug|x64
+		{43E20DBD-F46C-467E-A2D0-73B3708C4B72}.Profile|Win32.ActiveCfg = Profile|Win32
+		{43E20DBD-F46C-467E-A2D0-73B3708C4B72}.Profile|Win32.Build.0 = Profile|Win32
+		{43E20DBD-F46C-467E-A2D0-73B3708C4B72}.Profile|x64.ActiveCfg = Profile|x64
+		{43E20DBD-F46C-467E-A2D0-73B3708C4B72}.Profile|x64.Build.0 = Profile|x64
+		{43E20DBD-F46C-467E-A2D0-73B3708C4B72}.Release|Win32.ActiveCfg = Release|Win32
+		{43E20DBD-F46C-467E-A2D0-73B3708C4B72}.Release|Win32.Build.0 = Release|Win32
+		{43E20DBD-F46C-467E-A2D0-73B3708C4B72}.Release|x64.ActiveCfg = Release|x64
+		{43E20DBD-F46C-467E-A2D0-73B3708C4B72}.Release|x64.Build.0 = Release|x64
+		{F848E1DD-0135-4918-9AB7-A3B075E07C89}.Debug|Win32.ActiveCfg = Debug|Win32
+		{F848E1DD-0135-4918-9AB7-A3B075E07C89}.Debug|Win32.Build.0 = Debug|Win32
+		{F848E1DD-0135-4918-9AB7-A3B075E07C89}.Debug|x64.ActiveCfg = Debug|Win32
+		{F848E1DD-0135-4918-9AB7-A3B075E07C89}.Profile|Win32.ActiveCfg = Release|Win32
+		{F848E1DD-0135-4918-9AB7-A3B075E07C89}.Profile|Win32.Build.0 = Release|Win32
+		{F848E1DD-0135-4918-9AB7-A3B075E07C89}.Profile|x64.ActiveCfg = Release|Win32
+		{F848E1DD-0135-4918-9AB7-A3B075E07C89}.Release|Win32.ActiveCfg = Release|Win32
+		{F848E1DD-0135-4918-9AB7-A3B075E07C89}.Release|Win32.Build.0 = Release|Win32
+		{F848E1DD-0135-4918-9AB7-A3B075E07C89}.Release|x64.ActiveCfg = Release|Win32
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

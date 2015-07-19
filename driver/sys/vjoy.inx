@@ -1,0 +1,280 @@
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; 
+;; Installation file for vJoy - Virtual Joystick Driver
+;;
+;; Copyright 2010-2014, Shaul Eizikovich
+;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+
+[Version]
+Signature="$CHICAGO$"
+Class=HIDClass
+ClassGuid={745a17a0-74d3-11d0-b6fe-00a0c90f57da}
+Provider=%VENDOR%
+;LayoutFile=layout.inf
+DriverVer=01/10/2007,1.0.0.0
+CatalogFile = vJoy.cat
+
+
+;   
+;   In order to use IHV drivers, the SourceDisksNames section must list the 
+;   disk(s) containing the drivers and the SourceDisksFiles section must list 
+;   which disk number each file to be copied is found on.
+;   Disk number 99 is used to avoid a conflict with the disk numbers defined 
+;   in layout.inf
+;
+;   Files used in a driver installation need to be digitally signed otherwise 
+;   installation may fail.  See documentation elsewhere in the DDK regarding 
+;   driver signing.
+
+[SourceDisksFiles]
+vjoy.sys = 99
+hidkmdf.sys = 99
+
+[SourceDisksNames]
+99 = %DISK_NAME%,,,""
+
+[DestinationDirs]
+CopySystemSysFiles = 12      
+CopyFunctionDriver = 12      
+;CopyFilterDriver = 12      
+CopyFilesDLL = 11 
+
+[Manufacturer]
+%VENDOR%=Vendor, NT$ARCH$, NT$ARCH$.6.1
+
+
+; For XP and later
+[Vendor.NT$ARCH$]
+%vjoy%    = vjoy.Inst, root\VID_1234&PID_BEAD&REV_0216
+
+; For Win7 and later so that we can use inbox HID-KMDF mapper
+[Vendor.NT$ARCH$.6.1]
+%vjoy%    = vjoy.Inst.Win7, root\VID_1234&PID_BEAD&REV_0216
+
+
+;===============================================================
+;   vJoy for XP thru Vista
+;===============================================================
+[vjoy.Inst.NT]
+CopyFiles = CopySystemSysFiles, CopyFunctionDriver, CopyFilesDLL
+Include = input.inf
+Needs   = HID_Inst.NT
+
+[vjoy.Inst.NT.HW]
+AddReg = vjoy.AddReg 
+
+;
+; hidkmdf is the function driver and vJoy is the lower filter
+;
+[vjoy.Inst.NT.Services]
+AddService = hidkmdf,,hidkmdf_Service_Inst,
+AddService = vjoy,0x00000002, vjoy_Service_Inst, vjoy_EventLog_Inst
+
+[CopyFunctionDriver]
+hidkmdf.sys
+
+[vjoy.AddReg]
+HKR,,"UpperFilters",0x00010000,"hidkmdf"
+HKLM,%WMRW%\OEMForceFeedback,Attributes,1,00,00,00,00,E8,03,00,00,E8,03,00,00
+HKLM,%WMRW%\OEMForceFeedback,CLSID,,"%CLSID_WMRW_FF%"
+HKLM,%WMRW%\OEMForceFeedback,CreatedBy,1,00,08,00,00
+HKLM,%WMRW%\OEMForceFeedback,Attributes,1,00,00,00,00,40,42,0f,00,40,42,0f,00
+
+HKLM,%WMRWFF%\%F_CONST%,,0,%FN_CONST%
+HKLM,%WMRWFF%\%F_CONST%,Attributes,1,26,00,0f,00,01,86,00,00,fd,03,00,00,fd,03,00,00,10,00,00,00
+HKLM,%WMRWFF%\%F_RAMP%,,0,%FN_RAMP%
+HKLM,%WMRWFF%\%F_RAMP%,Attributes,1,27,00,0f,00,02,86,00,00,fd,03,00,00,fd,03,00,00,30,00,00,00
+HKLM,%WMRWFF%\%F_SQUARE%,,0,%FN_SQUARE%
+HKLM,%WMRWFF%\%F_SQUARE%,Attributes,1,30,00,0f,00,03,86,00,00,fd,03,00,00,fd,03,00,00,20,00,00,00
+HKLM,%WMRWFF%\%F_SINE%,,0,%FN_SINE%
+HKLM,%WMRWFF%\%F_SINE%,Attributes,1,31,00,0f,00,03,86,00,00,fd,03,00,00,fd,03,00,00,20,00,00,00
+HKLM,%WMRWFF%\%F_TRI%,,0,%FN_TRI%
+HKLM,%WMRWFF%\%F_TRI%,Attributes,1,32,00,0f,00,03,86,00,00,fd,03,00,00,fd,03,00,00,20,00,00,00
+HKLM,%WMRWFF%\%F_SAWUP%,,0,%FN_SAWUP%
+HKLM,%WMRWFF%\%F_SAWUP%,Attributes,1,33,00,0f,00,03,86,00,00,fd,03,00,00,fd,03,00,00,20,00,00,00
+HKLM,%WMRWFF%\%F_SAWDN%,,0,%FN_SAWDN%
+HKLM,%WMRWFF%\%F_SAWDN%,Attributes,1,34,00,0f,00,03,86,00,00,fd,03,00,00,fd,03,00,00,20,00,00,00
+;HKLM,%WMRWFF%\%F_SPRING%,,0,%FN_SPRING%
+;HKLM,%WMRWFF%\%F_SPRING%,Attributes,1,40,00,0f,00,04,c8,00,00,65,03,00,00,65,03,00,00,20,00,00,00
+HKLM,%WMRWFF%\%F_DAMP%,,0,%FN_DAMP%
+HKLM,%WMRWFF%\%F_DAMP%,Attributes,1,41,00,0f,00,04,c8,00,00,65,03,00,00,65,03,00,00,20,00,00,00
+HKLM,%WMRWFF%\%F_INERT%,,0,%FN_INERT%
+HKLM,%WMRWFF%\%F_INERT%,Attributes,1,42,00,0f,00,04,c8,00,00,65,03,00,00,65,03,00,00,20,00,00,00
+HKLM,%WMRWFF%\%F_FRIC%,,0,%FN_FRIC%
+HKLM,%WMRWFF%\%F_FRIC%,Attributes,1,43,00,0f,00,04,c8,00,00,65,03,00,00,65,03,00,00,20,00,00,00
+HKLM,%WMRWFF%\%F_CUST%,,0,%FN_CUST%
+HKLM,%WMRWFF%\%F_CUST%,Attributes,1,28,00,0f,00,05,c8,00,00,fd,03,00,00,fd,03,00,00,20,00,00,00
+
+
+[hidkmdf_Service_Inst]
+DisplayName    = %hidkmdf.SVCDESC%
+ServiceType    = 1               ; SERVICE_KERNEL_DRIVER
+StartType      = 3               ; SERVICE_DEMAND_START 
+ErrorControl   = 1               ; SERVICE_ERROR_NORMAL
+ServiceBinary  = %12%\hidkmdf.sys
+LoadOrderGroup = PNP Filter
+
+
+;===============================================================
+;   vJoy for Win7
+;   Instead of using hidkmdf.sys as a filter, use the inbox 
+;   mshidkmdf.sys as a mapper filter
+;===============================================================
+[vjoy.Inst.Win7.NT]
+; Just copy the driver. No neeed to copy other system binaries.
+CopyFiles = CopyFunctionDriver
+
+[vjoy.Inst.Win7.NT.HW]
+AddReg = vjoy_Win7_Parameters.AddReg 
+
+;
+; hidkmdf is the function driver and vJoy is the lower filter
+;
+[vjoy.Inst.Win7.NT.Services]
+AddService = vjoy,0x00000002, vjoy_Service_Inst, vjoy_EventLog_Inst
+
+[vjoy_Win7_Parameters.AddReg]
+HKR,,"UpperFilters",0x00010000,"mshidkmdf"
+;HKLM,%WMRW%\OEMForceFeedback,Attributes,1,00,00,00,00,E8,03,00,00,E8,03,00,00
+HKLM,%WMRW%\OEMForceFeedback,CLSID,,"%CLSID_WMRW_FF%"
+HKLM,%WMRW%\OEMForceFeedback,CreatedBy,1,00,08,00,00
+HKLM,%WMRW%\OEMForceFeedback,Attributes,1,00,00,00,00,40,42,0f,00,40,42,0f,00
+
+HKLM,%WMRWFF%\%F_CONST%,,0,%FN_CONST%
+HKLM,%WMRWFF%\%F_CONST%,Attributes,1,26,00,0f,00,01,86,00,00,fd,03,00,00,fd,03,00,00,20,00,00,00
+HKLM,%WMRWFF%\%F_RAMP%,,0,%FN_RAMP%
+HKLM,%WMRWFF%\%F_RAMP%,Attributes,1,27,00,0f,00,02,86,00,00,fd,03,00,00,fd,03,00,00,20,00,00,00
+HKLM,%WMRWFF%\%F_SQUARE%,,0,%FN_SQUARE%
+HKLM,%WMRWFF%\%F_SQUARE%,Attributes,1,30,00,0f,00,03,86,00,00,fd,03,00,00,fd,03,00,00,20,00,00,00
+HKLM,%WMRWFF%\%F_SINE%,,0,%FN_SINE%
+HKLM,%WMRWFF%\%F_SINE%,Attributes,1,31,00,0f,00,03,86,00,00,fd,03,00,00,fd,03,00,00,20,00,00,00
+HKLM,%WMRWFF%\%F_TRI%,,0,%FN_TRI%
+HKLM,%WMRWFF%\%F_TRI%,Attributes,1,32,00,0f,00,03,86,00,00,fd,03,00,00,fd,03,00,00,20,00,00,00
+HKLM,%WMRWFF%\%F_SAWUP%,,0,%FN_SAWUP%
+HKLM,%WMRWFF%\%F_SAWUP%,Attributes,1,33,00,0f,00,03,86,00,00,fd,03,00,00,fd,03,00,00,20,00,00,00
+HKLM,%WMRWFF%\%F_SAWDN%,,0,%FN_SAWDN%
+HKLM,%WMRWFF%\%F_SAWDN%,Attributes,1,34,00,0f,00,03,86,00,00,fd,03,00,00,fd,03,00,00,20,00,00,00
+;HKLM,%WMRWFF%\%F_SPRING%,,0,%FN_SPRING%
+;HKLM,%WMRWFF%\%F_SPRING%,Attributes,1,40,00,0f,00,04,c8,00,00,65,03,00,00,65,03,00,00,20,00,00,00
+HKLM,%WMRWFF%\%F_DAMP%,,0,%FN_DAMP%
+HKLM,%WMRWFF%\%F_DAMP%,Attributes,1,41,00,0f,00,04,c8,00,00,65,03,00,00,65,03,00,00,20,00,00,00
+HKLM,%WMRWFF%\%F_INERT%,,0,%FN_INERT%
+HKLM,%WMRWFF%\%F_INERT%,Attributes,1,42,00,0f,00,04,c8,00,00,65,03,00,00,65,03,00,00,20,00,00,00
+HKLM,%WMRWFF%\%F_FRIC%,,0,%FN_FRIC%
+HKLM,%WMRWFF%\%F_FRIC%,Attributes,1,43,00,0f,00,04,c8,00,00,65,03,00,00,65,03,00,00,20,00,00,00
+HKLM,%WMRWFF%\%F_CUST%,,0,%FN_CUST%
+HKLM,%WMRWFF%\%F_CUST%,Attributes,1,28,00,0f,00,05,c8,00,00,fd,03,00,00,fd,03,00,00,20,00,00,00
+
+;===============================================================
+;   Sections common to all OS versions
+;===============================================================
+
+[CopySystemSysFiles]
+;HidClass.sys,,,0x00000010    ;COPYFLG_NO_OVERWRITE (for win2k)
+;HidParse.sys,,,0x00000010    ;COPYFLG_NO_OVERWRITE (for win2k)
+
+[CopyFunctionDriver]
+vjoy.sys
+
+[CopyFilesDLL]
+;Hid.dll,,,0x00000010    ;COPYFLG_NO_OVERWRITE (for win2k)
+
+[vjoy_EventLog_Inst]
+AddReg                      =vJoyEventLogAddReg
+
+[vJoyEventLogAddReg]
+HKR,,EventMessageFile,0x00020000,"%%SystemRoot%%\System32\IoLogMsg.dll;%%SystemRoot%%\System32\drivers\vjoy.sys"
+HKR,,TypesSupported,0x00010001,7
+
+
+[vjoy_Service_Inst]
+DisplayName    = %vjoy%
+ServiceType    = %SERVICE_KERNEL_DRIVER% 
+StartType      = %SERVICE_DEMAND_START% 
+ErrorControl   = %SERVICE_ERROR_IGNORE% 
+ServiceBinary  = %12%\vjoy.sys  
+
+
+;================================================================
+;--- WDF Coinstaller installation ------
+;
+[DestinationDirs]
+vjoy.Inst_CoInstaller_CopyFiles = 11
+
+[vjoy.Inst.NT.CoInstallers]
+AddReg=vjoy.Inst_CoInstaller_AddReg
+CopyFiles=vjoy.Inst_CoInstaller_CopyFiles
+
+[vjoy.Inst_CoInstaller_AddReg]
+HKR,,CoInstallers32,0x00010000, "WdfCoInstaller$KMDFCOINSTALLERVERSION$.dll,WdfCoInstaller"
+
+[vjoy.Inst_CoInstaller_CopyFiles]
+WdfCoInstaller$KMDFCOINSTALLERVERSION$.dll
+
+[SourceDisksFiles]
+WdfCoInstaller$KMDFCOINSTALLERVERSION$.dll=99 ; make sure the number matches with SourceDisksNames
+
+[vjoy.Inst.NT.Wdf]
+KmdfService = vjoy, vjoy_wdfsect
+[vjoy_wdfsect]
+KmdfLibraryVersion = $KMDFVERSION$
+
+[Strings] 
+;  *******Localizable Strings******* 
+VENDOR         = "Shaul Eizikovich" 
+vjoy       	= "vJoy Device" 
+DISK_NAME      = "vJoy Device Install Disk"
+hidkmdf.SVCDESC= "Filter Driver Service for HID-KMDF Interface layer"
+
+;  *******Non Localizable Strings******* 
+
+SERVICE_BOOT_START     = 0x0 
+SERVICE_SYSTEM_START   = 0x1 
+SERVICE_AUTO_START     = 0x2 
+SERVICE_DEMAND_START   = 0x3 
+SERVICE_DISABLED       = 0x4 
+
+SERVICE_KERNEL_DRIVER  = 0x1 
+SERVICE_ERROR_IGNORE   = 0x0 
+SERVICE_ERROR_NORMAL   = 0x1 
+SERVICE_ERROR_SEVERE   = 0x2 
+SERVICE_ERROR_CRITICAL = 0x3 
+
+REG_EXPAND_SZ          = 0x00020000 
+REG_DWORD              = 0x00010001 
+REG_MULTI_SZ           = 0x00010000
+REG_BINARY             = 0x00000001
+REG_SZ                 = 0x00000000
+
+; FFB
+WMRW   = "System\CurrentControlSet\Control\MediaProperties\PrivateProperties\Joystick\OEM\VID_1234&PID_BEAD"
+WMRWFF = "System\CurrentControlSet\Control\MediaProperties\PrivateProperties\Joystick\OEM\VID_1234&PID_BEAD\OEMForceFeedback\Effects"
+CLSID_WMRW_FF = "{EEC6993A-B3FD-11D2-A916-00C04FB98638}"
+FN_CREATE="CreatedBy"
+FN_ATTRIB="Attributes"
+F_CONST="{13541C20-8E33-11D0-9AD0-00A0C9A06E35}"
+FN_CONST="Constant"
+F_RAMP="{13541C21-8E33-11D0-9AD0-00A0C9A06E35}"
+FN_RAMP="Ramp Force"
+F_SQUARE="{13541C22-8E33-11D0-9AD0-00A0C9A06E35}"
+FN_SQUARE="Square Wave"
+F_SINE="{13541C23-8E33-11D0-9AD0-00A0C9A06E35}"
+FN_SINE="Sine Wave"
+F_TRI="{13541C24-8E33-11D0-9AD0-00A0C9A06E35}"
+FN_TRI="Triangle Wave"
+F_SAWUP="{13541C25-8E33-11D0-9AD0-00A0C9A06E35}"
+FN_SAWUP="Sawtooth Up Wave"
+F_SAWDN="{13541C26-8E33-11D0-9AD0-00A0C9A06E35}"
+FN_SAWDN="Sawtooth Down Wave"
+F_SPRING="{13541C27-8E33-11D0-9AD0-00A0C9A06E35}"
+FN_SPRING="Spring"
+F_DAMP="{13541C28-8E33-11D0-9AD0-00A0C9A06E35}"
+FN_DAMP="Damper"
+F_INERT="{13541C29-8E33-11D0-9AD0-00A0C9A06E35}"
+FN_INERT="Inertia"
+F_FRIC="{13541C2A-8E33-11D0-9AD0-00A0C9A06E35}"
+FN_FRIC="Friction"
+F_CUST="{13541C2B-8E33-11D0-9AD0-00A0C9A06E35}"
+FN_CUST="CustomForce"

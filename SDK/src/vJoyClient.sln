@@ -1,0 +1,32 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 10.00
+# Visual C++ Express 2008
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "vJoyClient", "vJoyClient.vcproj", "{A3C0D9FE-F4A3-45F9-874A-AC2E6806477C}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Win32 = Debug|Win32
+		Debug|x64 = Debug|x64
+		Rel64|Win32 = Rel64|Win32
+		Rel64|x64 = Rel64|x64
+		Release|Win32 = Release|Win32
+		Release|x64 = Release|x64
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{A3C0D9FE-F4A3-45F9-874A-AC2E6806477C}.Debug|Win32.ActiveCfg = Debug|Win32
+		{A3C0D9FE-F4A3-45F9-874A-AC2E6806477C}.Debug|Win32.Build.0 = Debug|Win32
+		{A3C0D9FE-F4A3-45F9-874A-AC2E6806477C}.Debug|x64.ActiveCfg = Debug|x64
+		{A3C0D9FE-F4A3-45F9-874A-AC2E6806477C}.Debug|x64.Build.0 = Debug|x64
+		{A3C0D9FE-F4A3-45F9-874A-AC2E6806477C}.Rel64|Win32.ActiveCfg = Rel64|Win32
+		{A3C0D9FE-F4A3-45F9-874A-AC2E6806477C}.Rel64|Win32.Build.0 = Rel64|Win32
+		{A3C0D9FE-F4A3-45F9-874A-AC2E6806477C}.Rel64|x64.ActiveCfg = Rel64|x64
+		{A3C0D9FE-F4A3-45F9-874A-AC2E6806477C}.Rel64|x64.Build.0 = Rel64|x64
+		{A3C0D9FE-F4A3-45F9-874A-AC2E6806477C}.Release|Win32.ActiveCfg = Release|Win32
+		{A3C0D9FE-F4A3-45F9-874A-AC2E6806477C}.Release|Win32.Build.0 = Release|Win32
+		{A3C0D9FE-F4A3-45F9-874A-AC2E6806477C}.Release|x64.ActiveCfg = Release|x64
+		{A3C0D9FE-F4A3-45F9-874A-AC2E6806477C}.Release|x64.Build.0 = Release|x64
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

@@ -1,0 +1,29 @@
+#include "winuser.h"
+
+1 RT_MANIFEST Install.exe.manifest
+2 ICON "./Install.ico"
+
+1 VERSIONINFO
+FILEVERSION     1,0,0,0
+PRODUCTVERSION  1,0,0,0
+BEGIN
+  BLOCK "StringFileInfo"
+  BEGIN
+    BLOCK "080904E4"
+    BEGIN
+      VALUE "CompanyName", "Shaul Eizikovich"
+      VALUE "FileDescription", "Installer for vJoy KMDF driver"
+      VALUE "FileVersion", "1.0"
+      VALUE "InternalName", "install"
+      VALUE "LegalCopyright",  L"\251 Shaul Eizikovich. All rights reserved."
+      VALUE "OriginalFilename", "install.exe"
+      VALUE "ProductName", "vJoy"
+      VALUE "ProductVersion", "1.0"
+    END
+  END
+
+  BLOCK "VarFileInfo"
+  BEGIN
+    VALUE "Translation", 0x809, 1252
+  END
+END

@@ -1,0 +1,538 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Text;
+using System.Runtime.InteropServices;
+
+public enum HID_USAGES
+{
+    HID_USAGE_X = 0x30,
+    HID_USAGE_Y = 0x31,
+    HID_USAGE_Z = 0x32,
+    HID_USAGE_RX = 0x33,
+    HID_USAGE_RY = 0x34,
+    HID_USAGE_RZ = 0x35,
+    HID_USAGE_SL0 = 0x36,
+    HID_USAGE_SL1 = 0x37,
+    HID_USAGE_WHL = 0x38,
+    HID_USAGE_POV = 0x39,
+}
+
+public enum VjdStat  /* Declares an enumeration data type called BOOLEAN */
+{
+    VJD_STAT_OWN,	// The  vJoy Device is owned by this application.
+    VJD_STAT_FREE,	// The  vJoy Device is NOT owned by any application (including this one).
+    VJD_STAT_BUSY,	// The  vJoy Device is owned by another application. It cannot be acquired by this application.
+    VJD_STAT_MISS,	// The  vJoy Device is missing. It either does not exist or the driver is down.
+    VJD_STAT_UNKN	// Unknown
+}; 
+
+
+// FFB Declarations
+
+// HID Descriptor definitions - FFB Report IDs
+
+public enum FFBPType // FFB Packet Type
+{
+	// Write
+	PT_EFFREP	=  0x01,	// Usage Set Effect Report
+	PT_ENVREP	=  0x02,	// Usage Set Envelope Report
+	PT_CONDREP	=  0x03,	// Usage Set Condition Report
+	PT_PRIDREP	=  0x04,	// Usage Set Periodic Report
+	PT_CONSTREP	=  0x05,	// Usage Set Constant Force Report
+	PT_RAMPREP	=  0x06,	// Usage Set Ramp Force Report
+	PT_CSTMREP	=  0x07,	// Usage Custom Force Data Report
+	PT_SMPLREP	=  0x08,	// Usage Download Force Sample
+	PT_EFOPREP	=  0x0A,	// Usage Effect Operation Report
+	PT_BLKFRREP	=  0x0B,	// Usage PID Block Free Report
+	PT_CTRLREP	=  0x0C,	// Usage PID Device Control
+	PT_GAINREP	=  0x0D,	// Usage Device Gain Report
+	PT_SETCREP	=  0x0E,	// Usage Set Custom Force Report
+
+	// Feature
+	PT_NEWEFREP	=  0x01+0x10,	// Usage Create New Effect Report
+	PT_BLKLDREP	=  0x02+0x10,	// Usage Block Load Report
+	PT_POOLREP	=  0x03+0x10,	// Usage PID Pool Report
+};
+
+public enum FFBEType // FFB Effect Type
+{
+
+	// Effect Type
+	ET_NONE		=	0,	  //    No Force
+	ET_CONST	=	1,    //    Constant Force
+	ET_RAMP		=	2,    //    Ramp
+	ET_SQR		=	3,    //    Square
+	ET_SINE		=	4,    //    Sine
+	ET_TRNGL	=	5,    //    Triangle
+	ET_STUP		=	6,    //    Sawtooth Up
+	ET_STDN		=	7,    //    Sawtooth Down
+	ET_SPRNG	=	8,    //    Spring
+	ET_DMPR		=	9,    //    Damper
+	ET_INRT		=	10,   //    Inertia
+	ET_FRCTN	=	11,   //    Friction
+	ET_CSTM		=	12,   //    Custom Force Data
+};
+
+public enum FFB_CTRL
+{
+    CTRL_ENACT = 1,	// Enable all device actuators.
+    CTRL_DISACT = 2,	// Disable all the device actuators.
+    CTRL_STOPALL = 3,	// Stop All Effects­ Issues a stop on every running effect.
+    CTRL_DEVRST = 4,	// Device Reset– Clears any device paused condition, enables all actuators and clears all effects from memory.
+    CTRL_DEVPAUSE = 5,	// Device Pause– The all effects on the device are paused at the current time step.
+    CTRL_DEVCONT = 6,	// Device Continue– The all effects that running when the device was paused are restarted from their last time step.
+};
+
+public enum FFBOP
+{
+    EFF_START = 1, // EFFECT START
+    EFF_SOLO = 2, // EFFECT SOLO START
+    EFF_STOP = 3, // EFFECT STOP
+};
+
+namespace vJoyInterfaceWrap
+{
+    public class vJoy
+    {
+
+        /***************************************************/
+        /*********** Various declarations ******************/
+        /***************************************************/
+        private static RemovalCbFunc UserRemCB;
+        private static WrapRemovalCbFunc wrf;
+        private static GCHandle hRemUserData;
+
+
+        private static FfbCbFunc UserFfbCB;
+        private static WrapFfbCbFunc wf;
+        private static GCHandle hFfbUserData;
+
+        [StructLayout(LayoutKind.Sequential)] public struct JoystickState
+        {
+            public byte bDevice;
+            public Int32 Throttle;
+            public Int32 Rudder;
+            public Int32 Aileron;
+            public Int32 AxisX;
+            public Int32 AxisY;
+            public Int32 AxisZ;
+            public Int32 AxisXRot;
+            public Int32 AxisYRot;
+            public Int32 AxisZRot;
+            public Int32 Slider;
+            public Int32 Dial;
+            public Int32 Wheel;
+            public Int32 AxisVX;
+            public Int32 AxisVY;
+            public Int32 AxisVZ;
+            public Int32 AxisVBRX;
+            public Int32 AxisVBRY;
+            public Int32 AxisVBRZ;
+            public UInt32 Buttons;
+            public UInt32 bHats;	// Lower 4 bits: HAT switch or 16-bit of continuous HAT switch
+            public UInt32 bHatsEx1;	// Lower 4 bits: HAT switch or 16-bit of continuous HAT switch
+            public UInt32 bHatsEx2;	// Lower 4 bits: HAT switch or 16-bit of continuous HAT switch
+            public UInt32 bHatsEx3;	// Lower 4 bits: HAT switch or 16-bit of continuous HAT switch
+            public UInt32 ButtonsEx1;
+            public UInt32 ButtonsEx2;
+            public UInt32 ButtonsEx3;
+        };
+
+        [StructLayout(LayoutKind.Sequential)] private struct FFB_DATA
+        {
+            private UInt32 size;
+            private UInt32 cmd;
+            private IntPtr data;
+        }
+
+        [StructLayout(LayoutKind.Explicit)]
+        public struct FFB_EFF_CONST
+        {
+            [FieldOffset(0)]
+            public Byte EffectBlockIndex;
+            [FieldOffset(4)]
+            public FFBEType EffectType;
+            [FieldOffset(8)]
+            public UInt16 Duration;// Value in milliseconds. 0xFFFF means infinite
+            [FieldOffset(10)]
+            public UInt16 TrigerRpt;
+            [FieldOffset(12)]
+            public UInt16 SamplePrd;
+            [FieldOffset(14)]
+            public Byte Gain;
+            [FieldOffset(15)]
+            public Byte TrigerBtn;
+            [FieldOffset(16)]
+            public bool Polar; // How to interpret force direction Polar (0-360°) or Cartesian (X,Y)
+            [FieldOffset(20)]
+            public Byte Direction; // Polar direction: (0x00-0xFF correspond to 0-360°)
+            [FieldOffset(20)]
+            public Byte DirX; // X direction: Positive values are To the right of the center (X); Negative are Two's complement
+            [FieldOffset(21)]
+            public Byte DirY; // Y direction: Positive values are below the center (Y); Negative are Two's complement
+        }
+
+        [StructLayout(LayoutKind.Explicit)]
+        public struct FFB_EFF_OP
+        {
+            [FieldOffset(0)]
+            public Byte EffectBlockIndex;
+            [FieldOffset(4)]
+            public FFBOP EffectOp;
+            [FieldOffset(8)]
+            public Byte LoopCount;
+        }
+
+        [StructLayout(LayoutKind.Explicit)]
+        public struct FFB_EFF_COND
+        {
+            [FieldOffset(0)]
+            public Byte EffectBlockIndex;
+            [FieldOffset(4)]
+            public bool isY;
+            [FieldOffset(8)]
+            public Byte CenterPointOffset; // CP Offset: Range 0x80­0x7F (­10000 ­ 10000)
+            [FieldOffset(9)]
+            public Byte PosCoeff; // Positive Coefficient: Range 0x80­0x7F (­10000 ­ 10000)
+            [FieldOffset(10)]
+            public Byte NegCoeff; // Negative Coefficient: Range 0x80­0x7F (­10000 ­ 10000)
+            [FieldOffset(11)]
+            public Byte PosSatur; // Positive Saturation: Range 0x00­0xFF (0 – 10000)
+            [FieldOffset(12)]
+            public Byte NegSatur; // Negative Saturation: Range 0x00­0xFF (0 – 10000)
+            [FieldOffset(13)]
+            public Byte DeadBand; // Dead Band: : Range 0x00­0xFF (0 – 10000)
+        } 
+
+        [StructLayout(LayoutKind.Explicit)]
+        public struct FFB_EFF_ENVLP
+        {
+            [FieldOffset(0)]
+            public Byte EffectBlockIndex;
+            [FieldOffset(1)]
+            public Byte AttackLevel;
+            [FieldOffset(2)]
+            public Byte FadeLevel;
+            [FieldOffset(4)]
+            public UInt16 AttackTime;
+            [FieldOffset(6)]
+            public UInt16 FadeTime;
+        }
+
+        [StructLayout(LayoutKind.Explicit)]
+        public struct FFB_EFF_PERIOD
+        {
+            [FieldOffset(0)]
+            public Byte EffectBlockIndex;
+            [FieldOffset(1)]
+            public Byte Magnitude;
+            [FieldOffset(2)]
+            public Byte Offset;
+            [FieldOffset(3)]
+            public Byte Phase;
+            [FieldOffset(4)]
+            public UInt16 Period;
+        }
+
+        [StructLayout(LayoutKind.Sequential)]
+        public struct FFB_EFF_RAMP
+        {
+            public Byte EffectBlockIndex;
+            public Byte Start;             // The Normalized magnitude at the start of the effect
+            public Byte End;               // The Normalized magnitude at the end of the effect
+        }
+
+
+        /***************************************************/
+        /***** Import from file vJoyInterface.dll (C) ******/
+        /***************************************************/
+
+        /////	General driver data
+        [DllImport("vJoyInterface.dll", EntryPoint = "GetvJoyVersion")]
+        private static extern short _GetvJoyVersion();
+
+        [DllImport("vJoyInterface.dll", EntryPoint = "vJoyEnabled")]
+        private static extern bool _vJoyEnabled();
+
+        [DllImport("vJoyInterface.dll", EntryPoint = "GetvJoyProductString")]
+        private static extern IntPtr _GetvJoyProductString();
+
+        [DllImport("vJoyInterface.dll", EntryPoint = "GetvJoyManufacturerString")]
+        private static extern IntPtr _GetvJoyManufacturerString();
+
+        [DllImport("vJoyInterface.dll", EntryPoint = "GetvJoySerialNumberString")]
+        private static extern IntPtr _GetvJoySerialNumberString();
+
+        [DllImport("vJoyInterface.dll", EntryPoint = "DriverMatch")]
+        private static extern bool _DriverMatch(ref UInt32 DllVer, ref UInt32 DrvVer);
+
+        /////	vJoy Device properties
+        [DllImport("vJoyInterface.dll", EntryPoint = "GetVJDButtonNumber")]
+        private static extern int _GetVJDButtonNumber(UInt32 rID);
+
+        [DllImport("vJoyInterface.dll", EntryPoint = "GetVJDDiscPovNumber")]
+        private static extern int _GetVJDDiscPovNumber(UInt32 rID);
+
+        [DllImport("vJoyInterface.dll", EntryPoint = "GetVJDContPovNumber")]
+        private static extern int _GetVJDContPovNumber(UInt32 rID);
+
+        [DllImport("vJoyInterface.dll", EntryPoint = "GetVJDAxisExist")]
+        private static extern bool _GetVJDAxisExist(UInt32 rID, UInt32 Axis);
+
+        [DllImport("vJoyInterface.dll", EntryPoint = "GetVJDAxisMax")]
+        private static extern bool _GetVJDAxisMax(UInt32 rID, UInt32 Axis, ref long Max);
+
+        [DllImport("vJoyInterface.dll", EntryPoint = "GetVJDAxisMin")]
+        private static extern bool _GetVJDAxisMin(UInt32 rID, UInt32 Axis, ref long Min);
+
+
+        /////	Write access to vJoy Device - Basic
+        [DllImport("vJoyInterface.dll", EntryPoint = "AcquireVJD")]
+        private static extern bool _AcquireVJD(UInt32 rID);
+
+        [DllImport("vJoyInterface.dll", EntryPoint = "RelinquishVJD")]
+        private static extern void _RelinquishVJD(UInt32 rID);
+
+        [DllImport("vJoyInterface.dll", EntryPoint = "UpdateVJD")]
+        private static extern bool _UpdateVJD(UInt32 rID, ref JoystickState pData);
+
+        [DllImport("vJoyInterface.dll", EntryPoint = "GetVJDStatus")]
+        private static extern int _GetVJDStatus(UInt32 rID);
+
+
+        //// Reset functions
+        [DllImport("vJoyInterface.dll", EntryPoint = "ResetVJD")]
+        private static extern bool _ResetVJD(UInt32 rID);
+
+        [DllImport("vJoyInterface.dll", EntryPoint = "ResetAll")]
+        private static extern bool _ResetAll();
+
+        [DllImport("vJoyInterface.dll", EntryPoint = "ResetButtons")]
+        private static extern bool _ResetButtons(UInt32 rID);
+
+        [DllImport("vJoyInterface.dll", EntryPoint = "ResetPovs")]
+        private static extern bool _ResetPovs(UInt32 rID);
+
+        ////// Write data
+        [DllImport("vJoyInterface.dll", EntryPoint = "SetAxis")]
+        private static extern bool _SetAxis(Int32 Value, UInt32 rID, HID_USAGES Axis);
+
+        [DllImport("vJoyInterface.dll", EntryPoint = "SetBtn")]
+        private static extern bool _SetBtn(bool Value, UInt32 rID, char nBtn);
+
+        [DllImport("vJoyInterface.dll", EntryPoint = "SetDiscPov")]
+        private static extern bool _SetDiscPov(Int32 Value, UInt32 rID, uint nPov);
+
+        [DllImport("vJoyInterface.dll", EntryPoint = "SetContPov")]
+        private static extern bool _SetContPov(Int32 Value, UInt32 rID, uint nPov);
+
+        [DllImport("vJoyInterface.dll", EntryPoint = "RegisterRemovalCB", CallingConvention = CallingConvention.Cdecl)]
+        private extern static void _RegisterRemovalCB(WrapRemovalCbFunc cb, IntPtr data);
+
+        public delegate void RemovalCbFunc(bool complete, bool First, object userData);
+        public delegate void WrapRemovalCbFunc(bool complete, bool First, IntPtr userData);
+
+        public static void WrapperRemCB(bool complete, bool First, IntPtr userData)
+        {
+
+            object obj = null;
+
+            if (userData != IntPtr.Zero)
+            {
+                // Convert userData from pointer to object
+                GCHandle handle2 = (GCHandle)userData;
+                obj = handle2.Target as object;
+            }
+
+            // Call user-defined CB function
+            UserRemCB(complete,  First, obj);
+        }
+
+        // Force Feedback (FFB)
+        [DllImport("vJoyInterface.dll", EntryPoint = "FfbRegisterGenCB", CallingConvention = CallingConvention.Cdecl)]
+        private extern static void _FfbRegisterGenCB(WrapFfbCbFunc cb, IntPtr data);
+
+        public delegate void FfbCbFunc(IntPtr data,  object userData);
+        public delegate  void WrapFfbCbFunc(IntPtr data, IntPtr userData);
+
+        public static void  WrapperFfbCB(IntPtr data, IntPtr userData)
+        {
+
+            object obj = null;
+
+            if (userData != IntPtr.Zero)
+            {
+                // Convert userData from pointer to object
+                GCHandle handle2 = (GCHandle)userData;
+                obj = handle2.Target as object;
+            }
+
+            // Call user-defined CB function
+            UserFfbCB(data, obj);
+        }
+        
+        [DllImport("vJoyInterface.dll", EntryPoint = "FfbStart")]
+        private static extern bool _FfbStart(UInt32 rID);
+
+        [DllImport("vJoyInterface.dll", EntryPoint = "FfbStop")]
+        private static extern bool _FfbStop(UInt32 rID);
+
+        [DllImport("vJoyInterface.dll", EntryPoint = "Ffb_h_DeviceID")]
+        private static extern UInt32 _Ffb_h_DeviceID(IntPtr Packet, ref int DeviceID);
+
+        [DllImport("vJoyInterface.dll", EntryPoint = "Ffb_h_Type")]
+        private static extern UInt32 _Ffb_h_Type(IntPtr Packet, ref FFBPType Type);
+
+        [DllImport("vJoyInterface.dll", EntryPoint = "Ffb_h_Packet")]
+        private static extern UInt32 _Ffb_h_Packet(IntPtr Packet, ref UInt32 Type, ref Int32 DataSize, ref IntPtr Data);
+
+
+        [DllImport("vJoyInterface.dll", EntryPoint = "Ffb_h_EBI")]
+        private static extern UInt32 _Ffb_h_EBI(IntPtr Packet, ref Int32 Index);
+
+        [DllImport("vJoyInterface.dll", EntryPoint = "Ffb_h_Eff_Const")]
+        private static extern UInt32 _Ffb_h_Eff_Const(IntPtr Packet, ref FFB_EFF_CONST Effect);
+
+        [DllImport("vJoyInterface.dll", EntryPoint = "Ffb_h_DevCtrl")]
+        private static extern UInt32 _Ffb_h_DevCtrl(IntPtr Packet, ref FFB_CTRL Control);
+
+        [DllImport("vJoyInterface.dll", EntryPoint = "Ffb_h_EffOp")]
+        private static extern UInt32 _Ffb_h_EffOp(IntPtr Packet, ref FFB_EFF_OP Operation);
+
+        [DllImport("vJoyInterface.dll", EntryPoint = "Ffb_h_DevGain")]
+        private static extern UInt32 _Ffb_h_DevGain(IntPtr Packet, ref Byte Gain);
+
+        [DllImport("vJoyInterface.dll", EntryPoint = "Ffb_h_Eff_Cond")]
+        private static extern UInt32 _Ffb_h_Eff_Cond(IntPtr Packet, ref FFB_EFF_COND Condition);
+
+        [DllImport("vJoyInterface.dll", EntryPoint = "Ffb_h_Eff_Envlp")]
+        private static extern UInt32 _Ffb_h_Eff_Envlp(IntPtr Packet, ref FFB_EFF_ENVLP Envelope);
+
+        [DllImport("vJoyInterface.dll", EntryPoint = "Ffb_h_Eff_Period")]
+        private static extern UInt32 _Ffb_h_Eff_Period(IntPtr Packet, ref FFB_EFF_PERIOD Effect);
+
+        [DllImport("vJoyInterface.dll", EntryPoint = "Ffb_h_EffNew")]
+        private static extern UInt32 _Ffb_h_EffNew(IntPtr Packet, ref FFBEType Effect);
+
+         [DllImport("vJoyInterface.dll", EntryPoint = "Ffb_h_Eff_Ramp")]
+        private static extern UInt32 _Ffb_h_Eff_Ramp(IntPtr Packet, ref FFB_EFF_RAMP RampEffect);
+
+
+        /***************************************************/
+        /********** Export functions (C#) ******************/
+        /***************************************************/
+
+        /////	General driver data
+        public short GetvJoyVersion() { return _GetvJoyVersion(); }
+        public bool vJoyEnabled() { return _vJoyEnabled(); }
+        public string GetvJoyProductString() { return Marshal.PtrToStringAuto(_GetvJoyProductString()); }
+        public string GetvJoyManufacturerString() { return Marshal.PtrToStringAuto(_GetvJoyManufacturerString()); }
+        public string GetvJoySerialNumberString() { return Marshal.PtrToStringAuto(_GetvJoySerialNumberString()); }
+        public bool DriverMatch(ref UInt32 DllVer, ref UInt32 DrvVer) { return _DriverMatch(ref DllVer, ref DrvVer); }
+
+        /////	vJoy Device properties
+        public int GetVJDButtonNumber(uint rID) { return _GetVJDButtonNumber(rID); }
+        public int GetVJDDiscPovNumber(uint rID) { return _GetVJDDiscPovNumber(rID); }
+        public int GetVJDContPovNumber(uint rID) { return _GetVJDContPovNumber(rID); }
+        public bool GetVJDAxisExist(UInt32 rID, HID_USAGES Axis) { return _GetVJDAxisExist(rID, (uint)Axis); }
+        public bool GetVJDAxisMax(UInt32 rID, HID_USAGES Axis, ref long Max) { return _GetVJDAxisMax(rID, (uint)Axis, ref Max); }
+        public bool GetVJDAxisMin(UInt32 rID, HID_USAGES Axis, ref long Min) { return _GetVJDAxisMin(rID, (uint)Axis, ref Min); }
+
+        /////	Write access to vJoy Device - Basic
+        public bool AcquireVJD(UInt32 rID) { return _AcquireVJD(rID); }
+        public void RelinquishVJD(uint rID) {  _RelinquishVJD(rID); }
+        public bool UpdateVJD(UInt32 rID, ref JoystickState pData) {return _UpdateVJD( rID, ref pData);}
+        public VjdStat GetVJDStatus(UInt32 rID) { return (VjdStat)_GetVJDStatus(rID); }
+
+        //// Reset functions
+        public bool ResetVJD(UInt32 rID){return _ResetVJD(rID);}
+        public bool ResetAll(){return _ResetAll();}
+        public bool ResetButtons(UInt32 rID){return _ResetButtons(rID);}
+        public bool ResetPovs(UInt32 rID) { return _ResetPovs(rID); }
+
+        ////// Write data
+        public bool SetAxis(Int32 Value, UInt32 rID, HID_USAGES Axis) { return _SetAxis(Value, rID, Axis); }
+        public bool SetBtn(bool Value, UInt32 rID, uint nBtn) { return _SetBtn( Value, rID, (char)nBtn); }
+        public bool SetDiscPov(Int32 Value, UInt32 rID, uint nPov) { return _SetDiscPov(Value, rID, nPov); }
+        public bool SetContPov(Int32 Value, UInt32 rID, uint nPov) { return _SetContPov(Value, rID, nPov); }
+        
+        // Register CB function that takes a C# object as userdata
+        public void RegisterRemovalCB(RemovalCbFunc cb, object data)
+        {
+            // Free existing GCHandle (if exists)
+            if (hRemUserData.IsAllocated && hRemUserData.Target != null)
+                hRemUserData.Free();
+
+            // Convert object to pointer
+            hRemUserData = GCHandle.Alloc(data);
+
+            // Apply the user-defined CB function          
+            UserRemCB = new RemovalCbFunc(cb);
+            wrf = new WrapRemovalCbFunc(WrapperRemCB);
+
+            _RegisterRemovalCB(wrf, (IntPtr)hRemUserData);
+        }
+
+        // Register CB function that takes a pointer as userdata
+        public void RegisterRemovalCB(WrapRemovalCbFunc cb, IntPtr data)
+        {
+            wrf = new WrapRemovalCbFunc(cb);
+            _RegisterRemovalCB(wrf, data);
+        }
+
+
+        /////////////////////////////////////////////////////////////////////////////////////////////
+        //// Force Feedback (FFB)
+
+        // Register CB function that takes a C# object as userdata
+        public void FfbRegisterGenCB(FfbCbFunc cb, object data)
+        {
+            // Free existing GCHandle (if exists)
+            if (hFfbUserData.IsAllocated && hFfbUserData.Target != null)
+                hFfbUserData.Free();
+
+            // Convert object to pointer
+            hFfbUserData = GCHandle.Alloc(data);
+
+            // Apply the user-defined CB function          
+            UserFfbCB = new FfbCbFunc(cb);
+            wf = new WrapFfbCbFunc(WrapperFfbCB);
+
+            _FfbRegisterGenCB(wf, (IntPtr)hFfbUserData);
+        }
+
+        // Register CB function that takes a pointer as userdata
+        public void FfbRegisterGenCB(WrapFfbCbFunc cb, IntPtr data)
+        {
+            wf = new WrapFfbCbFunc(cb);
+            _FfbRegisterGenCB(wf, data);
+        }
+
+        public bool FfbStart(UInt32 rID) { return _FfbStart(rID); }
+        public bool FfbStop(UInt32 rID) { return _FfbStop(rID); }
+        public UInt32 Ffb_h_DeviceID(IntPtr  Packet, ref int DeviceID) {return _Ffb_h_DeviceID(Packet, ref DeviceID);}
+        public UInt32 Ffb_h_Type(IntPtr Packet, ref FFBPType Type) { return _Ffb_h_Type(Packet, ref  Type); }
+        public UInt32 Ffb_h_Packet(IntPtr Packet, ref UInt32 Type, ref Int32 DataSize, ref Byte[] Data) 
+        {
+            IntPtr buf = IntPtr.Zero;
+            UInt32 res = _Ffb_h_Packet(Packet, ref  Type, ref  DataSize, ref buf);
+            if (res != 0)
+                return res;
+
+            DataSize -= 8;
+            Data = new byte[DataSize];
+            Marshal.Copy(buf, Data, 0, DataSize);
+            return res;
+        }
+        public UInt32 Ffb_h_EBI(IntPtr Packet, ref Int32 Index) { return _Ffb_h_EBI( Packet, ref  Index);}
+        public UInt32 Ffb_h_Eff_Const(IntPtr Packet, ref FFB_EFF_CONST Effect) {return _Ffb_h_Eff_Const( Packet, ref  Effect);}
+        public UInt32 Ffb_h_DevCtrl(IntPtr Packet, ref FFB_CTRL Control) { return _Ffb_h_DevCtrl( Packet, ref  Control); }
+        public UInt32 Ffb_h_EffOp(IntPtr Packet, ref FFB_EFF_OP Operation) { return _Ffb_h_EffOp( Packet, ref  Operation);}
+        public UInt32 Ffb_h_DevGain(IntPtr Packet, ref Byte Gain) { return _Ffb_h_DevGain( Packet, ref  Gain);}
+        public UInt32 Ffb_h_Eff_Cond(IntPtr Packet, ref FFB_EFF_COND Condition) { return _Ffb_h_Eff_Cond( Packet, ref  Condition); }
+        public UInt32 Ffb_h_Eff_Envlp(IntPtr Packet, ref FFB_EFF_ENVLP Envelope) { return _Ffb_h_Eff_Envlp( Packet, ref  Envelope); }
+        public UInt32 Ffb_h_Eff_Period(IntPtr Packet, ref FFB_EFF_PERIOD Effect) { return _Ffb_h_Eff_Period( Packet, ref  Effect); }
+        public UInt32 Ffb_h_EffNew(IntPtr Packet, ref FFBEType Effect) { return _Ffb_h_EffNew( Packet, ref  Effect); }
+        public UInt32 Ffb_h_Eff_Ramp(IntPtr Packet, ref FFB_EFF_RAMP RampEffect) { return _Ffb_h_Eff_Ramp( Packet, ref  RampEffect);}
+    }
+}

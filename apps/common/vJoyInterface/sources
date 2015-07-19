@@ -1,0 +1,25 @@
+TARGETNAME=vJoyInterface
+TARGETTYPE=NOTARGET
+UMTYPE=console
+UMBASE=0x400000
+UMENTRY=DllMain
+
+C_DEFINES= NO_LINK NO_COMPILE
+           
+NTTARGETFILE0=	\
+		$(OBJ_PATH)\$O\$(TARGETNAME).dll \
+		
+SOURCES=\
+
+INCLUDES=\
+		..\..\..\inc
+
+LIB_DIR=\
+		..\..\..\lib
+
+NTTARGETFILE2=	\
+		$(INCLUDES)\$(TARGETNAME).h \
+		$(LIB_DIR)\$(O)\$(TARGETNAME).dll \
+		$(LIB_DIR)\$(O)\$(TARGETNAME).lib \
+
+
