@@ -145,6 +145,7 @@ namespace vJoyInterfaceWrap
             private IntPtr data;
         }
 
+        [System.Obsolete("use FFB_EFF_REPORT")]
         [StructLayout(LayoutKind.Explicit)]
         public struct FFB_EFF_CONST
         {
@@ -416,8 +417,10 @@ namespace vJoyInterfaceWrap
         [DllImport("vJoyInterface.dll", EntryPoint = "Ffb_h_EBI")]
         private static extern UInt32 _Ffb_h_EBI(IntPtr Packet, ref Int32 Index);
 
+#pragma warning disable 618
         [DllImport("vJoyInterface.dll", EntryPoint = "Ffb_h_Eff_Const")]
         private static extern UInt32 _Ffb_h_Eff_Const(IntPtr Packet, ref FFB_EFF_CONST Effect);
+#pragma warning restore 618
 
         [DllImport("vJoyInterface.dll", EntryPoint = "Ffb_h_Eff_Report")]
         private static extern UInt32 _Ffb_h_Eff_Report(IntPtr Packet, ref FFB_EFF_REPORT Effect);
@@ -554,6 +557,7 @@ namespace vJoyInterfaceWrap
             return res;
         }
         public UInt32 Ffb_h_EBI(IntPtr Packet, ref Int32 Index) { return _Ffb_h_EBI( Packet, ref  Index);}
+        [Obsolete("use Ffb_h_Eff_Report instead")]
         public UInt32 Ffb_h_Eff_Const(IntPtr Packet, ref FFB_EFF_CONST Effect) { return _Ffb_h_Eff_Const(Packet, ref  Effect); }
         public UInt32 Ffb_h_Eff_Report(IntPtr Packet, ref FFB_EFF_REPORT Effect) { return _Ffb_h_Eff_Report(Packet, ref  Effect); }
         public UInt32 Ffb_h_DevCtrl(IntPtr Packet, ref FFB_CTRL Control) { return _Ffb_h_DevCtrl(Packet, ref  Control); }

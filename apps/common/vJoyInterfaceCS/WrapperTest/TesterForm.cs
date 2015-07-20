@@ -352,8 +352,8 @@ namespace WrapperTest
 
             #region Effect Report
             // Effect Report
-            vJoy.FFB_EFF_CONST Effect = new vJoy.FFB_EFF_CONST();
-            result = joystick.Ffb_h_Eff_Const(data, ref Effect);
+            vJoy.FFB_EFF_REPORT Effect = new vJoy.FFB_EFF_REPORT();
+            result = joystick.Ffb_h_Eff_Report(data, ref Effect);
             if (result == 0)
             {
                 ///// This is an Effect Block
@@ -531,8 +531,8 @@ namespace WrapperTest
 
             #region Effect Report
             // Effect Report
-            vJoy.FFB_EFF_CONST Effect = new vJoy.FFB_EFF_CONST();
-            result = joystick.Ffb_h_Eff_Const(data, ref Effect);
+            vJoy.FFB_EFF_REPORT Effect = new vJoy.FFB_EFF_REPORT();
+            result = joystick.Ffb_h_Eff_Report(data, ref Effect);
             if (result == 0)
             {
                 ///// This is an Effect Block
