@@ -486,6 +486,15 @@ namespace WrapperTest
             };
             #endregion
 
+            #region Constant Effect
+            vJoy.FFB_EFF_CONSTANT ConstantEffect = new vJoy.FFB_EFF_CONSTANT();
+            if (0 == joystick.Ffb_h_Eff_Constant(data, ref ConstantEffect))
+            {
+                dlg.FfbTextBox_Write(String.Format("\r\n >> Constant Magnitude: {0}", ConstantEffect.Magnitude));
+            };
+
+            #endregion
+
             dlg.FfbTextBox_Write(String.Format("\r\n ==============================================\r\n"));
 
         }
@@ -665,6 +674,14 @@ namespace WrapperTest
             };
             #endregion
 
+            #region Constant Effect
+            vJoy.FFB_EFF_CONSTANT ConstantEffect = new vJoy.FFB_EFF_CONSTANT();
+            if (0 == joystick.Ffb_h_Eff_Constant(data, ref ConstantEffect))
+            {
+                dlg.FfbTextBox_Write(String.Format("\r\n >> Constant Magnitude: {0}", ConstantEffect.Magnitude));
+            };
+
+            #endregion
             dlg.FfbTextBox_Write(String.Format("\r\n ==============================================\r\n"));
 
         }

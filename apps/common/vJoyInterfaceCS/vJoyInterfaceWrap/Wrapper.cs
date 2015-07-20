@@ -138,11 +138,21 @@ namespace vJoyInterfaceWrap
             public UInt32 ButtonsEx3;
         };
 
-        [StructLayout(LayoutKind.Sequential)] private struct FFB_DATA
+        [StructLayout(LayoutKind.Sequential)]
+        private struct FFB_DATA
         {
             private UInt32 size;
             private UInt32 cmd;
             private IntPtr data;
+        }
+
+        [StructLayout(LayoutKind.Explicit)]
+        public struct FFB_EFF_CONSTANT
+        {
+            [FieldOffset(0)]
+            public Byte EffectBlockIndex;
+            [FieldOffset(2)]
+            public UInt16 Magnitude;
         }
 
         [System.Obsolete("use FFB_EFF_REPORT")]
@@ -172,6 +182,7 @@ namespace vJoyInterfaceWrap
             [FieldOffset(21)]
             public Byte DirY; // Y direction: Positive values are below the center (Y); Negative are Two's complement
         }
+
         [StructLayout(LayoutKind.Explicit)]
         public struct FFB_EFF_REPORT
         {
@@ -312,6 +323,8 @@ namespace vJoyInterfaceWrap
         [DllImport("vJoyInterface.dll", EntryPoint = "GetVJDAxisMin")]
         private static extern bool _GetVJDAxisMin(UInt32 rID, UInt32 Axis, ref long Min);
 
+        [DllImport("vJoyInterface.dll", EntryPoint = "isVJDExists")]
+        private static extern bool _isVJDExists(UInt32 rID);
 
         /////	Write access to vJoy Device - Basic
         [DllImport("vJoyInterface.dll", EntryPoint = "AcquireVJD")]
@@ -404,6 +417,12 @@ namespace vJoyInterfaceWrap
         [DllImport("vJoyInterface.dll", EntryPoint = "FfbStop")]
         private static extern bool _FfbStop(UInt32 rID);
 
+        [DllImport("vJoyInterface.dll", EntryPoint = "IsDeviceFfb")]
+        private static extern bool _IsDeviceFfb(UInt32 rID);
+
+        [DllImport("vJoyInterface.dll", EntryPoint = "IsDeviceFfbEffect")]
+        private static extern bool _IsDeviceFfbEffect(UInt32 rID, UInt32 Effect);
+
         [DllImport("vJoyInterface.dll", EntryPoint = "Ffb_h_DeviceID")]
         private static extern UInt32 _Ffb_h_DeviceID(IntPtr Packet, ref int DeviceID);
 
@@ -449,6 +468,8 @@ namespace vJoyInterfaceWrap
          [DllImport("vJoyInterface.dll", EntryPoint = "Ffb_h_Eff_Ramp")]
         private static extern UInt32 _Ffb_h_Eff_Ramp(IntPtr Packet, ref FFB_EFF_RAMP RampEffect);
 
+         [DllImport("vJoyInterface.dll", EntryPoint = "Ffb_h_Eff_Constant")]
+         private static extern UInt32 _Ffb_h_Eff_Constant(IntPtr Packet, ref FFB_EFF_CONSTANT ConstantEffect);
 
         /***************************************************/
         /********** Export functions (C#) ******************/
@@ -469,6 +490,7 @@ namespace vJoyInterfaceWrap
         public bool GetVJDAxisExist(UInt32 rID, HID_USAGES Axis) { return _GetVJDAxisExist(rID, (uint)Axis); }
         public bool GetVJDAxisMax(UInt32 rID, HID_USAGES Axis, ref long Max) { return _GetVJDAxisMax(rID, (uint)Axis, ref Max); }
         public bool GetVJDAxisMin(UInt32 rID, HID_USAGES Axis, ref long Min) { return _GetVJDAxisMin(rID, (uint)Axis, ref Min); }
+        public bool isVJDExists(UInt32 rID) { return _isVJDExists(rID); }
 
         /////	Write access to vJoy Device - Basic
         public bool AcquireVJD(UInt32 rID) { return _AcquireVJD(rID); }
@@ -540,8 +562,12 @@ namespace vJoyInterfaceWrap
             _FfbRegisterGenCB(wf, data);
         }
 
+        [Obsolete("you can remove the function from your code")]
         public bool FfbStart(UInt32 rID) { return _FfbStart(rID); }
+        [Obsolete("you can remove the function from your code")]
         public bool FfbStop(UInt32 rID) { return _FfbStop(rID); }
+        public bool IsDeviceFfb(UInt32 rID) { return _IsDeviceFfb(rID); }
+        public bool IsDeviceFfbEffect(UInt32 rID, UInt32 Effect) { return _IsDeviceFfbEffect(rID, Effect); }
         public UInt32 Ffb_h_DeviceID(IntPtr  Packet, ref int DeviceID) {return _Ffb_h_DeviceID(Packet, ref DeviceID);}
         public UInt32 Ffb_h_Type(IntPtr Packet, ref FFBPType Type) { return _Ffb_h_Type(Packet, ref  Type); }
         public UInt32 Ffb_h_Packet(IntPtr Packet, ref UInt32 Type, ref Int32 DataSize, ref Byte[] Data) 
@@ -568,5 +594,6 @@ namespace vJoyInterfaceWrap
         public UInt32 Ffb_h_Eff_Period(IntPtr Packet, ref FFB_EFF_PERIOD Effect) { return _Ffb_h_Eff_Period( Packet, ref  Effect); }
         public UInt32 Ffb_h_EffNew(IntPtr Packet, ref FFBEType Effect) { return _Ffb_h_EffNew( Packet, ref  Effect); }
         public UInt32 Ffb_h_Eff_Ramp(IntPtr Packet, ref FFB_EFF_RAMP RampEffect) { return _Ffb_h_Eff_Ramp( Packet, ref  RampEffect);}
+        public UInt32 Ffb_h_Eff_Constant(IntPtr Packet, ref FFB_EFF_CONSTANT ConstantEffect) { return _Ffb_h_Eff_Constant(Packet, ref  ConstantEffect); }
     }
 }

@@ -186,7 +186,7 @@ typedef struct _FFB_EFF_RAMP {
 
 //typedef struct _FFB_EFF_CONST {
 typedef struct _FFB_EFF_REPORT {
-		BYTE		EffectBlockIndex;
+	BYTE		EffectBlockIndex;
 	FFBEType	EffectType;
 	WORD		Duration;// Value in milliseconds. 0xFFFF means infinite
 	WORD		TrigerRpt;
