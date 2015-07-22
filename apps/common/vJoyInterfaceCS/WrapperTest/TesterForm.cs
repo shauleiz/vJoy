@@ -286,8 +286,10 @@ namespace WrapperTest
             dlg = dialog;
             joystick = dialog.joystick;
             // FFB
+#pragma warning disable 0618
             if (!joystick.FfbStart(id))
                 throw new Exception(String.Format("Failed to start Forcefeedback on device {0}", id));
+#pragma warning restore 0618
 
             // Convert Form to pointer and pass it as user data to the callback function
             GCHandle h = GCHandle.Alloc(dialog);
