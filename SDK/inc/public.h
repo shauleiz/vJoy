@@ -64,7 +64,7 @@ DEFINE_GUID(GUID_DEVINTERFACE_VJOY, 0x781EF630, 0x72B2, 0x11d2, 0xB8, 0x52, 0x00
 #define VER_X_	0
 #define VER_H_	2
 #define VER_M_	1
-#define VER_L_	5
+#define VER_L_	6
 
 #define STRINGIFY_1(x)   #x
 #define STRINGIFY(x)     STRINGIFY_1(x)
@@ -96,6 +96,15 @@ DEFINE_GUID(GUID_DEVINTERFACE_VJOY, 0x781EF630, 0x72B2, 0x11d2, 0xB8, 0x52, 0x00
 #define F_SET_FFB_STAT		0x913
 #define F_GET_FFB_STAT		0x916
 #define F_GET_DEV_INFO      0x917
+#define F_IS_DRV_FFB_CAP	0x918
+#define F_IS_DRV_FFB_EN		0x919
+#define F_GET_DRV_DEV_MAX	0x91A
+#define F_GET_DRV_DEV_EN	0x91B
+#define F_IS_DEV_FFB_START	0x91C
+#define F_GET_DEV_STAT		0x91D
+#define F_GET_DRV_INFO		0x91E
+#define F_RESET_DEV			0x91F
+
 // IO Device Control codes;
 #define IOCTL_VJOY_GET_ATTRIB		CTL_CODE (FILE_DEVICE_UNKNOWN, GETATTRIB, METHOD_BUFFERED, FILE_WRITE_ACCESS)
 #define LOAD_POSITIONS	            CTL_CODE (FILE_DEVICE_UNKNOWN, F_LOAD_POSITIONS, METHOD_BUFFERED, FILE_WRITE_ACCESS)
@@ -103,6 +112,14 @@ DEFINE_GUID(GUID_DEVINTERFACE_VJOY, 0x781EF630, 0x72B2, 0x11d2, 0xB8, 0x52, 0x00
 #define SET_FFB_STAT	            CTL_CODE (FILE_DEVICE_UNKNOWN, F_SET_FFB_STAT, METHOD_NEITHER, FILE_ANY_ACCESS)
 #define GET_FFB_STAT	            CTL_CODE (FILE_DEVICE_UNKNOWN, F_GET_FFB_STAT, METHOD_BUFFERED, FILE_ANY_ACCESS)
 #define GET_DEV_INFO			    CTL_CODE (FILE_DEVICE_UNKNOWN, F_GET_DEV_INFO, METHOD_BUFFERED, FILE_ANY_ACCESS)
+#define IS_DRV_FFB_CAP			    CTL_CODE (FILE_DEVICE_UNKNOWN, F_IS_DRV_FFB_CAP, METHOD_BUFFERED, FILE_ANY_ACCESS)
+#define IS_DRV_FFB_EN			    CTL_CODE (FILE_DEVICE_UNKNOWN, F_IS_DRV_FFB_EN, METHOD_BUFFERED, FILE_ANY_ACCESS)
+#define GET_DRV_DEV_MAX			    CTL_CODE (FILE_DEVICE_UNKNOWN, F_GET_DRV_DEV_MAX, METHOD_BUFFERED, FILE_ANY_ACCESS)
+#define GET_DRV_DEV_EN			    CTL_CODE (FILE_DEVICE_UNKNOWN, F_GET_DRV_DEV_EN, METHOD_BUFFERED, FILE_ANY_ACCESS)
+#define IS_DEV_FFB_START			CTL_CODE (FILE_DEVICE_UNKNOWN, F_IS_DEV_FFB_START, METHOD_BUFFERED, FILE_ANY_ACCESS)
+#define GET_DEV_STAT				CTL_CODE (FILE_DEVICE_UNKNOWN, F_GET_DEV_STAT, METHOD_BUFFERED, FILE_ANY_ACCESS)
+#define GET_DRV_INFO				CTL_CODE (FILE_DEVICE_UNKNOWN, F_GET_DRV_INFO, METHOD_BUFFERED, FILE_ANY_ACCESS)
+#define RESET_DEV					CTL_CODE (FILE_DEVICE_UNKNOWN, F_RESET_DEV, METHOD_BUFFERED, FILE_WRITE_ACCESS)
 
 #ifndef __HIDPORT_H__
 // Copied from hidport.h
@@ -171,9 +188,9 @@ typedef struct _JOYSTICK_POSITION
 	LONG	wAxisVBRZ;
 	LONG	lButtons;	// 32 buttons: 0x00000001 means button1 is pressed, 0x80000000 -> button32 is pressed
 	DWORD	bHats;		// Lower 4 bits: HAT switch or 16-bit of continuous HAT switch
-	DWORD	bHatsEx1;	// Lower 4 bits: HAT switch or 16-bit of continuous HAT switch
-	DWORD	bHatsEx2;	// Lower 4 bits: HAT switch or 16-bit of continuous HAT switch
-	DWORD	bHatsEx3;	// Lower 4 bits: HAT switch or 16-bit of continuous HAT switch
+	DWORD	bHatsEx1;	// 16-bit of continuous HAT switch
+	DWORD	bHatsEx2;	// 16-bit of continuous HAT switch
+	DWORD	bHatsEx3;	// 16-bit of continuous HAT switch
 } JOYSTICK_POSITION, *PJOYSTICK_POSITION;
 
 // Superset of JOYSTICK_POSITION
@@ -213,7 +230,7 @@ typedef struct _JOYSTICK_POSITION_V2
 } JOYSTICK_POSITION_V2, *PJOYSTICK_POSITION_V2;
 
 
-// HID Descriptor definitions
+// HID Descriptor definitions - Axes
 #define HID_USAGE_X		0x30
 #define HID_USAGE_Y		0x31
 #define HID_USAGE_Z		0x32
@@ -224,6 +241,20 @@ typedef struct _JOYSTICK_POSITION_V2
 #define HID_USAGE_SL1	0x37
 #define HID_USAGE_WHL	0x38
 #define HID_USAGE_POV	0x39
+
+// HID Descriptor definitions - FFB Effects
+#define HID_USAGE_CONST 0x26    //    Usage ET Constant Force
+#define HID_USAGE_RAMP  0x27    //    Usage ET Ramp
+#define HID_USAGE_SQUR  0x30    //    Usage ET Square
+#define HID_USAGE_SINE  0x31    //    Usage ET Sine
+#define HID_USAGE_TRNG  0x32    //    Usage ET Triangle
+#define HID_USAGE_STUP  0x33    //    Usage ET Sawtooth Up
+#define HID_USAGE_STDN  0x34    //    Usage ET Sawtooth Down
+#define HID_USAGE_SPRNG 0x40    //    Usage ET Spring
+#define HID_USAGE_DMPR  0x41    //    Usage ET Damper
+#define HID_USAGE_INRT  0x42    //    Usage ET Inertia
+#define HID_USAGE_FRIC  0x43    //    Usage ET Friction
+
 
 // HID Descriptor definitions - FFB Report IDs
 #define HID_ID_STATE	0x02	// Usage PID State report

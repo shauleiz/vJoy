@@ -188,9 +188,9 @@ typedef struct _JOYSTICK_POSITION
 	LONG	wAxisVBRZ;
 	LONG	lButtons;	// 32 buttons: 0x00000001 means button1 is pressed, 0x80000000 -> button32 is pressed
 	DWORD	bHats;		// Lower 4 bits: HAT switch or 16-bit of continuous HAT switch
-	DWORD	bHatsEx1;	// Lower 4 bits: HAT switch or 16-bit of continuous HAT switch
-	DWORD	bHatsEx2;	// Lower 4 bits: HAT switch or 16-bit of continuous HAT switch
-	DWORD	bHatsEx3;	// Lower 4 bits: HAT switch or 16-bit of continuous HAT switch
+	DWORD	bHatsEx1;	// 16-bit of continuous HAT switch
+	DWORD	bHatsEx2;	// 16-bit of continuous HAT switch
+	DWORD	bHatsEx3;	// 16-bit of continuous HAT switch
 } JOYSTICK_POSITION, *PJOYSTICK_POSITION;
 
 // Superset of JOYSTICK_POSITION
