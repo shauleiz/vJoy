@@ -187,19 +187,20 @@ std::vector<std::vector<BYTE>>  FfbDescriptor = { {
 			0x91, 0x02,         //    Output (Variable)
 			0x09, 0x5B,         //    Usage Attack Level
 			0x09, 0x5D,         //    Usage Fade Level
-			0x15, 0x00,         //    Logical Minimum 0
-			0x26, 0xFF, 0x00,    //    Logical Maximum FFh (255d)
-			0x35, 0x00,         //    Physical Minimum 0
+			0x16, 0x00, 0x00,    //    Logical Minimum 0
+			0x26, 0x10, 0x27,    //    Logical Maximum 2710h (10000d)
+			0x36, 0x00, 0x00,    //    Physical Minimum 0
 			0x46, 0x10, 0x27,    //    Physical Maximum 2710h (10000d)
+			0x75, 0x10,         //    Report Size 16
 			0x95, 0x02,         //    Report Count 2
 			0x91, 0x02,         //    Output (Variable)
 			0x09, 0x5C,         //    Usage Attack Time
 			0x09, 0x5E,         //    Usage Fade Time
 			0x66, 0x03, 0x10,    //    Unit 1003h (4099d)
-			0x55, 0xFD,         //    Unit Exponent FDh (253d)
-			0x26, 0xFF, 0x7F,    //    Logical Maximum 7FFFh (32767d)
-			0x46, 0xFF, 0x7F,    //    Physical Maximum 7FFFh (32767d)
-			0x75, 0x10,         //    Report Size 10h (16d)
+			//0x55,0xFD,         //    Unit Exponent FDh (253d)
+			0x27, 0xFF, 0xFF, 0xFF, 0xFF,    //    Logical Maximum FFFFFFFFh (4294967295)
+			0x47, 0xFF, 0xFF, 0xFF, 0xFF,    //    Physical Maximum FFFFFFFFh (4294967295)
+			0x75, 0x20,         //    Report Size 20h (32d)
 			0x91, 0x02,         //    Output (Variable)
 			0x45, 0x00,         //    Physical Maximum 0
 			0x66, 0x00, 0x00,    //    Unit 0
@@ -232,12 +233,12 @@ std::vector<std::vector<BYTE>>  FfbDescriptor = { {
 			0x95, 0x02,                   //    Report Count 2
 			0x91, 0x02,                   //    Output (Variable)
 			0xC0,         //    End Collection
-			0x15, 0x80,         //    Logical Minimum 80h (-128d)
-			0x25, 0x7F,         //    Logical Maximum 7Fh (127d)
+			0x16, 0xF0, 0xD8,    //    Logical Minimum D8F0h (-10000d)
+			0x26, 0x10, 0x27,    //    Logical Maximum 2710h (10000d)
 			0x36, 0xF0, 0xD8,    //    Physical Minimum D8F0h (-10000d)
 			0x46, 0x10, 0x27,    //    Physical Maximum 2710h (10000d)
 			0x09, 0x60,         //    Usage CP Offset
-			0x75, 0x08,         //    Report Size 8
+			0x75, 0x10,         //    Report Size 16
 			0x95, 0x01,         //    Report Count 1
 			0x91, 0x02,         //    Output (Variable)
 			0x36, 0xF0, 0xD8,    //    Physical Minimum D8F0h (-10000d)
@@ -246,13 +247,13 @@ std::vector<std::vector<BYTE>>  FfbDescriptor = { {
 			0x09, 0x62,         //    Usage Negative Coefficient
 			0x95, 0x02,         //    Report Count 2
 			0x91, 0x02,         //    Output (Variable)
-			0x15, 0x00,         //    Logical Minimum 0
-			0x26, 0xFF, 0x00,    //    Logical Maximum FFh (255d)
-			0x35, 0x00,         //    Physical Minimum 0
+			0x16, 0x00, 0x00,    //    Logical Minimum 0
+			0x26, 0x10, 0x27,	  //    Logical Maximum 2710h (10000d)
+			0x36, 0x00, 0x00,    //    Physical Minimum 0
 			0x46, 0x10, 0x27,    //    Physical Maximum 2710h (10000d)
 			0x09, 0x63,         //    Usage Positive Saturation
 			0x09, 0x64,         //    Usage Negative Saturation
-			0x75, 0x08,         //    Report Size 8
+			0x75, 0x10,         //    Report Size 16
 			0x95, 0x02,         //    Report Count 2
 			0x91, 0x02,         //    Output (Variable)
 			0x09, 0x65,         //    Usage Dead Band
@@ -272,34 +273,37 @@ std::vector<std::vector<BYTE>>  FfbDescriptor = { {
 			0x95, 0x01,                   //    Report Count 1
 			0x91, 0x02,                   //    Output (Variable)
 			0x09, 0x70,                   //    Usage Magnitude
-			0x15, 0x00,                   //    Logical Minimum 0
-			0x26, 0xFF, 0x00,              //    Logical Maximum FFh (255d)
-			0x35, 0x00,                   //    Physical Minimum 0
+			0x16, 0x00, 0x00,              //    Logical Minimum 0
+			0x26, 0x10, 0x27,				//    Logical Maximum 2710h (10000d)
+			0x36, 0x00, 0x00,              //    Physical Minimum 0
 			0x46, 0x10, 0x27,              //    Physical Maximum 2710h (10000d)
-			0x75, 0x08,                   //    Report Size 8
+			0x75, 0x10,                   //    Report Size 16
 			0x95, 0x01,                   //    Report Count 1
 			0x91, 0x02,                   //    Output (Variable)
 			0x09, 0x6F,                   //    Usage Offset
-			0x15, 0x80,                   //    Logical Minimum 80h (-128d)
-			0x25, 0x7F,                   //    Logical Maximum 7Fh (127d)
-			0x36, 0xF0, 0xD8,              //    Physical Minimum D8F0h (-10000d)
-			0x46, 0x10, 0x27,              //    Physical Maximum 2710h (10000d)
+			0x17, 0x00, 0x00, 0x00, 0x80     //    Logical Minimum 80000000h (–2147483648d)
+			0x27, 0xFF, 0xFF, 0xFF, 0x7F		//    Logical Maximum 7FFFFFFFh (2147483647d)
+			0x37, 0x00, 0x00, 0x00, 0x80     //    Physical Minimum 80000000h (–2147483648d)
+			0x47, 0xFF, 0xFF, 0xFF, 0x7F     //    Physical Maximum 7FFFFFFFh (2147483647d)
+			0x75, 0x20,                   //    Report Size 32
 			0x95, 0x01,                   //    Report Count 1
 			0x91, 0x02,                   //    Output (Variable)
 			0x09, 0x71,                   //    Usage Phase
 			0x66, 0x14, 0x00,              //    Unit 14h (20d)
-			0x55, 0xFE,                   //    Unit Exponent FEh (254d)
-			0x15, 0x00,                   //    Logical Minimum 0
-			0x26, 0xFF, 0x00,              //    Logical Maximum FFh (255d)
-			0x35, 0x00,                   //    Physical Minimum 0
-			0x47, 0xA0, 0x8C, 0x00, 0x00,    //    Physical Maximum 8CA0h (36000d)
+			//0x55,0xFE,                   //    Unit Exponent FEh (254d)
+			0x16, 0x00, 0x00,              //    Logical Minimum 0
+			0x26, 0x9F, 0x8C,              //    Logical Maximum 8C9Fh (35999d)
+			0x36, 0x00, 0x00,				//    Physical Minimum 0
+			0x46, 0x9F, 0x8C,				//    Physical Maximum 8C9Fh (35999d)
+			0x75, 0x10,                   //    Report Size 16
+			0x95, 0x01,                   //    Report Count 1
 			0x91, 0x02,                   //    Output (Variable)
 			0x09, 0x72,                   //    Usage Period
-			0x26, 0xFF, 0x7F,              //    Logical Maximum 7FFFh (32767d)
-			0x46, 0xFF, 0x7F,              //    Physical Maximum 7FFFh (32767d)
+			0x27, 0xFF, 0xFF, 0xFF, 0xFF,    //    Logical Maximum FFFFFFFFh (4294967295d)
+			0x47, 0xFF, 0xFF, 0xFF, 0xFF,    //    Physical Maximum FFFFFFFFh (4294967295d)
 			0x66, 0x03, 0x10,              //    Unit 1003h (4099d)
-			0x55, 0xFD,                   //    Unit Exponent FDh (253d)
-			0x75, 0x10,                   //    Report Size 10h (16d)
+			//0x55,0xFD,                   //    Unit Exponent FDh (253d)
+			0x75, 0x20,                   //    Report Size 20h (32d)
 			0x95, 0x01,                   //    Report Count 1
 			0x91, 0x02,                   //    Output (Variable)
 			0x66, 0x00, 0x00,              //    Unit 0
@@ -317,11 +321,9 @@ std::vector<std::vector<BYTE>>  FfbDescriptor = { {
 			0x95, 0x01,         //    Report Count 1
 			0x91, 0x02,         //    Output (Variable)
 			0x09, 0x70,         //    Usage Magnitude
-			//       0x16,0x01,0xFF,    //    Logical Minimum FF01h (-255d)
-			//       0x26,0xFF,0x00,    //    Logical Maximum FFh (255d)
-			0x16, 0x00, 0x00,    //    Logical Minimum 00h (00000d)
-			0x26, 0x10, 0x27,    //    Logical Maximum FFh (10000d)
-			0x36, 0x00, 0x00,    //    Physical Minimum 0000h (00000d)
+			0x16, 0xF0, 0xD8,    //    Logical Minimum D8F0h (-10000d)
+			0x26, 0x10, 0x27,    //    Logical Maximum 2710h (10000d)
+			0x36, 0xF0, 0xD8,    //    Physical Minimum D8F0h (-10000d)
 			0x46, 0x10, 0x27,    //    Physical Maximum 2710h (10000d)
 			0x75, 0x10,         //    Report Size 10h (16d)
 			0x95, 0x01,         //    Report Count 1
@@ -340,11 +342,11 @@ std::vector<std::vector<BYTE>>  FfbDescriptor = { {
 			0x91, 0x02,         //    Output (Variable)
 			0x09, 0x75,         //    Usage Ramp Start
 			0x09, 0x76,         //    Usage Ramp End
-			0x15, 0x80,         //    Logical Minimum 80h (-128d)
-			0x25, 0x7F,         //    Logical Maximum 7Fh (127d)
+			0x16, 0xF0, 0xD8,    //    Logical Minimum D8F0h (-10000d)
+			0x26, 0x10, 0x27,    //    Logical Maximum 2710h (10000d)
 			0x36, 0xF0, 0xD8,    //    Physical Minimum D8F0h (-10000d)
 			0x46, 0x10, 0x27,    //    Physical Maximum 2710h (10000d)
-			0x75, 0x08,         //    Report Size 8
+			0x75, 0x10,         //    Report Size 16
 			0x95, 0x02,         //    Report Count 2
 			0x91, 0x02,         //    Output (Variable)
 			0xC0,    //    End Collection
