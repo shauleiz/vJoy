@@ -175,18 +175,18 @@ typedef struct _FFB_DATA {
 
 typedef struct _FFB_EFF_CONSTANT { 
 	BYTE EffectBlockIndex; 
-	WORD Magnitude; 
+	LONG Magnitude; 			  // Constant force magnitude: 	-10000 - 10000
 } FFB_EFF_CONSTANT, *PFFB_EFF_CONSTANT;
 
 typedef struct _FFB_EFF_RAMP {
 	BYTE		EffectBlockIndex;
-	BYTE		Start;             // The Normalized magnitude at the start of the effect
-	BYTE		End;               // The Normalized magnitude at the end of the effect
+	LONG 		Start;             // The Normalized magnitude at the start of the effect (-10000 - 10000)
+	LONG 		End;               // The Normalized magnitude at the end of the effect	(-10000 - 10000)
 } FFB_EFF_RAMP, *PFFB_EFF_RAMP;
 
 //typedef struct _FFB_EFF_CONST {
 typedef struct _FFB_EFF_REPORT {
-		BYTE		EffectBlockIndex;
+	BYTE		EffectBlockIndex;
 	FFBEType	EffectType;
 	WORD		Duration;// Value in milliseconds. 0xFFFF means infinite
 	WORD		TrigerRpt;
@@ -211,29 +211,29 @@ typedef struct _FFB_EFF_OP {
 
 typedef struct _FFB_EFF_PERIOD {
 	BYTE		EffectBlockIndex;
-	BYTE		Magnitude;
-	BYTE		Offset;
-	BYTE		Phase;
-	WORD		Period;
+	DWORD		Magnitude;			// Range: 0 - 10000
+	LONG 		Offset;				// Range: –2147483648 -  2147483647
+	DWORD 		Phase;				// Range: 0 - 35999
+	DWORD 		Period;				// Range: 0 - 4294967295
 } FFB_EFF_PERIOD, *PFFB_EFF_PERIOD;
 
 typedef struct _FFB_EFF_COND {
 	BYTE		EffectBlockIndex;
 	BOOL		isY;
-	BYTE		CenterPointOffset; // CP Offset: Range 0x80­0x7F (­10000 ­ 10000)
-	BYTE		PosCoeff; // Positive Coefficient: Range 0x80­0x7F (­10000 ­ 10000)
-	BYTE		NegCoeff; // Negative Coefficient: Range 0x80­0x7F (­10000 ­ 10000)
-	BYTE		PosSatur; // Positive Saturation: Range 0x00­0xFF (0 – 10000)
-	BYTE		NegSatur; // Negative Saturation: Range 0x00­0xFF (0 – 10000)
-	BYTE		DeadBand; // Dead Band: : Range 0x00­0xFF (0 – 10000)
+	LONG 		CenterPointOffset; // CP Offset:  Range -­10000 ­- 10000
+	LONG 		PosCoeff; // Positive Coefficient: Range -­10000 ­- 10000
+	LONG 		NegCoeff; // Negative Coefficient: Range -­10000 ­- 10000
+	DWORD 		PosSatur; // Positive Saturation: Range 0 – 10000
+	DWORD 		NegSatur; // Negative Saturation: Range 0 – 10000
+	LONG 		DeadBand; // Dead Band: : Range 0 – 1000
 } FFB_EFF_COND, *PFFB_EFF_COND;
 
 typedef struct _FFB_EFF_ENVLP {
 	BYTE		EffectBlockIndex;
-	BYTE		AttackLevel;
-	BYTE		FadeLevel;
-	WORD		AttackTime;
-	WORD		FadeTime;
+	DWORD 		AttackLevel;   // The Normalized magnitude of the stating point: 0 - 10000
+	DWORD 		FadeLevel;	   // The Normalized magnitude of the stopping point: 0 - 10000
+	DWORD 		AttackTime;	   // Time of the attack: 0 - 4294967295
+	DWORD 		FadeTime;	   // Time of the fading: 0 - 4294967295
 } FFB_EFF_ENVLP, *PFFB_EFF_ENVLP;
 
 #define FFB_DATA_READY	 WM_USER+31

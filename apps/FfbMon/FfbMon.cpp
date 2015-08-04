@@ -277,9 +277,9 @@ if (Condition.isY)
 _tprintf(L"\n >> Y Axis");
 else
 _tprintf(L"\n >> X Axis");
-_tprintf(L"\n >> Center Point Offset: %d", TwosCompByte2Int(Condition.CenterPointOffset)*10000/127);
-_tprintf(L"\n >> Positive Coefficient: %d", TwosCompByte2Int(Condition.PosCoeff)*10000/127);
-_tprintf(L"\n >> Negative Coefficient: %d", TwosCompByte2Int(Condition.NegCoeff)*10000/127);
+_tprintf(L"\n >> Center Point Offset: %d", /*TwosCompByte2Int*/(Condition.CenterPointOffset)/**10000/127*/);
+_tprintf(L"\n >> Positive Coefficient: %d", /*TwosCompByte2Int*/(Condition.PosCoeff)/**10000/127*/);
+_tprintf(L"\n >> Negative Coefficient: %d", /*TwosCompByte2Int*/(Condition.NegCoeff)/**10000/127*/);
 _tprintf(L"\n >> Positive Saturation: %d", Condition.PosSatur*10000/255);
 _tprintf(L"\n >> Negative Saturation: %d", Condition.NegSatur*10000/255);
 _tprintf(L"\n >> Dead Band: %d", Condition.DeadBand*10000/255);
@@ -301,7 +301,7 @@ FFB_EFF_PERIOD EffPrd;
 if (ERROR_SUCCESS == Ffb_h_Eff_Period((FFB_DATA *)data, &EffPrd))
 {
 _tprintf(L"\n >> Magnitude: %d", EffPrd.Magnitude * 10000 / 255);
-_tprintf(L"\n >> Offset: %d", TwosCompByte2Int(EffPrd.Offset) * 10000 / 127);
+_tprintf(L"\n >> Offset: %d", /*TwosCompByte2Int*/(EffPrd.Offset) /** 10000 / 127*/);
 _tprintf(L"\n >> Phase: %d", EffPrd.Phase * 3600 / 255);
 _tprintf(L"\n >> Period: %d", static_cast<int>(EffPrd.Period));
 };
@@ -323,8 +323,8 @@ _tprintf(L"\n >> Effect Type: Unknown");
 FFB_EFF_RAMP RampEffect;
 if (ERROR_SUCCESS == Ffb_h_Eff_Ramp((FFB_DATA *)data, &RampEffect))
 {
-_tprintf(L"\n >> Ramp Start: %d", TwosCompByte2Int(RampEffect.Start) * 10000 / 127);
-_tprintf(L"\n >> Ramp End: %d", TwosCompByte2Int(RampEffect.End) * 10000 / 127);
+_tprintf(L"\n >> Ramp Start: %d", /*TwosCompByte2Int*/(RampEffect.Start) /** 10000 / 127*/);
+_tprintf(L"\n >> Ramp End: %d", /*TwosCompByte2Int*/(RampEffect.End) /** 10000 / 127*/);
 };
 
 #pragma endregion
@@ -333,7 +333,7 @@ _tprintf(L"\n >> Ramp End: %d", TwosCompByte2Int(RampEffect.End) * 10000 / 127);
 FFB_EFF_CONSTANT ConstantEffect;
 if (ERROR_SUCCESS == Ffb_h_Eff_Constant((FFB_DATA *)data, &ConstantEffect))
 {
-	_tprintf(L"\n >> Constant Magnitude: %d", ConstantEffect.Magnitude);
+	_tprintf(L"\n >> Constant Magnitude: %d", TwosCompWord2Int((WORD)ConstantEffect.Magnitude));
 };
 
 #pragma endregion
@@ -549,15 +549,31 @@ return ((UINT)InByte*100)/255;
 // Convert One-Byte 2's complement input to integer
 int TwosCompByte2Int(BYTE in)
 {
-int tmp;
-BYTE inv = ~in;
-BOOL isNeg = in>>7;
-if (isNeg)
-{
-tmp = (int)(inv);
-tmp = -1*tmp;
-return tmp;
+	int tmp;
+	BYTE inv = ~in;
+	BOOL isNeg = in >> 7;
+	if (isNeg)
+	{
+		tmp = (int)(inv);
+		tmp = -1 * tmp;
+		return tmp;
+	}
+	else
+		return (int)in;
 }
-else
-return (int)in;
+
+// Convert One-Byte 2's complement input to integer
+int TwosCompWord2Int(WORD in)
+{
+	int tmp;
+	WORD inv = ~in;
+	BOOL isNeg = in >> 15;
+	if (isNeg)
+	{
+		tmp = (int)(inv);
+		tmp = -1 * tmp;
+		return tmp-1;
+	}
+	else
+		return (int)in;
 }

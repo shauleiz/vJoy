@@ -11,3 +11,4 @@ BOOL EffectOpStr(FFBOP Op, LPTSTR Str);
 int  Polar2Deg(BYTE Polar);
 int  Byte2Percent(BYTE InByte);
 int TwosCompByte2Int(BYTE in);
+int TwosCompWord2Int(WORD in);

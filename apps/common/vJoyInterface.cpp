@@ -3917,7 +3917,7 @@ VJOYINTERFACE_API DWORD		__cdecl Ffb_h_Eff_Constant(const FFB_DATA * Packet, FFB
 		return ERROR_INVALID_DATA;
 
 	ConstantEffect->EffectBlockIndex = Packet->data[1];
-	ConstantEffect->Magnitude = (WORD)((Packet->data[3] << 8) + (Packet->data[2]));
+	ConstantEffect->Magnitude = (LONG)((Packet->data[3] << 8) + (Packet->data[2]));
 
 	return ERROR_SUCCESS;
 }
@@ -3930,7 +3930,7 @@ VJOYINTERFACE_API DWORD __cdecl Ffb_h_Eff_Ramp(const FFB_DATA * Packet, FFB_EFF_
 	// Routine validity checks 
 	if (!Packet)
 		return ERROR_INVALID_PARAMETER;
-	if (Packet->size <12)
+	if (Packet->size <14)
 		return ERROR_INVALID_DATA;
 
 	// Some types don't carry Effect Block Index
@@ -3941,8 +3941,8 @@ VJOYINTERFACE_API DWORD __cdecl Ffb_h_Eff_Ramp(const FFB_DATA * Packet, FFB_EFF_
 		return ERROR_INVALID_DATA;
 
 	RampEffect->EffectBlockIndex = Packet->data[1];
-	RampEffect->Start = Packet->data[2];
-	RampEffect->End = Packet->data[3];
+	RampEffect->Start = (LONG)((Packet->data[3] << 8) + (Packet->data[2]));
+	RampEffect->End = (LONG)((Packet->data[5] << 8) + (Packet->data[4]));
 
 	return ERROR_SUCCESS;
 }
@@ -4046,8 +4046,8 @@ VJOYINTERFACE_API DWORD __cdecl Ffb_h_Eff_Period(const FFB_DATA * Packet,  FFB_E
 	// Routine validity checks 
 	if (!Packet)
 		return ERROR_INVALID_PARAMETER;
-	if (Packet->size <15)
-		return ERROR_INVALID_DATA;
+	//if (Packet->size <23)
+	//	return ERROR_INVALID_DATA;
 
 	// Some types don't carry Effect Block Index
 	FFBPType Type;
@@ -4057,10 +4057,10 @@ VJOYINTERFACE_API DWORD __cdecl Ffb_h_Eff_Period(const FFB_DATA * Packet,  FFB_E
 		return ERROR_INVALID_DATA;
 
 	Effect->EffectBlockIndex = Packet->data[1];
-	Effect->Magnitude = Packet->data[2];
-	Effect->Offset = Packet->data[3];
-	Effect->Phase = Packet->data[4];
-	Effect->Period = (WORD)((Packet->data[6]<<8) + (Packet->data[5]));
+	Effect->Magnitude = (DWORD)((Packet->data[3] << 8) + (Packet->data[2]));
+	Effect->Offset = (LONG)((Packet->data[7] << 24) + (Packet->data[6] << 16) + (Packet->data[5] << 8) + (Packet->data[4]));
+	Effect->Phase = (DWORD)((Packet->data[9] << 8) + (Packet->data[8]));
+	Effect->Period = (DWORD)((Packet->data[13] << 24) + (Packet->data[12] << 16) + (Packet->data[11] << 8) + (Packet->data[10]));
 	return ERROR_SUCCESS;
 }
 
@@ -4072,7 +4072,7 @@ VJOYINTERFACE_API DWORD __cdecl Ffb_h_Eff_Cond(const FFB_DATA * Packet,  FFB_EFF
 	// Routine validity checks 
 	if (!Packet)
 		return ERROR_INVALID_PARAMETER;
-	if (Packet->size <15)
+	if (Packet->size <25)
 		return ERROR_INVALID_DATA;
 
 	// Some types don't carry Effect Block Index
@@ -4084,12 +4084,12 @@ VJOYINTERFACE_API DWORD __cdecl Ffb_h_Eff_Cond(const FFB_DATA * Packet,  FFB_EFF
 
 	Condition->EffectBlockIndex		= Packet->data[1];
 	Condition->isY					= Packet->data[2];
-	Condition->CenterPointOffset	= Packet->data[3];
-	Condition->PosCoeff				= Packet->data[4];
-	Condition->NegCoeff				= Packet->data[5];
-	Condition->PosSatur				= Packet->data[6];
-	Condition->NegSatur				= Packet->data[7];
-	Condition->DeadBand				= Packet->data[8];
+	Condition->CenterPointOffset	= (LONG)((Packet->data[4] << 8) + (Packet->data[3]));
+	Condition->PosCoeff				= (LONG)((Packet->data[6] << 8) + (Packet->data[5]));
+	Condition->NegCoeff				= (LONG)((Packet->data[8] << 8) + (Packet->data[7]));
+	Condition->PosSatur				= (DWORD)((Packet->data[10] << 8) + (Packet->data[9]));
+	Condition->NegSatur				= (DWORD)((Packet->data[12] << 8) + (Packet->data[11]));
+	Condition->DeadBand				= (LONG)((Packet->data[14] << 8) + (Packet->data[13]));
 	return ERROR_SUCCESS;
 }
 
@@ -4101,7 +4101,7 @@ VJOYINTERFACE_API DWORD __cdecl Ffb_h_Eff_Envlp(const FFB_DATA * Packet,  FFB_EF
 	// Routine validity checks 
 	if (!Packet)
 		return ERROR_INVALID_PARAMETER;
-	if (Packet->size <16)
+	if (Packet->size <22)
 		return ERROR_INVALID_DATA;
 
 	// Some types don't carry Effect Block Index
@@ -4112,10 +4112,10 @@ VJOYINTERFACE_API DWORD __cdecl Ffb_h_Eff_Envlp(const FFB_DATA * Packet,  FFB_EF
 		return ERROR_INVALID_DATA;
 
 	Envelope->EffectBlockIndex		= Packet->data[1];
-	Envelope->AttackLevel			= Packet->data[2];
-	Envelope->FadeLevel				= Packet->data[3];
-	Envelope->AttackTime			= (WORD)((Packet->data[5]<<8) + (Packet->data[4]));
-	Envelope->FadeTime				= (WORD)((Packet->data[7]<<8) + (Packet->data[6]));
+	Envelope->AttackLevel			= (DWORD)((Packet->data[3] << 8) + (Packet->data[2]));
+	Envelope->FadeLevel				= (DWORD)((Packet->data[5] << 8) + (Packet->data[4]));
+	Envelope->AttackTime			= (DWORD)((Packet->data[9] << 24) + (Packet->data[8] << 16) + (Packet->data[7] << 8) + (Packet->data[6]));
+	Envelope->FadeTime				= (DWORD)((Packet->data[13] << 24) + (Packet->data[12] << 16) + (Packet->data[11] << 8) + (Packet->data[10]));
 	return ERROR_SUCCESS;
 }
 
