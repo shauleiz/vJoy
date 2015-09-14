@@ -437,12 +437,12 @@ namespace WrapperTest
                     dlg.FfbTextBox_Write(String.Format("\r\n >> Y Axis"));
                 else
                     dlg.FfbTextBox_Write(String.Format("\r\n >> X Axis"));
-                dlg.FfbTextBox_Write(String.Format("\r\n >> Center Point Offset: {0}", TwosCompByte2Int(Condition.CenterPointOffset) * 10000 / 127));
-                dlg.FfbTextBox_Write(String.Format("\r\n >> Positive Coefficient: {0}", TwosCompByte2Int(Condition.PosCoeff) * 10000 / 127));
-                dlg.FfbTextBox_Write(String.Format("\r\n >> Negative Coefficient: {0}", TwosCompByte2Int(Condition.NegCoeff) * 10000 / 127));
-                dlg.FfbTextBox_Write(String.Format("\r\n >> Positive Saturation: {0}", Condition.PosSatur * 10000 / 255));
-                dlg.FfbTextBox_Write(String.Format("\r\n >> Negative Saturation: {0}", Condition.NegSatur * 10000 / 255));
-                dlg.FfbTextBox_Write(String.Format("\r\n >> Dead Band: {0}", Condition.DeadBand * 10000 / 255));
+                dlg.FfbTextBox_Write(String.Format("\r\n >> Center Point Offset: {0}", Condition.CenterPointOffset));
+                dlg.FfbTextBox_Write(String.Format("\r\n >> Positive Coefficient: {0}", Condition.PosCoeff));
+                dlg.FfbTextBox_Write(String.Format("\r\n >> Negative Coefficient: {0}", Condition.NegCoeff));
+                dlg.FfbTextBox_Write(String.Format("\r\n >> Positive Saturation: {0}", Condition.PosSatur));
+                dlg.FfbTextBox_Write(String.Format("\r\n >> Negative Saturation: {0}", Condition.NegSatur));
+                dlg.FfbTextBox_Write(String.Format("\r\n >> Dead Band: {0}", Condition.DeadBand ));
             }
             #endregion
 
@@ -450,8 +450,8 @@ namespace WrapperTest
             vJoy.FFB_EFF_ENVLP Envelope = new vJoy.FFB_EFF_ENVLP();
             if (0 == joystick.Ffb_h_Eff_Envlp(data, ref Envelope))
             {
-                dlg.FfbTextBox_Write(String.Format("\r\n >> Attack Level: {0}", Envelope.AttackLevel * 10000 / 255));
-                dlg.FfbTextBox_Write(String.Format("\r\n >> Fade Level: {0}", Envelope.FadeLevel * 10000 / 255));
+                dlg.FfbTextBox_Write(String.Format("\r\n >> Attack Level: {0}", Envelope.AttackLevel));
+                dlg.FfbTextBox_Write(String.Format("\r\n >> Fade Level: {0}", Envelope.FadeLevel));
                 dlg.FfbTextBox_Write(String.Format("\r\n >> Attack Time: {0}", (int)(Envelope.AttackTime)));
                 dlg.FfbTextBox_Write(String.Format("\r\n >> Fade Time: {0}", (int)(Envelope.FadeTime)));
             };
@@ -461,9 +461,9 @@ namespace WrapperTest
             vJoy.FFB_EFF_PERIOD EffPrd = new vJoy.FFB_EFF_PERIOD();
             if (0 == joystick.Ffb_h_Eff_Period(data, ref EffPrd))
             {
-                dlg.FfbTextBox_Write(String.Format("\r\n >> Magnitude: {0}", EffPrd.Magnitude * 10000 / 255));
-                dlg.FfbTextBox_Write(String.Format("\r\n >> Offset: {0}", TwosCompByte2Int(EffPrd.Offset) * 10000 / 127));
-                dlg.FfbTextBox_Write(String.Format("\r\n >> Phase: {0}", EffPrd.Phase * 3600 / 255));
+                dlg.FfbTextBox_Write(String.Format("\r\n >> Magnitude: {0}", EffPrd.Magnitude ));
+                dlg.FfbTextBox_Write(String.Format("\r\n >> Offset: {0}", EffPrd.Offset));
+                dlg.FfbTextBox_Write(String.Format("\r\n >> Phase: {0}", EffPrd.Phase));
                 dlg.FfbTextBox_Write(String.Format("\r\n >> Period: {0}", (int)(EffPrd.Period)));
             };
             #endregion
@@ -483,8 +483,8 @@ namespace WrapperTest
             vJoy.FFB_EFF_RAMP RampEffect = new vJoy.FFB_EFF_RAMP();
             if (0 == joystick.Ffb_h_Eff_Ramp(data, ref RampEffect))
             {
-                dlg.FfbTextBox_Write(String.Format("\r\n >> Ramp Start: {0}", TwosCompByte2Int(RampEffect.Start) * 10000 / 127));
-                dlg.FfbTextBox_Write(String.Format("\r\n >> Ramp End: {0}", TwosCompByte2Int(RampEffect.End) * 10000 / 127));
+                dlg.FfbTextBox_Write(String.Format("\r\n >> Ramp Start: {0}", RampEffect.Start));
+                dlg.FfbTextBox_Write(String.Format("\r\n >> Ramp End: {0}", RampEffect.End));
             };
             #endregion
 
@@ -625,12 +625,12 @@ namespace WrapperTest
                     dlg.FfbTextBox_Write(String.Format("\r\n >> Y Axis"));
                 else
                     dlg.FfbTextBox_Write(String.Format("\r\n >> X Axis"));
-                dlg.FfbTextBox_Write(String.Format("\r\n >> Center Point Offset: {0}", TwosCompByte2Int(Condition.CenterPointOffset) * 10000 / 127));
-                dlg.FfbTextBox_Write(String.Format("\r\n >> Positive Coefficient: {0}", TwosCompByte2Int(Condition.PosCoeff) * 10000 / 127));
-                dlg.FfbTextBox_Write(String.Format("\r\n >> Negative Coefficient: {0}", TwosCompByte2Int(Condition.NegCoeff) * 10000 / 127));
-                dlg.FfbTextBox_Write(String.Format("\r\n >> Positive Saturation: {0}", Condition.PosSatur * 10000 / 255));
-                dlg.FfbTextBox_Write(String.Format("\r\n >> Negative Saturation: {0}", Condition.NegSatur * 10000 / 255));
-                dlg.FfbTextBox_Write(String.Format("\r\n >> Dead Band: {0}", Condition.DeadBand * 10000 / 255));
+                dlg.FfbTextBox_Write(String.Format("\r\n >> Center Point Offset: {0}", Condition.CenterPointOffset));
+                dlg.FfbTextBox_Write(String.Format("\r\n >> Positive Coefficient: {0}", Condition.PosCoeff));
+                dlg.FfbTextBox_Write(String.Format("\r\n >> Negative Coefficient: {0}", Condition.NegCoeff));
+                dlg.FfbTextBox_Write(String.Format("\r\n >> Positive Saturation: {0}", Condition.PosSatur ));
+                dlg.FfbTextBox_Write(String.Format("\r\n >> Negative Saturation: {0}", Condition.NegSatur));
+                dlg.FfbTextBox_Write(String.Format("\r\n >> Dead Band: {0}", Condition.DeadBand));
             }
             #endregion
 
@@ -638,8 +638,8 @@ namespace WrapperTest
             vJoy.FFB_EFF_ENVLP Envelope = new vJoy.FFB_EFF_ENVLP();
             if (0 == joystick.Ffb_h_Eff_Envlp(data, ref Envelope))
             {
-                dlg.FfbTextBox_Write(String.Format("\r\n >> Attack Level: {0}", Envelope.AttackLevel * 10000 / 255));
-                dlg.FfbTextBox_Write(String.Format("\r\n >> Fade Level: {0}", Envelope.FadeLevel * 10000 / 255));
+                dlg.FfbTextBox_Write(String.Format("\r\n >> Attack Level: {0}", Envelope.AttackLevel));
+                dlg.FfbTextBox_Write(String.Format("\r\n >> Fade Level: {0}", Envelope.FadeLevel ));
                 dlg.FfbTextBox_Write(String.Format("\r\n >> Attack Time: {0}", (int)(Envelope.AttackTime)));
                 dlg.FfbTextBox_Write(String.Format("\r\n >> Fade Time: {0}", (int)(Envelope.FadeTime)));
             };
@@ -649,9 +649,9 @@ namespace WrapperTest
             vJoy.FFB_EFF_PERIOD EffPrd = new vJoy.FFB_EFF_PERIOD();
             if (0 == joystick.Ffb_h_Eff_Period(data, ref EffPrd))
             {
-                dlg.FfbTextBox_Write(String.Format("\r\n >> Magnitude: {0}", EffPrd.Magnitude * 10000 / 255));
-                dlg.FfbTextBox_Write(String.Format("\r\n >> Offset: {0}", TwosCompByte2Int(EffPrd.Offset) * 10000 / 127));
-                dlg.FfbTextBox_Write(String.Format("\r\n >> Phase: {0}", EffPrd.Phase * 3600 / 255));
+                dlg.FfbTextBox_Write(String.Format("\r\n >> Magnitude: {0}", EffPrd.Magnitude));
+                dlg.FfbTextBox_Write(String.Format("\r\n >> Offset: {0}", EffPrd.Offset));
+                dlg.FfbTextBox_Write(String.Format("\r\n >> Phase: {0}", EffPrd.Phase));
                 dlg.FfbTextBox_Write(String.Format("\r\n >> Period: {0}", (int)(EffPrd.Period)));
             };
             #endregion
@@ -671,8 +671,8 @@ namespace WrapperTest
             vJoy.FFB_EFF_RAMP RampEffect = new vJoy.FFB_EFF_RAMP();
             if (0 == joystick.Ffb_h_Eff_Ramp(data, ref RampEffect))
             {
-                dlg.FfbTextBox_Write(String.Format("\r\n >> Ramp Start: {0}", TwosCompByte2Int(RampEffect.Start) * 10000 / 127));
-                dlg.FfbTextBox_Write(String.Format("\r\n >> Ramp End: {0}", TwosCompByte2Int(RampEffect.End) * 10000 / 127));
+                dlg.FfbTextBox_Write(String.Format("\r\n >> Ramp Start: {0}", RampEffect.Start));
+                dlg.FfbTextBox_Write(String.Format("\r\n >> Ramp End: {0}", RampEffect.End));
             };
             #endregion
 

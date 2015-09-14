@@ -277,22 +277,22 @@ if (Condition.isY)
 _tprintf(L"\n >> Y Axis");
 else
 _tprintf(L"\n >> X Axis");
-_tprintf(L"\n >> Center Point Offset: %d", /*TwosCompByte2Int*/(Condition.CenterPointOffset)/**10000/127*/);
-_tprintf(L"\n >> Positive Coefficient: %d", /*TwosCompByte2Int*/(Condition.PosCoeff)/**10000/127*/);
-_tprintf(L"\n >> Negative Coefficient: %d", /*TwosCompByte2Int*/(Condition.NegCoeff)/**10000/127*/);
-_tprintf(L"\n >> Positive Saturation: %d", Condition.PosSatur*10000/255);
-_tprintf(L"\n >> Negative Saturation: %d", Condition.NegSatur*10000/255);
-_tprintf(L"\n >> Dead Band: %d", Condition.DeadBand*10000/255);
+_tprintf(L"\n >> Center Point Offset: %d", TwosCompWord2Int((WORD)Condition.CenterPointOffset)/**10000/127*/);
+_tprintf(L"\n >> Positive Coefficient: %d", TwosCompWord2Int((WORD)Condition.PosCoeff)/**10000/127*/);
+_tprintf(L"\n >> Negative Coefficient: %d", TwosCompWord2Int((WORD)Condition.NegCoeff)/**10000/127*/);
+_tprintf(L"\n >> Positive Saturation: %d", Condition.PosSatur/**10000/255*/);
+_tprintf(L"\n >> Negative Saturation: %d", Condition.NegSatur/**10000/255*/);
+_tprintf(L"\n >> Dead Band: %d", Condition.DeadBand/**10000/255*/);
 }
 #pragma endregion
 #pragma region Envelope
 FFB_EFF_ENVLP Envelope;
 if (ERROR_SUCCESS == Ffb_h_Eff_Envlp((FFB_DATA *)data, &Envelope))
 {
-_tprintf(L"\n >> Attack Level: %d", Envelope.AttackLevel*10000/255);
-_tprintf(L"\n >> Fade Level: %d", Envelope.FadeLevel*10000/255);
-_tprintf(L"\n >> Attack Time: %d", static_cast<int>(Envelope.AttackTime));
-_tprintf(L"\n >> Fade Time: %d", static_cast<int>(Envelope.FadeTime));
+	_tprintf(L"\n >> Attack Level: %d", TwosCompWord2Int((WORD)Envelope.AttackLevel));
+	_tprintf(L"\n >> Fade Level: %d", TwosCompWord2Int((WORD)Envelope.FadeLevel));
+	_tprintf(L"\n >> Attack Time: %d", static_cast<int>(Envelope.AttackTime));
+	_tprintf(L"\n >> Fade Time: %d", static_cast<int>(Envelope.FadeTime));
 };
 
 #pragma endregion
@@ -300,9 +300,9 @@ _tprintf(L"\n >> Fade Time: %d", static_cast<int>(Envelope.FadeTime));
 FFB_EFF_PERIOD EffPrd;
 if (ERROR_SUCCESS == Ffb_h_Eff_Period((FFB_DATA *)data, &EffPrd))
 {
-_tprintf(L"\n >> Magnitude: %d", EffPrd.Magnitude * 10000 / 255);
-_tprintf(L"\n >> Offset: %d", /*TwosCompByte2Int*/(EffPrd.Offset) /** 10000 / 127*/);
-_tprintf(L"\n >> Phase: %d", EffPrd.Phase * 3600 / 255);
+_tprintf(L"\n >> Magnitude: %d", EffPrd.Magnitude );
+_tprintf(L"\n >> Offset: %d", TwosCompWord2Int(static_cast<WORD>(EffPrd.Offset)));
+_tprintf(L"\n >> Phase: %d", EffPrd.Phase);
 _tprintf(L"\n >> Period: %d", static_cast<int>(EffPrd.Period));
 };
 #pragma endregion
@@ -323,8 +323,8 @@ _tprintf(L"\n >> Effect Type: Unknown");
 FFB_EFF_RAMP RampEffect;
 if (ERROR_SUCCESS == Ffb_h_Eff_Ramp((FFB_DATA *)data, &RampEffect))
 {
-_tprintf(L"\n >> Ramp Start: %d", /*TwosCompByte2Int*/(RampEffect.Start) /** 10000 / 127*/);
-_tprintf(L"\n >> Ramp End: %d", /*TwosCompByte2Int*/(RampEffect.End) /** 10000 / 127*/);
+	_tprintf(L"\n >> Ramp Start: %d", TwosCompWord2Int((WORD)RampEffect.Start) /** 10000 / 127*/);
+	_tprintf(L"\n >> Ramp End: %d", TwosCompWord2Int((WORD)RampEffect.End) /** 10000 / 127*/);
 };
 
 #pragma endregion

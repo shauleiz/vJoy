@@ -331,7 +331,7 @@ Return Value:
 	case 0x910: // Backward compatibility value of 	LOAD_POSITIONS
 	case LOAD_POSITIONS:
 		// KdBreakPoint(); Break When loading position
-		status = WdfRequestRetrieveInputBuffer( Request, sizeof(JOYSTICK_POSITION_V2), &buffer, &bufSize);
+		status = WdfRequestRetrieveInputBuffer( Request, sizeof(JOYSTICK_POSITION), &buffer, &bufSize);
 		if(!NT_SUCCESS(status))
 			break;
 

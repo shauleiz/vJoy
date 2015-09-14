@@ -221,7 +221,7 @@ void CALLBACK FfbFunction1(PVOID data, PVOID userdata)
 	/////// Effect Report
 #pragma region Effect Report
 	FFB_EFF_CONST Effect;
-	if (ERROR_SUCCESS == Ffb_h_Eff_Const((FFB_DATA *)data, &Effect))
+	if (ERROR_SUCCESS == Ffb_h_Eff_Report((FFB_DATA *)data, &Effect))
 	{
 		if (!EffectType2Str(Effect.EffectType, TypeStr))
 			_tprintf("\n >> Effect Report: %02x", Effect.EffectType);

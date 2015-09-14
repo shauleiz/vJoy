@@ -1278,12 +1278,12 @@ LoadPositions(PJOYSTICK_POSITION_V2 pPosition, PDEVICE_EXTENSION pDevContext, si
 	pDevContext->positions[i]->ValHatsEx3		= pPosition->bHatsEx3;
 	
 	// Supporting 128 buttons: Upper buttons
-	//if (buffsize >= sizeof(JOYSTICK_POSITION_V2))
-	//{
+	if (buffsize >= sizeof(JOYSTICK_POSITION_V2))
+	{
 		pDevContext->positions[i]->ValButtonsEx1		= pPosition->lButtonsEx1;
 		pDevContext->positions[i]->ValButtonsEx2		= pPosition->lButtonsEx2;
 		pDevContext->positions[i]->ValButtonsEx3		= pPosition->lButtonsEx3;
-	//};
+	};
 
 	WdfWaitLockRelease(pDevContext->positionLock);
 }

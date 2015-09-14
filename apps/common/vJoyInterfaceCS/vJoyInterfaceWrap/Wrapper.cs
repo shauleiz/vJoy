@@ -151,8 +151,8 @@ namespace vJoyInterfaceWrap
         {
             [FieldOffset(0)]
             public Byte EffectBlockIndex;
-            [FieldOffset(2)]
-            public UInt16 Magnitude;
+            [FieldOffset(4)]
+            public Int16 Magnitude;
         }
 
         [System.Obsolete("use FFB_EFF_REPORT")]
@@ -229,17 +229,17 @@ namespace vJoyInterfaceWrap
             [FieldOffset(4)]
             public bool isY;
             [FieldOffset(8)]
-            public Byte CenterPointOffset; // CP Offset: Range 0x80­0x7F (­10000 ­ 10000)
-            [FieldOffset(9)]
-            public Byte PosCoeff; // Positive Coefficient: Range 0x80­0x7F (­10000 ­ 10000)
-            [FieldOffset(10)]
-            public Byte NegCoeff; // Negative Coefficient: Range 0x80­0x7F (­10000 ­ 10000)
-            [FieldOffset(11)]
-            public Byte PosSatur; // Positive Saturation: Range 0x00­0xFF (0 – 10000)
+            public Int16 CenterPointOffset; // CP Offset: Range 0x80­0x7F (­10000 ­ 10000)
             [FieldOffset(12)]
-            public Byte NegSatur; // Negative Saturation: Range 0x00­0xFF (0 – 10000)
-            [FieldOffset(13)]
-            public Byte DeadBand; // Dead Band: : Range 0x00­0xFF (0 – 10000)
+            public Int16 PosCoeff; // Positive Coefficient: Range 0x80­0x7F (­10000 ­ 10000)
+            [FieldOffset(16)]
+            public Int16 NegCoeff; // Negative Coefficient: Range 0x80­0x7F (­10000 ­ 10000)
+            [FieldOffset(20)]
+            public UInt32 PosSatur; // Positive Saturation: Range 0x00­0xFF (0 – 10000)
+            [FieldOffset(24)]
+            public UInt32 NegSatur; // Negative Saturation: Range 0x00­0xFF (0 – 10000)
+            [FieldOffset(28)]
+            public Int32 DeadBand; // Dead Band: : Range 0x00­0xFF (0 – 10000)
         } 
 
         [StructLayout(LayoutKind.Explicit)]
@@ -247,14 +247,14 @@ namespace vJoyInterfaceWrap
         {
             [FieldOffset(0)]
             public Byte EffectBlockIndex;
-            [FieldOffset(1)]
-            public Byte AttackLevel;
-            [FieldOffset(2)]
-            public Byte FadeLevel;
             [FieldOffset(4)]
-            public UInt16 AttackTime;
-            [FieldOffset(6)]
-            public UInt16 FadeTime;
+            public UInt16 AttackLevel;
+            [FieldOffset(8)]
+            public UInt16 FadeLevel;
+            [FieldOffset(12)]
+            public UInt32 AttackTime;
+            [FieldOffset(16)]
+            public UInt32 FadeTime;
         }
 
         [StructLayout(LayoutKind.Explicit)]
@@ -262,22 +262,25 @@ namespace vJoyInterfaceWrap
         {
             [FieldOffset(0)]
             public Byte EffectBlockIndex;
-            [FieldOffset(1)]
-            public Byte Magnitude;
-            [FieldOffset(2)]
-            public Byte Offset;
-            [FieldOffset(3)]
-            public Byte Phase;
             [FieldOffset(4)]
-            public UInt16 Period;
+            public UInt32 Magnitude;
+            [FieldOffset(8)]
+            public Int16 Offset;
+            [FieldOffset(12)]
+            public UInt32 Phase;
+            [FieldOffset(16)]
+            public UInt32 Period;
         }
 
-        [StructLayout(LayoutKind.Sequential)]
+        [StructLayout(LayoutKind.Explicit)]
         public struct FFB_EFF_RAMP
         {
+            [FieldOffset(0)]
             public Byte EffectBlockIndex;
-            public Byte Start;             // The Normalized magnitude at the start of the effect
-            public Byte End;               // The Normalized magnitude at the end of the effect
+            [FieldOffset(4)]
+            public Int16 Start;             // The Normalized magnitude at the start of the effect
+            [FieldOffset(8)]
+            public Int16 End;               // The Normalized magnitude at the end of the effect
         }
 
 

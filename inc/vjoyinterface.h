@@ -212,9 +212,9 @@ typedef struct _FFB_EFF_OP {
 typedef struct _FFB_EFF_PERIOD {
 	BYTE		EffectBlockIndex;
 	DWORD		Magnitude;			// Range: 0 - 10000
-	LONG 		Offset;				// Range: –2147483648 -  2147483647
+	LONG 		Offset;				// Range: –10000 - 10000
 	DWORD 		Phase;				// Range: 0 - 35999
-	DWORD 		Period;				// Range: 0 - 4294967295
+	DWORD 		Period;				// Range: 0 - 32767
 } FFB_EFF_PERIOD, *PFFB_EFF_PERIOD;
 
 typedef struct _FFB_EFF_COND {

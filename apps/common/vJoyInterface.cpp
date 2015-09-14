@@ -4046,8 +4046,8 @@ VJOYINTERFACE_API DWORD __cdecl Ffb_h_Eff_Period(const FFB_DATA * Packet,  FFB_E
 	// Routine validity checks 
 	if (!Packet)
 		return ERROR_INVALID_PARAMETER;
-	//if (Packet->size <23)
-	//	return ERROR_INVALID_DATA;
+	if (Packet->size <20)
+		return ERROR_INVALID_DATA;
 
 	// Some types don't carry Effect Block Index
 	FFBPType Type;
@@ -4058,9 +4058,9 @@ VJOYINTERFACE_API DWORD __cdecl Ffb_h_Eff_Period(const FFB_DATA * Packet,  FFB_E
 
 	Effect->EffectBlockIndex = Packet->data[1];
 	Effect->Magnitude = (DWORD)((Packet->data[3] << 8) + (Packet->data[2]));
-	Effect->Offset = (LONG)((Packet->data[7] << 24) + (Packet->data[6] << 16) + (Packet->data[5] << 8) + (Packet->data[4]));
-	Effect->Phase = (DWORD)((Packet->data[9] << 8) + (Packet->data[8]));
-	Effect->Period = (DWORD)((Packet->data[13] << 24) + (Packet->data[12] << 16) + (Packet->data[11] << 8) + (Packet->data[10]));
+	Effect->Offset = (LONG)((Packet->data[5] << 8) + (Packet->data[4]));
+	Effect->Phase = (DWORD)((Packet->data[7] << 8) + (Packet->data[6]));
+	Effect->Period = (DWORD)((Packet->data[11] << 24) + (Packet->data[10] << 16) + (Packet->data[9] << 8) + (Packet->data[8]));
 	return ERROR_SUCCESS;
 }
 
@@ -4072,7 +4072,7 @@ VJOYINTERFACE_API DWORD __cdecl Ffb_h_Eff_Cond(const FFB_DATA * Packet,  FFB_EFF
 	// Routine validity checks 
 	if (!Packet)
 		return ERROR_INVALID_PARAMETER;
-	if (Packet->size <25)
+	if (Packet->size <23)
 		return ERROR_INVALID_DATA;
 
 	// Some types don't carry Effect Block Index
