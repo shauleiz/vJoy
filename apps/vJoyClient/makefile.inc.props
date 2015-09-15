@@ -1,0 +1,47 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <NmakeTarget Include=" ">
+      <TargetKillSwitch>ConvertedTarget0_Disabled</TargetKillSwitch>
+      <TargetName>Converted Target 0</TargetName>
+      <Outputs>.\$(O)\vJoyInterface.dll</Outputs>
+      <Condition>
+      </Condition>
+      <Cmd0>copy /y ..\..\lib\$(O)\vJoyInterface.dll  %24%40</Cmd0>
+    </NmakeTarget>
+  </ItemGroup>
+  <Target Name="Converted Target 0" BeforeTargets="$(AfterBuildLinkTargets)" AfterTargets="$(BuildLinkTargets)" Condition="'$(ConvertedTarget0_Disabled)'!='true'">
+    <ItemGroup>
+      <AllEvaluatedTargetInputs Remove="@(AllEvaluatedTargetInputs)" />
+      <AllEvaluatedTargetInputs Include=" " />
+    </ItemGroup>
+    <ReplaceNmakeCommandTokens Command="copy /y ..\..\lib\$(O)\vJoyInterface.dll  %24%40" TaskInputFiles="@(AllEvaluatedTargetInputs)" TaskOutputFile=".\$(O)\vJoyInterface.dll">
+      <Output TaskParameter="ShouldExecute" PropertyName="TargetOutDated" />
+      <Output TaskParameter="ProcessedCommand" PropertyName="ResolvedCommand_1" />
+    </ReplaceNmakeCommandTokens>
+    <Exec Condition="'$(TargetOutDated)'=='true'" Command="$(ResolvedCommand_1)" WorkingDirectory="$(MSBuildProjectDirectory)" />
+    <Message Condition="'$(TargetOutDated)'!='true'" Text="File .\$(O)\vJoyInterface.dll is up-to-date" />
+  </Target>
+  <ItemGroup>
+    <NmakeTarget Include=" ">
+      <TargetKillSwitch>ConvertedTarget1_Disabled</TargetKillSwitch>
+      <TargetName>Converted Target 1</TargetName>
+      <Outputs>.\$(O)\vJoyInterface.lib</Outputs>
+      <Condition>
+      </Condition>
+      <Cmd0>copy /y ..\..\lib\$(O)\vJoyInterface.lib  %24%40</Cmd0>
+    </NmakeTarget>
+  </ItemGroup>
+  <Target Name="Converted Target 1" BeforeTargets="$(AfterBuildLinkTargets)" AfterTargets="$(BuildLinkTargets)" Condition="'$(ConvertedTarget1_Disabled)'!='true'">
+    <ItemGroup>
+      <AllEvaluatedTargetInputs Remove="@(AllEvaluatedTargetInputs)" />
+      <AllEvaluatedTargetInputs Include=" " />
+    </ItemGroup>
+    <ReplaceNmakeCommandTokens Command="copy /y ..\..\lib\$(O)\vJoyInterface.lib  %24%40" TaskInputFiles="@(AllEvaluatedTargetInputs)" TaskOutputFile=".\$(O)\vJoyInterface.lib">
+      <Output TaskParameter="ShouldExecute" PropertyName="TargetOutDated" />
+      <Output TaskParameter="ProcessedCommand" PropertyName="ResolvedCommand_1" />
+    </ReplaceNmakeCommandTokens>
+    <Exec Condition="'$(TargetOutDated)'=='true'" Command="$(ResolvedCommand_1)" WorkingDirectory="$(MSBuildProjectDirectory)" />
+    <Message Condition="'$(TargetOutDated)'!='true'" Text="File .\$(O)\vJoyInterface.lib is up-to-date" />
+  </Target>
+</Project>

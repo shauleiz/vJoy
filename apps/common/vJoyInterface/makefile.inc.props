@@ -1,0 +1,124 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <NmakeTarget Include=" ">
+      <TargetKillSwitch>ConvertedTarget0_Disabled</TargetKillSwitch>
+      <TargetName>Converted Target 0</TargetName>
+      <Outputs>$(OBJ_PATH)\$(O)\$(TARGETNAME).dll $(OBJ_PATH)\$(O)\$(TARGETNAME).lib</Outputs>
+      <Condition>
+      </Condition>
+      <Cmd0>bldInterface.bat</Cmd0>
+    </NmakeTarget>
+  </ItemGroup>
+  <Target Name="Converted Target 0" BeforeTargets="$(BuildGenerateSourcesTargets)" Condition="'$(ConvertedTarget0_Disabled)'!='true'">
+    <ItemGroup>
+      <AllEvaluatedTargetInputs Remove="@(AllEvaluatedTargetInputs)" />
+      <AllEvaluatedTargetInputs Include=" " />
+    </ItemGroup>
+    <ReplaceNmakeCommandTokens Command="bldInterface.bat" TaskInputFiles="@(AllEvaluatedTargetInputs)" TaskOutputFile="$(OBJ_PATH)\$(O)\$(TARGETNAME).dll">
+      <Output TaskParameter="ShouldExecute" PropertyName="TargetOutDated" />
+      <Output TaskParameter="ProcessedCommand" PropertyName="ResolvedCommand_1" />
+    </ReplaceNmakeCommandTokens>
+    <Exec Condition="'$(TargetOutDated)'=='true'" Command="$(ResolvedCommand_1)" WorkingDirectory="$(MSBuildProjectDirectory)" />
+    <Message Condition="'$(TargetOutDated)'!='true'" Text="File $(OBJ_PATH)\$(O)\$(TARGETNAME).dll is up-to-date" />
+    <ReplaceNmakeCommandTokens Command="bldInterface.bat" TaskInputFiles="@(AllEvaluatedTargetInputs)" TaskOutputFile="$(OBJ_PATH)\$(O)\$(TARGETNAME).lib">
+      <Output TaskParameter="ShouldExecute" PropertyName="TargetOutDated" />
+      <Output TaskParameter="ProcessedCommand" PropertyName="ResolvedCommand_1" />
+    </ReplaceNmakeCommandTokens>
+    <Exec Condition="'$(TargetOutDated)'=='true'" Command="$(ResolvedCommand_1)" WorkingDirectory="$(MSBuildProjectDirectory)" />
+    <Message Condition="'$(TargetOutDated)'!='true'" Text="File $(OBJ_PATH)\$(O)\$(TARGETNAME).lib is up-to-date" />
+  </Target>
+  <ItemGroup>
+    <NmakeTarget Include="$(TARGETNAME).h">
+      <TargetKillSwitch>ConvertedTarget1_Disabled</TargetKillSwitch>
+      <TargetName>Converted Target 1</TargetName>
+      <Outputs>$(INCLUDES)\$(TARGETNAME).h</Outputs>
+      <Condition>
+      </Condition>
+      <Cmd0>if not exist $(INCLUDES) mkdir $(INCLUDES)</Cmd0>
+      <Cmd1>copy /y $(TARGETNAME).h  %24%40</Cmd1>
+    </NmakeTarget>
+  </ItemGroup>
+  <Target Name="Converted Target 1" BeforeTargets="$(AfterBuildLinkTargets)" AfterTargets="$(BuildLinkTargets)" Condition="'$(ConvertedTarget1_Disabled)'!='true'">
+    <ItemGroup>
+      <AllEvaluatedTargetInputs Remove="@(AllEvaluatedTargetInputs)" />
+      <t_TargetInput_0 Remove="@(t_TargetInput_0)" />
+      <t_TargetInput_0 Include="$(TARGETNAME).h" Condition="Exists('$(TARGETNAME).h') And ('@(t_TargetInput_0)'=='')" />
+      <t_TargetInput_0 Include="$(TARGETNAME).h" Condition="'@(t_TargetInput_0)'==''" />
+      <AllEvaluatedTargetInputs Include="@(t_TargetInput_0);" />
+    </ItemGroup>
+    <ReplaceNmakeCommandTokens Command="if not exist $(INCLUDES) mkdir $(INCLUDES)" TaskInputFiles="@(AllEvaluatedTargetInputs)" TaskOutputFile="$(INCLUDES)\$(TARGETNAME).h">
+      <Output TaskParameter="ShouldExecute" PropertyName="TargetOutDated" />
+      <Output TaskParameter="ProcessedCommand" PropertyName="ResolvedCommand_1" />
+    </ReplaceNmakeCommandTokens>
+    <Exec Condition="'$(TargetOutDated)'=='true'" Command="$(ResolvedCommand_1)" WorkingDirectory="$(MSBuildProjectDirectory)" />
+    <ReplaceNmakeCommandTokens Command="copy /y $(TARGETNAME).h  %24%40" TaskInputFiles="@(AllEvaluatedTargetInputs)" TaskOutputFile="$(INCLUDES)\$(TARGETNAME).h">
+      <Output TaskParameter="ShouldExecute" PropertyName="Junk_Property" />
+      <Output TaskParameter="ProcessedCommand" PropertyName="ResolvedCommand_2" />
+    </ReplaceNmakeCommandTokens>
+    <Exec Condition="'$(TargetOutDated)'=='true'" Command="$(ResolvedCommand_2)" WorkingDirectory="$(MSBuildProjectDirectory)" />
+    <Message Condition="'$(TargetOutDated)'!='true'" Text="File $(INCLUDES)\$(TARGETNAME).h is up-to-date" />
+  </Target>
+  <ItemGroup>
+    <NmakeTarget Include="$(OBJ_PATH)\$(O)\$(TARGETNAME).lib">
+      <TargetKillSwitch>ConvertedTarget2_Disabled</TargetKillSwitch>
+      <TargetName>Converted Target 2</TargetName>
+      <Outputs>$(LIB_DIR)\$(O)\$(TARGETNAME).lib</Outputs>
+      <Condition>
+      </Condition>
+      <Cmd0>if not exist $(LIB_DIR)\$(O) mkdir $(LIB_DIR)\$(O)</Cmd0>
+      <Cmd1>copy /y $(OBJ_PATH)\$(O)\$(TARGETNAME).lib  %24%40</Cmd1>
+    </NmakeTarget>
+  </ItemGroup>
+  <Target Name="Converted Target 2" DependsOnTargets="Converted Target 0" BeforeTargets="$(AfterBuildLinkTargets)" AfterTargets="$(BuildLinkTargets)" Condition="'$(ConvertedTarget2_Disabled)'!='true'">
+    <ItemGroup>
+      <AllEvaluatedTargetInputs Remove="@(AllEvaluatedTargetInputs)" />
+      <t_TargetInput_0 Remove="@(t_TargetInput_0)" />
+      <t_TargetInput_0 Include="$(OBJ_PATH)\$(O)\$(TARGETNAME).lib" Condition="Exists('$(OBJ_PATH)\$(O)\$(TARGETNAME).lib') And ('@(t_TargetInput_0)'=='')" />
+      <t_TargetInput_0 Include="$(OBJ_PATH)\$(O)\$(TARGETNAME).lib" Condition="'@(t_TargetInput_0)'==''" />
+      <AllEvaluatedTargetInputs Include="@(t_TargetInput_0);" />
+    </ItemGroup>
+    <ReplaceNmakeCommandTokens Command="if not exist $(LIB_DIR)\$(O) mkdir $(LIB_DIR)\$(O)" TaskInputFiles="@(AllEvaluatedTargetInputs)" TaskOutputFile="$(LIB_DIR)\$(O)\$(TARGETNAME).lib">
+      <Output TaskParameter="ShouldExecute" PropertyName="TargetOutDated" />
+      <Output TaskParameter="ProcessedCommand" PropertyName="ResolvedCommand_1" />
+    </ReplaceNmakeCommandTokens>
+    <Exec Condition="'$(TargetOutDated)'=='true'" Command="$(ResolvedCommand_1)" WorkingDirectory="$(MSBuildProjectDirectory)" />
+    <ReplaceNmakeCommandTokens Command="copy /y $(OBJ_PATH)\$(O)\$(TARGETNAME).lib  %24%40" TaskInputFiles="@(AllEvaluatedTargetInputs)" TaskOutputFile="$(LIB_DIR)\$(O)\$(TARGETNAME).lib">
+      <Output TaskParameter="ShouldExecute" PropertyName="Junk_Property" />
+      <Output TaskParameter="ProcessedCommand" PropertyName="ResolvedCommand_2" />
+    </ReplaceNmakeCommandTokens>
+    <Exec Condition="'$(TargetOutDated)'=='true'" Command="$(ResolvedCommand_2)" WorkingDirectory="$(MSBuildProjectDirectory)" />
+    <Message Condition="'$(TargetOutDated)'!='true'" Text="File $(LIB_DIR)\$(O)\$(TARGETNAME).lib is up-to-date" />
+  </Target>
+  <ItemGroup>
+    <NmakeTarget Include="$(OBJ_PATH)\$(O)\$(TARGETNAME).dll">
+      <TargetKillSwitch>ConvertedTarget3_Disabled</TargetKillSwitch>
+      <TargetName>Converted Target 3</TargetName>
+      <Outputs>$(LIB_DIR)\$(O)\$(TARGETNAME).dll</Outputs>
+      <Condition>
+      </Condition>
+      <Cmd0>if not exist $(LIB_DIR)\$(O) mkdir $(LIB_DIR)\$(O)</Cmd0>
+      <Cmd1>copy /y $(OBJ_PATH)\$(O)\$(TARGETNAME).dll  %24%40</Cmd1>
+    </NmakeTarget>
+  </ItemGroup>
+  <Target Name="Converted Target 3" DependsOnTargets="Converted Target 0" BeforeTargets="$(AfterBuildLinkTargets)" AfterTargets="$(BuildLinkTargets)" Condition="'$(ConvertedTarget3_Disabled)'!='true'">
+    <ItemGroup>
+      <AllEvaluatedTargetInputs Remove="@(AllEvaluatedTargetInputs)" />
+      <t_TargetInput_0 Remove="@(t_TargetInput_0)" />
+      <t_TargetInput_0 Include="$(OBJ_PATH)\$(O)\$(TARGETNAME).dll" Condition="Exists('$(OBJ_PATH)\$(O)\$(TARGETNAME).dll') And ('@(t_TargetInput_0)'=='')" />
+      <t_TargetInput_0 Include="$(OBJ_PATH)\$(O)\$(TARGETNAME).dll" Condition="'@(t_TargetInput_0)'==''" />
+      <AllEvaluatedTargetInputs Include="@(t_TargetInput_0);" />
+    </ItemGroup>
+    <ReplaceNmakeCommandTokens Command="if not exist $(LIB_DIR)\$(O) mkdir $(LIB_DIR)\$(O)" TaskInputFiles="@(AllEvaluatedTargetInputs)" TaskOutputFile="$(LIB_DIR)\$(O)\$(TARGETNAME).dll">
+      <Output TaskParameter="ShouldExecute" PropertyName="TargetOutDated" />
+      <Output TaskParameter="ProcessedCommand" PropertyName="ResolvedCommand_1" />
+    </ReplaceNmakeCommandTokens>
+    <Exec Condition="'$(TargetOutDated)'=='true'" Command="$(ResolvedCommand_1)" WorkingDirectory="$(MSBuildProjectDirectory)" />
+    <ReplaceNmakeCommandTokens Command="copy /y $(OBJ_PATH)\$(O)\$(TARGETNAME).dll  %24%40" TaskInputFiles="@(AllEvaluatedTargetInputs)" TaskOutputFile="$(LIB_DIR)\$(O)\$(TARGETNAME).dll">
+      <Output TaskParameter="ShouldExecute" PropertyName="Junk_Property" />
+      <Output TaskParameter="ProcessedCommand" PropertyName="ResolvedCommand_2" />
+    </ReplaceNmakeCommandTokens>
+    <Exec Condition="'$(TargetOutDated)'=='true'" Command="$(ResolvedCommand_2)" WorkingDirectory="$(MSBuildProjectDirectory)" />
+    <Message Condition="'$(TargetOutDated)'!='true'" Text="File $(LIB_DIR)\$(O)\$(TARGETNAME).dll is up-to-date" />
+  </Target>
+</Project>

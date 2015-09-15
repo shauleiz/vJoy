@@ -1,0 +1,46 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 2013
+VisualStudioVersion = 12.0
+MinimumVisualStudioVersion = 12.0
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "GTK", "GTK", "{0F8907C1-735B-461F-A9D1-E4F4C2487702}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "CmdLine", "CmdLine", "{248C571A-FEC8-4EB4-A075-B91E1252A9ED}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "vJoyInstall", "GTK\vJoyInstall.vcxproj", "{8BA587A9-8009-48DF-8C84-E9438EDC6020}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "vJoyInstall", "CmdLine\vJoyInstall.vcxproj", "{41B85AE3-464D-4F92-8AF4-5C2F890A9CAE}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Win32 = Debug|Win32
+		Release|Win32 = Release|Win32
+		Debug|x64 = Debug|x64
+		Release|x64 = Release|x64
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{8BA587A9-8009-48DF-8C84-E9438EDC6020}.Debug|Win32.ActiveCfg = Debug|Win32
+		{8BA587A9-8009-48DF-8C84-E9438EDC6020}.Debug|Win32.Build.0 = Debug|Win32
+		{8BA587A9-8009-48DF-8C84-E9438EDC6020}.Release|Win32.ActiveCfg = Release|Win32
+		{8BA587A9-8009-48DF-8C84-E9438EDC6020}.Release|Win32.Build.0 = Release|Win32
+		{8BA587A9-8009-48DF-8C84-E9438EDC6020}.Debug|x64.ActiveCfg = Debug|x64
+		{8BA587A9-8009-48DF-8C84-E9438EDC6020}.Debug|x64.Build.0 = Debug|x64
+		{8BA587A9-8009-48DF-8C84-E9438EDC6020}.Release|x64.ActiveCfg = Release|x64
+		{8BA587A9-8009-48DF-8C84-E9438EDC6020}.Release|x64.Build.0 = Release|x64
+		{41B85AE3-464D-4F92-8AF4-5C2F890A9CAE}.Debug|Win32.ActiveCfg = Debug|Win32
+		{41B85AE3-464D-4F92-8AF4-5C2F890A9CAE}.Debug|Win32.Build.0 = Debug|Win32
+		{41B85AE3-464D-4F92-8AF4-5C2F890A9CAE}.Release|Win32.ActiveCfg = Release|Win32
+		{41B85AE3-464D-4F92-8AF4-5C2F890A9CAE}.Release|Win32.Build.0 = Release|Win32
+		{41B85AE3-464D-4F92-8AF4-5C2F890A9CAE}.Debug|x64.ActiveCfg = Debug|x64
+		{41B85AE3-464D-4F92-8AF4-5C2F890A9CAE}.Debug|x64.Build.0 = Debug|x64
+		{41B85AE3-464D-4F92-8AF4-5C2F890A9CAE}.Release|x64.ActiveCfg = Release|x64
+		{41B85AE3-464D-4F92-8AF4-5C2F890A9CAE}.Release|x64.Build.0 = Release|x64
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{8BA587A9-8009-48DF-8C84-E9438EDC6020} = {0F8907C1-735B-461F-A9D1-E4F4C2487702}
+		{41B85AE3-464D-4F92-8AF4-5C2F890A9CAE} = {248C571A-FEC8-4EB4-A075-B91E1252A9ED}
+	EndGlobalSection
+EndGlobal

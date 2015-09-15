@@ -1,0 +1,68 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <TARGETNAME Condition="'$(OVERRIDE_TARGETNAME)'!='true'">vJoy</TARGETNAME>
+    <TARGETTYPE Condition="'$(OVERRIDE_TARGETTYPE)'!='true'">DRIVER</TARGETTYPE>
+    <KMDF_VERSION_MAJOR Condition="'$(OVERRIDE_KMDF_VERSION_MAJOR)'!='true'">1</KMDF_VERSION_MAJOR>
+    <KMDF_VERSION Condition="'$(OVERRIDE_KMDF_VERSION)'!='true'">1</KMDF_VERSION>
+    <TARGETLIBS Condition="'$(OVERRIDE_TARGETLIBS)'!='true'">$(DDK_LIB_PATH)\hidclass.lib             $(DDK_LIB_PATH)\ntstrsafe.lib</TARGETLIBS>
+    <INCLUDES Condition="'$(OVERRIDE_INCLUDES)'!='true'">$(INCLUDES);..\..\inc</INCLUDES>
+    <SOURCES Condition="'$(OVERRIDE_SOURCES)'!='true'">driver.c           hid.c           usb.c   	rawpdo.c  	vjoy.rc  	errcodes.mc</SOURCES>
+    <INF_NAME Condition="'$(OVERRIDE_INF_NAME)'!='true'">vjoy</INF_NAME>
+    <NTTARGETFILE0 Condition="'$(OVERRIDE_NTTARGETFILE0)'!='true'">$(OBJ_PATH)\$(O)\$(INF_NAME).inf</NTTARGETFILE0>
+    <PASS0_BINPLACE Condition="'$(OVERRIDE_PASS0_BINPLACE)'!='true'">$(NTTARGETFILE0)</PASS0_BINPLACE>
+    <SHIM_NAME Condition="'$(OVERRIDE_SHIM_NAME)'!='true'">hidkmdf</SHIM_NAME>
+    <SHIM_X64 Condition="'$(OVERRIDE_SHIM_X64)'!='true'">hidkmdf_wlh_amd64.sys</SHIM_X64>
+    <SHIM_X86 Condition="'$(OVERRIDE_SHIM_X86)'!='true'">hidkmdf_wxp_x86.sys</SHIM_X86>
+    <INSTALL_DIR Condition="'$(OVERRIDE_INSTALL_DIR)'!='true'">..\..\install</INSTALL_DIR>
+    <SHIM_DIR Condition="'$(OVERRIDE_SHIM_DIR)'!='true'">..\hidmapper</SHIM_DIR>
+    <WDFCOINST_BASE Condition="'$(OVERRIDE_WDFCOINST_BASE)'!='true'">WdfCoInstaller</WDFCOINST_BASE>
+    <WUDFUPDATE_BASE Condition="'$(OVERRIDE_WUDFUPDATE_BASE)'!='true'">WUDFUpdate_</WUDFUPDATE_BASE>
+    <NTTARGETFILE2 Condition="'$(OVERRIDE_NTTARGETFILE2)'!='true'">$(INSTALL_DIR)\$(O)\$(INF_NAME).inf  		$(INSTALL_DIR)\$(O)\$(TARGETNAME).sys  		$(INSTALL_DIR)\$(O)\$(WDFCOINST_BASE).dll  		$(INSTALL_DIR)\$(O)\$(WUDFUPDATE_BASE).dll  		$(INSTALL_DIR)\$(O)\$(SHIM_NAME).sys</NTTARGETFILE2>
+    <C_DEFINES Condition="'$(OVERRIDE_C_DEFINES)'!='true'">$(C_DEFINES) -DBUILD_ALT_DIR=\"$(BUILD_ALT_DIR)\"</C_DEFINES>
+  </PropertyGroup>
+  <ItemGroup>
+    <InvokedTargetsList Include="$(INSTALL_DIR)\$(O)\$(INF_NAME).inf">
+      <Pass>2</Pass>
+      <Condition>
+      </Condition>
+    </InvokedTargetsList>
+    <InvokedTargetsList Include="$(INSTALL_DIR)\$(O)\$(SHIM_NAME).sys">
+      <Pass>2</Pass>
+      <Condition>
+      </Condition>
+    </InvokedTargetsList>
+    <InvokedTargetsList Include="$(INSTALL_DIR)\$(O)\$(TARGETNAME).sys">
+      <Pass>2</Pass>
+      <Condition>
+      </Condition>
+    </InvokedTargetsList>
+    <InvokedTargetsList Include="$(INSTALL_DIR)\$(O)\$(WDFCOINST_BASE).dll">
+      <Pass>2</Pass>
+      <Condition>
+      </Condition>
+    </InvokedTargetsList>
+    <InvokedTargetsList Include="$(INSTALL_DIR)\$(O)\$(WUDFUPDATE_BASE).dll">
+      <Pass>2</Pass>
+      <Condition>
+      </Condition>
+    </InvokedTargetsList>
+    <InvokedTargetsList Include="$(OBJ_PATH)\$(O)\$(INF_NAME).inf">
+      <Pass>0</Pass>
+      <Condition>
+      </Condition>
+    </InvokedTargetsList>
+  </ItemGroup>
+  <Choose>
+    <When Condition="'$(ENABLE_EVENT_TRACING)'!=''">
+      <PropertyGroup>
+        <C_DEFINES Condition="'$(OVERRIDE_C_DEFINES)'!='true'">$(C_DEFINES) -DEVENT_TRACING</C_DEFINES>
+        <RUN_WPP Condition="'$(OVERRIDE_RUN_WPP)'!='true'">$(SOURCES)                                       -km                                              -func:TraceEvents(LEVEL,FLAGS,MSG,...)           -gen:{km-WdfDefault.tpl}*.tmh</RUN_WPP>
+      </PropertyGroup>
+    </When>
+  </Choose>
+  <PropertyGroup>
+    <TARGET_DESTINATION Condition="'$(OVERRIDE_TARGET_DESTINATION)'!='true'">wdf</TARGET_DESTINATION>
+    <ALLOW_DATE_TIME Condition="'$(OVERRIDE_ALLOW_DATE_TIME)'!='true'">1</ALLOW_DATE_TIME>
+  </PropertyGroup>
+</Project>

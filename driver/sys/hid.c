@@ -1315,7 +1315,7 @@ PVOID GetReportDescriptorFromRegistry(size_t * Size, USHORT * IdMask)
 	PVOID					out=NULL;
 	HANDLE					hKeyParameters=NULL;
 	int						iDevice=0;
-	PKEY_BASIC_INFORMATION 	pDeviceBasicInfo;
+	PKEY_BASIC_INFORMATION 	pDeviceBasicInfo=NULL;
 	ULONG					ResultLength;
 	ULONG					nameLength;
 	WCHAR					DeviceKeyName[512];
@@ -1364,6 +1364,9 @@ PVOID GetReportDescriptorFromRegistry(size_t * Size, USHORT * IdMask)
 			//ExFreePoolWithTag(pDeviceBasicInfo, 'fnIb');
 			return NULL;
 		};
+
+		if (!pDeviceBasicInfo)
+			return NULL;
 
 		// Copy name of subkey to unicode buffer and release temporary buffer
 		nameLength = pDeviceBasicInfo->NameLength;

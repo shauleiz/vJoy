@@ -1,0 +1,104 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <_LNG Condition="'$(OVERRIDE__LNG)'!='true'">$(LANGUAGE)</_LNG>
+  </PropertyGroup>
+  <Choose>
+    <When Condition="'$(_BUILDARCH)'=='AMD64'">
+      <PropertyGroup>
+        <MANIFEST Condition="'$(OVERRIDE_MANIFEST)'!='true'">vJoyInstallx64.exe.manifest</MANIFEST>
+      </PropertyGroup>
+    </When>
+    <Otherwise>
+      <PropertyGroup>
+        <MANIFEST Condition="'$(OVERRIDE_MANIFEST)'!='true'">vJoyInstallx86.exe.manifest</MANIFEST>
+      </PropertyGroup>
+    </Otherwise>
+  </Choose>
+  <PropertyGroup>
+    <AS_ADMIN Condition="'$(OVERRIDE_AS_ADMIN)'!='true'">mt.exe -manifest "$(MANIFEST)" -outputresource:$(OBJ_PATH)\$(O)\$(TARGETNAME).exe</AS_ADMIN>
+    <MAKE_SVN Condition="'$(OVERRIDE_MAKE_SVN)'!='true'">SubWCRev.exe .  svn_version.h.tmpl svn_version.h</MAKE_SVN>
+  </PropertyGroup>
+  <ItemGroup>
+    <NmakeTarget Include=" ">
+      <TargetKillSwitch>ConvertedTarget0_Disabled</TargetKillSwitch>
+      <TargetName>Converted Target 0</TargetName>
+      <Outputs>svn_version.h all</Outputs>
+      <Condition>
+      </Condition>
+      <Cmd0>DEL svn_version.h</Cmd0>
+      <Cmd1>$(MAKE_SVN)</Cmd1>
+    </NmakeTarget>
+  </ItemGroup>
+  <Target Name="Converted Target 0" BeforeTargets="$(BuildGenerateSourcesTargets)" Condition="'$(ConvertedTarget0_Disabled)'!='true'">
+    <ItemGroup>
+      <AllEvaluatedTargetInputs Remove="@(AllEvaluatedTargetInputs)" />
+      <AllEvaluatedTargetInputs Include=" " />
+    </ItemGroup>
+    <ReplaceNmakeCommandTokens Command="DEL svn_version.h" TaskInputFiles="@(AllEvaluatedTargetInputs)" TaskOutputFile="svn_version.h">
+      <Output TaskParameter="ShouldExecute" PropertyName="TargetOutDated" />
+      <Output TaskParameter="ProcessedCommand" PropertyName="ResolvedCommand_1" />
+    </ReplaceNmakeCommandTokens>
+    <Exec Condition="'$(TargetOutDated)'=='true'" Command="$(ResolvedCommand_1)" WorkingDirectory="$(MSBuildProjectDirectory)" />
+    <ReplaceNmakeCommandTokens Command="$(MAKE_SVN)" TaskInputFiles="@(AllEvaluatedTargetInputs)" TaskOutputFile="svn_version.h">
+      <Output TaskParameter="ShouldExecute" PropertyName="Junk_Property" />
+      <Output TaskParameter="ProcessedCommand" PropertyName="ResolvedCommand_2" />
+    </ReplaceNmakeCommandTokens>
+    <Exec Condition="'$(TargetOutDated)'=='true'" Command="$(ResolvedCommand_2)" WorkingDirectory="$(MSBuildProjectDirectory)" />
+    <Message Condition="'$(TargetOutDated)'!='true'" Text="File svn_version.h is up-to-date" />
+    <ReplaceNmakeCommandTokens Command="DEL svn_version.h" TaskInputFiles="@(AllEvaluatedTargetInputs)" TaskOutputFile="all">
+      <Output TaskParameter="ShouldExecute" PropertyName="TargetOutDated" />
+      <Output TaskParameter="ProcessedCommand" PropertyName="ResolvedCommand_1" />
+    </ReplaceNmakeCommandTokens>
+    <Exec Condition="'$(TargetOutDated)'=='true'" Command="$(ResolvedCommand_1)" WorkingDirectory="$(MSBuildProjectDirectory)" />
+    <ReplaceNmakeCommandTokens Command="$(MAKE_SVN)" TaskInputFiles="@(AllEvaluatedTargetInputs)" TaskOutputFile="all">
+      <Output TaskParameter="ShouldExecute" PropertyName="Junk_Property" />
+      <Output TaskParameter="ProcessedCommand" PropertyName="ResolvedCommand_2" />
+    </ReplaceNmakeCommandTokens>
+    <Exec Condition="'$(TargetOutDated)'=='true'" Command="$(ResolvedCommand_2)" WorkingDirectory="$(MSBuildProjectDirectory)" />
+    <Message Condition="'$(TargetOutDated)'!='true'" Text="File all is up-to-date" />
+  </Target>
+  <ItemGroup>
+    <NmakeTarget Include="$(OBJ_PATH)\$(O)\$(TARGETNAME).exe">
+      <TargetKillSwitch>ConvertedTarget1_Disabled</TargetKillSwitch>
+      <TargetName>Converted Target 1</TargetName>
+      <Outputs>$(INSTALL_DIR)\$(O)\$(TARGETNAME).exe</Outputs>
+      <Condition>
+      </Condition>
+      <Cmd0>$(AS_ADMIN)</Cmd0>
+      <Cmd1>if not exist $(INSTALL_DIR)\$(O) mkdir $(INSTALL_DIR)\$(O)</Cmd1>
+      <Cmd2>signtool sign /a /v /s PrivateCertStore $(OBJ_PATH)\$(O)\$(TARGETNAME).exe</Cmd2>
+      <Cmd3>copy $(OBJ_PATH)\$(O)\$(TARGETNAME).exe  %24%40</Cmd3>
+    </NmakeTarget>
+  </ItemGroup>
+  <Target Name="Converted Target 1" BeforeTargets="$(AfterBuildLinkTargets)" AfterTargets="$(BuildLinkTargets)" Condition="'$(ConvertedTarget1_Disabled)'!='true'">
+    <ItemGroup>
+      <AllEvaluatedTargetInputs Remove="@(AllEvaluatedTargetInputs)" />
+      <t_TargetInput_0 Remove="@(t_TargetInput_0)" />
+      <t_TargetInput_0 Include="$(OBJ_PATH)\$(O)\$(TARGETNAME).exe" Condition="Exists('$(OBJ_PATH)\$(O)\$(TARGETNAME).exe') And ('@(t_TargetInput_0)'=='')" />
+      <t_TargetInput_0 Include="$(OBJ_PATH)\$(O)\$(TARGETNAME).exe" Condition="'@(t_TargetInput_0)'==''" />
+      <AllEvaluatedTargetInputs Include="@(t_TargetInput_0);" />
+    </ItemGroup>
+    <ReplaceNmakeCommandTokens Command="$(AS_ADMIN)" TaskInputFiles="@(AllEvaluatedTargetInputs)" TaskOutputFile="$(INSTALL_DIR)\$(O)\$(TARGETNAME).exe">
+      <Output TaskParameter="ShouldExecute" PropertyName="TargetOutDated" />
+      <Output TaskParameter="ProcessedCommand" PropertyName="ResolvedCommand_1" />
+    </ReplaceNmakeCommandTokens>
+    <Exec Condition="'$(TargetOutDated)'=='true'" Command="$(ResolvedCommand_1)" WorkingDirectory="$(MSBuildProjectDirectory)" />
+    <ReplaceNmakeCommandTokens Command="if not exist $(INSTALL_DIR)\$(O) mkdir $(INSTALL_DIR)\$(O)" TaskInputFiles="@(AllEvaluatedTargetInputs)" TaskOutputFile="$(INSTALL_DIR)\$(O)\$(TARGETNAME).exe">
+      <Output TaskParameter="ShouldExecute" PropertyName="Junk_Property" />
+      <Output TaskParameter="ProcessedCommand" PropertyName="ResolvedCommand_2" />
+    </ReplaceNmakeCommandTokens>
+    <Exec Condition="'$(TargetOutDated)'=='true'" Command="$(ResolvedCommand_2)" WorkingDirectory="$(MSBuildProjectDirectory)" />
+    <ReplaceNmakeCommandTokens Command="signtool sign /a /v /s PrivateCertStore $(OBJ_PATH)\$(O)\$(TARGETNAME).exe" TaskInputFiles="@(AllEvaluatedTargetInputs)" TaskOutputFile="$(INSTALL_DIR)\$(O)\$(TARGETNAME).exe">
+      <Output TaskParameter="ShouldExecute" PropertyName="Junk_Property" />
+      <Output TaskParameter="ProcessedCommand" PropertyName="ResolvedCommand_3" />
+    </ReplaceNmakeCommandTokens>
+    <Exec Condition="'$(TargetOutDated)'=='true'" Command="$(ResolvedCommand_3)" WorkingDirectory="$(MSBuildProjectDirectory)" />
+    <ReplaceNmakeCommandTokens Command="copy $(OBJ_PATH)\$(O)\$(TARGETNAME).exe  %24%40" TaskInputFiles="@(AllEvaluatedTargetInputs)" TaskOutputFile="$(INSTALL_DIR)\$(O)\$(TARGETNAME).exe">
+      <Output TaskParameter="ShouldExecute" PropertyName="Junk_Property" />
+      <Output TaskParameter="ProcessedCommand" PropertyName="ResolvedCommand_4" />
+    </ReplaceNmakeCommandTokens>
+    <Exec Condition="'$(TargetOutDated)'=='true'" Command="$(ResolvedCommand_4)" WorkingDirectory="$(MSBuildProjectDirectory)" />
+    <Message Condition="'$(TargetOutDated)'!='true'" Text="File $(INSTALL_DIR)\$(O)\$(TARGETNAME).exe is up-to-date" />
+  </Target>
+</Project>

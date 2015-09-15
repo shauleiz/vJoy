@@ -1,0 +1,46 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 2013
+VisualStudioVersion = 12.0
+MinimumVisualStudioVersion = 12.0
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "VJoyInterface", "VJoyInterface", "{95F4CDEC-E2A4-4900-A393-60FD25604482}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "VJoyInterfaceCS", "VJoyInterfaceCS", "{26D932D2-0C93-4D3E-A5DA-A4755BC47959}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "vJoyInterface", "vJoyInterface\vJoyInterface.vcxproj", "{F2AA0807-8EE8-4B56-8F4F-AC4AA36B6715}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "WrapperTest", "vJoyInterfaceCS\WrapperTest.vcxproj", "{3BA244DE-A21E-4562-8E28-A7714EB31F94}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Win32 = Debug|Win32
+		Release|Win32 = Release|Win32
+		Debug|x64 = Debug|x64
+		Release|x64 = Release|x64
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{F2AA0807-8EE8-4B56-8F4F-AC4AA36B6715}.Debug|Win32.ActiveCfg = Debug|Win32
+		{F2AA0807-8EE8-4B56-8F4F-AC4AA36B6715}.Debug|Win32.Build.0 = Debug|Win32
+		{F2AA0807-8EE8-4B56-8F4F-AC4AA36B6715}.Release|Win32.ActiveCfg = Release|Win32
+		{F2AA0807-8EE8-4B56-8F4F-AC4AA36B6715}.Release|Win32.Build.0 = Release|Win32
+		{F2AA0807-8EE8-4B56-8F4F-AC4AA36B6715}.Debug|x64.ActiveCfg = Debug|x64
+		{F2AA0807-8EE8-4B56-8F4F-AC4AA36B6715}.Debug|x64.Build.0 = Debug|x64
+		{F2AA0807-8EE8-4B56-8F4F-AC4AA36B6715}.Release|x64.ActiveCfg = Release|x64
+		{F2AA0807-8EE8-4B56-8F4F-AC4AA36B6715}.Release|x64.Build.0 = Release|x64
+		{3BA244DE-A21E-4562-8E28-A7714EB31F94}.Debug|Win32.ActiveCfg = Debug|Win32
+		{3BA244DE-A21E-4562-8E28-A7714EB31F94}.Debug|Win32.Build.0 = Debug|Win32
+		{3BA244DE-A21E-4562-8E28-A7714EB31F94}.Release|Win32.ActiveCfg = Release|Win32
+		{3BA244DE-A21E-4562-8E28-A7714EB31F94}.Release|Win32.Build.0 = Release|Win32
+		{3BA244DE-A21E-4562-8E28-A7714EB31F94}.Debug|x64.ActiveCfg = Debug|x64
+		{3BA244DE-A21E-4562-8E28-A7714EB31F94}.Debug|x64.Build.0 = Debug|x64
+		{3BA244DE-A21E-4562-8E28-A7714EB31F94}.Release|x64.ActiveCfg = Release|x64
+		{3BA244DE-A21E-4562-8E28-A7714EB31F94}.Release|x64.Build.0 = Release|x64
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{F2AA0807-8EE8-4B56-8F4F-AC4AA36B6715} = {95F4CDEC-E2A4-4900-A393-60FD25604482}
+		{3BA244DE-A21E-4562-8E28-A7714EB31F94} = {26D932D2-0C93-4D3E-A5DA-A4755BC47959}
+	EndGlobalSection
+EndGlobal

@@ -20,11 +20,12 @@
   </ItemGroup>
   <PropertyGroup Label="PropertySheets">
     <PlatformToolset>WindowsKernelModeDriver10.0</PlatformToolset>
-    <ConfigurationType>Utility</ConfigurationType>
-    <DriverType>None</DriverType>
-    <TARGETNAME>FfbMon</TARGETNAME>
+    <ConfigurationType>Driver</ConfigurationType>
+    <DriverType>KMDF</DriverType>
+    <TARGETNAME>vJoy</TARGETNAME>
     <Configuration Condition="'$(Configuration)' == ''">Debug</Configuration>
     <Platform Condition="'$(Platform)' == ''">Win32</Platform>
+    <ConvertedTarget0_Disabled>True</ConvertedTarget0_Disabled>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Label="PropertySheets">
@@ -38,8 +39,9 @@
     <Import Project="$(VCTargetsPath)\WDKConversion\PreConfiguration.props" />
   </ImportGroup>
   <PropertyGroup Label="Globals">
-    <ProjectGuid>{F47958E4-9FF0-4E14-910A-1BA0A0F6D863}</ProjectGuid>
+    <ProjectGuid>{E56BFD67-086A-43A6-BE30-938203CCA66F}</ProjectGuid>
     <RootNamespace>$(MSBuildProjectName)</RootNamespace>
+    <WindowsTargetPlatformVersion>10.0.10240.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <PropertyGroup Label="Configuration" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <TargetVersion>Windows10</TargetVersion>
@@ -76,7 +78,14 @@
   <PropertyGroup Label="UserMacros" />
   <!-- The WrappedTaskItems label is used by the conversion tool to identify the location where items 
         associated with wrapped tasks will reside.-->
-  <ItemGroup Label="WrappedTaskItems" />
+  <ItemGroup Label="WrappedTaskItems">
+    <Inf Include="$(_INX)\$(INF_NAME).inx">
+      <Architecture>$(_BUILDARCH)</Architecture>
+      <SpecifyArchitecture>true</SpecifyArchitecture>
+      <KmdfVersionNumber>1.$(KMDF_VERSION_MINOR)</KmdfVersionNumber>
+      <CopyOutput>$(OBJ_PATH)\$(O)\$(INF_NAME).inf</CopyOutput>
+    </Inf>
+  </ItemGroup>
   <ItemGroup>
     <!-- We only add items (e.g. form ClSourceFiles) that do not already exist (e.g in the ClCompile list), this avoids duplication -->
     <ClCompile Include="@(ClSourceFiles)" Exclude="@(ClCompile)" />

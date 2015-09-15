@@ -1,0 +1,29 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <TARGETNAME Condition="'$(OVERRIDE_TARGETNAME)'!='true'">vJoyClient</TARGETNAME>
+    <TARGETTYPE Condition="'$(OVERRIDE_TARGETTYPE)'!='true'">PROGRAM</TARGETTYPE>
+    <UMTYPE Condition="'$(OVERRIDE_UMTYPE)'!='true'">console</UMTYPE>
+    <UMENTRY Condition="'$(OVERRIDE_UMENTRY)'!='true'">main</UMENTRY>
+    <UMBASE Condition="'$(OVERRIDE_UMBASE)'!='true'">0x400000</UMBASE>
+    <_NT_TARGET_VERSION Condition="'$(OVERRIDE__NT_TARGET_VERSION)'!='true'">$(_NT_TARGET_VERSION_WINXP)</_NT_TARGET_VERSION>
+    <INCLUDES Condition="'$(OVERRIDE_INCLUDES)'!='true'">$(INCLUDES);.\;..\..\inc</INCLUDES>
+    <TARGETLIBS Condition="'$(OVERRIDE_TARGETLIBS)'!='true'">$(SDK_LIB_PATH)\advapi32.lib           $(SDK_LIB_PATH)\kernel32.lib           $(SDK_LIB_PATH)\ntdll.lib              $(SDK_LIB_PATH)\ole32.lib              $(SDK_LIB_PATH)\setupapi.lib           $(SDK_LIB_PATH)\shell32.lib            ..\..\lib\$(O)\vJoyInterface.lib          $(SDK_LIB_PATH)\user32.lib</TARGETLIBS>
+    <SOURCES Condition="'$(OVERRIDE_SOURCES)'!='true'">stdafx.cpp           vJoyClient.cpp</SOURCES>
+    <NTTARGETFILE2 Condition="'$(OVERRIDE_NTTARGETFILE2)'!='true'">.\$(O)\vJoyInterface.lib  		.\$(O)\vJoyInterface.dll</NTTARGETFILE2>
+    <USE_MSVCRT Condition="'$(OVERRIDE_USE_MSVCRT)'!='true'">1</USE_MSVCRT>
+    <_NT_TARGET_VERSION Condition="'$(OVERRIDE__NT_TARGET_VERSION)'!='true'">$(_NT_TARGET_VERSION_WINXP)</_NT_TARGET_VERSION>
+  </PropertyGroup>
+  <ItemGroup>
+    <InvokedTargetsList Include=".\$(O)\vJoyInterface.dll">
+      <Pass>2</Pass>
+      <Condition>
+      </Condition>
+    </InvokedTargetsList>
+    <InvokedTargetsList Include=".\$(O)\vJoyInterface.lib">
+      <Pass>2</Pass>
+      <Condition>
+      </Condition>
+    </InvokedTargetsList>
+  </ItemGroup>
+</Project>

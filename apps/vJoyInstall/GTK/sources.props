@@ -1,0 +1,41 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <TARGETNAME Condition="'$(OVERRIDE_TARGETNAME)'!='true'">vJoyInstall</TARGETNAME>
+    <TARGETTYPE Condition="'$(OVERRIDE_TARGETTYPE)'!='true'">DYNLINK</TARGETTYPE>
+    <UMTYPE Condition="'$(OVERRIDE_UMTYPE)'!='true'">console</UMTYPE>
+    <UMENTRY Condition="'$(OVERRIDE_UMENTRY)'!='true'">DllMain</UMENTRY>
+    <UMBASE Condition="'$(OVERRIDE_UMBASE)'!='true'">0x400000</UMBASE>
+    <C_DEFINES Condition="'$(OVERRIDE_C_DEFINES)'!='true'">$(C_DEFINES) -DBUILD_ALT_DIR=\"$(BUILD_ALT_DIR)\" -DGTK</C_DEFINES>
+    <_NT_TARGET_VERSION Condition="'$(OVERRIDE__NT_TARGET_VERSION)'!='true'">$(_NT_TARGET_VERSION_WINXP)</_NT_TARGET_VERSION>
+    <TARGETLIBS Condition="'$(OVERRIDE_TARGETLIBS)'!='true'">$(SDK_LIB_PATH)\advapi32.lib           $(SDK_LIB_PATH)\kernel32.lib           $(SDK_LIB_PATH)\ntdll.lib              $(SDK_LIB_PATH)\ole32.lib              $(SDK_LIB_PATH)\setupapi.lib           $(SDK_LIB_PATH)\shell32.lib            $(SDK_LIB_PATH)\user32.lib</TARGETLIBS>
+    <SOURCES Condition="'$(OVERRIDE_SOURCES)'!='true'">../vJoyInstallLib.cpp           vJoyInstall.rc           wrapper.cpp</SOURCES>
+    <INCLUDES Condition="'$(OVERRIDE_INCLUDES)'!='true'">..\..\..\inc</INCLUDES>
+    <LIB_DIR Condition="'$(OVERRIDE_LIB_DIR)'!='true'">..\..\..\lib</LIB_DIR>
+    <USE_MSVCRT Condition="'$(OVERRIDE_USE_MSVCRT)'!='true'">1</USE_MSVCRT>
+    <NTTARGETFILE0 Condition="'$(OVERRIDE_NTTARGETFILE0)'!='true'">svn_version.h</NTTARGETFILE0>
+    <NTTARGETFILE2 Condition="'$(OVERRIDE_NTTARGETFILE2)'!='true'">$(LIB_DIR)\$(O)\$(TARGETNAME).dll 		$(LIB_DIR)\$(O)\$(TARGETNAME).lib 		$(INCLUDES)\wrapper.h</NTTARGETFILE2>
+  </PropertyGroup>
+  <ItemGroup>
+    <InvokedTargetsList Include="$(INCLUDES)\wrapper.h">
+      <Pass>2</Pass>
+      <Condition>
+      </Condition>
+    </InvokedTargetsList>
+    <InvokedTargetsList Include="$(LIB_DIR)\$(O)\$(TARGETNAME).dll">
+      <Pass>2</Pass>
+      <Condition>
+      </Condition>
+    </InvokedTargetsList>
+    <InvokedTargetsList Include="$(LIB_DIR)\$(O)\$(TARGETNAME).lib">
+      <Pass>2</Pass>
+      <Condition>
+      </Condition>
+    </InvokedTargetsList>
+    <InvokedTargetsList Include="svn_version.h">
+      <Pass>0</Pass>
+      <Condition>
+      </Condition>
+    </InvokedTargetsList>
+  </ItemGroup>
+</Project>

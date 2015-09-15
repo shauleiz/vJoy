@@ -1,0 +1,18 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <TARGETNAME Condition="'$(OVERRIDE_TARGETNAME)'!='true'">vJoyConf</TARGETNAME>
+    <TARGETTYPE Condition="'$(OVERRIDE_TARGETTYPE)'!='true'">NOTARGET</TARGETTYPE>
+    <UMTYPE Condition="'$(OVERRIDE_UMTYPE)'!='true'">console</UMTYPE>
+    <C_DEFINES Condition="'$(OVERRIDE_C_DEFINES)'!='true'">NO_LINK NO_COMPILE</C_DEFINES>
+    <SOURCES Condition="'$(OVERRIDE_SOURCES)'!='true'" />
+    <NTTARGETFILE0 Condition="'$(OVERRIDE_NTTARGETFILE0)'!='true'">$(OBJ_PATH)\$(O)\$(TARGETNAME).exe</NTTARGETFILE0>
+  </PropertyGroup>
+  <ItemGroup>
+    <InvokedTargetsList Include="$(OBJ_PATH)\$(O)\$(TARGETNAME).exe">
+      <Pass>0</Pass>
+      <Condition>
+      </Condition>
+    </InvokedTargetsList>
+  </ItemGroup>
+</Project>

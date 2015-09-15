@@ -1,0 +1,38 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <TARGETNAME Condition="'$(OVERRIDE_TARGETNAME)'!='true'">vJoyInterface</TARGETNAME>
+    <TARGETTYPE Condition="'$(OVERRIDE_TARGETTYPE)'!='true'">NOTARGET</TARGETTYPE>
+    <UMTYPE Condition="'$(OVERRIDE_UMTYPE)'!='true'">console</UMTYPE>
+    <UMBASE Condition="'$(OVERRIDE_UMBASE)'!='true'">0x400000</UMBASE>
+    <UMENTRY Condition="'$(OVERRIDE_UMENTRY)'!='true'">DllMain</UMENTRY>
+    <C_DEFINES Condition="'$(OVERRIDE_C_DEFINES)'!='true'">NO_LINK NO_COMPILE</C_DEFINES>
+    <NTTARGETFILE0 Condition="'$(OVERRIDE_NTTARGETFILE0)'!='true'">$(OBJ_PATH)\$(O)\$(TARGETNAME).dll</NTTARGETFILE0>
+    <SOURCES Condition="'$(OVERRIDE_SOURCES)'!='true'" />
+    <INCLUDES Condition="'$(OVERRIDE_INCLUDES)'!='true'">..\..\..\inc</INCLUDES>
+    <LIB_DIR Condition="'$(OVERRIDE_LIB_DIR)'!='true'">..\..\..\lib</LIB_DIR>
+    <NTTARGETFILE2 Condition="'$(OVERRIDE_NTTARGETFILE2)'!='true'">$(INCLUDES)\$(TARGETNAME).h  		$(LIB_DIR)\$(O)\$(TARGETNAME).dll  		$(LIB_DIR)\$(O)\$(TARGETNAME).lib</NTTARGETFILE2>
+  </PropertyGroup>
+  <ItemGroup>
+    <InvokedTargetsList Include="$(INCLUDES)\$(TARGETNAME).h">
+      <Pass>2</Pass>
+      <Condition>
+      </Condition>
+    </InvokedTargetsList>
+    <InvokedTargetsList Include="$(LIB_DIR)\$(O)\$(TARGETNAME).dll">
+      <Pass>2</Pass>
+      <Condition>
+      </Condition>
+    </InvokedTargetsList>
+    <InvokedTargetsList Include="$(LIB_DIR)\$(O)\$(TARGETNAME).lib">
+      <Pass>2</Pass>
+      <Condition>
+      </Condition>
+    </InvokedTargetsList>
+    <InvokedTargetsList Include="$(OBJ_PATH)\$(O)\$(TARGETNAME).dll">
+      <Pass>0</Pass>
+      <Condition>
+      </Condition>
+    </InvokedTargetsList>
+  </ItemGroup>
+</Project>
