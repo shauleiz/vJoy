@@ -200,7 +200,7 @@ Return Value:
     WDFDEVICE                     hDevice;
     PDEVICE_EXTENSION             devContext = NULL;
     WDFQUEUE                      queue;
-    WDF_PNPPOWER_EVENT_CALLBACKS  pnpPowerCallbacks;
+	WDF_PNPPOWER_EVENT_CALLBACKS  pnpPowerCallbacks;
     WDF_TIMER_CONFIG              timerConfig;
 	DECLARE_CONST_UNICODE_STRING(CompatId, COMPATIBLE_DEVICE_ID);
 	DECLARE_CONST_UNICODE_STRING(DeviceId, VJOY_DEVICE_ID);
@@ -213,7 +213,7 @@ Return Value:
 	WDF_IO_TARGET_OPEN_PARAMS	openParams;
 	WDFIOTARGET					ioTarget;
 	PFFB_QUEUE_EXTENSION		queueContext = NULL;
-	size_t 						i; 
+	int 						i; 
 
     UNREFERENCED_PARAMETER(Driver);
 
