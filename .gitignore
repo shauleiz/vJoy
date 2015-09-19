@@ -4,3 +4,7 @@
 
 *.log
 *.opensdf
+*.lastbuildstate
+*.vcxproj.user
+*.obj
+

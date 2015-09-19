@@ -7,7 +7,7 @@
   <Choose>
     <When Condition="!('$(KMDF_VERSION_MINOR)'!='')">
       <PropertyGroup>
-        <KMDF_VERSION_MINOR>5</KMDF_VERSION_MINOR>
+        <KMDF_VERSION_MINOR>1</KMDF_VERSION_MINOR>
       </PropertyGroup>
     </When>
   </Choose>
@@ -50,12 +50,12 @@
     </When>
     <When Condition="$(KMDF_VERSION_MINOR)&lt;100">
       <PropertyGroup>
-        <KMDF_MINOR_VERSION_STRING>0$(KMDF_VERSION_MINOR)</KMDF_MINOR_VERSION_STRING>
+        <KMDF_MINOR_VERSION_STRING>011</KMDF_MINOR_VERSION_STRING>
       </PropertyGroup>
     </When>
     <When Condition="$(KMDF_VERSION_MINOR)&lt;1000">
       <PropertyGroup>
-        <KMDF_MINOR_VERSION_STRING>$(KMDF_VERSION_MINOR)</KMDF_MINOR_VERSION_STRING>
+        <KMDF_MINOR_VERSION_STRING>3$(KMDF_VERSION_MINOR)</KMDF_MINOR_VERSION_STRING>
       </PropertyGroup>
     </When>
     <Otherwise />
@@ -113,7 +113,7 @@
       <Outputs>$(INSTALL_DIR)\$(O)\$(TARGETNAME).sys</Outputs>
       <Condition>
       </Condition>
-      <Cmd0>signtool sign /a /v /s PrivateCertStore $(OBJ_PATH)\$(O)\$(TARGETNAME).sys</Cmd0>
+      <Cmd0>signtool sign /a /v /s PrivateCertStore $(OBJ_PATH)\$(O)$(TARGETNAME).sys</Cmd0>
       <Cmd1>if not exist $(INSTALL_DIR)\$(O) mkdir $(INSTALL_DIR)\$(O)</Cmd1>
       <Cmd2>copy $(OBJ_PATH)\$(O)\$(TARGETNAME).sys  %24%40</Cmd2>
     </NmakeTarget>
@@ -126,11 +126,13 @@
       <t_TargetInput_0 Include="$(OBJ_PATH)\$(O)\$(TARGETNAME).sys" Condition="'@(t_TargetInput_0)'==''" />
       <AllEvaluatedTargetInputs Include="@(t_TargetInput_0);" />
     </ItemGroup>
-    <ReplaceNmakeCommandTokens Command="signtool sign /a /v /s PrivateCertStore $(OBJ_PATH)\$(O)\$(TARGETNAME).sys" TaskInputFiles="@(AllEvaluatedTargetInputs)" TaskOutputFile="$(INSTALL_DIR)\$(O)\$(TARGETNAME).sys">
+    <ReplaceNmakeCommandTokens Command="signtool sign /a /v /s PrivateCertStore $(OBJ_PATH)\$(O)$(TARGETNAME).sys" TaskInputFiles="@(AllEvaluatedTargetInputs)" TaskOutputFile="$(INSTALL_DIR)\$(O)\$(TARGETNAME).sys">
       <Output TaskParameter="ShouldExecute" PropertyName="TargetOutDated" />
       <Output TaskParameter="ProcessedCommand" PropertyName="ResolvedCommand_1" />
     </ReplaceNmakeCommandTokens>
+    <!--
     <Exec Condition="'$(TargetOutDated)'=='true'" Command="$(ResolvedCommand_1)" WorkingDirectory="$(MSBuildProjectDirectory)" />
+    -->
     <ReplaceNmakeCommandTokens Command="if not exist $(INSTALL_DIR)\$(O) mkdir $(INSTALL_DIR)\$(O)" TaskInputFiles="@(AllEvaluatedTargetInputs)" TaskOutputFile="$(INSTALL_DIR)\$(O)\$(TARGETNAME).sys">
       <Output TaskParameter="ShouldExecute" PropertyName="Junk_Property" />
       <Output TaskParameter="ProcessedCommand" PropertyName="ResolvedCommand_2" />
@@ -140,7 +142,7 @@
       <Output TaskParameter="ShouldExecute" PropertyName="Junk_Property" />
       <Output TaskParameter="ProcessedCommand" PropertyName="ResolvedCommand_3" />
     </ReplaceNmakeCommandTokens>
-    <Exec Condition="'$(TargetOutDated)'=='true'" Command="$(ResolvedCommand_3)" WorkingDirectory="$(MSBuildProjectDirectory)" />
+    <!--<Exec Condition="'$(TargetOutDated)'=='true'" Command="$(ResolvedCommand_3)" WorkingDirectory="$(MSBuildProjectDirectory)" />-->
     <Message Condition="'$(TargetOutDated)'!='true'" Text="File $(INSTALL_DIR)\$(O)\$(TARGETNAME).sys is up-to-date" />
   </Target>
   <ItemGroup>
@@ -169,12 +171,12 @@
       <Output TaskParameter="ShouldExecute" PropertyName="Junk_Property" />
       <Output TaskParameter="ProcessedCommand" PropertyName="ResolvedCommand_2" />
     </ReplaceNmakeCommandTokens>
-    <Exec Condition="'$(TargetOutDated)'=='true'" Command="$(ResolvedCommand_2)" WorkingDirectory="$(MSBuildProjectDirectory)" />
+    <!--<Exec Condition="'$(TargetOutDated)'=='true'" Command="$(ResolvedCommand_2)" WorkingDirectory="$(MSBuildProjectDirectory)" />-->
     <ReplaceNmakeCommandTokens Command="copy $(SHIM_DIR)\$(O)\$(SHIM_NAME).sys  %24%40" TaskInputFiles="@(AllEvaluatedTargetInputs)" TaskOutputFile="$(INSTALL_DIR)\$(O)\$(SHIM_NAME).sys">
       <Output TaskParameter="ShouldExecute" PropertyName="Junk_Property" />
       <Output TaskParameter="ProcessedCommand" PropertyName="ResolvedCommand_3" />
     </ReplaceNmakeCommandTokens>
-    <Exec Condition="'$(TargetOutDated)'=='true'" Command="$(ResolvedCommand_3)" WorkingDirectory="$(MSBuildProjectDirectory)" />
+    <!--<Exec Condition="'$(TargetOutDated)'=='true'" Command="$(ResolvedCommand_3)" WorkingDirectory="$(MSBuildProjectDirectory)" />-->
     <Message Condition="'$(TargetOutDated)'!='true'" Text="File $(INSTALL_DIR)\$(O)\$(SHIM_NAME).sys is up-to-date" />
   </Target>
   <ItemGroup>
@@ -185,7 +187,7 @@
       <Condition>
       </Condition>
       <Cmd0>if not exist $(INSTALL_DIR)\$(O) mkdir $(INSTALL_DIR)\$(O)</Cmd0>
-      <Cmd1>copy $(BASEDIR)\redist\wdf\$(_BUILDARCH)\$(WUDFUPDATE_BASE)$(KMDF_VERSION_STRING).dll   	$(INSTALL_DIR)\$(O)\$(WUDFUPDATE_BASE)$(KMDF_VERSION_STRING).dll</Cmd1>
+      <Cmd1>copy '$(BASEDIR)redist\wdf\$(_BUILDARCH)\$(WUDFUPDATE_BASE)$(KMDF_VERSION_STRING).dll'   	$(INSTALL_DIR)\$(O)\$(WUDFUPDATE_BASE)$(KMDF_VERSION_STRING).dll</Cmd1>
     </NmakeTarget>
   </ItemGroup>
   <Target Name="Converted Target 4" BeforeTargets="$(AfterBuildLinkTargets)" AfterTargets="$(BuildLinkTargets)" Condition="'$(ConvertedTarget4_Disabled)'!='true'">
@@ -198,11 +200,11 @@
       <Output TaskParameter="ProcessedCommand" PropertyName="ResolvedCommand_1" />
     </ReplaceNmakeCommandTokens>
     <Exec Condition="'$(TargetOutDated)'=='true'" Command="$(ResolvedCommand_1)" WorkingDirectory="$(MSBuildProjectDirectory)" />
-    <ReplaceNmakeCommandTokens Command="copy $(BASEDIR)\redist\wdf\$(_BUILDARCH)\$(WUDFUPDATE_BASE)$(KMDF_VERSION_STRING).dll   	$(INSTALL_DIR)\$(O)\$(WUDFUPDATE_BASE)$(KMDF_VERSION_STRING).dll" TaskInputFiles="@(AllEvaluatedTargetInputs)" TaskOutputFile="$(INSTALL_DIR)\$(O)\$(WUDFUPDATE_BASE).dll">
+    <ReplaceNmakeCommandTokens Command="copy '$(BASEDIR)redist\wdf\$(_BUILDARCH)\$(WUDFUPDATE_BASE)$(KMDF_VERSION_STRING).dll'   	$(INSTALL_DIR)\$(O)\$(WUDFUPDATE_BASE)$(KMDF_VERSION_STRING).dll" TaskInputFiles="@(AllEvaluatedTargetInputs)" TaskOutputFile="$(INSTALL_DIR)\$(O)\$(WUDFUPDATE_BASE).dll">
       <Output TaskParameter="ShouldExecute" PropertyName="Junk_Property" />
       <Output TaskParameter="ProcessedCommand" PropertyName="ResolvedCommand_2" />
     </ReplaceNmakeCommandTokens>
-    <Exec Condition="'$(TargetOutDated)'=='true'" Command="$(ResolvedCommand_2)" WorkingDirectory="$(MSBuildProjectDirectory)" />
+    <!--<Exec Condition="'$(TargetOutDated)'=='true'" Command="$(ResolvedCommand_2)" WorkingDirectory="$(MSBuildProjectDirectory)" />-->
     <Message Condition="'$(TargetOutDated)'!='true'" Text="File $(INSTALL_DIR)\$(O)\$(WUDFUPDATE_BASE).dll is up-to-date" />
   </Target>
   <ItemGroup>
@@ -213,7 +215,7 @@
       <Condition>
       </Condition>
       <Cmd0>if not exist $(INSTALL_DIR)\$(O) mkdir $(INSTALL_DIR)\$(O)</Cmd0>
-      <Cmd1>copy $(BASEDIR)\redist\wdf\$(_BUILDARCH)\$(WDFCOINST_BASE)$(KMDF_VERSION_STRING).dll   	$(INSTALL_DIR)\$(O)\$(WDFCOINST_BASE)$(KMDF_VERSION_STRING).dll</Cmd1>
+      <Cmd1>copy '$(BASEDIR)redist\wdf\$(_BUILDARCH)\$(WDFCOINST_BASE)$(KMDF_VERSION_STRING).dll'   	$(INSTALL_DIR)\$(O)\$(WDFCOINST_BASE)$(KMDF_VERSION_STRING).dll</Cmd1>
     </NmakeTarget>
   </ItemGroup>
   <Target Name="Converted Target 5" BeforeTargets="$(AfterBuildLinkTargets)" AfterTargets="$(BuildLinkTargets)" Condition="'$(ConvertedTarget5_Disabled)'!='true'">
@@ -226,11 +228,11 @@
       <Output TaskParameter="ProcessedCommand" PropertyName="ResolvedCommand_1" />
     </ReplaceNmakeCommandTokens>
     <Exec Condition="'$(TargetOutDated)'=='true'" Command="$(ResolvedCommand_1)" WorkingDirectory="$(MSBuildProjectDirectory)" />
-    <ReplaceNmakeCommandTokens Command="copy $(BASEDIR)\redist\wdf\$(_BUILDARCH)\$(WDFCOINST_BASE)$(KMDF_VERSION_STRING).dll   	$(INSTALL_DIR)\$(O)\$(WDFCOINST_BASE)$(KMDF_VERSION_STRING).dll" TaskInputFiles="@(AllEvaluatedTargetInputs)" TaskOutputFile="$(INSTALL_DIR)\$(O)\$(WDFCOINST_BASE).dll">
+    <ReplaceNmakeCommandTokens Command="copy '$(BASEDIR)redist\wdf\$(_BUILDARCH)\$(WDFCOINST_BASE)$(KMDF_VERSION_STRING).dll'   	$(INSTALL_DIR)\$(O)\$(WDFCOINST_BASE)$(KMDF_VERSION_STRING).dll" TaskInputFiles="@(AllEvaluatedTargetInputs)" TaskOutputFile="$(INSTALL_DIR)\$(O)\$(WDFCOINST_BASE).dll">
       <Output TaskParameter="ShouldExecute" PropertyName="Junk_Property" />
       <Output TaskParameter="ProcessedCommand" PropertyName="ResolvedCommand_2" />
     </ReplaceNmakeCommandTokens>
-    <Exec Condition="'$(TargetOutDated)'=='true'" Command="$(ResolvedCommand_2)" WorkingDirectory="$(MSBuildProjectDirectory)" />
+    <!--<Exec Condition="'$(TargetOutDated)'=='true'" Command="$(ResolvedCommand_2)" WorkingDirectory="$(MSBuildProjectDirectory)" />-->
     <Message Condition="'$(TargetOutDated)'!='true'" Text="File $(INSTALL_DIR)\$(O)\$(WDFCOINST_BASE).dll is up-to-date" />
   </Target>
 </Project>
