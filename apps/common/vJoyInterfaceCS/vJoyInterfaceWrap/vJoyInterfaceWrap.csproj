@@ -100,7 +100,6 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="$(ProjectDir)..\GlobalAssemblyInfo.cs" />
     <Compile Include="Wrapper.cs">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Compile>

@@ -99,7 +99,6 @@
     <Reference Include="System.Windows.Forms" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="$(ProjectDir)..\GlobalAssemblyInfo.cs" />
     <Compile Include="TesterForm.cs">
       <SubType>Form</SubType>
     </Compile>

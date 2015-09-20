@@ -19,7 +19,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="PropertySheets">
-    <PlatformToolset>WindowsKernelModeDriver10.0</PlatformToolset>
+    <PlatformToolset>v140</PlatformToolset>
     <ConfigurationType>Utility</ConfigurationType>
     <DriverType>None</DriverType>
     <TARGETNAME>vJoyInterface</TARGETNAME>
@@ -40,6 +40,7 @@
   <PropertyGroup Label="Globals">
     <ProjectGuid>{F2AA0807-8EE8-4B56-8F4F-AC4AA36B6715}</ProjectGuid>
     <RootNamespace>$(MSBuildProjectName)</RootNamespace>
+    <WindowsTargetPlatformVersion>$(LatestTargetPlatformVersion)</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <PropertyGroup Label="Configuration" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <TargetVersion>Windows10</TargetVersion>
