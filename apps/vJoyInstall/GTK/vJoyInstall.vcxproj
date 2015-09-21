@@ -28,7 +28,6 @@
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Label="PropertySheets">
-    <ConversionToolVersion>1.0</ConversionToolVersion>
     <BUILD_ALT_DIR>$(Configuration.Replace(' ',''))</BUILD_ALT_DIR>
     <IntDir Condition="'$(Platform)'!='Win32'">$(BUILD_ALT_DIR)\$(Platform)\</IntDir>
     <IntDir Condition="'$(Platform)'=='Win32'">$(BUILD_ALT_DIR)\x86\</IntDir>
@@ -77,14 +76,77 @@
   <!-- The WrappedTaskItems label is used by the conversion tool to identify the location where items 
         associated with wrapped tasks will reside.-->
   <ItemGroup Label="WrappedTaskItems" />
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+    </ClCompile>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <TreatWarningAsError>false</TreatWarningAsError>
+      <PreprocessorDefinitions>_X86_=1;i386=1;STD_CALL;%(PreprocessorDefinitions);GTK;GTK</PreprocessorDefinitions>
+    </ClCompile>
+    <Link>
+      <AdditionalDependencies>setupapi.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;ntdll.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <TreatLinkerWarningAsErrors>false</TreatLinkerWarningAsErrors>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+    </ClCompile>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <TreatWarningAsError>false</TreatWarningAsError>
+      <PreprocessorDefinitions>_X86_=1;i386=1;STD_CALL;%(PreprocessorDefinitions);GTK</PreprocessorDefinitions>
+    </ClCompile>
+    <Link>
+      <AdditionalDependencies>setupapi.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;ntdll.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <TreatLinkerWarningAsErrors>false</TreatLinkerWarningAsErrors>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+    </ClCompile>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <TreatWarningAsError>false</TreatWarningAsError>
+      <PreprocessorDefinitions>X64;_WINDLL;%(PreprocessorDefinitions);GTK;GTK</PreprocessorDefinitions>
+    </ClCompile>
+    <Link>
+      <AdditionalDependencies>setupapi.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;ntdll.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <TreatLinkerWarningAsErrors>false</TreatLinkerWarningAsErrors>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+    </ClCompile>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <TreatWarningAsError>false</TreatWarningAsError>
+      <PreprocessorDefinitions>X64;_WINDLL;%(PreprocessorDefinitions);GTK;GTK</PreprocessorDefinitions>
+    </ClCompile>
+    <Link>
+      <AdditionalDependencies>setupapi.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;ntdll.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <TreatLinkerWarningAsErrors>false</TreatLinkerWarningAsErrors>
+    </Link>
+  </ItemDefinitionGroup>
   <ItemGroup>
     <!-- We only add items (e.g. form ClSourceFiles) that do not already exist (e.g in the ClCompile list), this avoids duplication -->
+    <ClCompile Include="..\vJoyInstallLib.cpp" />
     <ClCompile Include="@(ClSourceFiles)" Exclude="@(ClCompile)" />
+    <ClCompile Include="wrapper.cpp" />
     <ResourceCompile Include="@(RcSourceFiles)" Exclude="@(ResourceCompile)" />
     <Midl Include="@(IdlSourceFiles)" Exclude="@(Midl)" />
     <MessageCompile Include="@(McSourceFiles)" Exclude="@(MessageCompile)" />
     <MASM Include="@(AsmSourceFiles)" Exclude="@(MASM)" />
     <GenerateBmf Include="@(MofSourceFiles)" Exclude="@(GenerateBmf)" />
+    <ResourceCompile Include="vJoyInstall.rc" />
   </ItemGroup>
   <!-- Set default environment variables, e.g. for stampinf -->
   <ItemGroup>

@@ -1,6 +1,5 @@
 #include <windows.h>
 
-#include <svn_version.h>
 #include <..\..\..\inc\public.h>
 
 
@@ -10,6 +9,7 @@
 //
 #define VERSION_BUILD               SVN_REVISION
 #define FILEDESC_STR1				"Installer DLL for vJoy KMDF driver"
+#define SVN_REVISION				777
 
 #ifdef AMD64
 #define BITNESS_STR					"X64"
@@ -17,7 +17,7 @@
 #define BITNESS_STR					"X32"
 #endif
 
-#ifdef _DEBUG
+#if (DBG==1)
 #define CONF_STR					"d"
 #else
 #define CONF_STR					""
