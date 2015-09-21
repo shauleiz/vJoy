@@ -1781,7 +1781,7 @@ BOOL RemoveRevStr(LPCTSTR DeviceHWID, LPTSTR DeviceHWID_NoRev)
 		return FALSE;
 
 	// Get pointer to begining of "&REV" (Upper or lower)
-	TCHAR * revstr;
+	LPCTSTR revstr;
 	revstr = _tcsstr(DeviceHWID, "&R");
 	if (!revstr)
 	{
