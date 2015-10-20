@@ -541,6 +541,9 @@ bool WriteHidReportDescriptor(int target)
 
 			 // Axes: Creat C-language array
 			 int nAxes = g_nAxes;
+			 if (nAxes < 8)
+				 return false;
+
 			 bool * Axes = new bool[nAxes];
 			 Axes[0] = g_isAxisX;
 			 Axes[1] = g_isAxisY;
@@ -555,6 +558,8 @@ bool WriteHidReportDescriptor(int target)
 			 // Call external C-function that creats an array of bytes that holds
 			 // the HID Report Descriptor
 			 UCHAR **out = (UCHAR **)malloc(sizeof(UCHAR *));
+			 if (!out)
+				 return false;
 			 int desc_size = CreateHidReportDesc((void **)out, g_nButtons, Axes, g_nAnalogPovs, g_nDescretePovs, (int)target);
 
 			 if ((desc_size<=0))
@@ -722,10 +727,15 @@ void DisplayVersion(void)
 	HGLOBAL hResData;
 	LPVOID pRes, pResCopy;
 	UINT uLen;
-	LPCTSTR InternalName, FileVersion;
+	LPCWSTR InternalName, FileVersion;
 
 	HINSTANCE  hInst = GetModuleHandle(NULL);
 	hResInfo = FindResource(hInst, MAKEINTRESOURCE(1), RT_VERSION);
+	if (!hResInfo)
+	{
+		DWORD err = GetLastError();
+		return;
+	};
 	dwSize = SizeofResource(hInst, hResInfo);
 	hResData = LoadResource(hInst, hResInfo);
 	pRes = LockResource(hResData);
@@ -733,8 +743,10 @@ void DisplayVersion(void)
 	CopyMemory(pResCopy, pRes, dwSize);
 	FreeResource(hResData);
 
-	VerQueryValue(pResCopy, TEXT("\\StringFileInfo\\080904E4\\InternalName"), (LPVOID*)&InternalName, &uLen);
-	VerQueryValue(pResCopy, TEXT("\\StringFileInfo\\080904E4\\FileVersion"), (LPVOID*)&FileVersion, &uLen);
+	if (!VerQueryValue(pResCopy, L"\\StringFileInfo\\040904B0\\InternalName", (LPVOID*)&InternalName, &uLen))
+		InternalName = L"<Unknown Name>";
+	if (!VerQueryValue(pResCopy, L"\\StringFileInfo\\040904B0\\FileVersion", (LPVOID*)&FileVersion, &uLen))
+		FileVersion = L"0.0.0.0";
 
 	wprintf_s(L"\n%s version %s\n", InternalName, FileVersion);
 
