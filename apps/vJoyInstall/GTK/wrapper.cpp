@@ -109,4 +109,3 @@ BOOL DummyStatusMessage(void * output, TCHAR * buffer,  ERRLEVEL level)
 {
 	return FALSE;
 }
-
