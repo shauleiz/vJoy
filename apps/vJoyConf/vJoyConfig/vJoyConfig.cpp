@@ -13,6 +13,7 @@
 #include "../HidToken.h"
 #include "../HidUsage.h"
 #include "../Declarations.h"
+#include "../hidReportDescFfb.h"
 #include "resource.h"
 #include "vJoyConfig.h"
 
@@ -37,10 +38,25 @@ bool	g_isAxisRY = true;
 bool	g_isAxisRZ = true;
 bool	g_isAxisSL0 = true;
 bool	g_isAxisSL1 = true;
+bool	g_isFfbConst = false;
+bool	g_isFfbRamp = false;
+bool	g_isFfbSq = false;
+bool	g_isFfbSine = false;
+bool	g_isFfbTr = false;
+bool	g_isFfbStUp = false;
+bool	g_isFfbStDn = false;
+bool	g_isFfbSpr = false;
+bool	g_isFfbDm = false;
+bool	g_isFfbInr = false;
+bool	g_isFfbFric = false;
+
 
 //////////////// Declarations ////////////////
 bool ParseCommandLine(int argc, _TCHAR* argv[]);
-int  CreateHidReportDesc(void ** data, UINT nButtons, bool * axes, int nPovHatsCont, int nPovHatsDir, BYTE ReportId);
+void ModifyFfbEffectDesc(std::vector<BYTE> * buffer, UINT16 Mask);
+UINT16 GetFfbEffectMask(void);
+void WriteHidReportDescToReg(int target, UCHAR * Descriptor, int size, bool Overwrite);
+int  CreateHidReportDesc(void ** data, UINT nButtons, bool * axes, int nPovHatsCont, int nPovHatsDir, BYTE ReportId, bool Ffb);
 bool WriteHidReportDescriptor(int target);
 void WriteHidReportDescToReg(int target, UCHAR * Descriptor, int size, bool Overwrite);
 void DeleteHidReportDescFromReg(int target);
@@ -168,6 +184,22 @@ bool ParseCommandLine(int argc, _TCHAR* argv[])
 			g_isAxisSL1 = cl_isParamExist(argc, argv, L"-a", L"sl1");
 		};
 
+		// Parse FFB effects (Following '-e')
+		if (cl_FindFlg(argc, argv, L"-e"))
+		{
+			g_isFfbConst = cl_isParamExist(argc, argv, L"-e", L"Const") || cl_isParamExist(argc, argv, L"-e", L"All");
+			g_isFfbRamp = cl_isParamExist(argc, argv, L"-e", L"Ramp") || cl_isParamExist(argc, argv, L"-e", L"All");
+			g_isFfbSq = cl_isParamExist(argc, argv, L"-e", L"Sq") || cl_isParamExist(argc, argv, L"-e", L"All");
+			g_isFfbSine = cl_isParamExist(argc, argv, L"-e", L"Sine") || cl_isParamExist(argc, argv, L"-e", L"All");
+			g_isFfbTr = cl_isParamExist(argc, argv, L"-e", L"Tr") || cl_isParamExist(argc, argv, L"-e", L"All");
+			g_isFfbStUp = cl_isParamExist(argc, argv, L"-e", L"StUp") || cl_isParamExist(argc, argv, L"-e", L"All");
+			g_isFfbStDn = cl_isParamExist(argc, argv, L"-e", L"StDn") || cl_isParamExist(argc, argv, L"-e", L"All");
+			g_isFfbSpr = cl_isParamExist(argc, argv, L"-e", L"Spr") || cl_isParamExist(argc, argv, L"-e", L"All");
+			g_isFfbDm = cl_isParamExist(argc, argv, L"-e", L"Dm") || cl_isParamExist(argc, argv, L"-e", L"All");
+			g_isFfbInr = cl_isParamExist(argc, argv, L"-e", L"Inr") || cl_isParamExist(argc, argv, L"-e", L"All");
+			g_isFfbFric = cl_isParamExist(argc, argv, L"-e", L"Fric") || cl_isParamExist(argc, argv, L"-e", L"All");
+		};
+
 		// Parse buttons (Following '-b')
 		int nButtons;
 		if (cl_getParamValue(argc, argv, L"-b", 1, &nButtons))
@@ -263,6 +295,118 @@ bool ParseCommandLine(int argc, _TCHAR* argv[])
 	return false;
 }
 
+// Appends the FFB section of the descriptor to a given buff
+// The FFB section is given as a global array of bytes
+void CreateFfbDesc(std::vector<BYTE> * buffer, BYTE ReportId)
+{
+
+	// Vector of bytes depending on the ID
+	std::vector<BYTE> vars
+	{
+		static_cast<BYTE>(HID_ID_STATE + 0x10 * ReportId),    //    Report ID 2
+		static_cast<BYTE>(HID_ID_EFFREP + 0x10 * ReportId),    //    Report ID 1
+		static_cast<BYTE>(HID_ID_ENVREP + 0x10 * ReportId),         //    Report ID 2
+		static_cast<BYTE>(HID_ID_CONDREP + 0x10 * ReportId),    //    Report ID 3
+		static_cast<BYTE>(HID_ID_PRIDREP + 0x10 * ReportId),                   //    Report ID 4
+		static_cast<BYTE>(HID_ID_CONSTREP + 0x10 * ReportId),         //    Report ID 5
+		static_cast<BYTE>(HID_ID_RAMPREP + 0x10 * ReportId),         //    Report ID 6
+		static_cast<BYTE>(HID_ID_CSTMREP + 0x10 * ReportId),         //    Report ID 7
+		static_cast<BYTE>(HID_ID_SMPLREP + 0x10 * ReportId),         //    Report ID 8
+		static_cast<BYTE>(HID_ID_EFOPREP + 0x10 * ReportId),    //    Report ID Ah (10d)
+		static_cast<BYTE>(HID_ID_BLKFRREP + 0x10 * ReportId),    //    Report ID Bh (11d)
+		static_cast<BYTE>(HID_ID_CTRLREP + 0x10 * ReportId),    //    Report ID Ch (12d)
+		static_cast<BYTE>(HID_ID_GAINREP + 0x10 * ReportId),         //    Report ID Dh (13d)
+		static_cast<BYTE>(HID_ID_SETCREP + 0x10 * ReportId),         //    Report ID Eh (14d)
+		static_cast<BYTE>(HID_ID_NEWEFREP + 0x10 * ReportId),    //    Report ID 1
+		static_cast<BYTE>(HID_ID_BLKLDREP + 0x10 * ReportId),    //    Report ID 2
+		static_cast<BYTE>(HID_ID_POOLREP + 0x10 * ReportId),                   //    Report ID 3
+	};
+
+	// Replace the first byte of each sub vector with the corresponding varible (exclude first sub vector)
+	// Append modified sub vector to buffer
+	buffer->insert(buffer->end(), FfbDescriptor[0].begin(), FfbDescriptor[0].end());
+	for (UINT i = 1; i < FfbDescriptor.size(); i++)
+	{
+		FfbDescriptor[i][0] = vars[i - 1];
+		buffer->insert(buffer->end(), FfbDescriptor[i].begin(), FfbDescriptor[i].end());
+	}
+}
+
+// Modify the Descriptor according to the FFB Effects the user selects
+// Parameters:
+// Buffer: Descriptor to be modified
+// Mask: Bit-mask representing the effects required
+void ModifyFfbEffectDesc(std::vector<BYTE> * buffer, UINT16 Mask)
+{
+	int Effect[]{ 0x26, 0x27, 0x30, 0x31, 0x32, 0x33, 0x34, 0x40, 0x41, 0x42, 0x43 };
+	BYTE nEff = sizeof(Effect) / sizeof(int);
+
+	// Search for sequence(0x09, 0x25, 0xA1, 0x02)
+	for (auto &i : *buffer)
+	{
+		if ((i == 0x09) && (*std::next(&i, 1) == 0x25) && (*std::next(&i, 2) == 0xA1) && (*std::next(&i, 3) == 0x02))
+			// Sequence found - now replace by going over the effects 
+			for (BYTE e = 0; e < nEff; e++)
+			{
+				if ((Mask >> (nEff - e - 1)) & 0x01)
+					*std::next(&i, 5 + e * 2) = Effect[e];
+				else
+					*std::next(&i, 5 + e * 2) = 0x29;
+			};
+	};
+}
+
+// Create a mask where every bit represents an FFB effect
+UINT16 GetFfbEffectMask(void)
+{
+	UINT16 Mask = 0;
+
+	if (g_isFfbConst)
+		Mask |= 0x01;
+	Mask = Mask << 1;
+
+	if (g_isFfbRamp)
+		Mask |= 0x01;
+	Mask = Mask << 1;
+
+	if (g_isFfbSq)
+		Mask |= 0x01;
+	Mask = Mask << 1;
+
+	if (g_isFfbSine)
+		Mask |= 0x01;
+	Mask = Mask << 1;
+
+	if (g_isFfbTr)
+		Mask |= 0x01;
+	Mask = Mask << 1;
+
+	if (g_isFfbStUp)
+		Mask |= 0x01;
+	Mask = Mask << 1;
+
+	if (g_isFfbStDn)
+		Mask |= 0x01;
+	Mask = Mask << 1;
+
+	if (g_isFfbSpr)
+		Mask |= 0x01;
+	Mask = Mask << 1;
+
+	if (g_isFfbDm)
+		Mask |= 0x01;
+	Mask = Mask << 1;
+
+	if (g_isFfbInr)
+		Mask |= 0x01;
+	Mask = Mask << 1;
+
+	if (g_isFfbFric)
+		Mask |= 0x01;
+
+	return Mask;
+}
+
 /*
 	Write the HID Report Descriptor to the registry
 	Key:	HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\services\vjoy\Parameters\Device0
@@ -330,7 +474,7 @@ void WriteHidReportDescToReg(int target, UCHAR * Descriptor, int size, bool Over
 		Positive value: Size of HID Report Descriptor (output buffer) in bytes.
 
 */
-int CreateHidReportDesc(void ** data, UINT nButtons, bool * axes, int nPovHatsCont, int nPovHatsDir, BYTE ReportId)
+int CreateHidReportDesc(void ** data, UINT nButtons, bool * axes, int nPovHatsCont, int nPovHatsDir, BYTE ReportId, bool Ffb)
 {
 	/* normalize if illegal parameters are passed */
 	// Buttons: 0-128
@@ -527,6 +671,14 @@ int CreateHidReportDesc(void ** data, UINT nButtons, bool * axes, int nPovHatsCo
 			};
 
 
+		// Insert FFB section to the descriptor if the user chose to
+		if (Ffb)
+		{
+			CreateFfbDesc(&buffer, ReportId);
+			UINT16 mask = GetFfbEffectMask();
+			ModifyFfbEffectDesc(&buffer, mask);
+		};
+
 		NEXT_BYTE(buffer, HIDP_MAIN_ENDCOLLECTION)			// END_COLLECTION:					0xC0
 
 			UCHAR * orig = &buffer[0];
@@ -553,14 +705,21 @@ bool WriteHidReportDescriptor(int target)
 			 Axes[5] = g_isAxisRZ;
 			 Axes[6] = g_isAxisSL0;
 			 Axes[7] = g_isAxisSL1;
-			 
+
+			 // Check if need FFB support
+			 bool isFfb =
+				 (
+					 g_isFfbConst || g_isFfbRamp || g_isFfbSq || g_isFfbSine ||
+					 g_isFfbTr || g_isFfbStUp || g_isFfbStDn || g_isFfbSpr ||
+					 g_isFfbDm || g_isFfbInr || g_isFfbFric
+					 );
 
 			 // Call external C-function that creats an array of bytes that holds
 			 // the HID Report Descriptor
 			 UCHAR **out = (UCHAR **)malloc(sizeof(UCHAR *));
 			 if (!out)
 				 return false;
-			 int desc_size = CreateHidReportDesc((void **)out, g_nButtons, Axes, g_nAnalogPovs, g_nDescretePovs, (int)target);
+			 int desc_size = CreateHidReportDesc((void **)out, g_nButtons, Axes, g_nAnalogPovs, g_nDescretePovs, (int)target, isFfb);
 
 			 if ((desc_size<=0))
 			 {
@@ -738,8 +897,18 @@ void DisplayVersion(void)
 	};
 	dwSize = SizeofResource(hInst, hResInfo);
 	hResData = LoadResource(hInst, hResInfo);
+	if (!hResData)
+	{
+		DWORD err = GetLastError();
+		return;
+	};
 	pRes = LockResource(hResData);
 	pResCopy = LocalAlloc(LMEM_FIXED, dwSize);
+	if (!pResCopy)
+	{
+		DWORD err = GetLastError();
+		return;
+	};
 	CopyMemory(pResCopy, pRes, dwSize);
 	FreeResource(hResData);
 
