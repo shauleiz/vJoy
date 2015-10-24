@@ -959,69 +959,140 @@ void ReportConfSingleDev(BYTE ReportId)
 		!(CONST_Exist || RAMP_Exist || SQUR_Exist || SINE_Exist || TRNG_Exist  || STUP_Exist ||
 		STDN_Exist || SPRNG_Exist || DMPR_Exist || INRT_Exist ||FRIC_Exist);
 
- 	// Printout
-	wprintf_s(L"\n\n\n========================================================================");
-	wprintf_s(L"\nDevice:\t\t\t%d", ReportId);
-	wprintf_s(L"\nState:\t\t\t%s", StrStat[DevStat]);
-	wprintf_s(L"\nButtons:\t\t%d", nButtons);
-	wprintf_s(L"\nDescrete POVs:\t\t%d", DiscPovNumber);
-	wprintf_s(L"\nContinous POVs:\t\t%d", ContPovNumber);
-	
-	LPCWSTR axis;
-	wprintf_s(L"\nAxes:\t\t\t");
-	axis = (X_Exist==TRUE) ? L"X" : L"-";
-	wprintf_s(L"%s ", axis);
-	axis = (Y_Exist == TRUE) ? L"Y" : L"-";
-	wprintf_s(L"%s ", axis);
-	axis = (Z_Exist == TRUE) ? L"Z" : L"-";
-	wprintf_s(L"%s ", axis);
-	axis = (RX_Exist == TRUE) ? L"Rx" : L"-";
-	wprintf_s(L"%s ", axis);
-	axis = (RY_Exist == TRUE) ? L"Ry" : L"-";
-	wprintf_s(L"%s ", axis);
-	axis = (RZ_Exist == TRUE) ? L"Rz" : L"-";
-	wprintf_s(L"%s ", axis);
-	axis = (SL0_Exist == TRUE) ? L"Sl0" : L"-";
-	wprintf_s(L"%s ", axis);
-	axis = (SL1_Exist == TRUE) ? L"Sl1" : L"-";
-	wprintf_s(L"%s ", axis);
+	if (!g_frmtCmd)
+	{
+		// Human readable Printout
+		wprintf_s(L"\n\n\n========================================================================");
+		wprintf_s(L"\nDevice:\t\t\t%d", ReportId);
+		wprintf_s(L"\nState:\t\t\t%s", StrStat[DevStat]);
+		wprintf_s(L"\nButtons:\t\t%d", nButtons);
+		wprintf_s(L"\nDescrete POVs:\t\t%d", DiscPovNumber);
+		wprintf_s(L"\nContinous POVs:\t\t%d", ContPovNumber);
 
-	wprintf_s(L"\nFFB Effects:\t\t");
-	if (FFB_all)
-		wprintf_s(L"All Effects");
-	else if (FFB_none)
-		wprintf_s(L"None");
+		LPCWSTR axis;
+		wprintf_s(L"\nAxes:\t\t\t");
+		axis = (X_Exist == TRUE) ? L"X" : L"-";
+		wprintf_s(L"%s ", axis);
+		axis = (Y_Exist == TRUE) ? L"Y" : L"-";
+		wprintf_s(L"%s ", axis);
+		axis = (Z_Exist == TRUE) ? L"Z" : L"-";
+		wprintf_s(L"%s ", axis);
+		axis = (RX_Exist == TRUE) ? L"Rx" : L"-";
+		wprintf_s(L"%s ", axis);
+		axis = (RY_Exist == TRUE) ? L"Ry" : L"-";
+		wprintf_s(L"%s ", axis);
+		axis = (RZ_Exist == TRUE) ? L"Rz" : L"-";
+		wprintf_s(L"%s ", axis);
+		axis = (SL0_Exist == TRUE) ? L"Sl0" : L"-";
+		wprintf_s(L"%s ", axis);
+		axis = (SL1_Exist == TRUE) ? L"Sl1" : L"-";
+		wprintf_s(L"%s ", axis);
+
+		wprintf_s(L"\nFFB Effects:\t\t");
+		if (FFB_all)
+			wprintf_s(L"All Effects");
+		else if (FFB_none)
+			wprintf_s(L"None");
+		else
+		{
+			LPCWSTR effect;
+			effect = (CONST_Exist == TRUE) ? L"Constant" : L"-";
+			wprintf_s(L"%s ", effect);
+			effect = (RAMP_Exist == TRUE) ? L"Ramp" : L"-";
+			wprintf_s(L"%s ", effect);
+			effect = (SQUR_Exist == TRUE) ? L"Square" : L"-";
+			wprintf_s(L"%s ", effect);
+			effect = (SINE_Exist == TRUE) ? L"Sine" : L"-";
+			wprintf_s(L"%s ", effect);
+			effect = (SINE_Exist == TRUE) ? L"Sine" : L"-";
+			wprintf_s(L"%s ", effect);
+			effect = (TRNG_Exist == TRUE) ? L"Triangular" : L"-";
+			wprintf_s(L"%s ", effect);
+			effect = (STUP_Exist == TRUE) ? L"Sawtooth_Up" : L"-";
+			wprintf_s(L"%s ", effect);
+			effect = (STDN_Exist == TRUE) ? L"Sawtooth_Down" : L"-";
+			wprintf_s(L"%s ", effect);
+			effect = (SPRNG_Exist == TRUE) ? L"Spring" : L"-";
+			wprintf_s(L"%s ", effect);
+			effect = (DMPR_Exist == TRUE) ? L"Damper" : L"-";
+			wprintf_s(L"%s ", effect);
+			effect = (INRT_Exist == TRUE) ? L"Inertia" : L"-";
+			wprintf_s(L"%s ", effect);
+			effect = (FRIC_Exist == TRUE) ? L"Friction" : L"-";
+			wprintf_s(L"%s ", effect);
+		};
+
+		wprintf_s(L"\n");
+		wprintf_s(L"\n========================================================================\n");
+	}
 	else
 	{
-		LPCWSTR effect;
-		effect = (CONST_Exist == TRUE) ? L"Constant" : L"-";
-		wprintf_s(L"%s ", effect);
-		effect = (RAMP_Exist == TRUE) ? L"Ramp" : L"-";
-		wprintf_s(L"%s ", effect);
-		effect = (SQUR_Exist == TRUE) ? L"Square" : L"-";
-		wprintf_s(L"%s ", effect);
-		effect = (SINE_Exist == TRUE) ? L"Sine" : L"-";
-		wprintf_s(L"%s ", effect);
-		effect = (SINE_Exist == TRUE) ? L"Sine" : L"-";
-		wprintf_s(L"%s ", effect);
-		effect = (TRNG_Exist == TRUE) ? L"Triangular" : L"-";
-		wprintf_s(L"%s ", effect);
-		effect = (STUP_Exist == TRUE) ? L"Sawtooth_Up" : L"-";
-		wprintf_s(L"%s ", effect);
-		effect = (STDN_Exist == TRUE) ? L"Sawtooth_Down" : L"-";
-		wprintf_s(L"%s ", effect);
-		effect = (SPRNG_Exist == TRUE) ? L"Spring" : L"-";
-		wprintf_s(L"%s ", effect);
-		effect = (DMPR_Exist == TRUE) ? L"Damper" : L"-";
-		wprintf_s(L"%s ", effect);
-		effect = (INRT_Exist == TRUE) ? L"Inertia" : L"-";
-		wprintf_s(L"%s ", effect);
-		effect = (FRIC_Exist == TRUE) ? L"Friction" : L"-";
-		wprintf_s(L"%s ", effect);
-	};
+		wprintf_s(L"\nvJoyConfig ");
+		wprintf_s(L"%d ", ReportId);
+		wprintf_s(L"-f ");
+		wprintf_s(L"-a ");
 
-	wprintf_s(L"\n");
-	wprintf_s(L"\n========================================================================\n");
+		LPCWSTR axis;
+		axis = (X_Exist == TRUE) ? L"X" : L"";
+		wprintf_s(L"%s ", axis);
+		axis = (Y_Exist == TRUE) ? L"Y" : L"";
+		wprintf_s(L"%s ", axis);
+		axis = (Z_Exist == TRUE) ? L"Z" : L"";
+		wprintf_s(L"%s ", axis);
+		axis = (RX_Exist == TRUE) ? L"Rx" : L"";
+		wprintf_s(L"%s ", axis);
+		axis = (RY_Exist == TRUE) ? L"Ry" : L"";
+		wprintf_s(L"%s ", axis);
+		axis = (RZ_Exist == TRUE) ? L"Rz" : L"";
+		wprintf_s(L"%s ", axis);
+		axis = (SL0_Exist == TRUE) ? L"Sl0" : L"";
+		wprintf_s(L"%s ", axis);
+		axis = (SL1_Exist == TRUE) ? L"Sl1" : L"";
+		wprintf_s(L"%s ", axis);
+
+		wprintf_s(L"-b %d ", nButtons);
+		if (DiscPovNumber)
+			wprintf_s(L"-s %d", DiscPovNumber);
+		if (ContPovNumber)
+			wprintf_s(L"-p %d", ContPovNumber);
+
+		if (FFB_all)
+			wprintf_s(L" -e all");
+		else if (FFB_none)
+			wprintf_s(L"");
+		else
+		{
+			LPCWSTR effect;
+			wprintf_s(L" -e ");
+			effect = (CONST_Exist == TRUE) ? L"Constant" : L"";
+			wprintf_s(L"%s ", effect);
+			effect = (RAMP_Exist == TRUE) ? L"Ramp" : L"";
+			wprintf_s(L"%s ", effect);
+			effect = (SQUR_Exist == TRUE) ? L"Sq" : L"";
+			wprintf_s(L"%s ", effect);
+			effect = (SINE_Exist == TRUE) ? L"Sine" : L"";
+			wprintf_s(L"%s ", effect);
+			effect = (SINE_Exist == TRUE) ? L"Sine" : L"";
+			wprintf_s(L"%s ", effect);
+			effect = (TRNG_Exist == TRUE) ? L"Tr" : L"";
+			wprintf_s(L"%s ", effect);
+			effect = (STUP_Exist == TRUE) ? L"StUp" : L"";
+			wprintf_s(L"%s ", effect);
+			effect = (STDN_Exist == TRUE) ? L"StDn" : L"";
+			wprintf_s(L"%s ", effect);
+			effect = (SPRNG_Exist == TRUE) ? L"Spr" : L"";
+			wprintf_s(L"%s ", effect);
+			effect = (DMPR_Exist == TRUE) ? L"Dm" : L"";
+			wprintf_s(L"%s ", effect);
+			effect = (INRT_Exist == TRUE) ? L"Inr" : L"";
+			wprintf_s(L"%s ", effect);
+			effect = (FRIC_Exist == TRUE) ? L"Fric" : L"";
+			wprintf_s(L"%s ", effect);
+		};
+
+
+		wprintf_s(L"\n");
+	};
 }
 
 // Display Configuration report
