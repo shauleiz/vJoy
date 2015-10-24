@@ -12,3 +12,4 @@
 #define IDS_ERR_NOGUI                          40007
 #define IDS_ERR_32ON64                         40008
 #define IDS_ERR_64ON32                         40009
+#define IDS_ERR_ENABLE                         40010
