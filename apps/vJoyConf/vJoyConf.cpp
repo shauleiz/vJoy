@@ -715,7 +715,7 @@ BOOL Initialize()
 		WORD DllVer, DrvVer;
 		if (!DriverMatch(&DllVer, &DrvVer))
 		{
-			TCHAR msg[250];
+			TCHAR msg[250] = { 0 };
 			_stprintf_s(msg, Res2TStr(IDC_VER_MISMATCH), DllVer, DrvVer);
 			if (IDYES != MessageBox(NULL, msg, Res2TStr(IDS_APP_TITLE), MB_YESNO | MB_ICONWARNING))
 				return FALSE;
