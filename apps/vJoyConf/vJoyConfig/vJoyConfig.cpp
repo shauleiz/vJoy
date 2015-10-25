@@ -55,6 +55,7 @@ bool	g_isFfbInr = false;
 bool	g_isFfbFric = false;
 
 bool	g_frmtCmd  = false;
+bool	g_deffered = false;
 
 //////////////// Declarations ////////////////
 bool ParseCommandLine(int argc, _TCHAR* argv[]);
@@ -139,7 +140,7 @@ int _tmain(int argc, _TCHAR* argv[])
 	if (parse_ok && (g_cmnd == FRC || g_cmnd == CRT))
 	{
 		WriteHidReportDescriptor(g_iDevice[0]);
-		restart = true;
+		restart = !g_deffered;
 	};
 
 	// Enable
@@ -189,6 +190,10 @@ bool ParseCommandLine(int argc, _TCHAR* argv[])
 			g_cmnd = FRC;
 		else
 			g_cmnd = CRT;
+
+		if (cl_FindFlg(argc, argv, L"-l"))
+			g_deffered = true;
+
 
 		// Parse axes (Following '-a')
 		if (cl_FindFlg(argc, argv, L"-a"))

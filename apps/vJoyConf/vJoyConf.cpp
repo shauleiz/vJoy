@@ -30,7 +30,7 @@ HWND  hTabs;	  // Handle to tabs control
 HWND  hwndToolTip; // Handle to tooltip window
 HINSTANCE g_hInstance;
 std::vector<CvJoyDevice *> vJoyDevice;
-std::vector<const int> vControls;
+std::vector<int> vControls;
 HWND  hDlgTab; // Dialog box inside the tab control
 HWND  hTopDlg; // Top Dialog
 BOOL Changed = FALSE;
@@ -662,9 +662,9 @@ void OnUserChanged(void)
 	EnableWindow(GetDlgItem(hDlgTab, IDC_APPLY_BTN), Changed);
 	EnableWindow(GetDlgItem(hDlgTab, IDC_REVT_BTN), Changed);
 
-	TCHAR ChangedStr[MAX_MSG_SIZE] = TEXT(""); 
+	WCHAR ChangedStr[MAX_MSG_SIZE] = (L""); 
 	LoadStringW(hInst, IDS_STAT_CHNGD, ChangedStr, MAX_MSG_SIZE);
-	SetWindowText(GetDlgItem(hDlgTab, IDC_STATLINE), ChangedStr);
+	SetWindowTextW(GetDlgItem(hDlgTab, IDC_STATLINE), ChangedStr);
 }
 
 // Button Add/Delete device pressed
