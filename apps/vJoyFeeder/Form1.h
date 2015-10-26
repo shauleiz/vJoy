@@ -404,7 +404,7 @@ private: System::Windows::Forms::Label^  label1;
 // Then send to vJoy Device
 	private: System::Void js_update(void) {
 				 JOYSTICK_POSITION_V2	Report;
-				 static UINT pov[4]={-1,-1,-1,-1};
+				 static UINT pov[4]={(UINT)-1,(UINT)-1,(UINT)-1,(UINT)-1};
 
 
 				 // If no target selected then NO-OP
