@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Project DefaultTargets="Build" ToolsVersion="12.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|Win32">
       <Configuration>Debug</Configuration>
@@ -17,193 +17,202 @@
       <Configuration>Release</Configuration>
       <Platform>x64</Platform>
     </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|ARM">
+      <Configuration>Debug</Configuration>
+      <Platform>ARM</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|ARM">
+      <Configuration>Release</Configuration>
+      <Platform>ARM</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|ARM64">
+      <Configuration>Debug</Configuration>
+      <Platform>ARM64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|ARM64">
+      <Configuration>Release</Configuration>
+      <Platform>ARM64</Platform>
+    </ProjectConfiguration>
   </ItemGroup>
-  <PropertyGroup Label="PropertySheets">
-    <PlatformToolset>WindowsApplicationForDrivers10.0</PlatformToolset>
-    <ConfigurationType>Application</ConfigurationType>
-    <DriverType />
-    <TARGETNAME>vJoyInstall</TARGETNAME>
-    <Configuration Condition="'$(Configuration)' == ''">Debug</Configuration>
-    <Platform Condition="'$(Platform)' == ''">Win32</Platform>
-  </PropertyGroup>
-  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
-  <PropertyGroup Label="PropertySheets">
-    <BUILD_ALT_DIR>$(Configuration.Replace(' ',''))</BUILD_ALT_DIR>
-    <IntDir Condition="'$(Platform)'!='Win32'">$(BUILD_ALT_DIR)\$(Platform)\</IntDir>
-    <IntDir Condition="'$(Platform)'=='Win32'">$(BUILD_ALT_DIR)\x86\</IntDir>
-    <OutDir>$(IntDir)</OutDir>
-  </PropertyGroup>
-  <ImportGroup Label="PreConfiguration">
-    <Import Project="$(VCTargetsPath)\WDKConversion\PreConfiguration.props" />
-  </ImportGroup>
+  <ItemGroup>
+    <ResourceCompile Include="vJoyInstall.rc" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\vJoyInstallLib.cpp" />
+    <ClCompile Include="stdafx.cpp" />
+    <ClCompile Include="vJoyInstall.cpp" />
+  </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectGuid>{41B85AE3-464D-4F92-8AF4-5C2F890A9CAE}</ProjectGuid>
-    <RootNamespace>$(MSBuildProjectName)</RootNamespace>
+    <ProjectGuid>{9794FF85-60A8-4E93-8BD0-D99F7167E70A}</ProjectGuid>
+    <TemplateGuid>{504102d4-2172-473c-8adf-cd96e308f257}</TemplateGuid>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <MinimumVisualStudioVersion>12.0</MinimumVisualStudioVersion>
+    <Configuration>Debug</Configuration>
+    <Platform Condition="'$(Platform)' == ''">Win32</Platform>
+    <RootNamespace>vJoyInstall</RootNamespace>
     <WindowsTargetPlatformVersion>$(LatestTargetPlatformVersion)</WindowsTargetPlatformVersion>
   </PropertyGroup>
-  <PropertyGroup Label="Configuration" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
     <TargetVersion>Windows10</TargetVersion>
-    <UseDebugLibraries>True</UseDebugLibraries>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>WindowsApplicationForDrivers10.0</PlatformToolset>
+    <ConfigurationType>Application</ConfigurationType>
   </PropertyGroup>
-  <PropertyGroup Label="Configuration" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
     <TargetVersion>Windows10</TargetVersion>
-    <UseDebugLibraries>False</UseDebugLibraries>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>WindowsApplicationForDrivers10.0</PlatformToolset>
+    <ConfigurationType>Application</ConfigurationType>
   </PropertyGroup>
-  <PropertyGroup Label="Configuration" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
     <TargetVersion>Windows10</TargetVersion>
-    <UseDebugLibraries>True</UseDebugLibraries>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>WindowsApplicationForDrivers10.0</PlatformToolset>
+    <ConfigurationType>Application</ConfigurationType>
   </PropertyGroup>
-  <PropertyGroup Label="Configuration" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
     <TargetVersion>Windows10</TargetVersion>
-    <UseDebugLibraries>False</UseDebugLibraries>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>WindowsApplicationForDrivers10.0</PlatformToolset>
+    <ConfigurationType>Application</ConfigurationType>
   </PropertyGroup>
-  <!-- Needed by any VcxProj -->
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'" Label="Configuration">
+    <TargetVersion>Windows10</TargetVersion>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>WindowsApplicationForDrivers10.0</PlatformToolset>
+    <ConfigurationType>Application</ConfigurationType>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|ARM'" Label="Configuration">
+    <TargetVersion>Windows10</TargetVersion>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>WindowsApplicationForDrivers10.0</PlatformToolset>
+    <ConfigurationType>Application</ConfigurationType>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM64'" Label="Configuration">
+    <TargetVersion>Windows10</TargetVersion>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>WindowsApplicationForDrivers10.0</PlatformToolset>
+    <ConfigurationType>Application</ConfigurationType>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|ARM64'" Label="Configuration">
+    <TargetVersion>Windows10</TargetVersion>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>WindowsApplicationForDrivers10.0</PlatformToolset>
+    <ConfigurationType>Application</ConfigurationType>
+  </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <ImportGroup Label="ExtensionSettings">
   </ImportGroup>
-  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" />
-  </ImportGroup>
-  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" />
-  </ImportGroup>
-  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" />
-  </ImportGroup>
-  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" />
+  <ImportGroup Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM64'">
+    <OutDir>$(SolutionDir)$(Platform)\$(Configuration)\</OutDir>
+    <IntDir>$(Platform)\$(Configuration)\</IntDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|ARM64'">
+    <OutDir>$(SolutionDir)$(Platform)\$(Configuration)\</OutDir>
+    <IntDir>$(Platform)\$(Configuration)\</IntDir>
+  </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <IncludePath>$(SolutionDir)Include;$(SolutionDir)vJoyMonitor;$(SolutionDir)SppTopWin;$(SolutionDir)SppUI;$(SolutionDir)SppProcess;$(SolutionDir)TinyXml;$(SolutionDir)SppAudio;$(SolutionDir)PulseScope;C:\Program Files (x86)\Visual Leak Detector\include;$(IncludePath);.\;..\</IncludePath>
-    <LibraryPath>$(LibraryPath)</LibraryPath>
-    <GenerateManifest>true</GenerateManifest>
-    <EmbedManifest>false</EmbedManifest>
+    <OutDir>$(SolutionDir)$(Platform)\$(Configuration)\</OutDir>
+    <IntDir>$(Platform)\$(Configuration)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <IncludePath>$(SolutionDir)Include;$(SolutionDir)vJoyMonitor;$(SolutionDir)SppTopWin;$(SolutionDir)SppUI;$(SolutionDir)SppProcess;$(SolutionDir)TinyXml;$(SolutionDir)SppAudio;$(SolutionDir)PulseScope;C:\Program Files (x86)\Visual Leak Detector\include;$(IncludePath);.\;..\</IncludePath>
-    <LibraryPath>$(LibraryPath)</LibraryPath>
-    <GenerateManifest>true</GenerateManifest>
-    <EmbedManifest>false</EmbedManifest>
+    <OutDir>$(SolutionDir)$(Platform)\$(Configuration)\</OutDir>
+    <IntDir>$(Platform)\$(Configuration)\</IntDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">
+    <OutDir>$(SolutionDir)$(Platform)\$(Configuration)\</OutDir>
+    <IntDir>$(Platform)\$(Configuration)\</IntDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">
+    <OutDir>$(SolutionDir)$(Platform)\$(Configuration)\</OutDir>
+    <IntDir>$(Platform)\$(Configuration)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <IncludePath>$(SolutionDir)Include;$(SolutionDir)SppTopWin;$(SolutionDir)vJoyMonitor;$(SolutionDir)SppUI;$(SolutionDir)SppProcess;$(SolutionDir)TinyXml;$(SolutionDir)SppAudio;$(SolutionDir)PulseScope;C:\Program Files (x86)\Visual Leak Detector\include;$(IncludePath);.\;..\</IncludePath>
-    <LibraryPath>$(LibraryPath)</LibraryPath>
-    <GenerateManifest>true</GenerateManifest>
-    <EmbedManifest>false</EmbedManifest>
+    <OutDir>$(SolutionDir)$(Platform)\$(Configuration)\</OutDir>
+    <IntDir>$(Platform)\$(Configuration)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <IncludePath>$(SolutionDir)Include;$(SolutionDir)SppTopWin;$(SolutionDir)vJoyMonitor;$(SolutionDir)SppUI;$(SolutionDir)SppProcess;$(SolutionDir)TinyXml;$(SolutionDir)SppAudio;$(SolutionDir)PulseScope;C:\Program Files (x86)\Visual Leak Detector\include;$(IncludePath);.\;..\</IncludePath>
-    <LibraryPath>$(LibraryPath)</LibraryPath>
-    <GenerateManifest>true</GenerateManifest>
-    <EmbedManifest>false</EmbedManifest>
+    <OutDir>$(SolutionDir)$(Platform)\$(Configuration)\</OutDir>
+    <IntDir>$(Platform)\$(Configuration)\</IntDir>
   </PropertyGroup>
-  <!-- The WrappedTaskItems label is used by the conversion tool to identify the location where items 
-        associated with wrapped tasks will reside.-->
-  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <ClCompile>
-      <WarningLevel>Level3</WarningLevel>
-    </ClCompile>
-  </ItemDefinitionGroup>
-  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM64'">
+    <Link>
+      <TreatLinkerWarningAsErrors>true</TreatLinkerWarningAsErrors>
+      <AdditionalDependencies>setupapi.lib;kernel32.lib;user32.lib;gdi32.lib;advapi32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
     <ClCompile>
       <TreatWarningAsError>false</TreatWarningAsError>
     </ClCompile>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|ARM64'">
     <Link>
-      <AdditionalDependencies>setupapi.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <UACExecutionLevel>RequireAdministrator</UACExecutionLevel>
+      <TreatLinkerWarningAsErrors>true</TreatLinkerWarningAsErrors>
+      <AdditionalDependencies>setupapi.lib;kernel32.lib;user32.lib;gdi32.lib;advapi32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
-    <Manifest>
-      <AdditionalManifestFiles>
-      </AdditionalManifestFiles>
-      <OutputManifestFile>$(TargetPath).manifest</OutputManifestFile>
-    </Manifest>
+    <ClCompile>
+      <TreatWarningAsError>false</TreatWarningAsError>
+    </ClCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <Link>
-      <AdditionalDependencies>setupapi.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <UACExecutionLevel>RequireAdministrator</UACExecutionLevel>
+      <TreatLinkerWarningAsErrors>true</TreatLinkerWarningAsErrors>
+      <AdditionalDependencies>setupapi.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
-    <ClCompile>
-      <WarningLevel>Level3</WarningLevel>
-    </ClCompile>
     <ClCompile>
       <TreatWarningAsError>false</TreatWarningAsError>
     </ClCompile>
-    <Manifest>
-      <AdditionalManifestFiles>
-      </AdditionalManifestFiles>
-    </Manifest>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <Link>
-      <AdditionalDependencies>setupapi.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <UACExecutionLevel>RequireAdministrator</UACExecutionLevel>
+      <TreatLinkerWarningAsErrors>true</TreatLinkerWarningAsErrors>
+      <AdditionalDependencies>setupapi.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
-    <ClCompile>
-      <WarningLevel>Level3</WarningLevel>
-    </ClCompile>
     <ClCompile>
       <TreatWarningAsError>false</TreatWarningAsError>
     </ClCompile>
-    <Manifest>
-      <AdditionalManifestFiles>
-      </AdditionalManifestFiles>
-    </Manifest>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">
+    <Link>
+      <TreatLinkerWarningAsErrors>true</TreatLinkerWarningAsErrors>
+      <AdditionalDependencies>setupapi.lib;kernel32.lib;user32.lib;gdi32.lib;advapi32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+    <ClCompile>
+      <TreatWarningAsError>false</TreatWarningAsError>
+    </ClCompile>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">
+    <Link>
+      <TreatLinkerWarningAsErrors>true</TreatLinkerWarningAsErrors>
+      <AdditionalDependencies>setupapi.lib;kernel32.lib;user32.lib;gdi32.lib;advapi32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+    <ClCompile>
+      <TreatWarningAsError>false</TreatWarningAsError>
+    </ClCompile>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <Link>
+      <TreatLinkerWarningAsErrors>true</TreatLinkerWarningAsErrors>
+      <AdditionalDependencies>setupapi.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+    <ClCompile>
+      <TreatWarningAsError>false</TreatWarningAsError>
+    </ClCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <Link>
-      <AdditionalDependencies>setupapi.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <UACExecutionLevel>RequireAdministrator</UACExecutionLevel>
+      <TreatLinkerWarningAsErrors>true</TreatLinkerWarningAsErrors>
+      <AdditionalDependencies>setupapi.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
-    <ClCompile>
-      <WarningLevel>Level3</WarningLevel>
-    </ClCompile>
     <ClCompile>
       <TreatWarningAsError>false</TreatWarningAsError>
     </ClCompile>
-    <Manifest>
-      <AdditionalManifestFiles>
-      </AdditionalManifestFiles>
-      <OutputManifestFile>$(TargetPath).manifest</OutputManifestFile>
-    </Manifest>
   </ItemDefinitionGroup>
-  <ItemGroup>
-    <!-- We only add items (e.g. form ClSourceFiles) that do not already exist (e.g in the ClCompile list), this avoids duplication -->
-    <ClCompile Include="..\vJoyInstallLib.cpp" />
-    <ClCompile Include="@(ClSourceFiles)" Exclude="@(ClCompile)" />
-    <ClCompile Include="vJoyInstall.cpp" />
-    <ResourceCompile Include="@(RcSourceFiles)" Exclude="@(ResourceCompile)" />
-    <Midl Include="@(IdlSourceFiles)" Exclude="@(Midl)" />
-    <MessageCompile Include="@(McSourceFiles)" Exclude="@(MessageCompile)" />
-    <MASM Include="@(AsmSourceFiles)" Exclude="@(MASM)" />
-    <GenerateBmf Include="@(MofSourceFiles)" Exclude="@(GenerateBmf)" />
-    <ResourceCompile Include="vJoyInstall.rc" />
-  </ItemGroup>
-  <!-- Set default environment variables, e.g. for stampinf -->
-  <ItemGroup>
-    <BuildMacro Include="SDK_INC_PATH">
-      <Value>$(KIT_SHARED_INC_PATH)</Value>
-      <EnvironmentVariable>true</EnvironmentVariable>
-    </BuildMacro>
-  </ItemGroup>
-  <ItemGroup>
-    <Inf Exclude="@(Inf)" Include="$(DDK_INF_FILES)" />
-    <Inf Exclude="@(Inf)" Include="*.inf" />
-    <FilesToPackage Include="$(TargetPath)" Condition="'$(ConfigurationType)'=='Driver' or '$(ConfigurationType)'=='DynamicLibrary'" />
-    <FilesToPackage Include="$(DDK_PACKAGE_FILES)" />
-  </ItemGroup>
-  <!-- Necessary to pick up proper files from local directory when in the IDE-->
-  <ItemGroup>
-    <None Exclude="@(None)" Include="*.txt;*.htm;*.html" />
-    <None Exclude="@(None)" Include="*.ico;*.cur;*.bmp;*.dlg;*.rct;*.gif;*.jpg;*.jpeg;*.wav;*.jpe;*.tiff;*.tif;*.png;*.rc2" />
-    <None Exclude="@(None)" Include="*.def;*.bat;*.hpj;*.asmx" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Exclude="@(ClInclude)" Include="*.h;*.hpp;*.hxx;*.hm;*.inl;*.xsd" />
-    <ClInclude Include="..\stdafx.h" />
-    <ClInclude Include="..\vJoyInstall.h" />
-  </ItemGroup>
-  <!-- /Necessary to pick up proper files from local directory when in the IDE-->
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
 </Project>

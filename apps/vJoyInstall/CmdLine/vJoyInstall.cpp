@@ -1,11 +1,11 @@
 // vJoyInstall.cpp : Defines the entry point for the console application.
 //
 
-#include "stdafx.h"
-#include "vJoyInstall.h"
+#include "..\stdafx.h"
+#include "..\vJoyInstall.h"
 
 // Global
-FILE *stream=NULL;
+/**/extern FILE *stream;
 
 
 int
@@ -19,6 +19,7 @@ _tmain(__in int argc, __in PZPWSTR argv)
 	TCHAR DeviceHWID[MAX_PATH];
 	VERBTYPE verb;
 	TCHAR InfFile[MAX_PATH];
+	stream = NULL;
 
 	////////////////////////////////////////////////////
 	/// Parse Command line

@@ -1,7 +1,7 @@
 #include <windows.h>
 
 //#include <svn_version.h>
-#include <..\..\inc\public.h>
+#include <..\..\..\inc\public.h>
 
 
 /////////////////////////////////////////////////////////////////////////////
