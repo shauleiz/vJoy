@@ -4,11 +4,11 @@
 // Monitor Force Feedback (FFB) vJoy device
 #include "stdafx.h"
 #include "Devioctl.h"
-#include "public.h"
+#include "..\..\inc\public.h"
 #include <malloc.h>
 #include <string.h>
 #include <stdlib.h>
-#include "vjoyinterface.h"
+#include "..\..\inc\vjoyinterface.h"
 #include "FfbMon.h"
 #include "Math.h"
 
