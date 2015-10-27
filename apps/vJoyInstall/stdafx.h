@@ -10,7 +10,6 @@
 
 #include <windows.h>
 #include <stdio.h>
-#include <tchar.h>
 #include <stdlib.h>
 #include <tchar.h>
 #include <basetyps.h>
@@ -20,7 +19,6 @@
 #include <Newdev.h>
 #include <ks.h>
 #include <initguid.h>
-
 
 
 // TODO: reference additional headers your program requires here

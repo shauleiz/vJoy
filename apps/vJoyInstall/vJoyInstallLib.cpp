@@ -1,12 +1,7 @@
 #include "stdafx.h"
 #include "vJoyInstall.h"
 
-
-#ifdef GTK
 FILE *stream;
-#else
-extern FILE *stream;
-#endif
 
 StatusMessageFunc StatusMessage = StatusMessageToStream;
 TCHAR prt[MAX_PATH];
@@ -1152,7 +1147,7 @@ void RefreshvJoySpecific(USHORT Revision)
 
 
 /* Major Functions */
-Installation(LPCTSTR DeviceHWID, TCHAR * InfFile)
+int Installation(LPCTSTR DeviceHWID, TCHAR * InfFile)
 {
 	BOOL	rDi;
 	int		assigned;
@@ -1218,7 +1213,7 @@ Installation(LPCTSTR DeviceHWID, TCHAR * InfFile)
 	return 0;
 }
 
-Removal(TCHAR * DeviceHWID, TCHAR * InfFile, BOOL DelInf)
+int Removal(TCHAR * DeviceHWID, TCHAR * InfFile, BOOL DelInf)
 {
 	TCHAR InstanceId[MAX_DEVICE_ID_LEN];
 
@@ -1240,7 +1235,7 @@ Removal(TCHAR * DeviceHWID, TCHAR * InfFile, BOOL DelInf)
 	int result = RemoveDevice(InstanceId, DelInf);
 	return result;
 }
-Repair(TCHAR * DeviceHWID, TCHAR * InfFile)
+int Repair(TCHAR * DeviceHWID, TCHAR * InfFile)
 {
 	BOOL	rDi;
 	int assigned;
@@ -1627,7 +1622,7 @@ void PrintHeader(FILE * dst)
 	 _ftprintf(dst,"\n");
 }
 
-BOOL StatusMessageToStream(void * reserved, TCHAR * buffer,  ERRLEVEL level)
+BOOL WINAPI StatusMessageToStream(void * reserved, TCHAR * buffer,  ERRLEVEL level)
 {
 	TCHAR *Prefix;
 

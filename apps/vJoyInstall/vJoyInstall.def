@@ -1,0 +1,20 @@
+LIBRARY vJoyInstall
+
+EXPORTS
+
+get_inf_file @1
+get_dev_hwid @2
+Func3	@3
+installation @5
+repair	@6
+removal @7
+is_ppjoy_installed @8
+SetStatusMessageFunc @9
+is_vjoy_installed @10
+is_vjoy_installed_specific @11
+refresh_vjoy @12
+refresh_vjoy_specific @13
+disable @14
+enable @15
+
+
