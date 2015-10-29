@@ -93,7 +93,7 @@ Return Value:
     // Initialize WPP Tracing
     //
     WPP_INIT_TRACING( DriverObject, RegistryPath );
-    TraceEvents(TRACE_LEVEL_INFORMATION, DBG_INIT, "vJoy Driver Built %s %s\n", __DATE__, __TIME__);
+    // TraceEvents(TRACE_LEVEL_INFORMATION, DBG_INIT, "vJoy Driver Built %s %s\n", __DATE__, __TIME__);
 	// KdBreakPoint(); Break at the entry point to the driver
 
     // Since there is only one control-device for all the instances
