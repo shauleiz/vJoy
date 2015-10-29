@@ -28,10 +28,17 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Hidmapper", "Hidmapper", "{B0182616-C5EB-4C1A-91DF-AD02B17F7F44}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "FfbMon", "apps\FfbMon\FfbMon.vcxproj", "{F47958E4-9FF0-4E14-910A-1BA0A0F6D863}"
+	ProjectSection(ProjectDependencies) = postProject
+		{9E1FC894-F587-4FBA-8599-2F8C544E061A} = {9E1FC894-F587-4FBA-8599-2F8C544E061A}
+	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "vJoyFeeder", "apps\vJoyFeeder\vJoyFeeder.vcxproj", "{0B6F020D-754E-4B0D-9575-BAA03E0FBABD}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "vJoyConf", "apps\vJoyConf\vJoyConf.vcxproj", "{DB7872FF-B0E0-46F6-A070-F059BBBAC659}"
+	ProjectSection(ProjectDependencies) = postProject
+		{E8EF423A-0C43-44E3-AF98-5400D82DA827} = {E8EF423A-0C43-44E3-AF98-5400D82DA827}
+		{9E1FC894-F587-4FBA-8599-2F8C544E061A} = {9E1FC894-F587-4FBA-8599-2F8C544E061A}
+	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "vJoy", "driver\sys\vJoy.vcxproj", "{E56BFD67-086A-43A6-BE30-938203CCA66F}"
 EndProject
@@ -49,6 +56,10 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WrapperTest", "apps\common\vJoyInterfaceCS\WrapperTest\WrapperTest.csproj", "{23F03B03-B65E-47EF-A61C-FB4631FBA71C}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "vJoyConfig", "apps\vJoyConf\vJoyConfig\vJoyConfig.vcxproj", "{DF01DF55-7429-484F-BB05-3717830A2F22}"
+	ProjectSection(ProjectDependencies) = postProject
+		{E8EF423A-0C43-44E3-AF98-5400D82DA827} = {E8EF423A-0C43-44E3-AF98-5400D82DA827}
+		{9E1FC894-F587-4FBA-8599-2F8C544E061A} = {9E1FC894-F587-4FBA-8599-2F8C544E061A}
+	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "vJoyInstall", "apps\vJoyInstall\vJoyInstall.vcxproj", "{E8EF423A-0C43-44E3-AF98-5400D82DA827}"
 EndProject
