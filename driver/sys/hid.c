@@ -94,10 +94,10 @@ Return Value:
     WDFDEVICE           device;
     PDEVICE_EXTENSION   devContext = NULL;
 
-	WDFMEMORY           memory;
-	size_t				NumBytesTransferred;
-	PUCHAR				switchState = NULL;
-	UCHAR				eb;
+	//WDFMEMORY           memory;
+	//size_t				NumBytesTransferred;
+	//PUCHAR				switchState = NULL;
+	//UCHAR				eb;
 	int					id=0;
 
     UNREFERENCED_PARAMETER(OutputBufferLength);
@@ -298,7 +298,7 @@ vJoyGetFeature(
 	NTSTATUS				status = STATUS_SUCCESS;
 	WDF_REQUEST_PARAMETERS	params;
 	PHID_XFER_PACKET		transferPacket = NULL;
-	UCHAR					ucBuffer[20] = {0};
+	//UCHAR					ucBuffer[20] = {0};
 	PUCHAR					ucTmp;
 	WDFQUEUE				ParentQueue = NULL;
     WDFDEVICE				device;
@@ -391,11 +391,11 @@ Return Value:
 --*/
 {
     NTSTATUS                     status = STATUS_SUCCESS;
-    UCHAR                        commandData = 0;
+    //UCHAR                        commandData = 0;
     PHID_XFER_PACKET             transferPacket = NULL;
     WDF_REQUEST_PARAMETERS       params;
-    WDFDEVICE                    device;
-    UCHAR                        featureUsage = 0;
+    //WDFDEVICE                    device;
+    //UCHAR                        featureUsage = 0;
 	PUCHAR						 TmpBfr;
 
     PAGED_CODE();
@@ -584,7 +584,7 @@ Return Value:
 --*/
 {
 	//PVOID				buffer;
-	size_t				bufSize;
+	//size_t				bufSize;
     NTSTATUS			status = STATUS_SUCCESS;
 	PWSTR				pwstrID;
 	WDFMEMORY           memory;
@@ -871,17 +871,17 @@ Return Value:
 --*/
 {
     NTSTATUS             status= STATUS_SUCCESS;
-    WDF_DEVICE_STATE     deviceState;
+    //WDF_DEVICE_STATE     deviceState;
     WDFDEVICE            hDevice = WdfIoQueueGetDevice(Queue);
 	PCONTROL_DEVICE_EXTENSION			 ControlDevContext = ControlGetData(hDevice);
-	ULONG  bytes;
+	//ULONG  bytes;
     PDEVICE_EXTENSION    pDevContext = NULL;
-	WDFMEMORY  reqMemory;
+	//WDFMEMORY  reqMemory;
     PVOID  buffer;
     size_t  bufSize;
 	JOYSTICK_POSITION_V2 * iReport;
-	JOYSTICK_POSITION_V2   icReport;
-    PHID_DEVICE_ATTRIBUTES   deviceAttributes = NULL;
+	//JOYSTICK_POSITION_V2   icReport;
+    //PHID_DEVICE_ATTRIBUTES   deviceAttributes = NULL;
 	size_t	bytesReturned = 0;
 
 
@@ -1216,6 +1216,8 @@ NTSTATUS vJoyEvtDeviceReleaseHardware(
 	// Test Only
 {
 	PAGED_CODE();
+	UNREFERENCED_PARAMETER(Device);
+ 	UNREFERENCED_PARAMETER(ResourcesTranslated);
 
 	TraceEvents(TRACE_LEVEL_INFORMATION, DBG_INIT, "PNP: Entered vJoyEvtDeviceReleaseHardware\n");
 	return STATUS_SUCCESS;
@@ -1229,6 +1231,9 @@ NTSTATUS vJoyEvtDevicePrepareHardware(
 	// Test Only
 {
 	PAGED_CODE();
+	UNREFERENCED_PARAMETER(Device);
+ 	UNREFERENCED_PARAMETER(ResourcesRaw);
+ 	UNREFERENCED_PARAMETER(ResourcesTranslated);
 
 	TraceEvents(TRACE_LEVEL_INFORMATION, DBG_INIT, "PNP: Entered vJoyEvtDevicePrepareHardware\n");
 	return STATUS_SUCCESS;
@@ -1240,6 +1245,7 @@ VOID vJoyEvtDeviceSelfManagedIoFlush(
 	// Test Only
 {
 	PAGED_CODE();
+	UNREFERENCED_PARAMETER(Device);
 
 	TraceEvents(TRACE_LEVEL_INFORMATION, DBG_INIT, "PNP: Entered vJoyEvtDeviceSelfManagedIoFlush\n");
 }
@@ -1250,6 +1256,8 @@ VOID vJoyEvtDevicePnpStateChange(
 	)
 {
 	PAGED_CODE();
+	UNREFERENCED_PARAMETER(Device);
+	UNREFERENCED_PARAMETER(NotificationData);
 
 	TraceEvents(TRACE_LEVEL_INFORMATION, DBG_INIT, "PNP: Entered vJoyEvtDevicePnpStateChange\n");
 }
@@ -1602,7 +1610,7 @@ void   CalcInitValue(USHORT		id, PDEVICE_INIT_VALS data_buf)
 	unsigned int mask_device=0, mask_master=0;
 	int i,j, k;
 	UCHAR InitValAxis[8] = { 50, 50, 50, 0, 0, 0, 0, 0 };
-	UCHAR InitValPov[4] = { -1, -1, -1, -1 };
+	UCHAR InitValPov[4] = { (UCHAR)-1, (UCHAR)-1, (UCHAR)-1, (UCHAR)-1 };
 	UCHAR ButtonMask[16] = { 0 };
 	int nAxes, nPovs, offset;
 
@@ -1737,7 +1745,7 @@ void UpdateCollections(WDFDEVICE Device)
 */
 void InitializeDeviceContext(PDEVICE_EXTENSION   devContext)
 {
-	int i, j;
+	int i/*, j*/;
 
 	// Init array of pointers to reports
 	for (i=0; i<MAX_N_DEVICES; i++)
@@ -1799,22 +1807,22 @@ void InitializeDefaultDev(PDEVICE_EXTENSION   devContext)
 		devContext->positions[index]->ValWheel = 0;
 
 		if (data_buf.InitValPov[0] == -1)
-			devContext->positions[index]->ValHats = -1;
+			devContext->positions[index]->ValHats = (DWORD)-1;
 		else
 			devContext->positions[index]->ValHats = data_buf.InitValPov[0] * 0x7FFF / 100 + 1;
 
 		if (data_buf.InitValPov[1] == -1)
-			devContext->positions[index]->ValHatsEx1 = -1;
+			devContext->positions[index]->ValHatsEx1 = (DWORD)-1;
 		else
 			devContext->positions[index]->ValHatsEx1 = data_buf.InitValPov[1] * 0x7FFF / 100 + 1;
 
 		if (data_buf.InitValPov[2] == -1)
-			devContext->positions[index]->ValHatsEx2 = -1;
+			devContext->positions[index]->ValHatsEx2 = (DWORD)-1;
 		else
 			devContext->positions[index]->ValHatsEx2 = data_buf.InitValPov[2] * 0x7FFF / 100 + 1;
 
 		if (data_buf.InitValPov[3] == -1)
-			devContext->positions[index]->ValHatsEx3 = -1;
+			devContext->positions[index]->ValHatsEx3 = (DWORD)-1;
 		else
 			devContext->positions[index]->ValHatsEx3 = data_buf.InitValPov[3] * 0x7FFF / 100 + 1;
 
@@ -1870,22 +1878,22 @@ void ResetDeviceControls(int id, PDEVICE_EXTENSION devContext, PDEVICE_INIT_VALS
 	devContext->positions[index]->ValWheel = 0;
 
 	if (pdata_buf->InitValPov[0] == -1)
-		devContext->positions[index]->ValHats = -1;
+		devContext->positions[index]->ValHats = (DWORD)-1;
 	else
 		devContext->positions[index]->ValHats = pdata_buf->InitValPov[0] * 35999 / 100;
 
 	if (pdata_buf->InitValPov[1] == -1)
-		devContext->positions[index]->ValHatsEx1 = -1;
+		devContext->positions[index]->ValHatsEx1 = (DWORD)-1;
 	else
 		devContext->positions[index]->ValHatsEx1 = pdata_buf->InitValPov[1] * 35999 / 100;
 
 	if (pdata_buf->InitValPov[2] == -1)
-		devContext->positions[index]->ValHatsEx2 = -1;
+		devContext->positions[index]->ValHatsEx2 = (DWORD)-1;
 	else
 		devContext->positions[index]->ValHatsEx2 = pdata_buf->InitValPov[2] * 35999 / 100;
 
 	if (pdata_buf->InitValPov[3] == -1)
-		devContext->positions[index]->ValHatsEx3 = -1;
+		devContext->positions[index]->ValHatsEx3 = (DWORD)-1;
 	else
 		devContext->positions[index]->ValHatsEx3 = pdata_buf->InitValPov[3] * 35999 / 100;
 
@@ -1935,7 +1943,7 @@ void InitializeDev(PDEVICE_EXTENSION   devContext, USHORT Mask, BOOLEAN ResetOnl
 			break;
 
 		// Get initialization values
-		CalcInitValue(index + 1, &data_buf);
+		CalcInitValue((USHORT)index + 1, &data_buf);
 
 		// Initialize all fields
 		devContext->positions[index]->ValThrottle = 0;
@@ -1952,22 +1960,22 @@ void InitializeDev(PDEVICE_EXTENSION   devContext, USHORT Mask, BOOLEAN ResetOnl
 		devContext->positions[index]->ValWheel = 0;
 
 		if (data_buf.InitValPov[0] == -1)
-			devContext->positions[index]->ValHats = -1;
+			devContext->positions[index]->ValHats = (DWORD)-1;
 		else
 			devContext->positions[index]->ValHats = data_buf.InitValPov[0] * 35999 / 100;
 
 		if (data_buf.InitValPov[1] == -1)
-			devContext->positions[index]->ValHatsEx1 = -1;
+			devContext->positions[index]->ValHatsEx1 = (DWORD)-1;
 		else
 			devContext->positions[index]->ValHatsEx1 = data_buf.InitValPov[1] * 35999 / 100;
 
 		if (data_buf.InitValPov[2] == -1)
-			devContext->positions[index]->ValHatsEx2 = -1;
+			devContext->positions[index]->ValHatsEx2 = (DWORD)-1;
 		else
 			devContext->positions[index]->ValHatsEx2 = data_buf.InitValPov[2] * 35999 / 100;
 
 		if (data_buf.InitValPov[3] == -1)
-			devContext->positions[index]->ValHatsEx3 = -1;
+			devContext->positions[index]->ValHatsEx3 = (DWORD)-1;
 		else
 			devContext->positions[index]->ValHatsEx3 = data_buf.InitValPov[3] * 35999 / 100;
 

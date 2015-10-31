@@ -120,8 +120,6 @@ BOOL Install(LPCTSTR inf, LPCTSTR hwid, TCHAR *InstanceId)
 		 _stprintf_s(prt, MAX_PATH, "Install: Illegal Inf file");
 		StatusMessage( NULL, prt,  ERR);
 		return FALSE;
-
-		return FALSE;
 	}
 
     if(!hwid[0]) 
@@ -299,9 +297,9 @@ BOOL GetParentDevInst(TCHAR * ParentDeviceNode, TCHAR * CompatibleId, DEVINST * 
 	TCHAR buf[MAX_DEVICE_ID_LEN]; // Place the Device Node here
 	//DEVINST  dnDevInst;
 	CONFIGRET  rType;
-	TCHAR ErrMsg[1000];
-	SP_DEVINFO_DATA  DeviceInfoData;
-	BOOL	rDi;
+	//TCHAR ErrMsg[1000];
+	//SP_DEVINFO_DATA  DeviceInfoData;
+	//BOOL	rDi;
 
 	if (!ParentDeviceNode)
 	{
@@ -336,7 +334,7 @@ BOOL GetParentDevInst(TCHAR * ParentDeviceNode, TCHAR * CompatibleId, DEVINST * 
 BOOL AssignCompatibleId(TCHAR * CompatibleId, DEVINST  * pdnDevInst , BOOL First)
 {
 
-	TCHAR buf[MAX_DEVICE_ID_LEN]; // Place the Device Node here
+	//TCHAR buf[MAX_DEVICE_ID_LEN]; // Place the Device Node here
 	DEVINST  childDevInst, dnDevInst = *pdnDevInst;
 	CONFIGRET  rType;
 	TCHAR ErrMsg[1000];
@@ -1127,7 +1125,7 @@ BOOL Disable(USHORT Revision)
 
 void RefreshvJoy(void)
 {
-	TCHAR InstanceId[MAX_DEVICE_ID_LEN];
+	//TCHAR InstanceId[MAX_DEVICE_ID_LEN];
 	TCHAR DeviceHWID[MAX_PATH];
 
 	if (GetDevHwId(0, NULL, DeviceHWID))
@@ -1136,7 +1134,7 @@ void RefreshvJoy(void)
 
 void RefreshvJoySpecific(USHORT Revision)
 {
-	TCHAR InstanceId[MAX_DEVICE_ID_LEN];
+	//TCHAR InstanceId[MAX_DEVICE_ID_LEN];
 	TCHAR DeviceHWID[MAX_PATH];
 
 	_stprintf_s(DeviceHWID, MAX_PATH, HWID_TMPLT,VENDOR_N_ID, PRODUCT_N_ID, Revision);
@@ -1149,7 +1147,7 @@ void RefreshvJoySpecific(USHORT Revision)
 /* Major Functions */
 int Installation(LPCTSTR DeviceHWID, TCHAR * InfFile)
 {
-	BOOL	rDi;
+	//BOOL	rDi;
 	int		assigned;
 	TCHAR InstanceId[MAX_DEVICE_ID_LEN];
 	GUID ClassGUID = GUID_NULL;
@@ -1216,6 +1214,7 @@ int Installation(LPCTSTR DeviceHWID, TCHAR * InfFile)
 int Removal(TCHAR * DeviceHWID, TCHAR * InfFile, BOOL DelInf)
 {
 	TCHAR InstanceId[MAX_DEVICE_ID_LEN];
+	UNREFERENCED_PARAMETER(InfFile);
 
 	/////////////////////////////////////
 	// Test if device already installed. 
@@ -1237,7 +1236,7 @@ int Removal(TCHAR * DeviceHWID, TCHAR * InfFile, BOOL DelInf)
 }
 int Repair(TCHAR * DeviceHWID, TCHAR * InfFile)
 {
-	BOOL	rDi;
+	//BOOL	rDi;
 	int assigned;
 	TCHAR InstanceId[MAX_DEVICE_ID_LEN];
 	GUID ClassGUID = GUID_NULL;
@@ -1310,7 +1309,7 @@ BOOL GetErrorString(TCHAR * Msg, int Size)
 BOOL GetInputInfFullPath(TCHAR * Str)
 {
 
-	size_t ReturnValue;
+	//size_t ReturnValue;
 	TCHAR  tbuffer[MAX_PATH];
 	TCHAR * buffer;
 
@@ -1509,8 +1508,8 @@ void PrintHeader(FILE * dst)
 	#define PRODUCT_PROFESSIONAL 0x00000030
 	typedef BOOL (WINAPI *PGPI)(DWORD, DWORD, DWORD, DWORD, PDWORD);
 	time_t long_time;
-	char timebuf[26], tmpbuf[128];
-	errno_t err;
+	//char timebuf[26], tmpbuf[128];
+	//errno_t err;
 	struct tm *newtime;
 	OSVERSIONINFOEX osvi;
 	LPOSVERSIONINFOEX lposvi;
@@ -1625,6 +1624,7 @@ void PrintHeader(FILE * dst)
 BOOL WINAPI StatusMessageToStream(void * reserved, TCHAR * buffer,  ERRLEVEL level)
 {
 	TCHAR *Prefix;
+	UNREFERENCED_PARAMETER(reserved);
 
 	switch (level)
 	{

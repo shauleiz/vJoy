@@ -75,29 +75,29 @@ Return Value:
 --*/
 {
     NTSTATUS status = STATUS_SUCCESS;
-    WDFDEVICE parent;
-    WDF_REQUEST_FORWARD_OPTIONS forwardOptions;
+    //WDFDEVICE parent;
+    //WDF_REQUEST_FORWARD_OPTIONS forwardOptions;
     PDEVICE_EXTENSION    pDevContext = NULL;
-	WDFMEMORY  inMemory, outMemory;
+	//WDFMEMORY  inMemory, outMemory;
     PVOID  buffer;
     size_t  bufSize;
     WDFDEVICE            hRawDevice = WdfIoQueueGetDevice(Queue);
 	PRPDO_DEVICE_DATA pdoData = PdoGetData(hRawDevice);
-	WDF_REQUEST_SEND_OPTIONS RequestOptions;
-	WDFIOTARGET TargetOnParent;
+	//WDF_REQUEST_SEND_OPTIONS RequestOptions;
+	//WDFIOTARGET TargetOnParent;
 
 	JOYSTICK_POSITION_V2 * iReport;
 	WDFFILEOBJECT FileObj;
 	USHORT id=0;
 	PFILEOBJECT_EXTENSION pExtension=NULL;
 
-    WDFREQUEST				requestForceFeedback;
-	PHID_XFER_PACKET		transferPacket = NULL;
-	PVOID					ForceFeedbackBuffer = NULL;
+    //WDFREQUEST				requestForceFeedback;
+	//PHID_XFER_PACKET		transferPacket = NULL;
+	//PVOID					ForceFeedbackBuffer = NULL;
 	PVOID					GenBuffer = NULL;
 	size_t					bytesReturned = 0;
 	WDF_REQUEST_PARAMETERS	Params;
-	BOOLEAN					FfbStat = FALSE;
+	//BOOLEAN					FfbStat = FALSE;
 	ULONG					bytesToCopy = 0;
 	BYTE					Byte_tmp;
 
@@ -912,6 +912,7 @@ rawEvtCleanupCallback(
     IN WDFDEVICE Device
     )
 {
+	UNREFERENCED_PARAMETER(Device);
 	//NTSTATUS status;
 
 	//status = WdfPdoMarkMissing(Device);

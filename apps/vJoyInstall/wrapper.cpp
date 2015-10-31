@@ -8,7 +8,8 @@ BOOL DummyStatusMessage(void * output, TCHAR * buffer,  ERRLEVEL level);
 
 int WINAPI  DllMain( HANDLE hModule, DWORD  ul_reason_for_call, LPVOID lpReserved)
 {
-
+	UNREFERENCED_PARAMETER(lpReserved);
+	UNREFERENCED_PARAMETER(hModule);
     switch (ul_reason_for_call)
 	{
 		case DLL_PROCESS_ATTACH:
@@ -107,5 +108,9 @@ int WINAPI  Func3(void)
 // Wrapper Internal functions
 BOOL DummyStatusMessage(void * output, TCHAR * buffer,  ERRLEVEL level)
 {
+	UNREFERENCED_PARAMETER(level);
+	UNREFERENCED_PARAMETER(buffer);
+	UNREFERENCED_PARAMETER(output);
+
 	return FALSE;
 }
