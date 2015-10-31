@@ -2229,7 +2229,7 @@ VOID FfbTransferData(
 	// Calculate size of Read data
 	WDF_REQUEST_PARAMETERS_INIT(&Params);
 	WdfRequestGetParameters(ReadRequest, &Params);
-	bytesToCopy = Params.Parameters.DeviceIoControl.OutputBufferLength;
+	bytesToCopy = (unsigned int)Params.Parameters.DeviceIoControl.OutputBufferLength;
 	if (bytesToCopy<DataSize)
 	{
 		status = STATUS_BUFFER_TOO_SMALL;
