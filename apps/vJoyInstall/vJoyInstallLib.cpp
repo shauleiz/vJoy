@@ -1314,7 +1314,9 @@ BOOL GetInputInfFullPath(TCHAR * Str)
 	TCHAR * buffer;
 
 	buffer = tbuffer;
-	buffer = _tgetenv(TEXT("WINDIR"));
+	//buffer = _tgetenv(TEXT("WINDIR"));
+	size_t	RequiredCount = 0;
+	_tgetenv_s(&RequiredCount, buffer, MAX_PATH, TEXT("WINDIR"));
 
 	_stprintf_s(Str, MAX_PATH, TEXT("%s\\Inf\\Input.inf"),buffer);
 	return TRUE;
@@ -1510,12 +1512,13 @@ void PrintHeader(FILE * dst)
 	time_t long_time;
 	//char timebuf[26], tmpbuf[128];
 	//errno_t err;
-	struct tm *newtime;
+	struct tm newtime;
 	OSVERSIONINFOEX osvi;
 	LPOSVERSIONINFOEX lposvi;
 	SYSTEM_INFO sysinfo;
 	DWORD ProdType;
 	PGPI pGPI;
+	char timebuf[128];
 
 
 
@@ -1525,9 +1528,11 @@ void PrintHeader(FILE * dst)
 	// Get time as 64-bit integer.
 	time( &long_time ); 
 	// Convert to local time.
-	newtime = localtime( &long_time );
-	// Use strftime to build a customized time string. 
-	_ftprintf(dst, "+++++++ +++++++ %s",  asctime( newtime ) );
+	//newtime = localtime( &long_time );
+	localtime_s(&newtime, &long_time);
+	// Use strftime to build a customized time string.
+	asctime_s(timebuf, &newtime);
+	_ftprintf(dst, "+++++++ +++++++ %s", timebuf /*asctime( &newtime )*/ );
 
 	//// System information /////////////////////////////////////////
 	ZeroMemory(&osvi, sizeof(OSVERSIONINFOEX));
@@ -1788,6 +1793,7 @@ BOOL RemoveRevStr(LPCTSTR DeviceHWID, LPTSTR DeviceHWID_NoRev)
 	// Trim
 	size_t lenall = _tcslen(DeviceHWID);
 	size_t lenrev = _tcslen(revstr);
-	_tcsncpy(DeviceHWID_NoRev, DeviceHWID, lenall-lenrev);
+	//_tcsncpy(DeviceHWID_NoRev, DeviceHWID, lenall-lenrev);
+	_tcsncpy_s(DeviceHWID_NoRev, _tcslen(DeviceHWID), DeviceHWID, lenall - lenrev);
 	return TRUE;
 }
