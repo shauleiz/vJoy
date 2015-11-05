@@ -7,21 +7,19 @@
 #define MyAppURL "http://vjoystick.sourceforge.net"
 #define AppGUID "{{8E31F76F-74C3-47F1-9550-E041EEDC5FBB}"
 
-#define vJoyInstx86 ".\objfre_wxp_x86\i386"
-#define vJoyInstx64 ".\objfre_wlh_amd64\amd64"
-#define vJoyLibx86 "..\lib\objfre_wxp_x86\i386"
-#define vJoyLibx64 "..\lib\objfre_wlh_amd64\amd64"
-#define vJoyConfDirx86 "..\apps\vJoyConf\objfre_wxp_x86\i386"
-#define vJoyConfDirx64 "..\apps\vJoyConf\objfre_wlh_amd64\amd64"
-#define vJoyConfigDirx86 "..\apps\vJoyConf\vJoyConfig\objfre_wxp_x86\i386"
-#define vJoyConfigDirx64 "..\apps\vJoyConf\vJoyConfig\objfre_wlh_amd64\amd64"
-#define vJoyFeederDirx86 "..\apps\vJoyFeeder\objfre_wxp_x86\i386"
-#define vJoyFeederDirx64 "..\apps\vJoyFeeder\objfre_wlh_amd64\amd64"
+#define vJoyInstx86 "..\Win32\Release\Package"
+#define vJoyInstx64 "..\x64\Release\Package"
+#define vJoyLibx86 "..\Win32\Release"
+#define vJoyLibx64 "..\x64\Release"
+
+#define vJoyAppsx86 "..\Win32\Release"
+#define vJoyAppsx64 "..\x64\Release"
+
 #define vJoyMonDirx86 "..\apps\External\JoyMonitor\x86"
 #define vJoyMonDirx64 "..\apps\External\JoyMonitor\x64"
 #define vJoyDllDirx64 "..\apps\External\DLL\x64"
 #define vJoyDllDirx86 "..\apps\External\DLL\x86"
-#define vJoyIconFile "..\apps\vJoyInstall\GTK\Joystick-icon.ico"
+#define vJoyIconFile ".\Joystick-icon.ico"
 
 #define DestSubDirX86 "x86"
 #define DestSubDirX64 "x64"
@@ -51,7 +49,7 @@ AppUpdatesURL={#MyAppURL}
 CreateAppDir=true
 OutputDir=.
 OutputBaseFilename=vJoyInstallerSigned
-SetupIconFile=..\apps\vJoyInstall\GTK\install.ico
+SetupIconFile=install.ico
 Compression=lzma/Max
 SolidCompression=true
 DefaultDirName={pf}\{#MyShortAppName}
@@ -59,7 +57,8 @@ DefaultGroupName={#MyShortAppName}
 VersionInfoCompany=Shaul Eizikovich
 AppCopyright=Copyright (c) 2005-2015 by Shaul Eizikovich
 MinVersion = 5.1.2600sp1
-SignTool=Sig sign /a /v /s My /t http://timestamp.digicert.com $f
+;SignTool=DigiCert sign /sha1 "6d 54 71 df 6b bf af a5 d5 90 0c 88 c0 8d f0 e9 c5 13 69 0a"  /noInput  $f
+SignTool=sig sign /a /v /i DigiCert /t http://timestamp.digicert.com $f
 SignedUninstaller=yes
 DisableDirPage=yes
 DisableProgramGroupPage=yes
@@ -86,16 +85,19 @@ Source: "{#vJoyLibx86}\*.dll"; DestDir: "{app}\{#DestSubDirX86}"
 Source: "{#vJoyLibx64}\*.dll"; DestDir: "{app}\{#DestSubDirX64}"; Check: IsX64
 Source: "{#vJoyDllDirx86}\*.dll"; DestDir: "{app}\{#DestSubDirX86}"
 Source: "{#vJoyDllDirx64}\*.dll"; DestDir: "{app}\{#DestSubDirX64}"; Check: IsX64
+;Installer
+Source: "{#vJoyAppsx86}\vJoyInstall.exe"; DestDir: "{app}"; Check: IsX86
+Source: "{#vJoyAppsx64}\vJoyInstall.exe"; DestDir: "{app}"; Check: IsX64
 ;Configuration application
-Source: "{#vJoyConfDirx86}\vJoyConf.exe"; DestDir: "{app}\{#DestSubDirX86}"; Components: Apps\vJoyConf; Check: IsX86
-Source: "{#vJoyConfDirx64}\vJoyConf.exe"; DestDir: "{app}\{#DestSubDirX64}"; Components: Apps\vJoyConf; Check: IsX64
-Source: "{#vJoyConfigDirx86}\vJoyConfig.exe"; DestDir: "{app}\{#DestSubDirX86}"; Components: Apps\vJoyConf; Check: IsX86
-Source: "{#vJoyConfigDirx64}\vJoyConfig.exe"; DestDir: "{app}\{#DestSubDirX64}"; Components: Apps\vJoyConf; Check: IsX64
+Source: "{#vJoyAppsx86}\vJoyConf.exe"; DestDir: "{app}\{#DestSubDirX86}"; Components: Apps\vJoyConf; Check: IsX86
+Source: "{#vJoyAppsx64}\vJoyConf.exe"; DestDir: "{app}\{#DestSubDirX64}"; Components: Apps\vJoyConf; Check: IsX64
+Source: "{#vJoyAppsx86}\vJoyConfig.exe"; DestDir: "{app}\{#DestSubDirX86}"; Components: Apps\vJoyConf; Check: IsX86
+Source: "{#vJoyAppsx64}\vJoyConfig.exe"; DestDir: "{app}\{#DestSubDirX64}"; Components: Apps\vJoyConf; Check: IsX64
 ;Demo feeder
-Source: "{#vJoyFeederDirx86}\vJoyFeeder.exe"; DestDir: "{app}\{#DestSubDirX86}"; Components: Apps\vJoyFeeder ; Check: IsX86
-Source: "{#vJoyFeederDirx64}\vJoyFeeder.exe"; DestDir: "{app}\{#DestSubDirX64}"; Components: Apps\vJoyFeeder ; Check: IsX64
-Source: "{#vJoyFeederDirx86}\..\..\LBIndustrialCtrls.dll"; DestDir: "{app}\{#DestSubDirX86}"; Components: Apps\vJoyFeeder ; Check: IsX86
-Source: "{#vJoyFeederDirx64}\..\..\LBIndustrialCtrls.dll"; DestDir: "{app}\{#DestSubDirX64}"; Components: Apps\vJoyFeeder ; Check: IsX64
+Source: "{#vJoyAppsx86}\vJoyFeeder.exe"; DestDir: "{app}\{#DestSubDirX86}"; Components: Apps\vJoyFeeder ; Check: IsX86
+Source: "{#vJoyAppsx64}\vJoyFeeder.exe"; DestDir: "{app}\{#DestSubDirX64}"; Components: Apps\vJoyFeeder ; Check: IsX64
+Source: "{#vJoyAppsx86}\LBIndustrialCtrls.dll"; DestDir: "{app}\{#DestSubDirX86}"; Components: Apps\vJoyFeeder ; Check: IsX86
+Source: "{#vJoyAppsx64}\LBIndustrialCtrls.dll"; DestDir: "{app}\{#DestSubDirX64}"; Components: Apps\vJoyFeeder ; Check: IsX64
 ; Monitor
 Source: "{#vJoyMonDirx86}\JoyMonitor.exe"; DestDir: "{app}\{#DestSubDirX86}"; Components: Apps\vJoyMon; Check: IsX86
 Source: "{#vJoyMonDirx64}\JoyMonitor.exe"; DestDir: "{app}\{#DestSubDirX64}"; Components: Apps\vJoyMon; Check: IsX64
