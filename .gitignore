@@ -8,3 +8,5 @@
 *.vcxproj.user
 *.obj
 
+*.pdb
+*.idb
