@@ -5,9 +5,9 @@
 *.log
 *.opensdf
 *.lastbuildstate
-*.vcxproj.user
+*.vcxproj
 *.obj
-
+*.tlog
 *.pdb
 *.idb
 *.pch
