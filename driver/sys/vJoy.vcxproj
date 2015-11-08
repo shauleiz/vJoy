@@ -121,14 +121,14 @@
     <DebuggerFlavor>DbgengKernelDebugger</DebuggerFlavor>
     <OutDir>$(SolutionDir)$(Platform)\$(Configuration)\</OutDir>
     <IntDir>$(Platform)\$(Configuration)\</IntDir>
-    <IncludePath>$(SolutionDir)inc;$(ProjectDir);$(IncludePath)</IncludePath>
+    <IncludePath>$(SolutionDir)inc;$(ProjectDir);$(IncludePath);$(ProjectDir)..\..\inc</IncludePath>
     <EnableInf2cat>false</EnableInf2cat>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <DebuggerFlavor>DbgengKernelDebugger</DebuggerFlavor>
     <OutDir>$(SolutionDir)$(Platform)\$(Configuration)\</OutDir>
     <IntDir>$(Platform)\$(Configuration)\</IntDir>
-    <IncludePath>$(SolutionDir)inc;$(ProjectDir);$(IncludePath)</IncludePath>
+    <IncludePath>$(SolutionDir)inc;$(ProjectDir);$(IncludePath);$(ProjectDir)..\..\inc</IncludePath>
     <EnableInf2cat>false</EnableInf2cat>
     <CodeAnalysisRuleSet>..\..\..\..\..\..\..\..\..\Program Files (x86)\Windows Kits\10\CodeAnalysis\DriverMinimumRules.ruleset</CodeAnalysisRuleSet>
     <RunCodeAnalysis>false</RunCodeAnalysis>
@@ -137,7 +137,7 @@
     <DebuggerFlavor>DbgengKernelDebugger</DebuggerFlavor>
     <OutDir>$(SolutionDir)$(Platform)\$(Configuration)\</OutDir>
     <IntDir>$(Platform)\$(Configuration)\</IntDir>
-    <IncludePath>$(SolutionDir)inc;$(ProjectDir);$(IncludePath)</IncludePath>
+    <IncludePath>$(SolutionDir)inc;$(ProjectDir);$(IncludePath);$(ProjectDir)..\..\inc</IncludePath>
     <EnableInf2cat>false</EnableInf2cat>
     <Inf2CatWindowsVersionList>7_x64;$(Inf2CatWindowsVersionList)</Inf2CatWindowsVersionList>
   </PropertyGroup>
@@ -145,7 +145,7 @@
     <DebuggerFlavor>DbgengKernelDebugger</DebuggerFlavor>
     <OutDir>$(SolutionDir)$(Platform)\$(Configuration)\</OutDir>
     <IntDir>$(Platform)\$(Configuration)\</IntDir>
-    <IncludePath>$(SolutionDir)inc;$(ProjectDir);$(IncludePath)</IncludePath>
+    <IncludePath>$(SolutionDir)inc;$(ProjectDir);$(IncludePath);$(ProjectDir)..\..\inc</IncludePath>
     <EnableInf2cat>false</EnableInf2cat>
     <Inf2CatWindowsVersionList>10_$(DDKPlatform);7_$(DDKPlatform)</Inf2CatWindowsVersionList>
   </PropertyGroup>
@@ -153,26 +153,26 @@
     <DebuggerFlavor>DbgengKernelDebugger</DebuggerFlavor>
     <OutDir>$(SolutionDir)$(Platform)\$(Configuration)\</OutDir>
     <IntDir>$(Platform)\$(Configuration)\</IntDir>
-    <IncludePath>$(SolutionDir)inc;$(ProjectDir);$(IncludePath)</IncludePath>
+    <IncludePath>$(SolutionDir)inc;$(ProjectDir);$(IncludePath)$(ProjectDir)..\..\inc</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">
     <DebuggerFlavor>DbgengKernelDebugger</DebuggerFlavor>
     <OutDir>$(SolutionDir)$(Platform)\$(Configuration)\</OutDir>
     <IntDir>$(Platform)\$(Configuration)\</IntDir>
-    <IncludePath>$(SolutionDir)inc;$(ProjectDir);$(IncludePath)</IncludePath>
+    <IncludePath>$(SolutionDir)inc;$(ProjectDir);$(IncludePath)$(ProjectDir)..\..\inc</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM64'">
     <DebuggerFlavor>DbgengKernelDebugger</DebuggerFlavor>
     <OutDir>$(SolutionDir)$(Platform)\$(Configuration)\</OutDir>
     <IntDir>$(Platform)\$(Configuration)\</IntDir>
-    <IncludePath>$(SolutionDir)inc;$(ProjectDir);$(IncludePath)</IncludePath>
+    <IncludePath>$(SolutionDir)inc;$(ProjectDir);$(IncludePath)$(ProjectDir)..\..\inc</IncludePath>
     <EnableInf2cat>false</EnableInf2cat>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|ARM64'">
     <DebuggerFlavor>DbgengKernelDebugger</DebuggerFlavor>
     <OutDir>$(SolutionDir)$(Platform)\$(Configuration)\</OutDir>
     <IntDir>$(Platform)\$(Configuration)\</IntDir>
-    <IncludePath>$(SolutionDir)inc;$(ProjectDir);$(IncludePath)</IncludePath>
+    <IncludePath>$(SolutionDir)inc;$(ProjectDir);$(IncludePath)$(ProjectDir)..\..\inc</IncludePath>
     <EnableInf2cat>false</EnableInf2cat>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM64'">
