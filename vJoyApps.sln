@@ -27,6 +27,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "vJoyInstall", "apps\vJoyIns
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "vJoyInstall", "apps\vJoyInstall\vJoyInstall2013.vcxproj", "{8971D7E3-7880-4660-9DEE-A0C59A54B347}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "vJoyConf", "apps\vJoyConf\vJoyConf2013.vcxproj", "{B9A43168-309F-45A0-AC09-014787390F02}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Mixed Platforms = Debug|Mixed Platforms
@@ -59,6 +61,18 @@ Global
 		{8971D7E3-7880-4660-9DEE-A0C59A54B347}.Release|Win32.ActiveCfg = Release|Win32
 		{8971D7E3-7880-4660-9DEE-A0C59A54B347}.Release|Win32.Build.0 = Release|Win32
 		{8971D7E3-7880-4660-9DEE-A0C59A54B347}.Release|x64.ActiveCfg = Release|x64
+		{8971D7E3-7880-4660-9DEE-A0C59A54B347}.Release|x64.Build.0 = Release|x64
+		{B9A43168-309F-45A0-AC09-014787390F02}.Debug|Mixed Platforms.ActiveCfg = Debug|Win32
+		{B9A43168-309F-45A0-AC09-014787390F02}.Debug|Mixed Platforms.Build.0 = Debug|Win32
+		{B9A43168-309F-45A0-AC09-014787390F02}.Debug|Win32.ActiveCfg = Debug|Win32
+		{B9A43168-309F-45A0-AC09-014787390F02}.Debug|Win32.Build.0 = Debug|Win32
+		{B9A43168-309F-45A0-AC09-014787390F02}.Debug|x64.ActiveCfg = Debug|x64
+		{B9A43168-309F-45A0-AC09-014787390F02}.Release|Mixed Platforms.ActiveCfg = Release|Win32
+		{B9A43168-309F-45A0-AC09-014787390F02}.Release|Mixed Platforms.Build.0 = Release|Win32
+		{B9A43168-309F-45A0-AC09-014787390F02}.Release|Win32.ActiveCfg = Release|Win32
+		{B9A43168-309F-45A0-AC09-014787390F02}.Release|Win32.Build.0 = Release|Win32
+		{B9A43168-309F-45A0-AC09-014787390F02}.Release|x64.ActiveCfg = Release|x64
+		{B9A43168-309F-45A0-AC09-014787390F02}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -75,5 +89,6 @@ Global
 		{BA8D3CFD-EF2E-4C35-8042-A18791B756F6} = {B495920F-94BC-4CA3-88B4-AB5B17E69811}
 		{4ADC2F16-F17A-414E-A990-726D7A2F15A6} = {6A4D721C-0671-49F6-A59D-3057273DBF84}
 		{8971D7E3-7880-4660-9DEE-A0C59A54B347} = {BA8D3CFD-EF2E-4C35-8042-A18791B756F6}
+		{B9A43168-309F-45A0-AC09-014787390F02} = {563F6382-1E14-4CC6-B585-911D926CA024}
 	EndGlobalSection
 EndGlobal

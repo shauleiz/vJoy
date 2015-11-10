@@ -10,6 +10,8 @@
 *.pdb
 *.idb
 *.pch
+*.sdf
+
 /apps/vJoyFeeder/vJoyFeeder01.vcxproj
 
 # Folders
