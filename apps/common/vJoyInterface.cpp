@@ -988,6 +988,9 @@ VJOYINTERFACE_API BOOL	__cdecl	SetBtn(BOOL Value, UINT rID, UCHAR nBtn)
 	case 3:
 		Target = &(vJoyDevices[rID].position.lButtonsEx3);
 		break;
+	default:
+		Target = &(vJoyDevices[rID].position.lButtons);
+		break;
 	};
 
 
@@ -2153,6 +2156,9 @@ bool	GetDrvStat(int * nbytes, BYTE * buffer)
 	If the buffer is not large enough to hold the namespace string the function returns false
 	Else, the namespace is put into the buffer (DestDevicePath)	and the function returns true
 */
+#pragma warning( push )
+#pragma warning( disable : 4996 )
+
 bool ExtractNamespace(const char *SrcDevicePath, char * DestDevicePath, int * DestSize)
 {
 	// Sanity checks
@@ -2187,6 +2193,7 @@ bool ExtractNamespace(const char *SrcDevicePath, char * DestDevicePath, int * De
 	DestDevicePath[size] = '\0';
 	return 		true;
 }
+
 /*
 	 CreateDevicePath create a path to the requested device from a given Device Path (SrcDevicePath)
 	 It extracts the namespace from the input DevicePath then appends a string based on Index
@@ -2255,6 +2262,7 @@ bool isRawDevice(const char *DevicePath, int Index)
 		return false;
 
 }
+#pragma warning( pop )
 
 int WINAPI CreateDummyWindow(void)
 {
