@@ -5,10 +5,15 @@
 *.log
 *.opensdf
 *.lastbuildstate
-*.vcxproj
 *.obj
 *.tlog
 *.pdb
 *.idb
 *.pch
 /apps/vJoyFeeder/vJoyFeeder01.vcxproj
+
+# Folders
+win32/
+x64/
+release/
+debug/
