@@ -456,6 +456,9 @@ private: System::Windows::Forms::Label^  label1;
 					 case 3:
 						 Target = &(Report.lButtonsEx3);
 						 break;
+					 default:
+						 Target = &(Report.lButtonsEx3);
+						 break;
 					 };
 
 					 if (this->CBvJoyButton[index]->Checked)

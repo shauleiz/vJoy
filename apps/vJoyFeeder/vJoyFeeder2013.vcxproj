@@ -19,15 +19,15 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectGuid>{0B6F020D-754E-4B0D-9575-BAA03E0FBABD}</ProjectGuid>
+    <ProjectGuid>{BF05E61C-7E54-465F-988E-84D684D7EE99}</ProjectGuid>
     <RootNamespace>vJoyDemo</RootNamespace>
     <Keyword>ManagedCProj</Keyword>
-    <WindowsTargetPlatformVersion>8.1</WindowsTargetPlatformVersion>
+    <ProjectName>vJoyFeeder</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
-    <PlatformToolset>v140</PlatformToolset>
+    <PlatformToolset>v120</PlatformToolset>
     <UseOfMfc>false</UseOfMfc>
     <CharacterSet>Unicode</CharacterSet>
     <CLRSupport>true</CLRSupport>
@@ -35,22 +35,22 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
-    <PlatformToolset>v140</PlatformToolset>
+    <PlatformToolset>v120</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
     <CLRSupport>true</CLRSupport>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
-    <PlatformToolset>v140</PlatformToolset>
+    <PlatformToolset>v120_xp</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
     <CLRSupport>true</CLRSupport>
     <WholeProgramOptimization>true</WholeProgramOptimization>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
-    <PlatformToolset>v140</PlatformToolset>
+    <PlatformToolset>v120</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
-    <CLRSupport>true</CLRSupport>
+    <CLRSupport>Pure</CLRSupport>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <ImportGroup Label="ExtensionSettings">
@@ -73,8 +73,8 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ReferencePath>..\vJoyDemo;$(ReferencePath)</ReferencePath>
-    <OutDir>$(SolutionDir)$(Platform)\$(Configuration)\</OutDir>
-    <IntDir>$(Platform)\$(Configuration)\</IntDir>
+    <OutDir>$(SolutionDir)$(Configuration)\</OutDir>
+    <IntDir>$(Configuration)\</IntDir>
     <LinkIncremental>true</LinkIncremental>
     <PreBuildEventUseInBuild>false</PreBuildEventUseInBuild>
   </PropertyGroup>
@@ -87,8 +87,8 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ReferencePath>..\vJoyDemo;$(ReferencePath)</ReferencePath>
-    <OutDir>$(SolutionDir)$(Platform)\$(Configuration)\</OutDir>
-    <IntDir>$(Platform)\$(Configuration)\</IntDir>
+    <OutDir>$(SolutionDir)$(Configuration)\</OutDir>
+    <IntDir>$(Configuration)\</IntDir>
     <LinkIncremental>false</LinkIncremental>
     <PreBuildEventUseInBuild>false</PreBuildEventUseInBuild>
   </PropertyGroup>
@@ -98,7 +98,6 @@
     <IntDir>$(Platform)\$(Configuration)\</IntDir>
     <LinkIncremental>false</LinkIncremental>
     <PreBuildEventUseInBuild>false</PreBuildEventUseInBuild>
-    <PostBuildEventUseInBuild>false</PostBuildEventUseInBuild>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -112,13 +111,12 @@
     </ClCompile>
     <Link>
       <AdditionalDependencies>Setupapi.lib</AdditionalDependencies>
-      <AdditionalLibraryDirectories> $(OutDir)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>C:\Program Files\Microsoft SDKs\Windows\v6.0A\Lib;..\common\vJoyInterface\objchk_wxp_x86\i386;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AssemblyDebug>true</AssemblyDebug>
       <SubSystem>Windows</SubSystem>
       <EntryPointSymbol>main</EntryPointSymbol>
       <TargetMachine>MachineX86</TargetMachine>
-      <OutputFile>$(OutDir)$(TargetName)$(TargetExt)</OutputFile>
     </Link>
     <PostBuildEvent>
       <Command>copy /y ..\common\vJoyInterface\objchk_wxp_x86\i386\*.dll  $(OutDir).
@@ -147,7 +145,7 @@ copy /y .\LBIndustrialCtrls.dll  $(OutDir).</Command>
     </ClCompile>
     <Link>
       <AdditionalDependencies>Setupapi.lib</AdditionalDependencies>
-      <AdditionalLibraryDirectories> $(OutDir)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>..\..\lib\objchk_wlh_amd64\amd64;C:\Program Files\Microsoft SDKs\Windows\v6.0A\Lib\x64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AssemblyDebug>true</AssemblyDebug>
       <SubSystem>Windows</SubSystem>
@@ -179,7 +177,7 @@ copy /y .\LBIndustrialCtrls.dll  $(OutDir).</Command>
     </ClCompile>
     <Link>
       <AdditionalDependencies>Setupapi.lib</AdditionalDependencies>
-      <AdditionalLibraryDirectories> $(OutDir)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>C:\Program Files\Microsoft SDKs\Windows\v6.0A\Lib;..\common\vJoyInterface\objfre_wxp_x86\i386;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Windows</SubSystem>
       <EntryPointSymbol>main</EntryPointSymbol>
@@ -207,12 +205,11 @@ copy /y .\LBIndustrialCtrls.dll  $(OutDir).</Command>
     </ClCompile>
     <Link>
       <AdditionalDependencies>Setupapi.lib</AdditionalDependencies>
-      <AdditionalLibraryDirectories> $(OutDir)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>..\..\lib\objfre_wlh_amd64\amd64;C:\Program Files\Microsoft SDKs\Windows\v6.0A\Lib\x64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Windows</SubSystem>
       <EntryPointSymbol>main</EntryPointSymbol>
       <TargetMachine>MachineX64</TargetMachine>
-      <OutputFile>$(OutDir)$(TargetName)$(TargetExt)</OutputFile>
     </Link>
     <PostBuildEvent>
       <Command>copy /y ..\common\vJoyInterface\objfre_wlh_amd64\amd64\*.dll  $(OutDir). &amp; copy /y .\LBIndustrialCtrls.dll  $(OutDir).</Command>
@@ -223,9 +220,6 @@ copy /y .\LBIndustrialCtrls.dll  $(OutDir).</Command>
     <PreBuildEvent>
       <Message>Generate the svn_version.h file with the necessary repo identify info for versioning</Message>
     </PreBuildEvent>
-    <ResourceCompile>
-      <PreprocessorDefinitions>_UNICODE;UNICODE;%(PreprocessorDefinitions);X64</PreprocessorDefinitions>
-    </ResourceCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
     <Reference Include="LBIndustrialCtrls">
@@ -276,6 +270,12 @@ copy /y .\LBIndustrialCtrls.dll  $(OutDir).</Command>
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Form1.resX">
+      <DependentUpon>Form1.h</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
