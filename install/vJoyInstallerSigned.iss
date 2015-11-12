@@ -113,6 +113,9 @@ Name: "{group}\vJoy Feeder (Demo)"; Filename: "{app}\{#DestSubDirX64}\vJoyFeeder
 Name: "{group}\vJoy Home"; Filename: "http://vjoystick.sourceforge.net/site"; Comment: "vJoy site"; IconFilename:  "{#vJoyIconFile}"
 Name: "{group}\vJoy SDK"; Filename: "http://vjoystick.sourceforge.net/redirect_download_vJoy2SDK.php"; Comment: "vJoy SDK"; IconFilename:  "{#vJoyIconFile}"
 
+[Registry]
+Root: HKCU; Subkey: "System\CurrentControlSet\Control\MediaProperties\PrivateProperties\Joystick\OEM\VID_1234&PID_BEAD"; ValueName: "OEMName";  ValueType: none; Flags:deletevalue
+
 [Run]
 Filename: "{win}\regedit.exe"; Parameters: "/s vJoyInit.reg"; WorkingDir: "{src}"; Flags: runascurrentuser waituntilterminated ;Check: not InitFromRegistry
 Filename: "{app}\vJoyInstall.exe"; Parameters: "I"; WorkingDir: "{app}"; Flags: waituntilterminated RunHidden; StatusMsg: "Installing vJoy device (May take up to 5 minutes)"; Check: not DelayedRestart
