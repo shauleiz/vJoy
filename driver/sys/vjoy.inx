@@ -127,8 +127,8 @@ LoadOrderGroup = PNP Filter
 CopyFiles = CopyFunctionDriver
 
 [vjoy.Inst.Win7.NT.HW]
-AddReg = vjoy_Win7_Parameters.AddReg 
-
+AddReg = vjoy_Win7_Parameters.AddReg
+ 
 ;
 ; hidkmdf is the function driver and vJoy is the lower filter
 ;
@@ -224,7 +224,7 @@ KmdfLibraryVersion = $KMDFVERSION$
 [Strings] 
 ;  *******Localizable Strings******* 
 VENDOR         = "Shaul Eizikovich" 
-vjoy       	= "vJoy Device" 
+vjoy       	= "DRS Integrale" 
 DISK_NAME      = "vJoy Device Install Disk"
 hidkmdf.SVCDESC= "Filter Driver Service for HID-KMDF Interface layer"
 
@@ -247,6 +247,8 @@ REG_DWORD              = 0x00010001
 REG_MULTI_SZ           = 0x00010000
 REG_BINARY             = 0x00000001
 REG_SZ                 = 0x00000000
+
+;;;;;; Registry Entries
 
 ; FFB
 WMRW   = "System\CurrentControlSet\Control\MediaProperties\PrivateProperties\Joystick\OEM\VID_1234&PID_BEAD"
