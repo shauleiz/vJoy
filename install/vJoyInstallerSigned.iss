@@ -114,7 +114,7 @@ Name: "{group}\vJoy Home"; Filename: "http://vjoystick.sourceforge.net/site"; Co
 Name: "{group}\vJoy SDK"; Filename: "http://vjoystick.sourceforge.net/redirect_download_vJoy2SDK.php"; Comment: "vJoy SDK"; IconFilename:  "{#vJoyIconFile}"
 
 [Registry]
-Root: HKCU; Subkey: "System\CurrentControlSet\Control\MediaProperties\PrivateProperties\Joystick\OEM\VID_1234&PID_BEAD"; ValueName: "OEMName";  ValueType: none; Flags:deletevalue
+Root: HKCU; Subkey: "System\CurrentControlSet\Control\MediaProperties\PrivateProperties\Joystick\OEM\VID_1234&PID_BEAD"; ValueName: "OEMName";  ValueType: none; Flags:deletevalue  uninsdeletevalue
 
 [Run]
 Filename: "{win}\regedit.exe"; Parameters: "/s vJoyInit.reg"; WorkingDir: "{src}"; Flags: runascurrentuser waituntilterminated ;Check: not InitFromRegistry
