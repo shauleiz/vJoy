@@ -115,6 +115,7 @@ Name: "{group}\vJoy SDK"; Filename: "http://vjoystick.sourceforge.net/redirect_d
 
 [Registry]
 Root: HKCU; Subkey: "System\CurrentControlSet\Control\MediaProperties\PrivateProperties\Joystick\OEM\VID_1234&PID_BEAD"; ValueName: "OEMName";  ValueType: none; Flags:deletevalue  uninsdeletevalue
+Root: HKCU; Subkey: "System\CurrentControlSet\Control\MediaProperties\PrivateProperties\Joystick\OEM\VID_1234&PID_BEAD"; ValueName: "OEMData";  ValueType: binary;  ValueData: "43 00 88 01 FE 00 00 00"; Flags:  uninsdeletevalue
 
 [Run]
 Filename: "{win}\regedit.exe"; Parameters: "/s vJoyInit.reg"; WorkingDir: "{src}"; Flags: runascurrentuser waituntilterminated ;Check: not InitFromRegistry
