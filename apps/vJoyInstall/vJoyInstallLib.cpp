@@ -1504,7 +1504,9 @@ BOOL GetDevHwId(int argc, PZPWSTR argv, TCHAR * DeviceHWID)
 	return TRUE;
 }
 
-
+// TODO: Remove pragma and solve problem
+#pragma warning( push )
+#pragma warning( disable : 4996 )
 void PrintHeader(FILE * dst)
 {
 	#define PRODUCT_PROFESSIONAL 0x00000030
@@ -1625,6 +1627,7 @@ void PrintHeader(FILE * dst)
 
 	 _ftprintf(dst,"\n");
 }
+#pragma warning( pop )
 
 BOOL WINAPI StatusMessageToStream(void * reserved, TCHAR * buffer,  ERRLEVEL level)
 {
