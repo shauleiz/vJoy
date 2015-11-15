@@ -1,5 +1,5 @@
 echo off
-SET VS=12.0
+SET VS=14.0
 SET BUILDER=%ProgramFiles(x86)%\MSBuild\%VS%\Bin\MSBuild.exe
 SET Target64=x64\Release
 SET Target32=Win32\Release

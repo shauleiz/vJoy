@@ -7,6 +7,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <SignMode>ProductionSign</SignMode>
     <ProductionCertificate>CN=Shaul Eizikovich, O=Shaul Eizikovich, L=Hod HaSharon, S=Tel Aviv, C=IL | 6D5471DF6BBFAFA5D5900C88C08DF0E9C513690A</ProductionCertificate>
+    <DebugDeployment>True</DebugDeployment>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <SignMode>ProductionSign</SignMode>
