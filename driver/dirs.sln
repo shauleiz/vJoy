@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 2013
-VisualStudioVersion = 12.0
+# Visual Studio 14
+VisualStudioVersion = 14.0.23107.0
 MinimumVisualStudioVersion = 12.0
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Hidmapper", "Hidmapper", "{FB4CC19F-46F0-47D9-AA2C-0C88F9EB0C7D}"
 EndProject
@@ -9,38 +9,38 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Sys", "Sys", "{055EF7AC-577
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "hidkmdf", "hidmapper\hidkmdf.vcxproj", "{7A0BD5DC-5ACA-4AB9-B395-C16E078C11E9}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "vJoy", "sys\vJoy.vcxproj", "{E56BFD67-086A-43A6-BE30-938203CCA66F}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "vJoy", "sys\vJoy.vcxproj", "{B7F8EA5A-FD07-4922-ADD5-F547E84C9700}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
-		Release|Win32 = Release|Win32
 		Debug|x64 = Debug|x64
+		Release|Win32 = Release|Win32
 		Release|x64 = Release|x64
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
 		{7A0BD5DC-5ACA-4AB9-B395-C16E078C11E9}.Debug|Win32.ActiveCfg = Debug|Win32
 		{7A0BD5DC-5ACA-4AB9-B395-C16E078C11E9}.Debug|Win32.Build.0 = Debug|Win32
-		{7A0BD5DC-5ACA-4AB9-B395-C16E078C11E9}.Release|Win32.ActiveCfg = Release|Win32
-		{7A0BD5DC-5ACA-4AB9-B395-C16E078C11E9}.Release|Win32.Build.0 = Release|Win32
 		{7A0BD5DC-5ACA-4AB9-B395-C16E078C11E9}.Debug|x64.ActiveCfg = Debug|x64
 		{7A0BD5DC-5ACA-4AB9-B395-C16E078C11E9}.Debug|x64.Build.0 = Debug|x64
+		{7A0BD5DC-5ACA-4AB9-B395-C16E078C11E9}.Release|Win32.ActiveCfg = Release|Win32
+		{7A0BD5DC-5ACA-4AB9-B395-C16E078C11E9}.Release|Win32.Build.0 = Release|Win32
 		{7A0BD5DC-5ACA-4AB9-B395-C16E078C11E9}.Release|x64.ActiveCfg = Release|x64
 		{7A0BD5DC-5ACA-4AB9-B395-C16E078C11E9}.Release|x64.Build.0 = Release|x64
-		{E56BFD67-086A-43A6-BE30-938203CCA66F}.Debug|Win32.ActiveCfg = Debug|Win32
-		{E56BFD67-086A-43A6-BE30-938203CCA66F}.Debug|Win32.Build.0 = Debug|Win32
-		{E56BFD67-086A-43A6-BE30-938203CCA66F}.Release|Win32.ActiveCfg = Release|Win32
-		{E56BFD67-086A-43A6-BE30-938203CCA66F}.Release|Win32.Build.0 = Release|Win32
-		{E56BFD67-086A-43A6-BE30-938203CCA66F}.Debug|x64.ActiveCfg = Debug|x64
-		{E56BFD67-086A-43A6-BE30-938203CCA66F}.Debug|x64.Build.0 = Debug|x64
-		{E56BFD67-086A-43A6-BE30-938203CCA66F}.Release|x64.ActiveCfg = Release|x64
-		{E56BFD67-086A-43A6-BE30-938203CCA66F}.Release|x64.Build.0 = Release|x64
+		{B7F8EA5A-FD07-4922-ADD5-F547E84C9700}.Debug|Win32.ActiveCfg = Debug|Win32
+		{B7F8EA5A-FD07-4922-ADD5-F547E84C9700}.Debug|Win32.Build.0 = Debug|Win32
+		{B7F8EA5A-FD07-4922-ADD5-F547E84C9700}.Debug|x64.ActiveCfg = Debug|x64
+		{B7F8EA5A-FD07-4922-ADD5-F547E84C9700}.Debug|x64.Build.0 = Debug|x64
+		{B7F8EA5A-FD07-4922-ADD5-F547E84C9700}.Release|Win32.ActiveCfg = Release|Win32
+		{B7F8EA5A-FD07-4922-ADD5-F547E84C9700}.Release|Win32.Build.0 = Release|Win32
+		{B7F8EA5A-FD07-4922-ADD5-F547E84C9700}.Release|x64.ActiveCfg = Release|x64
+		{B7F8EA5A-FD07-4922-ADD5-F547E84C9700}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{7A0BD5DC-5ACA-4AB9-B395-C16E078C11E9} = {FB4CC19F-46F0-47D9-AA2C-0C88F9EB0C7D}
-		{E56BFD67-086A-43A6-BE30-938203CCA66F} = {055EF7AC-5773-43F7-96C3-7FAF2093332D}
+		{B7F8EA5A-FD07-4922-ADD5-F547E84C9700} = {055EF7AC-5773-43F7-96C3-7FAF2093332D}
 	EndGlobalSection
 EndGlobal

@@ -3,7 +3,7 @@
 #include "wrapper.h"
 
 extern StatusMessageFunc StatusMessage;
-BOOL DummyStatusMessage(void * output, TCHAR * buffer,  ERRLEVEL level);
+BOOL WINAPI DummyStatusMessage(void * output, TCHAR * buffer,  ERRLEVEL level);
 //void SetStatusMessageFunc( StatusMessageFunc f);
 
 int WINAPI  DllMain( HANDLE hModule, DWORD  ul_reason_for_call, LPVOID lpReserved)
@@ -106,7 +106,7 @@ int WINAPI  Func3(void)
 } // Extern "C"
 
 // Wrapper Internal functions
-BOOL DummyStatusMessage(void * output, TCHAR * buffer,  ERRLEVEL level)
+BOOL WINAPI DummyStatusMessage(void * output, TCHAR * buffer,  ERRLEVEL level)
 {
 	UNREFERENCED_PARAMETER(level);
 	UNREFERENCED_PARAMETER(buffer);
