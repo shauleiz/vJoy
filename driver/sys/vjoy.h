@@ -58,7 +58,7 @@ Revision History:
 
 #include "trace.h"
 #include <TCHAR.H>
-#include "errcodes.h"
+#include <errcodes.h>
 
 #include <public.h>
 

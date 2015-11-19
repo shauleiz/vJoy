@@ -44,6 +44,9 @@
     <ClInclude Include="vjoy.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="errcodes.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="vjoy.rc">
