@@ -116,10 +116,12 @@ Name: "{group}\vJoy SDK"; Filename: "http://vjoystick.sourceforge.net/redirect_d
 [Registry]
 Root: HKCU; Subkey: "System\CurrentControlSet\Control\MediaProperties\PrivateProperties\Joystick\OEM\VID_1234&PID_BEAD"; ValueName: "OEMName";  ValueType: none; Flags:deletevalue  uninsdeletevalue
 Root: HKCU; Subkey: "System\CurrentControlSet\Control\MediaProperties\PrivateProperties\Joystick\OEM\VID_1234&PID_BEAD"; ValueName: "OEMData";  ValueType: binary;  ValueData: "43 00 88 01 FE 00 00 00"; Flags:  uninsdeletevalue
+Root: HKLM; Subkey: "System\CurrentControlSet\Control\MediaProperties\PrivateProperties\Joystick\OEM\VID_1234&PID_BEAD"; ValueName: "OEMName";  ValueType: none; Flags:deletevalue  uninsdeletevalue
+Root: HKLM; Subkey: "System\CurrentControlSet\Control\MediaProperties\PrivateProperties\Joystick\OEM\VID_1234&PID_BEAD"; ValueName: "OEMData";  ValueType: binary;  ValueData: "43 00 88 01 FE 00 00 00"; Flags:  uninsdeletevalue
 
 [Run]
 Filename: "{win}\regedit.exe"; Parameters: "/s vJoyInit.reg"; WorkingDir: "{src}"; Flags: runascurrentuser waituntilterminated ;Check: not InitFromRegistry
-Filename: "{app}\vJoyInstall.exe"; Parameters: "I"; WorkingDir: "{app}"; Flags: waituntilterminated RunHidden; StatusMsg: "Installing vJoy device (May take up to 5 minutes)"; Check: not DelayedRestart
+;Filename: "{app}\vJoyInstall.exe"; Parameters: "I"; WorkingDir: "{app}"; Flags: waituntilterminated RunHidden; StatusMsg: "Installing vJoy device (May take up to 5 minutes)"; Check: not DelayedRestart
 
 [UninstallRun]
 Filename: {app}\vJoyInstall.exe; Parameters: C; StatusMsg: "Uninstalling vJoy device"; Flags: waituntilterminated RunHidden; WorkingDir: {app}; 
@@ -371,6 +373,11 @@ end;
 
 (* Pre & Post-install operations *)
 procedure CurStepChanged(CurStep: TSetupStep);
+
+var
+  TmpFileName, ExecStdout, msg: string;
+  ResultCode: Integer;
+
 begin
 //	if  CurStep=ssInstall then
 //		MsgBox('CurStepChanged(ssInstall)' , mbInformation, MB_OK);	
@@ -394,10 +401,26 @@ begin
 	if  (CurStep=ssPostInstall) and (not CalledBySpp) then
 	begin // Post install actions - check if vJoy is now installed
     Log('CurStepChanged(ssPostInstall)');
-		if IsVjoyInstalled then
-			MsgBox(InstallGood , mbInformation, MB_OK)
+	TmpFileName := ExpandConstant('{app}') + '\vJoyInstall.exe';
+	if Exec(TmpFileName, 'I', '',  SW_HIDE, ewWaitUntilTerminated, ResultCode) then
+	begin (* handle success if necessary; ResultCode contains the exit code *)
+    msg:= 'vJoyInstall.exe Was executed. Result code: ' +  IntToStr(ResultCode);
+		Log(msg);
+	end
+	else begin
+		Log('vJoyInstall.exe Was NOT executed');
+	end;
+
+	if IsVjoyInstalled then
+		begin
+			Log('IsVjoyInstalled = TRUE');
+			MsgBox(InstallGood , mbInformation, MB_OK);
+		end
 		else
-			MsgBox(InstallBad , mbError, MB_OK)
+		begin
+			Log('IsVjoyInstalled = FALSE');
+			MsgBox(InstallBad , mbError, MB_OK);
+		end;
 	end; // Post install actions
 end;
 
@@ -427,8 +450,9 @@ var
   
 begin
 // Default
-NeedsRestart := False;
-DldRestart := False;
+	NeedsRestart := False;
+	DldRestart := False;
+
 end;
 
 (*
