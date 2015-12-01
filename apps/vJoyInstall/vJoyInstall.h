@@ -58,7 +58,7 @@ int AssignAllCompatibleId(TCHAR * ParentDeviceNode, TCHAR * CompatibleId);
 int cmdUpdateNI( __in DWORD Flags, LPCTSTR inf, LPCTSTR hwid );
 int cmdUpdate( __in DWORD Flags, LPCTSTR inf, LPCTSTR hwid );
 int InstallDriverOnDevice( TCHAR *InstanceId, LPCTSTR inf);
-BOOL Install(LPCTSTR inf, LPCTSTR hwid, TCHAR *InstanceId);
+UINT Install(LPCTSTR inf, LPCTSTR hwid, TCHAR *InstanceId);
 BOOL FindInstalled(LPCTSTR hwid, TCHAR *InstanceId);
 BOOL EnableInstalled(LPCTSTR hwid, TCHAR *InstanceId);
 BOOL DisableInstalled(LPCTSTR hwid, TCHAR *InstanceId);

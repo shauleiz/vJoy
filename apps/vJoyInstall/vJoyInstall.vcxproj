@@ -155,6 +155,7 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
       <TreatWarningAsError>false</TreatWarningAsError>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
     </ClCompile>
     <Link>
       <ModuleDefinitionFile>$(TargetName).def</ModuleDefinitionFile>
@@ -171,6 +172,7 @@
     </Link>
     <ClCompile>
       <TreatWarningAsError>false</TreatWarningAsError>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -180,6 +182,7 @@
     </Link>
     <ClCompile>
       <TreatWarningAsError>false</TreatWarningAsError>
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
@@ -189,6 +192,7 @@
     </Link>
     <ClCompile>
       <TreatWarningAsError>false</TreatWarningAsError>
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
     </ClCompile>
   </ItemDefinitionGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

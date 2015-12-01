@@ -143,6 +143,7 @@ const
 	(* Messages *)
 		ManuallySetTestMode = 'You cannot install vJoy on this system.'#13#13'To enable the system open a command prompt (DOS) window as Administrator.'#13'In this window type the following line:'#13#13'BCDEDIT -SET TESTSIGNING ON'#13#13'Then Restart your computer.';
 		InstallGood					= 'vJoy installed successfully';
+		InstallReboot				= 'vJoy installation requires reboot'#13#13'restart your computer and run this program again';
 		InstallBad					= 'vJoy failed to install';
 		TestModeChanged			=	'Would you like to reset your computer back to TestSigning mode OFF?'#13'This will take effect only after you restart your computer';
 
@@ -398,7 +399,7 @@ begin
   end;        
 
 
-	if  (CurStep=ssPostInstall) and (not CalledBySpp) then
+	if  (CurStep=ssInstall) and (not CalledBySpp) then
 	begin // Post install actions - check if vJoy is now installed
     Log('CurStepChanged(ssPostInstall)');
 	TmpFileName := ExpandConstant('{app}') + '\vJoyInstall.exe';
@@ -410,6 +411,16 @@ begin
 	else begin
 		Log('vJoyInstall.exe Was NOT executed');
 	end;
+
+  // Test if need reboot
+  // Later replace with RunOnce
+  if ResultCode=-8  then 
+  begin
+    Log('vJoyInstall.exe reported that it needs reboot');
+	MsgBox(InstallReboot , mbInformation, MB_OK);
+	DldRestart := True;
+    Exit;
+  end;
 
 	if IsVjoyInstalled then
 		begin
@@ -802,3 +813,10 @@ begin
         Log('InitFromRegistry(): Merging file  ' + FileName + ' into the registry - Failed');
 
 end;
+
+function NeedRestart(): Boolean;
+begin
+	Result := DldRestart;
+end;
+
+

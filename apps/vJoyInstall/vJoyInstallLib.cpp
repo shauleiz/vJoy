@@ -98,7 +98,7 @@ BOOL ChangeInstalled(LPCTSTR hwid, TCHAR *InstanceId, BOOL Enable, BOOL Disable)
 }
 
 
-BOOL Install(LPCTSTR inf, LPCTSTR hwid, TCHAR *InstanceId)
+UINT Install(LPCTSTR inf, LPCTSTR hwid, TCHAR *InstanceId)
 /*
 	Install current vJoy driver according to the given inf file and HW id
 	If this exact driver is installed then fail
@@ -111,7 +111,7 @@ BOOL Install(LPCTSTR inf, LPCTSTR hwid, TCHAR *InstanceId)
     TCHAR ClassName[MAX_CLASS_NAME_LEN];
     TCHAR hwIdList[LINE_LEN+4];
     TCHAR InfPath[MAX_PATH];
-    BOOL failcode = FALSE;
+    UINT failcode = EXIT_FAIL;
 	TCHAR ErrMsg[1000];
 
 
@@ -119,7 +119,7 @@ BOOL Install(LPCTSTR inf, LPCTSTR hwid, TCHAR *InstanceId)
 	{
 		 _stprintf_s(prt, MAX_PATH, "Install: Illegal Inf file");
 		StatusMessage( NULL, prt,  ERR);
-		return FALSE;
+		return EXIT_FAIL;
 	}
 
     if(!hwid[0]) 
@@ -127,7 +127,7 @@ BOOL Install(LPCTSTR inf, LPCTSTR hwid, TCHAR *InstanceId)
 		_stprintf_s(prt, MAX_PATH, "Install: Illegal  Hardware Id");
 		StatusMessage( NULL, prt,  ERR);
 
-		return FALSE;
+		return EXIT_FAIL;
 	}
 
     //
@@ -137,7 +137,7 @@ BOOL Install(LPCTSTR inf, LPCTSTR hwid, TCHAR *InstanceId)
 	{
 		_stprintf_s(prt, MAX_PATH, "Install: InfPath too long");
 		StatusMessage( NULL, prt,  ERR);
-		return FALSE;
+		return EXIT_FAIL;
 	}
 	_stprintf_s(prt, MAX_PATH, "Install: GetFullPathName --> %s ", InfPath);
 	StatusMessage( NULL, prt,  INFO);
@@ -260,7 +260,6 @@ BOOL Install(LPCTSTR inf, LPCTSTR hwid, TCHAR *InstanceId)
 #ifndef  UPDATE
 	InstallDriverOnDevice(InstanceId, inf);
 #endif // !UPDATE
-	failcode = TRUE;
 
 final:
 
@@ -780,7 +779,7 @@ Return Value:
        goto final;
     }
 
-    if(!UpdateFn(NULL,hwid,InfPath,flags,NULL)) 
+    if(!UpdateFn(NULL,hwid,InfPath,flags,&reboot)) 
 	{
 		GetErrorString(ErrMsg,1000);
 		//_ftprintf(stream,"[E] cmdUpdate:  UPDATEDRIVERFORPLUGANDPLAYDEVICES(hwid=%s, InfPath=%s) failed with error: %s\n", hwid, InfPath, ErrMsg);
@@ -1188,12 +1187,29 @@ int Installation(LPCTSTR DeviceHWID, TCHAR * InfFile)
 			RemoveDevice(InstanceId, TRUE);
 		};
 
-		if (!Install(InfFile, DeviceHWID,InstanceId))
+		UINT Install_res = Install(InfFile, DeviceHWID, InstanceId);
+
+		if (Install_res == EXIT_OK)
+		{
+			_stprintf_s(prt, MAX_PATH, "Install() OK - No need to reboot");
+			StatusMessage(NULL, prt, INFO);
+		}
+
+		else if (Install_res == EXIT_REBOOT)
+ 		{
+			_stprintf_s(prt, MAX_PATH, "Install() OK - Must reboot");
+			StatusMessage( NULL, prt,  WARN);
+			return -8;
+		}
+
+		else if ((Install_res != EXIT_OK) && (Install_res != EXIT_REBOOT))
 		{
 			_stprintf_s(prt, MAX_PATH, "Install failed");
 			StatusMessage( NULL, prt,  ERR);
 			return -1;
 		};
+
+
 	};
 	//
 	/////////////////////////////////////
