@@ -67,7 +67,8 @@ _tmain(__in int argc, __in PZPWSTR argv)
 	//// Perform the actual operation //////////////////
 	switch (verb)
 	{
-	case INSTALL:	return Installation(DeviceHWID, InfFile);
+	case INSTALL:	return Installation(DeviceHWID, InfFile, FALSE);
+	case QUIET_I:	return Installation(DeviceHWID, InfFile, TRUE);	// Undocumented: Quiet install
 	case REMOVE:	return Removal(DeviceHWID, InfFile, FALSE);
 	case CLEAN:		return Removal(DeviceHWID, InfFile, TRUE);
 	case REPAIR:	return Repair(DeviceHWID, InfFile);

@@ -98,7 +98,7 @@ BOOL ChangeInstalled(LPCTSTR hwid, TCHAR *InstanceId, BOOL Enable, BOOL Disable)
 }
 
 
-UINT Install(LPCTSTR inf, LPCTSTR hwid, TCHAR *InstanceId)
+UINT Install(LPCTSTR inf, LPCTSTR hwid, TCHAR *InstanceId, BOOL quiet)
 /*
 	Install current vJoy driver according to the given inf file and HW id
 	If this exact driver is installed then fail
@@ -238,7 +238,7 @@ UINT Install(LPCTSTR inf, LPCTSTR hwid, TCHAR *InstanceId)
 	//_ftprintf(stream,">> Install: Starting cmdUpdate\n");
 	_stprintf_s(prt, MAX_PATH, "Install: Starting cmdUpdate");
 	StatusMessage( NULL, prt,  INFO);
-	failcode = cmdUpdate( INSTALLFLAG_FORCE, inf,  hwid );
+	failcode = cmdUpdate( INSTALLFLAG_FORCE, inf,  hwid, quiet);
 	//_ftprintf(stream,">> Install: Finished cmdUpdate\n");
 	_stprintf_s(prt, MAX_PATH, "Install: Finished cmdUpdate");
 	StatusMessage( NULL, prt,  INFO);
@@ -626,7 +626,7 @@ Return Value:
 		//_ftprintf(stream,"[E] cmdUpdateNI: LoadLibrary failed to load setupapi.dll\n");
 		_stprintf_s(prt, MAX_PATH, "cmdUpdateNI: LoadLibrary failed to load setupapi.dll");
 		StatusMessage( NULL, prt,  ERR);
-        return cmdUpdate(Flags,InfPath,  hwid);
+        return cmdUpdate(Flags,InfPath,  hwid, FALSE);
     }
     SetNIFn = (SetupSetNonInteractiveModeProto)GetProcAddress(setupapiMod,SETUPSETNONINTERACTIVEMODE);
     if(!SetNIFn)
@@ -635,7 +635,7 @@ Return Value:
 		//_ftprintf(stream,"[E] cmdUpdateNI: GetProcAddress failed to get SETUPSETNONINTERACTIVEMODE\n");
 		_stprintf_s(prt, MAX_PATH, "cmdUpdateNI: GetProcAddress failed to get SETUPSETNONINTERACTIVEMODE");
 		StatusMessage( NULL, prt,  ERR);
-        return cmdUpdate(Flags,InfPath,  hwid);
+        return cmdUpdate(Flags,InfPath,  hwid, FALSE);
     }
 
     prev = SetNIFn(TRUE);
@@ -645,7 +645,7 @@ Return Value:
 	//_ftprintf(stream,">> cmdUpdateNI: Calling cmdUpdate with InfPath=%s\n", InfPath);
 	_stprintf_s(prt, MAX_PATH, "cmdUpdateNI: Calling cmdUpdate with InfPath=%s", InfPath);
 	StatusMessage( NULL, prt,  INFO);
-    res = cmdUpdate(Flags,TEXT(InfPath),  hwid);
+    res = cmdUpdate(Flags,TEXT(InfPath),  hwid, FALSE);
 	//_ftprintf(stream,">> cmdUpdateNI: cmdUpdate returned %d\n", res);
 	_stprintf_s(prt, MAX_PATH, "cmdUpdateNI: cmdUpdate returned %d", res);
 	StatusMessage( NULL, prt,  INFO);
@@ -657,7 +657,7 @@ Return Value:
     return res;
 }
 
-int cmdUpdate( __in DWORD Flags, LPCTSTR inf, LPCTSTR hwid )
+int cmdUpdate( __in DWORD Flags, LPCTSTR inf, LPCTSTR hwid, BOOL quiet)
 /*++
 
 Routine Description:
@@ -779,7 +779,11 @@ Return Value:
        goto final;
     }
 
-    if(!UpdateFn(NULL,hwid,InfPath,flags,&reboot)) 
+	PBOOL preboot = NULL;
+	if (quiet)
+		preboot = &reboot;
+
+    if(!UpdateFn(NULL,hwid,InfPath,flags, preboot))
 	{
 		GetErrorString(ErrMsg,1000);
 		//_ftprintf(stream,"[E] cmdUpdate:  UPDATEDRIVERFORPLUGANDPLAYDEVICES(hwid=%s, InfPath=%s) failed with error: %s\n", hwid, InfPath, ErrMsg);
@@ -794,9 +798,10 @@ Return Value:
 		StatusMessage( NULL, prt,  INFO);
 	};
 
-    //FormatToStream(stdout,MSG_UPDATE_OK);
-
-    failcode = reboot ? EXIT_REBOOT : EXIT_OK;
+	if (quiet)
+		failcode = reboot ? EXIT_REBOOT : EXIT_OK;
+	else
+		failcode = EXIT_OK;
 
 final:
 
@@ -1144,7 +1149,7 @@ void RefreshvJoySpecific(USHORT Revision)
 
 
 /* Major Functions */
-int Installation(LPCTSTR DeviceHWID, TCHAR * InfFile)
+int Installation(LPCTSTR DeviceHWID, TCHAR * InfFile, BOOL quiet)
 {
 	//BOOL	rDi;
 	int		assigned;
@@ -1187,7 +1192,7 @@ int Installation(LPCTSTR DeviceHWID, TCHAR * InfFile)
 			RemoveDevice(InstanceId, TRUE);
 		};
 
-		UINT Install_res = Install(InfFile, DeviceHWID, InstanceId);
+		UINT Install_res = Install(InfFile, DeviceHWID, InstanceId, quiet);
 
 		if (Install_res == EXIT_OK)
 		{
@@ -1281,7 +1286,7 @@ int Repair(TCHAR * DeviceHWID, TCHAR * InfFile)
 	{	// Not installed so install it
 		_stprintf_s(prt, MAX_PATH, "Device not installed - Installing");
 		StatusMessage( NULL, prt,  INFO);
-		if (!Install(InfFile, DeviceHWID,InstanceId))
+		if (!Install(InfFile, DeviceHWID,InstanceId, FALSE))
 		{
 			_stprintf_s(prt, MAX_PATH, "Install failed");
 			StatusMessage( NULL, prt,  ERR);
@@ -1495,6 +1500,8 @@ VERBTYPE GetVerb(int argc, PZPWSTR argv)
 		return CLEAN;
 	if ((((TCHAR *)argv[1])[0] == 'r') || (((TCHAR *)argv[1])[0] == 'R'))
 		return REPAIR;
+	if ((((TCHAR *)argv[1])[0] == 'q') || (((TCHAR *)argv[1])[0] == 'Q'))
+		return QUIET_I;
 
 	return INVALID;
 }
