@@ -120,8 +120,8 @@ Root: HKLM; Subkey: "System\CurrentControlSet\Control\MediaProperties\PrivatePro
 Root: HKLM; Subkey: "System\CurrentControlSet\Control\MediaProperties\PrivateProperties\Joystick\OEM\VID_1234&PID_BEAD"; ValueName: "OEMData";  ValueType: binary;  ValueData: "43 00 88 01 FE 00 00 00"; Flags:  uninsdeletevalue
 
 [Run]
-Filename: "{win}\regedit.exe"; Parameters: "/s vJoyInit.reg"; WorkingDir: "{src}"; Flags: runascurrentuser waituntilterminated ;Check: not InitFromRegistry
-;Filename: "{app}\vJoyInstall.exe"; Parameters: "I"; WorkingDir: "{app}"; Flags: waituntilterminated RunHidden; StatusMsg: "Installing vJoy device (May take up to 5 minutes)"; Check: not DelayedRestart
+; Filename: "{win}\regedit.exe"; Parameters: "/s vJoyInit.reg"; WorkingDir: "{src}"; Flags: runascurrentuser waituntilterminated ;Check: not InitFromRegistry
+; Filename: "{app}\vJoyInstall.exe"; Parameters: "I"; WorkingDir: "{app}"; Flags: waituntilterminated RunHidden; StatusMsg: "Installing vJoy device (May take up to 5 minutes)"; Check: not DelayedRestart
 
 [UninstallRun]
 Filename: {app}\vJoyInstall.exe; Parameters: C; StatusMsg: "Uninstalling vJoy device"; Flags: waituntilterminated RunHidden; WorkingDir: {app}; 
@@ -154,13 +154,14 @@ const
     BCDRoot                   = 'BCD00000000';
     UninstKey 								= 'Software\Microsoft\Windows\CurrentVersion\Uninstall\';
   	ValOrig 									= 'OrigTestMode';
+    vJoyInitFile              = 'vJoyInit.reg';
 
 
     (* Constants related to two-phase installation *)
     RunOnceName = 'vJoy Setup restart';
     RunOnceKey  = 'Software\Microsoft\Windows\CurrentVersion\RunOnce';
-    Ph2Flag			=	'PH2';
-    Ph2Param    = ' /'+Ph2Flag+'=1';
+    Ph2Flag			=	'ph2';
+    Ph2Param    = ' -'+Ph2Flag+' 1' + '  /VERYSILENT';
     QuitMessageReboot = 'The installer will now set your computer to TestSigning mode. You will need to restart your computer to complete that installation.'#13#13'After restarting your computer, Setup will continue next time an administrator logs in.';
     WaitingForRestart = 'You should now restat your computer.'#13#13'Press OK then restart your computer manually'#13'Press Cancel to cancel installation';
     ErrorRunOnce      = 'Failed to update RunOnce registry entry';
@@ -197,6 +198,7 @@ function DelayedRestart(): Boolean; Forward;
 function InitFromRegistry(): Boolean; Forward;
 function GetCommandlineParam (inParam: String):String;  Forward;
 function Exec_vJoyInstall(): Boolean; Forward;
+procedure PreparePh2; Forward;
 
 (* Forward Function declarations - End *)
 
@@ -361,17 +363,30 @@ end;
 *)
 function InitializeSetup(): Boolean;
 
-begin
+var
+  Ph2Val: string;
 
-	//MsgBox('Inside InitializeSetup()' , mbInformation, MB_OK)
-	Log('InitializeSetup()');
+begin
+  Log('InitializeSetup()');
+  SkipToPh2 := false;
+  Result := True;
+	
   // Command-line parameters 
-    if (IsUpgrade()) then
-    begin
-      UnInstallOldVersion();
-   end;
- 
-  Result := True; 
+  Ph2Val :=  GetCommandlineParam(Ph2Flag);
+  Log('InitializeSetup() - Value of Ph2 Flag = ' + Ph2Val);
+  if CompareStr(Ph2Val, '1')=0 then
+  begin
+     Log('InitializeSetup() - Ph2 detected');
+     SkipToPh2 := true;
+     exit;
+  end;
+
+  if (IsUpgrade()) then
+  begin
+    Log('InitializeSetup() - IsUpgrade=true');
+    UnInstallOldVersion();    
+  end;
+   
 end;
 
 (* Pre & Post-install operations *)
@@ -399,7 +414,17 @@ begin
  //     UnInstallOldVersion();
  //  end;
   end;        
-end;
+
+ 	if  (CurStep=ssPostInstall) and (not DldRestart) then
+	begin // Post install actions - check if vJoy is now installed
+    Log('CurStepChanged(ssPostInstall)');
+		if IsVjoyInstalled then
+			MsgBox(InstallGood , mbInformation, MB_OK)
+		else
+			MsgBox(InstallBad , mbError, MB_OK)
+	end; // Post install actions
+  
+ end;
 
 (* Pre & Post-uninstall operations *)
 procedure CurUninstallStepChanged(CurUninstallStep: TUninstallStep);
@@ -440,6 +465,12 @@ end;
 function ShouldSkipPage(PageID: Integer): Boolean;
 begin
   Log(' ShouldSkipPage() - Page ID:'  + IntToStr(PageID));
+  if (PageID = wpWelcome) then  Log(' ShouldSkipPage() - Page ID: wpWelcome');
+  if (PageID = wpSelectComponents) then  Log(' ShouldSkipPage() - Page ID: wpSelectComponents');
+  if (PageID = wpReady) then  Log(' ShouldSkipPage() - Page ID: wpReady');
+  if (PageID = wpInstalling) then  Log(' ShouldSkipPage() - Page ID: wpInstalling');
+  if (PageID = wpInfoAfter) then  Log(' ShouldSkipPage() - Page ID: wpInfoAfter');
+  if (PageID = wpFinished) then  Log(' ShouldSkipPage() - Page ID: wpFinished');
   Result := SkipToPh2;
 end;
 
@@ -555,7 +586,7 @@ begin
 	  RegWriteOrigTestMode(OrigTestMode);
 
   (* Write directory locations to the registry *)
-  RegWriteDllFolderLocation();
+  if not SkipToPh2 then  RegWriteDllFolderLocation();
 	  
 end;
 
@@ -766,7 +797,13 @@ begin
 
   // Gets the file name - exit with FALSE if fails
   FileName :=  GetCommandlineParam(ParamInitReg);
-  if (Length(FileName) = 0 )   then exit;
+  if (Length(FileName) = 0 )   then 
+
+  // Command line does not specify a registry file
+  begin
+    FileName := vJoyInitFile;
+    Log('InitFromRegistry() - using the default registry file: ' + FileName);
+  end;
 
   // Merge file to registry
   if (not FileExists(ExpandConstant('{src}\'+FileName))) then
@@ -824,10 +861,22 @@ var
    end;
 end;
 
+// Prepare for Ph2 after restart
+// Write to RunOnce registry entry
+procedure PreparePh2;
+begin
+  Log('PreparePh2() - Start');
+  RegWriteStringValue(HKEY_LOCAL_MACHINE, RunOnceKey, 'vJoy Installer Phase 2', expandconstant('{srcexe}')+' '+ Ph2Param)
+end;
+
+
 function NeedRestart(): Boolean;
 begin
   Log('NeedRestart() - Start');
-	Result := Exec_vJoyInstall;
+  InitFromRegistry;
+  DldRestart   := Exec_vJoyInstall;
+  if   DldRestart then  PreparePh2;
+	Result       := DldRestart;
 end;
 
 
