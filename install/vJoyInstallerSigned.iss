@@ -196,6 +196,8 @@ function GetAppId(Param: String): String; Forward;
 function DelayedRestart(): Boolean; Forward;
 function InitFromRegistry(): Boolean; Forward;
 function GetCommandlineParam (inParam: String):String;  Forward;
+function Exec_vJoyInstall(): Boolean; Forward;
+
 (* Forward Function declarations - End *)
 
 (* Helper Functions *)
@@ -397,42 +399,6 @@ begin
  //     UnInstallOldVersion();
  //  end;
   end;        
-
-
-	if  (CurStep=ssInstall) and (not CalledBySpp) then
-	begin // Post install actions - check if vJoy is now installed
-    Log('CurStepChanged(ssPostInstall)');
-	TmpFileName := ExpandConstant('{app}') + '\vJoyInstall.exe';
-	if Exec(TmpFileName, 'I', '',  SW_HIDE, ewWaitUntilTerminated, ResultCode) then
-	begin (* handle success if necessary; ResultCode contains the exit code *)
-    msg:= 'vJoyInstall.exe Was executed. Result code: ' +  IntToStr(ResultCode);
-		Log(msg);
-	end
-	else begin
-		Log('vJoyInstall.exe Was NOT executed');
-	end;
-
-  // Test if need reboot
-  // Later replace with RunOnce
-  if ResultCode=-8  then 
-  begin
-    Log('vJoyInstall.exe reported that it needs reboot');
-	MsgBox(InstallReboot , mbInformation, MB_OK);
-	DldRestart := True;
-    Exit;
-  end;
-
-	if IsVjoyInstalled then
-		begin
-			Log('IsVjoyInstalled = TRUE');
-			MsgBox(InstallGood , mbInformation, MB_OK);
-		end
-		else
-		begin
-			Log('IsVjoyInstalled = FALSE');
-			MsgBox(InstallBad , mbError, MB_OK);
-		end;
-	end; // Post install actions
 end;
 
 (* Pre & Post-uninstall operations *)
@@ -461,6 +427,7 @@ var
   
 begin
 // Default
+  Log(' PrepareToInstall()');
 	NeedsRestart := False;
 	DldRestart := False;
 
@@ -472,6 +439,7 @@ end;
 *)
 function ShouldSkipPage(PageID: Integer): Boolean;
 begin
+  Log(' ShouldSkipPage() - Page ID:'  + IntToStr(PageID));
   Result := SkipToPh2;
 end;
 
@@ -792,6 +760,8 @@ var
   FileName : String ;
   ResultCode: Integer;
 begin
+
+  Log('InitFromRegistry() - Start');
   Result := FALSE;
 
   // Gets the file name - exit with FALSE if fails
@@ -814,9 +784,50 @@ begin
 
 end;
 
+// Exec vJoyInstall with parameter Q for quiet installation
+// Returns TRUE if need to restart
+function Exec_vJoyInstall(): Boolean;
+var
+  TmpFileName, ExecStdout, msg: string;
+  ResultCode: Integer;
+  
+  Begin
+  Log('Exec_vJoyInstall() - Start');
+	begin 
+	TmpFileName := ExpandConstant('{app}') + '\vJoyInstall.exe';
+  if not FileExists(TmpFileName) then   Log('Exec_vJoyInstall() - file ' + TmpFileName + 'was not found');
+
+  // Executing   vJoyInstall.exe Q
+	if Exec(TmpFileName, 'Q', '',  SW_HIDE, ewWaitUntilTerminated, ResultCode) then
+	begin (* handle success if necessary; ResultCode contains the exit code *)
+    msg:= 'vJoyInstall.exe Was executed. Result code: ' +  IntToStr(ResultCode);
+		Log(msg);
+	end
+	else begin
+		Log('vJoyInstall.exe Was NOT executed');
+    Result := false;
+    exit;
+	end;
+
+  // Test if need reboot
+  // Later replace with RunOnce
+  if ResultCode=-8  then 
+  begin
+    Log('vJoyInstall.exe reported that it needs reboot');
+    Result := true;
+    Exit;
+   end
+   else
+    Log('vJoyInstall.exe reported that it does not need reboot');
+    Result := false;
+    Exit;
+   end;
+end;
+
 function NeedRestart(): Boolean;
 begin
-	Result := DldRestart;
+  Log('NeedRestart() - Start');
+	Result := Exec_vJoyInstall;
 end;
 
 
