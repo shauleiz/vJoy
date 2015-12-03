@@ -1173,7 +1173,7 @@ int Installation(LPCTSTR DeviceHWID, TCHAR * InfFile, BOOL quiet)
 	// Test if device already installed.
 	// Older device is not recognised as THIS device
 	InstanceId[0] = '\0';
-	if (FindInstalled(DeviceHWID,InstanceId))
+	if (FindInstalled(DeviceHWID,InstanceId) && !quiet)
 	{
 		_stprintf_s(prt, MAX_PATH, "Device already installed - Install failed");
 		StatusMessage( NULL, prt,  WARN);
