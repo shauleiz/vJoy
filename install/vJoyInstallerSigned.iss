@@ -146,6 +146,7 @@ const
 		InstallReboot				= 'vJoy installation requires reboot'#13#13'restart your computer and run this program again';
 		InstallBad					= 'vJoy failed to install';
 		TestModeChanged			=	'Would you like to reset your computer back to TestSigning mode OFF?'#13'This will take effect only after you restart your computer';
+    InstallContinue     = 'vJoy Completing Installation';
 
   (* Constants related to registry *)
     GUID_WINDOWS_BOOTMGR      = '{9DEA862C-5CDD-4E70-ACC1-F32B344D4795}';
@@ -189,7 +190,7 @@ function IsVjoyInstalled(): Boolean; Forward;
 function IsX64: Boolean; Forward;
 function IsX86: Boolean; Forward;
 function PrepareToInstall(var NeedsRestart: Boolean): String; Forward;
-function ShouldSkipPage(PageID: Integer): Boolean; Forward;
+//function ShouldSkipPage(PageID: Integer): Boolean; Forward;
 function SetTestMode(value: Boolean): Boolean; Forward;
 function SetTestModeOff(): Boolean; Forward;
 function SetTestModeOn(): Boolean; Forward;
@@ -378,6 +379,7 @@ begin
   begin
      Log('InitializeSetup() - Ph2 detected');
      SkipToPh2 := true;
+     if  SkipToPh2  then MsgBox(InstallContinue, mbInformation, MB_OK);
      exit;
   end;
 
@@ -461,7 +463,7 @@ end;
 (*
   Called before every wizard page.
   Pages skipped if installer called with parameter PH2 
-*)
+
 function ShouldSkipPage(PageID: Integer): Boolean;
 begin
   Log(' ShouldSkipPage() - Page ID:'  + IntToStr(PageID));
@@ -473,7 +475,7 @@ begin
   if (PageID = wpFinished) then  Log(' ShouldSkipPage() - Page ID: wpFinished');
   Result := SkipToPh2;
 end;
-
+*)
 (*
   Set Testsigning mode On/Off acording to value of variable 'value'
   Executed only for x64 - else NOP (return FALSE)
@@ -873,7 +875,8 @@ end;
 function NeedRestart(): Boolean;
 begin
   Log('NeedRestart() - Start');
-  InitFromRegistry;
+
+  if not SkipToPh2  then InitFromRegistry;
   DldRestart   := Exec_vJoyInstall;
   if   DldRestart then  PreparePh2;
 	Result       := DldRestart;

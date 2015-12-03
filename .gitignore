@@ -13,9 +13,12 @@
 *.pch
 *.cd
 /apps/vJoyFeeder/vJoyFeeder01.vcxproj
+*.suo
+*.*.*.tlog
 
 # Folders
 win32/
 x64/
 release/
+Release/
 debug/
