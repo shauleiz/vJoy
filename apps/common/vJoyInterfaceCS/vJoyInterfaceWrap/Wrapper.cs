@@ -318,7 +318,7 @@ namespace vJoyInterfaceWrap
         private static extern int _GetVJDContPovNumber(UInt32 rID);
 
         [DllImport("vJoyInterface.dll", EntryPoint = "GetVJDAxisExist")]
-        private static extern bool _GetVJDAxisExist(UInt32 rID, UInt32 Axis);
+        private static extern UInt32 _GetVJDAxisExist(UInt32 rID, UInt32 Axis);
 
         [DllImport("vJoyInterface.dll", EntryPoint = "GetVJDAxisMax")]
         private static extern bool _GetVJDAxisMax(UInt32 rID, UInt32 Axis, ref long Max);
@@ -490,7 +490,14 @@ namespace vJoyInterfaceWrap
         public int GetVJDButtonNumber(uint rID) { return _GetVJDButtonNumber(rID); }
         public int GetVJDDiscPovNumber(uint rID) { return _GetVJDDiscPovNumber(rID); }
         public int GetVJDContPovNumber(uint rID) { return _GetVJDContPovNumber(rID); }
-        public bool GetVJDAxisExist(UInt32 rID, HID_USAGES Axis) { return _GetVJDAxisExist(rID, (uint)Axis); }
+        public bool GetVJDAxisExist(UInt32 rID, HID_USAGES Axis)
+        {
+            UInt32 res = _GetVJDAxisExist(rID, (uint)Axis);
+            if (res == 1)
+                return true;
+            else
+                return false;
+        }
         public bool GetVJDAxisMax(UInt32 rID, HID_USAGES Axis, ref long Max) { return _GetVJDAxisMax(rID, (uint)Axis, ref Max); }
         public bool GetVJDAxisMin(UInt32 rID, HID_USAGES Axis, ref long Min) { return _GetVJDAxisMin(rID, (uint)Axis, ref Min); }
         public bool isVJDExists(UInt32 rID) { return _isVJDExists(rID); }
