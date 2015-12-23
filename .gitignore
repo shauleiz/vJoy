@@ -13,6 +13,7 @@
 *.pch
 *.cd
 *.suo
+*.user
 
 /apps/vJoyFeeder/vJoyFeeder01.vcxproj
 
