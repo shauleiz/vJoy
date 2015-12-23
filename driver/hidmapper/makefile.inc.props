@@ -1,0 +1,55 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <_LNG>$(LANGUAGE)</_LNG>
+  </PropertyGroup>
+  <Choose>
+    <When Condition="$(KMDF_VERSION_MAJOR)&gt;=9" />
+    <Otherwise />
+  </Choose>
+  <ItemGroup>
+    <NmakeTarget Include="$(OBJ_PATH)\$(O)\$(TARGETNAME).sys">
+      <TargetKillSwitch>ConvertedTarget0_Disabled</TargetKillSwitch>
+      <TargetName>Converted Target 0</TargetName>
+      <Outputs>$(INSTALL_DIR)\$(O)\$(TARGETNAME).sys</Outputs>
+      <Condition>$(KMDF_VERSION_MAJOR)&gt;=9</Condition>
+      <Cmd0>if not exist $(INSTALL_DIR)\$(O) mkdir $(INSTALL_DIR)\$(O)</Cmd0>
+      <Cmd1>copy $(OBJ_PATH)\$(O)\$(TARGETNAME).sys  %24%40</Cmd1>
+    </NmakeTarget>
+  </ItemGroup>
+  <Target Name="Converted Target 0" Condition="($(KMDF_VERSION_MAJOR)&gt;=9) And ('$(ConvertedTarget0_Disabled)'!='true')" BeforeTargets="$(AfterBuildLinkTargets)" AfterTargets="$(BuildLinkTargets)">
+    <ItemGroup>
+      <AllEvaluatedTargetInputs Remove="@(AllEvaluatedTargetInputs)" />
+      <t_TargetInput_0 Remove="@(t_TargetInput_0)" />
+      <t_TargetInput_0 Include="$(OBJ_PATH)\$(O)\$(TARGETNAME).sys" Condition="Exists('$(OBJ_PATH)\$(O)\$(TARGETNAME).sys') And ('@(t_TargetInput_0)'=='')" />
+      <t_TargetInput_0 Include="$(OBJ_PATH)\$(O)\$(TARGETNAME).sys" Condition="'@(t_TargetInput_0)'==''" />
+      <AllEvaluatedTargetInputs Include="@(t_TargetInput_0);" />
+    </ItemGroup>
+    <ReplaceNmakeCommandTokens Command="if not exist $(INSTALL_DIR)\$(O) mkdir $(INSTALL_DIR)\$(O)" TaskInputFiles="@(AllEvaluatedTargetInputs)" TaskOutputFile="$(INSTALL_DIR)\$(O)\$(TARGETNAME).sys">
+      <Output TaskParameter="ShouldExecute" PropertyName="TargetOutDated" />
+      <Output TaskParameter="ProcessedCommand" PropertyName="ResolvedCommand_1" />
+    </ReplaceNmakeCommandTokens>
+    <Exec Condition="'$(TargetOutDated)'=='true'" Command="$(ResolvedCommand_1)" WorkingDirectory="$(MSBuildProjectDirectory)" />
+    <ReplaceNmakeCommandTokens Command="copy $(OBJ_PATH)\$(O)\$(TARGETNAME).sys  %24%40" TaskInputFiles="@(AllEvaluatedTargetInputs)" TaskOutputFile="$(INSTALL_DIR)\$(O)\$(TARGETNAME).sys">
+      <Output TaskParameter="ShouldExecute" PropertyName="Junk_Property" />
+      <Output TaskParameter="ProcessedCommand" PropertyName="ResolvedCommand_2" />
+    </ReplaceNmakeCommandTokens>
+    <Exec Condition="'$(TargetOutDated)'=='true'" Command="$(ResolvedCommand_2)" WorkingDirectory="$(MSBuildProjectDirectory)" />
+    <Message Condition="'$(TargetOutDated)'!='true'" Text="File $(INSTALL_DIR)\$(O)\$(TARGETNAME).sys is up-to-date" />
+  </Target>
+  <ItemGroup>
+    <NmakeTarget Include=" ">
+      <TargetKillSwitch>ConvertedTarget1_Disabled</TargetKillSwitch>
+      <TargetName>Converted Target 1</TargetName>
+      <Outputs>$(INSTALL_DIR)\$(O)\$(TARGETNAME).sys</Outputs>
+      <Condition>!($(KMDF_VERSION_MAJOR)&gt;=9)</Condition>
+    </NmakeTarget>
+  </ItemGroup>
+  <Target Name="Converted Target 1" Condition="(!($(KMDF_VERSION_MAJOR)&gt;=9)) And ('$(ConvertedTarget1_Disabled)'!='true')" BeforeTargets="$(AfterBuildLinkTargets)" AfterTargets="$(BuildLinkTargets)">
+    <ItemGroup>
+      <AllEvaluatedTargetInputs Remove="@(AllEvaluatedTargetInputs)" />
+      <AllEvaluatedTargetInputs Include=" " />
+    </ItemGroup>
+    <Message Condition="'$(TargetOutDated)'!='true'" Text="File $(INSTALL_DIR)\$(O)\$(TARGETNAME).sys is up-to-date" />
+  </Target>
+</Project>

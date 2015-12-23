@@ -48,7 +48,7 @@ AppSupportURL={#MyAppURL}
 AppUpdatesURL={#MyAppURL}
 CreateAppDir=true
 OutputDir=.
-OutputBaseFilename=vJoyInstallerSigned
+OutputBaseFilename=vJoySetup
 SetupIconFile=install.ico
 Compression=lzma/Max
 SolidCompression=true
@@ -113,9 +113,13 @@ Name: "{group}\vJoy Feeder (Demo)"; Filename: "{app}\{#DestSubDirX64}\vJoyFeeder
 Name: "{group}\vJoy Home"; Filename: "http://vjoystick.sourceforge.net/site"; Comment: "vJoy site"; IconFilename:  "{#vJoyIconFile}"
 Name: "{group}\vJoy SDK"; Filename: "http://vjoystick.sourceforge.net/redirect_download_vJoy2SDK.php"; Comment: "vJoy SDK"; IconFilename:  "{#vJoyIconFile}"
 
+[Registry]
+Root: HKCU; Subkey: "System\CurrentControlSet\Control\MediaProperties\PrivateProperties\Joystick\OEM\VID_1234&PID_BEAD"; ValueName: "OEMName";  ValueType: none; Flags:deletevalue  uninsdeletevalue
+Root: HKLM; Subkey: "System\CurrentControlSet\Control\MediaProperties\PrivateProperties\Joystick\OEM\VID_1234&PID_BEAD"; ValueName: "OEMName";  ValueType: none; Flags:deletevalue  uninsdeletevalue
+
 [Run]
-Filename: "{win}\regedit.exe"; Parameters: "/s vJoyInit.reg"; WorkingDir: "{src}"; Flags: runascurrentuser waituntilterminated ;Check: not InitFromRegistry
-Filename: "{app}\vJoyInstall.exe"; Parameters: "I"; WorkingDir: "{app}"; Flags: waituntilterminated RunHidden; StatusMsg: "Installing vJoy device (May take up to 5 minutes)"; Check: not DelayedRestart
+; Filename: "{win}\regedit.exe"; Parameters: "/s vJoyInit.reg"; WorkingDir: "{src}"; Flags: runascurrentuser waituntilterminated ;Check: not InitFromRegistry
+; Filename: "{app}\vJoyInstall.exe"; Parameters: "I"; WorkingDir: "{app}"; Flags: waituntilterminated RunHidden; StatusMsg: "Installing vJoy device (May take up to 5 minutes)"; Check: not DelayedRestart
 
 [UninstallRun]
 Filename: {app}\vJoyInstall.exe; Parameters: C; StatusMsg: "Uninstalling vJoy device"; Flags: waituntilterminated RunHidden; WorkingDir: {app}; 
@@ -137,8 +141,10 @@ const
 	(* Messages *)
 		ManuallySetTestMode = 'You cannot install vJoy on this system.'#13#13'To enable the system open a command prompt (DOS) window as Administrator.'#13'In this window type the following line:'#13#13'BCDEDIT -SET TESTSIGNING ON'#13#13'Then Restart your computer.';
 		InstallGood					= 'vJoy installed successfully';
+		InstallReboot				= 'vJoy installation requires reboot'#13#13'restart your computer and run this program again';
 		InstallBad					= 'vJoy failed to install';
 		TestModeChanged			=	'Would you like to reset your computer back to TestSigning mode OFF?'#13'This will take effect only after you restart your computer';
+    InstallContinue     = 'vJoy Completing Installation';
 
   (* Constants related to registry *)
     GUID_WINDOWS_BOOTMGR      = '{9DEA862C-5CDD-4E70-ACC1-F32B344D4795}';
@@ -147,13 +153,14 @@ const
     BCDRoot                   = 'BCD00000000';
     UninstKey 								= 'Software\Microsoft\Windows\CurrentVersion\Uninstall\';
   	ValOrig 									= 'OrigTestMode';
+    vJoyInitFile              = 'vJoyInit.reg';
 
 
     (* Constants related to two-phase installation *)
     RunOnceName = 'vJoy Setup restart';
     RunOnceKey  = 'Software\Microsoft\Windows\CurrentVersion\RunOnce';
-    Ph2Flag			=	'PH2';
-    Ph2Param    = ' /'+Ph2Flag+'=1';
+    Ph2Flag			=	'ph2';
+    Ph2Param    = ' -'+Ph2Flag+' 1' + '  /VERYSILENT';
     QuitMessageReboot = 'The installer will now set your computer to TestSigning mode. You will need to restart your computer to complete that installation.'#13#13'After restarting your computer, Setup will continue next time an administrator logs in.';
     WaitingForRestart = 'You should now restat your computer.'#13#13'Press OK then restart your computer manually'#13'Press Cancel to cancel installation';
     ErrorRunOnce      = 'Failed to update RunOnce registry entry';
@@ -164,6 +171,10 @@ const
     SppParam	= ' /'+SppFlag+'=1';
     AppIdFlag	= 'ID';
     AppIdParam	= ' /'+AppIdFlag;
+
+    // Exit codes
+    EXIT_INSTALL_BAD = 109;
+
 
 var
 		SkipToPh2: 		boolean; (* True is installer resumes installation after Set Test mode & restart*)
@@ -181,7 +192,7 @@ function IsVjoyInstalled(): Boolean; Forward;
 function IsX64: Boolean; Forward;
 function IsX86: Boolean; Forward;
 function PrepareToInstall(var NeedsRestart: Boolean): String; Forward;
-function ShouldSkipPage(PageID: Integer): Boolean; Forward;
+//function ShouldSkipPage(PageID: Integer): Boolean; Forward;
 function SetTestMode(value: Boolean): Boolean; Forward;
 function SetTestModeOff(): Boolean; Forward;
 function SetTestModeOn(): Boolean; Forward;
@@ -189,9 +200,17 @@ function GetAppId(Param: String): String; Forward;
 function DelayedRestart(): Boolean; Forward;
 function InitFromRegistry(): Boolean; Forward;
 function GetCommandlineParam (inParam: String):String;  Forward;
+function Exec_vJoyInstall(): Boolean; Forward;
+procedure PreparePh2; Forward;
+function IsVerySilent: Boolean;  Forward;
+function vJoyMsgBox(const Text: String; const Typ: TMsgBoxType; const Buttons: Integer): Integer;   Forward;
+//procedure ExitProcess(exitCode:integer);    Forward;
 (* Forward Function declarations - End *)
 
 (* Helper Functions *)
+procedure ExitProcess(exitCode:integer);
+external 'ExitProcess@kernel32.dll stdcall';
+
 function IsX64: Boolean;
 begin
   Result := ProcessorArchitecture = paX64;
@@ -306,32 +325,120 @@ begin
   Result := (GetUninstallString() <> '');
 end;
 
+// Checks for flag '/verysilent'
+function IsVerySilent: Boolean;
+var
+  I: Integer;
+begin
+  Result := False;
+  for I := 1 to ParamCount do
+    if CompareText(ParamStr(I), '/verysilent') = 0 then
+    begin
+      Result := True;
+      Exit;
+    end; 
+end;
+
+// Special version of the standard message box
+// If in VerySilent mode - dialog box supressed and message is sent to log file
+function vJoyMsgBox(const Text: String; const Typ: TMsgBoxType; const Buttons: Integer): Integer;
+
+var 
+  MsgBoxReturned: Integer;
+
+begin
+  Result :=  IDOK;
+  if  not IsVerySilent then
+    begin
+      Result :=  MsgBox(Text,  Typ, Buttons);
+      Exit; 
+    end
+    else begin
+      Log('Supressed Message Box: ' + Text);
+      case Buttons of
+       MB_OK: 
+        begin
+         Log('Return default value: OK'); 
+         Result := IDOK;
+        end;
+        MB_OKCANCEL:
+         begin
+          Log('Return default value: Cancel'); 
+          Result := IDCANCEL;
+         end;
+        MB_ABORTRETRYIGNORE:
+         begin
+          Log('Return default value: Abort'); 
+          Result := IDABORT;
+         end;
+        MB_YESNOCANCEL:
+         begin
+          Log('Return default value: Yes'); 
+          Result := IDYES;
+         end;
+        MB_YESNO:
+          begin
+          Log('Return default value: Yes'); 
+          Result := IDYES;
+         end;
+       MB_RETRYCANCEL:
+         begin
+          Log('Return default value: Cancel'); 
+          Result := IDCANCEL;
+         end;
+      end;
+    end;
+end;
 
 /////////////////////////////////////////////////////////////////////
 
 function UnInstallOldVersion(): Integer;
 var
   sUnInstallString: String;
+  sUnInstallFlags: String;
   iResultCode: Integer;
+  i :  Integer;
 begin
 // Return Values:
 // 1 - uninstall string is empty
 // 2 - error executing the UnInstallString
 // 3 - successfully executed the UnInstallString
+// 4 - Timeout. Waited too much for the ununstaller
 
   // default return value
   Result := 0;
+
+  // Preparing the uninstall flags
+  if IsVerySilent then
+    sUnInstallFlags :=  '/VERYSILENT  /NORESTART /SUPPRESSMSGBOXES'
+  else
+    sUnInstallFlags :=  '/SILENT  /NORESTART /SUPPRESSMSGBOXES';
+
 
   // get the uninstall string of the old app
   sUnInstallString := GetUninstallString();
   if sUnInstallString <> '' then begin
     sUnInstallString := RemoveQuotes(sUnInstallString);
-    if Exec(sUnInstallString, '/SILENT  /NORESTART /SUPPRESSMSGBOXES','', SW_HIDE, ewWaitUntilTerminated  , iResultCode) then
+    if Exec(sUnInstallString, sUnInstallFlags,'', SW_HIDE, ewWaitUntilTerminated  , iResultCode) then
       Result := 3
     else
       Result := 2;
   end else
     Result := 1;
+
+  // Wait until files are removed
+  i := 0;
+  while FileOrDirExists(sUnInstallString) do
+   begin
+    i := i+1;
+    Sleep(100);
+    if i>50 then
+     begin
+      Result := 4 ;
+      Log('Uninstaller timed out');
+      Exit;
+     end;
+  end;
 end;
 
 /////////////////////////////////////////////////////////////////////
@@ -352,21 +459,40 @@ end;
 *)
 function InitializeSetup(): Boolean;
 
-begin
+var
+  Ph2Val: string;
 
-	//MsgBox('Inside InitializeSetup()' , mbInformation, MB_OK)
-	Log('InitializeSetup()');
+begin
+  Log('InitializeSetup()');
+  SkipToPh2 := false;
+  Result := True;
+	
   // Command-line parameters 
-    if (IsUpgrade()) then
-    begin
-      UnInstallOldVersion();
-   end;
- 
-  Result := True; 
+  Ph2Val :=  GetCommandlineParam(Ph2Flag);
+  Log('InitializeSetup() - Value of Ph2 Flag = ' + Ph2Val);
+  if CompareStr(Ph2Val, '1')=0 then
+  begin
+     Log('InitializeSetup() - Ph2 detected');
+     SkipToPh2 := true;
+     if  SkipToPh2  then vJoyMsgBox(InstallContinue, mbInformation, MB_OK);
+     exit;
+  end;
+
+  if (IsUpgrade()) then
+  begin
+    Log('InitializeSetup() - IsUpgrade=true');
+    UnInstallOldVersion();    
+  end;
+   
 end;
 
 (* Pre & Post-install operations *)
 procedure CurStepChanged(CurStep: TSetupStep);
+
+var
+  TmpFileName, ExecStdout, msg: string;
+  ResultCode: Integer;
+
 begin
 //	if  CurStep=ssInstall then
 //		MsgBox('CurStepChanged(ssInstall)' , mbInformation, MB_OK);	
@@ -386,16 +512,19 @@ begin
  //  end;
   end;        
 
-
-	if  (CurStep=ssPostInstall) and (not CalledBySpp) then
+ 	if  (CurStep=ssPostInstall) and (not DldRestart) then
 	begin // Post install actions - check if vJoy is now installed
     Log('CurStepChanged(ssPostInstall)');
 		if IsVjoyInstalled then
-			MsgBox(InstallGood , mbInformation, MB_OK)
+			vJoyMsgBox(InstallGood , mbInformation, MB_OK)
 		else
-			MsgBox(InstallBad , mbError, MB_OK)
+     begin
+			vJoyMsgBox(InstallBad , mbError, MB_OK)
+      ExitProcess(EXIT_INSTALL_BAD);
+     end
 	end; // Post install actions
-end;
+  
+ end;
 
 (* Pre & Post-uninstall operations *)
 procedure CurUninstallStepChanged(CurUninstallStep: TUninstallStep);
@@ -423,19 +552,28 @@ var
   
 begin
 // Default
-NeedsRestart := False;
-DldRestart := False;
+  Log(' PrepareToInstall()');
+	NeedsRestart := False;
+	DldRestart := False;
+
 end;
 
 (*
   Called before every wizard page.
   Pages skipped if installer called with parameter PH2 
-*)
+
 function ShouldSkipPage(PageID: Integer): Boolean;
 begin
+  Log(' ShouldSkipPage() - Page ID:'  + IntToStr(PageID));
+  if (PageID = wpWelcome) then  Log(' ShouldSkipPage() - Page ID: wpWelcome');
+  if (PageID = wpSelectComponents) then  Log(' ShouldSkipPage() - Page ID: wpSelectComponents');
+  if (PageID = wpReady) then  Log(' ShouldSkipPage() - Page ID: wpReady');
+  if (PageID = wpInstalling) then  Log(' ShouldSkipPage() - Page ID: wpInstalling');
+  if (PageID = wpInfoAfter) then  Log(' ShouldSkipPage() - Page ID: wpInfoAfter');
+  if (PageID = wpFinished) then  Log(' ShouldSkipPage() - Page ID: wpFinished');
   Result := SkipToPh2;
 end;
-
+*)
 (*
   Set Testsigning mode On/Off acording to value of variable 'value'
   Executed only for x64 - else NOP (return FALSE)
@@ -548,7 +686,7 @@ begin
 	  RegWriteOrigTestMode(OrigTestMode);
 
   (* Write directory locations to the registry *)
-  RegWriteDllFolderLocation();
+  if not SkipToPh2 then  RegWriteDllFolderLocation();
 	  
 end;
 
@@ -646,7 +784,7 @@ begin
 	
 	if (OrigTestMode = false) and  IsTestMode then
 	begin // Test Mode Changed
-		ResetTestMode := MsgBox(TestModeChanged, mbConfirmation, MB_YESNO);
+		ResetTestMode := vJoyMsgBox(TestModeChanged, mbConfirmation, MB_YESNO);
 		if ResetTestMode = IDYES then
 		begin	// Reset Test Mode
 			SetTestModeOff();
@@ -753,11 +891,19 @@ var
   FileName : String ;
   ResultCode: Integer;
 begin
+
+  Log('InitFromRegistry() - Start');
   Result := FALSE;
 
   // Gets the file name - exit with FALSE if fails
   FileName :=  GetCommandlineParam(ParamInitReg);
-  if (Length(FileName) = 0 )   then exit;
+  if (Length(FileName) = 0 )   then 
+
+  // Command line does not specify a registry file
+  begin
+    FileName := vJoyInitFile;
+    Log('InitFromRegistry() - using the default registry file: ' + FileName);
+  end;
 
   // Merge file to registry
   if (not FileExists(ExpandConstant('{src}\'+FileName))) then
@@ -774,3 +920,63 @@ begin
         Log('InitFromRegistry(): Merging file  ' + FileName + ' into the registry - Failed');
 
 end;
+
+// Exec vJoyInstall with parameter Q for quiet installation
+// Returns TRUE if need to restart
+function Exec_vJoyInstall(): Boolean;
+var
+  TmpFileName, ExecStdout, msg: string;
+  ResultCode: Integer;
+  
+  Begin
+  Log('Exec_vJoyInstall() - Start');
+	begin 
+	TmpFileName := ExpandConstant('{app}') + '\vJoyInstall.exe';
+  if not FileExists(TmpFileName) then   Log('Exec_vJoyInstall() - file ' + TmpFileName + 'was not found');
+
+  // Executing   vJoyInstall.exe Q
+	if Exec(TmpFileName, 'Q', '',  SW_HIDE, ewWaitUntilTerminated, ResultCode) then
+	begin (* handle success if necessary; ResultCode contains the exit code *)
+    msg:= 'vJoyInstall.exe Was executed. Result code: ' +  IntToStr(ResultCode);
+		Log(msg);
+	end
+	else begin
+		Log('vJoyInstall.exe Was NOT executed');
+    Result := false;
+    exit;
+	end;
+
+  // Test if need reboot
+  // Later replace with RunOnce
+  if ResultCode=-8  then 
+  begin
+    Log('vJoyInstall.exe reported that it needs reboot');
+    Result := true;
+    Exit;
+   end
+   else
+    Log('vJoyInstall.exe reported that it does not need reboot');
+    Result := false;
+    Exit;
+   end;
+end;
+
+// Prepare for Ph2 after restart
+// Write to RunOnce registry entry
+procedure PreparePh2;
+begin
+  Log('PreparePh2() - Start');
+  RegWriteStringValue(HKEY_LOCAL_MACHINE, RunOnceKey, 'vJoy Installer Phase 2', expandconstant('{srcexe}')+' '+ Ph2Param)
+end;
+
+
+function NeedRestart(): Boolean;
+begin
+  Log('NeedRestart() - Start');
+
+  if not SkipToPh2  then InitFromRegistry;
+  DldRestart   := Exec_vJoyInstall;
+  if   DldRestart then  PreparePh2;
+	Result       := DldRestart;
+end;
+
