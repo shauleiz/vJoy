@@ -93,7 +93,7 @@ Return Value:
     // Initialize WPP Tracing
     //
     WPP_INIT_TRACING( DriverObject, RegistryPath );
-    TraceEvents(TRACE_LEVEL_INFORMATION, DBG_INIT, "vJoy Driver Built %s %s\n", __DATE__, __TIME__);
+    // TraceEvents(TRACE_LEVEL_INFORMATION, DBG_INIT, "vJoy Driver Built %s %s\n", __DATE__, __TIME__);
 	// KdBreakPoint(); Break at the entry point to the driver
 
     // Since there is only one control-device for all the instances
@@ -200,20 +200,20 @@ Return Value:
     WDFDEVICE                     hDevice;
     PDEVICE_EXTENSION             devContext = NULL;
     WDFQUEUE                      queue;
-    WDF_PNPPOWER_EVENT_CALLBACKS  pnpPowerCallbacks;
+	//WDF_PNPPOWER_EVENT_CALLBACKS  pnpPowerCallbacks;
     WDF_TIMER_CONFIG              timerConfig;
 	DECLARE_CONST_UNICODE_STRING(CompatId, COMPATIBLE_DEVICE_ID);
 	DECLARE_CONST_UNICODE_STRING(DeviceId, VJOY_DEVICE_ID);
 	DECLARE_CONST_UNICODE_STRING(InstanceId, VJOY_INSTANCE_ID);
-	WDFSTRING  stringHandle = NULL;
-	UNICODE_STRING uStr;
-	TCHAR						DeviceName[100];
+	//WDFSTRING  stringHandle = NULL;
+	//UNICODE_STRING uStr;
+	//TCHAR						DeviceName[100];
 	LONG						SerialNumber=-1;
 	PDEVICE_OBJECT				fdoDeviceObject=NULL;
 	WDF_IO_TARGET_OPEN_PARAMS	openParams;
 	WDFIOTARGET					ioTarget;
 	PFFB_QUEUE_EXTENSION		queueContext = NULL;
-	size_t 						i; 
+	int 						i; 
 
     UNREFERENCED_PARAMETER(Driver);
 
@@ -576,7 +576,7 @@ vJoyCompleteWriteReport(
 	
 	WDF_REQUEST_PARAMETERS_INIT(&Parameters);
 	WdfRequestGetParameters(request, &Parameters);
-	bytesToCopy = Parameters.Parameters.DeviceIoControl.InputBufferLength;
+	bytesToCopy = (ULONG)Parameters.Parameters.DeviceIoControl.InputBufferLength;
 
 	transferPacket = (PHID_XFER_PACKET) WdfRequestWdmGetIrp(request)->UserBuffer;
 
@@ -619,7 +619,7 @@ vJoyWriteReport(
 {
 	PDEVICE_EXTENSION   pDevContext = NULL;
     NTSTATUS            status = STATUS_SUCCESS;
-	WDFQUEUE			WriteQueue = NULL;
+	//WDFQUEUE			WriteQueue = NULL;
 	PHID_XFER_PACKET	transferPacket = NULL;
 	WDFREQUEST			FfbRequest = NULL;
 	PVOID				ForceFeedbackBuffer = NULL;
@@ -685,14 +685,14 @@ Return Value:
     WDFREQUEST           request;
     PDEVICE_EXTENSION    pDevContext = NULL;
     size_t               bytesReturned = 0;
-    UCHAR                toggledSwitch = 0;
+    //UCHAR                toggledSwitch = 0;
     ULONG                bytesToCopy = 0;
     PHID_INPUT_REPORT_V2 HidReport = NULL;
 	
-	WDFMEMORY           memory;
-	size_t				NumBytesTransferred;
-	PUCHAR				switchState = NULL;
-	UCHAR				eb;
+	//WDFMEMORY           memory;
+	//size_t				NumBytesTransferred;
+	//PUCHAR				switchState = NULL;
+	//UCHAR				eb;
 
     pDevContext = GetDeviceContext(Device);
 	// Check if the requested report is valid. If not just return
@@ -767,6 +767,7 @@ vJoyGetPositionData(
 {
 			int i;
 			LONGLONG timeout = 0;
+			UNREFERENCED_PARAMETER(size);
 
 			// If id is out of range then assume id is 1
 			if (id > MAX_N_DEVICES || id <1)
@@ -993,7 +994,7 @@ NTSTATUS GetHwKeySerialNumber(PWDFDEVICE_INIT  DeviceInit, PLONG SerialNumber)
 	NTSTATUS				status = STATUS_SUCCESS;
 	WCHAR					HwKeyName[260];
 	PWSTR					leaf;
-	LONG					out;
+	ULONG					out;
 	UNICODE_STRING			usLeaf;
 
 	// Get the name of the HW key
@@ -1046,7 +1047,7 @@ VOID LogEvent(NTSTATUS code, PWSTR msg, PVOID pObj)
 	USHORT DumpDataSize = 0;
 	ULONG packetlen = sizeof(IO_ERROR_LOG_PACKET) + DumpDataSize;
 	if (msg)
-		packetlen += (wcslen(msg) + 1) * sizeof(WCHAR);
+		packetlen += (ULONG)((wcslen(msg) + 1) * sizeof(WCHAR));
 
 	if (packetlen > ERROR_LOG_MAXIMUM_SIZE)
 		return;
@@ -1084,9 +1085,9 @@ VOID LogEventWithStatus(NTSTATUS code, PWSTR msg, PVOID pObj, NTSTATUS stat)
 
 	RtlStringCchPrintfW((NTSTRSAFE_PWSTR)strStat, 12,  L"0x%08x", stat);
 
-	packetlen = sizeof(IO_ERROR_LOG_PACKET) + DumpDataSize + (wcslen(strStat) + 1) * sizeof(WCHAR);
+	packetlen = (ULONG)(sizeof(IO_ERROR_LOG_PACKET) + DumpDataSize + (wcslen(strStat) + 1) * sizeof(WCHAR));
 	if (msg)
-		packetlen += (wcslen(msg) + 1) * sizeof(WCHAR);
+		packetlen += (ULONG)((wcslen(msg) + 1) * sizeof(WCHAR));
 
 	if (packetlen > ERROR_LOG_MAXIMUM_SIZE)
 		return;
