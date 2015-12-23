@@ -48,7 +48,7 @@ typedef BOOL (WINAPI *SetupUninstallOEMInfProto)(__in LPCTSTR InfFileName,
 
 
 
-enum VERBTYPE {INSTALL, REMOVE, REPAIR, CLEAN, INVALID};
+enum VERBTYPE {INSTALL, REMOVE, REPAIR, CLEAN, QUIET_I, INVALID};
 
 
 // Function Prototypes
@@ -56,9 +56,9 @@ BOOL GetParentDevInst(TCHAR * ParentDeviceNode, TCHAR * CompatibleId, DEVINST * 
 BOOL AssignCompatibleId(TCHAR * CompatibleId, DEVINST  * pdnDevInst, BOOL First);
 int AssignAllCompatibleId(TCHAR * ParentDeviceNode, TCHAR * CompatibleId);
 int cmdUpdateNI( __in DWORD Flags, LPCTSTR inf, LPCTSTR hwid );
-int cmdUpdate( __in DWORD Flags, LPCTSTR inf, LPCTSTR hwid );
+int cmdUpdate( __in DWORD Flags, LPCTSTR inf, LPCTSTR hwid, BOOL quiet);
 int InstallDriverOnDevice( TCHAR *InstanceId, LPCTSTR inf);
-BOOL Install(LPCTSTR inf, LPCTSTR hwid, TCHAR *InstanceId);
+UINT Install(LPCTSTR inf, LPCTSTR hwid, TCHAR *InstanceId, BOOL quiet);
 BOOL FindInstalled(LPCTSTR hwid, TCHAR *InstanceId);
 BOOL EnableInstalled(LPCTSTR hwid, TCHAR *InstanceId);
 BOOL DisableInstalled(LPCTSTR hwid, TCHAR *InstanceId);
@@ -84,7 +84,7 @@ BOOL Enable(USHORT Revision);
 BOOL Disable(USHORT Revision);
 
 // Major functions 
-int Installation(LPCTSTR DeviceHWID, TCHAR * InfFile);
+int Installation(LPCTSTR DeviceHWID, TCHAR * InfFile, BOOL quiet);
 int Removal(TCHAR * DeviceHWID, TCHAR * InfFile, BOOL DelInf);
 int Repair(TCHAR * DeviceHWID, TCHAR * InfFile);
 

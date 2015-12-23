@@ -48,7 +48,7 @@ BOOL WINAPI  get_dev_hwid(TCHAR * DeviceHWID)
 
 int WINAPI  installation(TCHAR * DeviceHWID, TCHAR * InfFile)
 {
-	return Installation(DeviceHWID, InfFile);
+	return Installation(DeviceHWID, InfFile, FALSE);
 }
 
 int WINAPI  removal(TCHAR * DeviceHWID, TCHAR * InfFile, BOOL DelInf)
