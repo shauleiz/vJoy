@@ -75,29 +75,29 @@ Return Value:
 --*/
 {
     NTSTATUS status = STATUS_SUCCESS;
-    WDFDEVICE parent;
-    WDF_REQUEST_FORWARD_OPTIONS forwardOptions;
+    //WDFDEVICE parent;
+    //WDF_REQUEST_FORWARD_OPTIONS forwardOptions;
     PDEVICE_EXTENSION    pDevContext = NULL;
-	WDFMEMORY  inMemory, outMemory;
+	//WDFMEMORY  inMemory, outMemory;
     PVOID  buffer;
     size_t  bufSize;
     WDFDEVICE            hRawDevice = WdfIoQueueGetDevice(Queue);
 	PRPDO_DEVICE_DATA pdoData = PdoGetData(hRawDevice);
-	WDF_REQUEST_SEND_OPTIONS RequestOptions;
-	WDFIOTARGET TargetOnParent;
+	//WDF_REQUEST_SEND_OPTIONS RequestOptions;
+	//WDFIOTARGET TargetOnParent;
 
 	JOYSTICK_POSITION_V2 * iReport;
 	WDFFILEOBJECT FileObj;
 	USHORT id=0;
 	PFILEOBJECT_EXTENSION pExtension=NULL;
 
-    WDFREQUEST				requestForceFeedback;
-	PHID_XFER_PACKET		transferPacket = NULL;
-	PVOID					ForceFeedbackBuffer = NULL;
+    //WDFREQUEST				requestForceFeedback;
+	//PHID_XFER_PACKET		transferPacket = NULL;
+	//PVOID					ForceFeedbackBuffer = NULL;
 	PVOID					GenBuffer = NULL;
 	size_t					bytesReturned = 0;
 	WDF_REQUEST_PARAMETERS	Params;
-	BOOLEAN					FfbStat = FALSE;
+	//BOOLEAN					FfbStat = FALSE;
 	ULONG					bytesToCopy = 0;
 	BYTE					Byte_tmp;
 
@@ -132,7 +132,7 @@ Return Value:
 		// Get the data from the request
 		WDF_REQUEST_PARAMETERS_INIT(&Params);
 		WdfRequestGetParameters(Request, &Params);
-		bytesToCopy = Params.Parameters.DeviceIoControl.OutputBufferLength;
+		bytesToCopy = (ULONG)Params.Parameters.DeviceIoControl.OutputBufferLength;
 		if (bytesToCopy<5)
 		{
 			TraceEvents(TRACE_LEVEL_ERROR, DBG_INIT, "vJoy_EvtIoDeviceControlForRawPdo[GET_DEV_STAT]: failed - bytesToCopy=%d\n", bytesToCopy);
@@ -217,7 +217,7 @@ Return Value:
 		WdfRequestGetParameters(Request, &Params);
 
 		// Number of bytes to copy must be at least one byte
-		bytesToCopy = Params.Parameters.DeviceIoControl.OutputBufferLength;
+		bytesToCopy = (ULONG)Params.Parameters.DeviceIoControl.OutputBufferLength;
 		if (bytesToCopy <1 )
 		{
 			TraceEvents(TRACE_LEVEL_ERROR, DBG_INIT, "vJoy_EvtIoDeviceControlForRawPdo: [GET_DRV_INFO] - bytesToCopy <1\n");
@@ -291,7 +291,7 @@ Return Value:
 		// Get the data from the request
 		WDF_REQUEST_PARAMETERS_INIT(&Params);
 		WdfRequestGetParameters(Request, &Params);
-		bytesToCopy = Params.Parameters.DeviceIoControl.OutputBufferLength;
+		bytesToCopy = (ULONG)Params.Parameters.DeviceIoControl.OutputBufferLength;
 		if (bytesToCopy<6)
 		{
 			WdfRequestComplete(Request, STATUS_NO_SUCH_DEVICE);
@@ -369,7 +369,7 @@ Return Value:
 		// Get the data from the request
 		WDF_REQUEST_PARAMETERS_INIT(&Params);
 		WdfRequestGetParameters(Request, &Params);
-		bytesToCopy = Params.Parameters.DeviceIoControl.OutputBufferLength;
+		bytesToCopy = (ULONG)Params.Parameters.DeviceIoControl.OutputBufferLength;
 		status = WdfRequestRetrieveOutputBuffer(Request, bytesToCopy, &GenBuffer, &bytesReturned);
 		if (!bytesReturned)
 		{
@@ -452,7 +452,7 @@ Return Value:
 		// Get the data from the request
 		WDF_REQUEST_PARAMETERS_INIT(&Params);
 		WdfRequestGetParameters(Request, &Params);
-		bytesToCopy = Params.Parameters.DeviceIoControl.OutputBufferLength;
+		bytesToCopy = (ULONG)Params.Parameters.DeviceIoControl.OutputBufferLength;
 		TraceEvents(TRACE_LEVEL_INFORMATION, DBG_INIT, "vJoy_EvtIoDeviceControlForRawPdo: bytesToCopy=%d\n", bytesToCopy);
 		if (bytesToCopy<1)
 		{
@@ -487,7 +487,7 @@ Return Value:
 		// Get the data from the request
 		WDF_REQUEST_PARAMETERS_INIT(&Params);
 		WdfRequestGetParameters(Request, &Params);
-		bytesToCopy = Params.Parameters.DeviceIoControl.OutputBufferLength;
+		bytesToCopy = (ULONG)Params.Parameters.DeviceIoControl.OutputBufferLength;
 		TraceEvents(TRACE_LEVEL_INFORMATION, DBG_INIT, "vJoy_EvtIoDeviceControlForRawPdo: bytesToCopy=%d\n", bytesToCopy);
 		if (bytesToCopy<1)
 		{
@@ -519,7 +519,7 @@ Return Value:
 		// Get the data from the request (Bytes to copy)
 		WDF_REQUEST_PARAMETERS_INIT(&Params);
 		WdfRequestGetParameters(Request, &Params);
-		bytesToCopy = Params.Parameters.DeviceIoControl.OutputBufferLength;
+		bytesToCopy = (ULONG)Params.Parameters.DeviceIoControl.OutputBufferLength;
 		TraceEvents(TRACE_LEVEL_INFORMATION, DBG_INIT, "vJoy_EvtIoDeviceControlForRawPdo: bytesToCopy=%d\n", bytesToCopy);
 		if (bytesToCopy<1)
 		{
@@ -613,10 +613,10 @@ Return Value:
     DECLARE_UNICODE_STRING_SIZE(buffer, MAX_ID_LEN);
 	PDEVICE_OBJECT				ChildDeviceObject;
 	PDEVICE_OBJECT				ParentDeviceObject;
-	DECLARE_CONST_UNICODE_STRING(
-		SDDL_DEVOBJ_SYS_ALL_ADM_RWX_WORLD_R_RES_R,
-		L"D:P(A;;GA;;;SY)(A;;GRGWGX;;;BA)(A;;GR;;;WD)(A;;GR;;;RC)"
-		);
+	//DECLARE_CONST_UNICODE_STRING(
+	//	SDDL_DEVOBJ_SYS_ALL_ADM_RWX_WORLD_R_RES_R,
+	//	L"D:P(A;;GA;;;SY)(A;;GRGWGX;;;BA)(A;;GR;;;WD)(A;;GR;;;RC)"
+	//	);
 	DECLARE_CONST_UNICODE_STRING(
 		SDDL_DEVOBJ_SYS_ALL_ADM_RWX_WORLD_RWX_RES_R,
 		L"D:P(A;;GA;;;SY)(A;;GRGWGX;;;BA)(A;;GRGWGX;;;WD)(A;;GR;;;RC)"
@@ -912,6 +912,7 @@ rawEvtCleanupCallback(
     IN WDFDEVICE Device
     )
 {
+	UNREFERENCED_PARAMETER(Device);
 	//NTSTATUS status;
 
 	//status = WdfPdoMarkMissing(Device);
@@ -1083,7 +1084,7 @@ VOID FfbActiveSet(
 	)
 {
 
-	size_t szarry, szelement;
+	int szarry, szelement;
 	int sz;
 
 	// Check id
@@ -1130,7 +1131,7 @@ BOOLEAN FfbActiveGet(
 	PDEVICE_EXTENSION    pDevContext
 	)
 {
-	size_t szarry, szelement;
+	int szarry, szelement;
 	int sz;
 
 	// Check id

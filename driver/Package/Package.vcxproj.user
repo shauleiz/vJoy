@@ -1,0 +1,35 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM64'">
+    <SignMode>ProductionSign</SignMode>
+    <ProductionCertificate>CN=Shaul Eizikovich, O=Shaul Eizikovich, L=Hod HaSharon, S=Tel Aviv, C=IL | 6D5471DF6BBFAFA5D5900C88C08DF0E9C513690A</ProductionCertificate>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|ARM64'">
+    <SignMode>ProductionSign</SignMode>
+    <ProductionCertificate>CN=Shaul Eizikovich, O=Shaul Eizikovich, L=Hod HaSharon, S=Tel Aviv, C=IL | 6D5471DF6BBFAFA5D5900C88C08DF0E9C513690A</ProductionCertificate>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <SignMode>ProductionSign</SignMode>
+    <ProductionCertificate>CN=Shaul Eizikovich, O=Shaul Eizikovich, L=Hod HaSharon, S=Tel Aviv, C=IL | 6D5471DF6BBFAFA5D5900C88C08DF0E9C513690A</ProductionCertificate>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <SignMode>ProductionSign</SignMode>
+    <ProductionCertificate>CN=Shaul Eizikovich, O=Shaul Eizikovich, L=Hod HaSharon, S=Tel Aviv, C=IL | 6D5471DF6BBFAFA5D5900C88C08DF0E9C513690A</ProductionCertificate>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">
+    <SignMode>ProductionSign</SignMode>
+    <ProductionCertificate>CN=Shaul Eizikovich, O=Shaul Eizikovich, L=Hod HaSharon, S=Tel Aviv, C=IL | 6D5471DF6BBFAFA5D5900C88C08DF0E9C513690A</ProductionCertificate>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">
+    <SignMode>ProductionSign</SignMode>
+    <ProductionCertificate>CN=Shaul Eizikovich, O=Shaul Eizikovich, L=Hod HaSharon, S=Tel Aviv, C=IL | 6D5471DF6BBFAFA5D5900C88C08DF0E9C513690A</ProductionCertificate>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <SignMode>ProductionSign</SignMode>
+    <ProductionCertificate>CN=Shaul Eizikovich, O=Shaul Eizikovich, L=Hod HaSharon, S=Tel Aviv, C=IL | 6D5471DF6BBFAFA5D5900C88C08DF0E9C513690A</ProductionCertificate>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <SignMode>ProductionSign</SignMode>
+    <ProductionCertificate>CN=Shaul Eizikovich, O=Shaul Eizikovich, L=Hod HaSharon, S=Tel Aviv, C=IL | 6D5471DF6BBFAFA5D5900C88C08DF0E9C513690A</ProductionCertificate>
+  </PropertyGroup>
+</Project>

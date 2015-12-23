@@ -1,4 +1,27 @@
+################################################################################
+# This .gitignore file was automatically created by Microsoft(R) Visual Studio.
+################################################################################
+
 *.sdf
-.vs/
 *.log
+*.opensdf
+*.lastbuildstate
+*.obj
 *.tlog
+*.pdb
+*.idb
+*.pch
+*.cd
+*.suo
+
+/apps/vJoyFeeder/vJoyFeeder01.vcxproj
+
+# Folders
+win32/
+x64/
+release/
+debug/
+vlwciwos.lhj.txt
+ipch/
+.vs/
+

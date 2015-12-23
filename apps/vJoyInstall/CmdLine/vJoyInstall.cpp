@@ -1,24 +1,25 @@
 // vJoyInstall.cpp : Defines the entry point for the console application.
 //
 
-#include "stdafx.h"
-#include "vJoyInstall.h"
+#include "..\stdafx.h"
+#include "..\vJoyInstall.h"
 
 // Global
-FILE *stream=NULL;
+/**/extern FILE *stream;
 
 
 int
 __cdecl
 _tmain(__in int argc, __in PZPWSTR argv)
 {
-	BOOL	rDi;
-	TCHAR InstanceId[MAX_DEVICE_ID_LEN];
+	//BOOL	rDi;
+	//TCHAR InstanceId[MAX_DEVICE_ID_LEN];
 	GUID ClassGUID = GUID_NULL;
-	TCHAR InfPath[MAX_PATH];
+	//TCHAR InfPath[MAX_PATH];
 	TCHAR DeviceHWID[MAX_PATH];
 	VERBTYPE verb;
 	TCHAR InfFile[MAX_PATH];
+	stream = NULL;
 
 	////////////////////////////////////////////////////
 	/// Parse Command line
@@ -39,8 +40,15 @@ _tmain(__in int argc, __in PZPWSTR argv)
 	////////////////////////////////////////////////////
 
 	////////////////////////////////////////////////////
+	// Open file for writing.
+
 	// Open logfile. If unable then steam log to console
-	stream = _tfopen( INSTALL_LOG, "a+" );
+	errno_t err;
+	err = _tfopen_s(&stream, INSTALL_LOG, "a+");
+	if (err)
+		return -8;
+
+	//stream = _tfopen( INSTALL_LOG, "a+" );
 	if (!stream)
 	{
 		_ftprintf(stdout, ">> main: Cannot open log file %s \n", INSTALL_LOG);
@@ -73,7 +81,4 @@ Syntax:	vJoyInstall [I|U|C|R]\n\
 	R: Refresh (Uninstall then Install)");
 		return -9;
 	};
-
-
-	return 0;
 }

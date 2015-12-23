@@ -27,6 +27,7 @@ STRINGTABLE
     IDS_ERR_NOGUI                 "Error: Graphical User Interface configuration application was not found in this directory."
     IDS_ERR_32ON64                "Error: You are running a 32 bit application on a 64 bit computer."
     IDS_ERR_64ON32                "Error: You are running a 64 bit application on a 32 bit computer."
+	IDS_ERR_ENABLE				  "Error: Incorrect parameter %s, Use flag '-h' to get help"
 }
 
 //

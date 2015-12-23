@@ -96,6 +96,6 @@ VERBTYPE GetVerb(int argc, PZPWSTR argv);
 BOOL GetInfFile(int argc, PZPWSTR argv, TCHAR * InfFile);
 BOOL GetDevHwId(int argc, PZPWSTR argv, TCHAR * DeviceHWID);
 void PrintHeader(FILE * dst);
-BOOL StatusMessageToStream(void * reserved, TCHAR * buffer, ERRLEVEL level);
+BOOL WINAPI StatusMessageToStream(void * reserved, char * buffer, ERRLEVEL level);
 BOOL GetOEMInfFileName( HDEVINFO DeviceInfoSet, SP_DEVINFO_DATA DeviceInfoData, TCHAR * OEMInfFileName);
 BOOL RemoveRevStr(LPCTSTR DeviceHWID, LPTSTR DeviceHWID_NoRev);

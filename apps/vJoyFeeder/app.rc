@@ -7,7 +7,7 @@
 #include <richedit.h>
 #include "resource.h"
 #include "..\..\inc\public.h"
-#include "svn_version.h"
+//#include "svn_version.h"
 
 
 
@@ -42,7 +42,7 @@ IDI_ICON1          ICON           ".\\Joystick-Feeder-icon.ico"
 #define FILEDESC_STR				FILEDESC_STR1 " [" BITNESS_STR CONF_STR "]"
 
 VS_VERSION_INFO VERSIONINFO
-FILEVERSION VER_H_, VER_M_, VER_L_, SVN_REVISION
+FILEVERSION VER_H_, VER_M_, VER_L_, 999
  PRODUCTVERSION 6,3,9600,17298
  FILEFLAGSMASK 0x3fL
 #ifdef _DEBUG
