@@ -961,7 +961,7 @@ Return Value:
 
     //DECLARE_CONST_UNICODE_STRING(ntDeviceName, NTDEVICE_NAME_STRING) ;
     //DECLARE_CONST_UNICODE_STRING(symbolicLinkName, SYMBOLIC_NAME_STRING) ;
-    DECLARE_CONST_UNICODE_STRING(SDDL_DEVOBJ_SYS_ALL_ADM_RWX_WORLD_RW_RES_R, L"D:P(A;;GA;;;SY)(A;;GRGWGX;;;BA)(A;;GRGW;;;WD)(A;;GR;;;RC)");
+    DECLARE_CONST_UNICODE_STRING(__SDDL_DEVOBJ_SYS_ALL_ADM_RWX_WORLD_RW_RES_R, L"D:P(A;;GA;;;SY)(A;;GRGWGX;;;BA)(A;;GRGW;;;WD)(A;;GR;;;RC)");
 
     PAGED_CODE();
     TraceEvents(TRACE_LEVEL_INFORMATION, DBG_INIT, "Entering vJoyCreateControlDevice\n");
@@ -996,7 +996,7 @@ Return Value:
         
 
     TraceEvents(TRACE_LEVEL_INFORMATION, DBG_INIT, "vJoyCreateControlDevice: Calling WdfControlDeviceInitAllocate\n");
-    pInit = WdfControlDeviceInitAllocate( WdfDeviceGetDriver(Device), &SDDL_DEVOBJ_SYS_ALL_ADM_RWX_WORLD_RW_RES_R);
+    pInit = WdfControlDeviceInitAllocate( WdfDeviceGetDriver(Device), &__SDDL_DEVOBJ_SYS_ALL_ADM_RWX_WORLD_RW_RES_R);
 
     if (pInit == NULL) {
         status = STATUS_INSUFFICIENT_RESOURCES;
@@ -1151,7 +1151,7 @@ Return Value:
 
 VOID
 vJoyEvtDeviceContextCleanup(
-    IN WDFDEVICE Device
+    IN WDFOBJECT Device
     )
 /*++
 
@@ -1172,22 +1172,23 @@ Return Value:
 
 --*/
 {
-    ULONG   count;
-    PDEVICE_EXTENSION             devContext = NULL;
+ // 	_IRQL_requires_max_(DISPATCH_LEVEL);
+	PAGED_CODE();
 
-    PAGED_CODE();
+   int   nDevices = 0;
+    PDEVICE_EXTENSION             devContext = NULL;
 
     TraceEvents(TRACE_LEVEL_INFORMATION, DBG_INIT, "Entered FilterEvtDeviceContextCleanup\n");
 
-    count = DeviceCount(TRUE, -1); // Decrementing device count
-    TraceEvents(TRACE_LEVEL_INFORMATION, DBG_INIT, "Device Count before decrementing is %d\n", count);
+    nDevices = DeviceCount(TRUE, -1); // Decrementing device count
+    TraceEvents(TRACE_LEVEL_INFORMATION, DBG_INIT, "Device Count before decrementing is %d\n", nDevices);
     TraceEvents(TRACE_LEVEL_INFORMATION, DBG_INIT, "Device Count after decrementing is %d\n", DeviceCount(TRUE, 0));
 
     WdfWaitLockAcquire(vJoyDeviceCollectionLock, NULL);
 
-    count = WdfCollectionGetCount(vJoyDeviceCollection);
+    nDevices = WdfCollectionGetCount(vJoyDeviceCollection);
 
-    if(count == 1)
+    if(nDevices == 1)
     {
          //
          // We are the last instance. So let us delete the control-device
@@ -1837,6 +1838,8 @@ void InitializeDefaultDev(PDEVICE_EXTENSION   devContext)
 
     // Copy HID Report Descriptor
     devContext->ReportDescriptor = ExAllocatePoolWithTag(PagedPool, sizeof(G_DefaultReportDescriptor),MEM_TAG_HIDRPRT);
+	if (!devContext->ReportDescriptor)
+		return;
     RtlCopyMemory(devContext->ReportDescriptor, G_DefaultReportDescriptor, sizeof(G_DefaultReportDescriptor));
 
     // Init HID Descriptor
@@ -2197,82 +2200,85 @@ VOID FfbTransferData(
 
 
     ///////////  Loop ///////////////////////////////////////
-    do{
-    // Get a Write request
-    status = WdfIoQueueRetrieveNextRequest(devContext->FfbWriteQ[id-1], &WriteRequest);
-    if (!NT_SUCCESS(status))
-        return;
+	do {
+		// Get a Write request
+		status = WdfIoQueueRetrieveNextRequest(devContext->FfbWriteQ[id - 1], &WriteRequest);
+		if (!NT_SUCCESS(status))
+			return;
 
-    // Get data from the Write request
-    transferPacket = (PHID_XFER_PACKET) WdfRequestWdmGetIrp(WriteRequest)->UserBuffer;
-    if (!transferPacket)
-        return;
+		// Get data from the Write request
+		transferPacket = (PHID_XFER_PACKET)WdfRequestWdmGetIrp(WriteRequest)->UserBuffer;
+		if (!transferPacket)
+			return;
 
-    // Get the command from the Write request
-    WDF_REQUEST_PARAMETERS_INIT(&Params);
-    WdfRequestGetParameters(WriteRequest, &Params);
-    Cmd = Params.Parameters.DeviceIoControl. IoControlCode;
+		// Get the command from the Write request
+		WDF_REQUEST_PARAMETERS_INIT(&Params);
+		WdfRequestGetParameters(WriteRequest, &Params);
+		Cmd = Params.Parameters.DeviceIoControl.IoControlCode;
 
-    // Calculate the size of the Read data packet
-    DataSize += sizeof(ULONG);						// Size of packet
-    DataSize += sizeof(ULONG);						// Cmd
-    DataSize += transferPacket->reportBufferLen;	// Raw data (First byte is report ID)
+		// Calculate the size of the Read data packet
+		DataSize += sizeof(ULONG);						// Size of packet
+		DataSize += sizeof(ULONG);						// Cmd
+		DataSize += transferPacket->reportBufferLen;	// Raw data (First byte is report ID)
 
-    // Get the Read request
-    status = WdfIoQueueRetrieveNextRequest(devContext->FfbReadQ[id-1], &ReadRequest);
-    if (!NT_SUCCESS(status))
-    {
-        WdfRequestComplete(WriteRequest, status);
-        return;
-    };
+		// Get the Read request
+		status = WdfIoQueueRetrieveNextRequest(devContext->FfbReadQ[id - 1], &ReadRequest);
+		if (!NT_SUCCESS(status))
+		{
+			WdfRequestComplete(WriteRequest, status);
+			return;
+		};
 
-    // Calculate size of Read data
-    WDF_REQUEST_PARAMETERS_INIT(&Params);
-    WdfRequestGetParameters(ReadRequest, &Params);
-    bytesToCopy = (unsigned int)Params.Parameters.DeviceIoControl.OutputBufferLength;
-    if (bytesToCopy<DataSize)
-    {
-        status = STATUS_BUFFER_TOO_SMALL;
-        WdfRequestComplete(WriteRequest, status);
-        WdfRequestComplete(ReadRequest, status);
-        return;
-    };
+		// Calculate size of Read data
+		WDF_REQUEST_PARAMETERS_INIT(&Params);
+		WdfRequestGetParameters(ReadRequest, &Params);
+		bytesToCopy = (unsigned int)Params.Parameters.DeviceIoControl.OutputBufferLength;
+		if (bytesToCopy < DataSize)
+		{
+			status = STATUS_BUFFER_TOO_SMALL;
+			WdfRequestComplete(WriteRequest, status);
+			WdfRequestComplete(ReadRequest, status);
+			return;
+		};
 
-    // Get Read request output buffer
-    status = WdfRequestRetrieveOutputBuffer(ReadRequest, bytesToCopy, (PVOID)&ReadBuffer, &bytesReturned);
-    if (!NT_SUCCESS(status))
-    {
-        WdfRequestComplete(WriteRequest, status);
-        WdfRequestComplete(ReadRequest, status);
-        return;
-    };
+		// Get Read request output buffer
+		status = WdfRequestRetrieveOutputBuffer(ReadRequest, bytesToCopy, (PVOID)&ReadBuffer, &bytesReturned);
+		if (!NT_SUCCESS(status))
+		{
+			WdfRequestComplete(WriteRequest, status);
+			WdfRequestComplete(ReadRequest, status);
+			return;
+		};
 
-    // Copy data to Read request output buffer
-    memcpy(&(ReadBuffer[0]), &DataSize,  sizeof(ULONG));
-    memcpy(&(ReadBuffer[sizeof(ULONG)]), &Cmd,  sizeof(ULONG));
-    memcpy(&(ReadBuffer[2*sizeof(ULONG)]), transferPacket->reportBuffer,  transferPacket->reportBufferLen);
+		// Copy data to Read request output buffer
+		if (bytesReturned >= 4)
+		{
+			memcpy(&(ReadBuffer[0]), &DataSize, sizeof(ULONG));
+			memcpy(&(ReadBuffer[sizeof(ULONG)]), &Cmd, sizeof(ULONG));
+			memcpy(&(ReadBuffer[2 * sizeof(ULONG)]), transferPacket->reportBuffer, transferPacket->reportBufferLen);
+		};
 
-    // Complete Read request
-    WdfRequestCompleteWithInformation(ReadRequest, status, bytesReturned);
+		// Complete Read request
+		WdfRequestCompleteWithInformation(ReadRequest, status, bytesReturned);
 
 
-    // Complete Write Request
-    WdfRequestCompleteWithInformation(WriteRequest, status, transferPacket->reportBufferLen);
+		// Complete Write Request
+		WdfRequestCompleteWithInformation(WriteRequest, status, transferPacket->reportBufferLen);
 
-    // Ready to next transfer?
-    WdfIoQueueGetState(devContext->FfbReadQ[id-1],&QueueRequests, NULL);
-    if (QueueRequests)
-        ReadQueueReady = TRUE;
-    else
-        ReadQueueReady = FALSE;
-    WdfIoQueueGetState(devContext->FfbWriteQ[id-1], &QueueRequests, NULL);
-    if (QueueRequests)
-        WriteQueueReady = TRUE;
-    else
-        WriteQueueReady = FALSE;
-    DataExist = ReadQueueReady && WriteQueueReady;
+		// Ready to next transfer?
+		WdfIoQueueGetState(devContext->FfbReadQ[id - 1], &QueueRequests, NULL);
+		if (QueueRequests)
+			ReadQueueReady = TRUE;
+		else
+			ReadQueueReady = FALSE;
+		WdfIoQueueGetState(devContext->FfbWriteQ[id - 1], &QueueRequests, NULL);
+		if (QueueRequests)
+			WriteQueueReady = TRUE;
+		else
+			WriteQueueReady = FALSE;
+		DataExist = ReadQueueReady && WriteQueueReady;
 
-    } while (DataExist);
+	} while (DataExist);
     ///////////  Loop ///////////////////////////////////////
 }
 

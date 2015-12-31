@@ -913,6 +913,7 @@ rawEvtCleanupCallback(
     )
 {
 	UNREFERENCED_PARAMETER(Device);
+	PAGED_CODE();
 	//NTSTATUS status;
 
 	//status = WdfPdoMarkMissing(Device);
@@ -929,7 +930,7 @@ VOID vJoy_EvtDeviceFileCreate(
 		PCUNICODE_STRING pName;
 		UNICODE_STRING TmpUstr;
 		NTSTATUS status = STATUS_SUCCESS;
-		int  id=0;
+		ULONG  id=0;
 		WCHAR RefStr[100];
 		PFILEOBJECT_EXTENSION pExtension=NULL;
 		PDEVICE_EXTENSION    pDevContext = NULL;
@@ -1060,14 +1061,21 @@ VOID vJoy_EvtFileCleanup(
 			pExtension->CallingProcessId = 0;
 
 		// Get the parent device context
-		pParentRawDeviceContext = pExtension->pParentRawDeviceContext;
-		if (!pParentRawDeviceContext)
-			return;
-		pDevContext = GetDeviceContext(pParentRawDeviceContext->hParentDevice);
-		if (!pDevContext)
-			return;
+		if (pExtension)
+		{
+			pParentRawDeviceContext = pExtension->pParentRawDeviceContext;
+			if (!pParentRawDeviceContext)
+				return;
+		};
+		
+		if (pParentRawDeviceContext) {
+			pDevContext = GetDeviceContext(pParentRawDeviceContext->hParentDevice);
+			if (!pDevContext)
+				return;
+		};
+		
 
-		if ( pExtension->id)
+		if (pDevContext && pExtension && pExtension->id)
 		{
 			// set FFB to false
 			FfbActiveSet(FALSE, pExtension->id, pDevContext);
@@ -1183,7 +1191,7 @@ USHORT GetIdFromRawPdoRequest(
 NTSTATUS  ResetDevice(USHORT id, PDEVICE_EXTENSION pDevContext)
 {
 	DEVICE_INIT_VALS data_buf;
-	int index;
+	USHORT index;
 
 	// Sanity check
 	TraceEvents(TRACE_LEVEL_INFORMATION, DBG_INIT, "ResetDevice: DevID=%d\n", id);

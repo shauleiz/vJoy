@@ -1,6 +1,6 @@
 #include <windows.h>
 #include <ntverp.h>
-#include <public.h>
+#include "../../inc/public.h"
 
 #undef	VER_PRODUCTNAME_STR
 #undef	VER_COMPANYNAME_STR

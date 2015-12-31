@@ -60,7 +60,7 @@ Revision History:
 #include <TCHAR.H>
 #include <errcodes.h>
 
-#include <public.h>
+#include "../../inc/public.h"
 
 #define _DRIVER_NAME_					"VJOY: "
 #define FEATURE_COLLECTION_REPORT_ID	3

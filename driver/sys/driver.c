@@ -53,7 +53,7 @@ ULONG DebugFlag = 0xff;
 #ifdef ALLOC_PRAGMA
     #pragma alloc_text( INIT, DriverEntry )
     #pragma alloc_text( PAGE, vJoyEvtDeviceAdd)
-    #pragma alloc_text( PAGE, vJoyEvtDriverContextCleanup)
+    //#pragma alloc_text( PAGE, vJoyEvtDriverContextCleanup)
 #endif
 
 
@@ -86,7 +86,7 @@ Return Value:
 
     NTSTATUS				status = STATUS_SUCCESS;
     WDF_DRIVER_CONFIG		config;
-    WDF_OBJECT_ATTRIBUTES	attributes;
+    //WDF_OBJECT_ATTRIBUTES	attributes;
     WDFDRIVER				hDriver;
 
     //
@@ -121,16 +121,18 @@ Return Value:
     //   Register a cleanup callback so that we can call WPP_CLEANUP when
     //   the framework driver object is deleted during driver unload.
     //
-    WDF_OBJECT_ATTRIBUTES_INIT(&attributes);
-    attributes.EvtCleanupCallback = vJoyEvtDriverContextCleanup;
+    
+	//WDF_OBJECT_ATTRIBUTES_INIT(&attributes);
+    //attributes.EvtCleanupCallback = vJoyEvtDriverContextCleanup;
 
 	// Driver and its decendents are set to execute at PASSIVE_LEVEL
 	// This will make the synchronization of the event handlers simpler
-	attributes.ExecutionLevel = WdfExecutionLevelPassive;
+	
+	//attributes.ExecutionLevel = WdfExecutionLevelPassive;
 
     status = WdfDriverCreate(DriverObject,
                             RegistryPath,
-                            &attributes /*WDF_NO_OBJECT_ATTRIBUTES*/,
+                            /*&attributes*/ WDF_NO_OBJECT_ATTRIBUTES,
                             &config,
                             &hDriver);
     if (!NT_SUCCESS(status)) 
@@ -343,7 +345,7 @@ Return Value:
     // queue to park the requests since we dont care whether the device is idle
     // or fully powered up.
     //
-    queueConfig.PowerManaged = WdfTrue;
+    queueConfig.PowerManaged = WdfFalse/*WdfTrue*/;
     status = WdfIoQueueCreate(hDevice, &queueConfig, WDF_NO_OBJECT_ATTRIBUTES, &devContext->ReadReportMsgQueue);
     if (!NT_SUCCESS(status))
 	{
@@ -611,6 +613,7 @@ vJoyCompleteWriteReport(
 }
 
 
+#if 0
 NTSTATUS
 vJoyWriteReport(
 	IN WDFDEVICE device,
@@ -618,7 +621,7 @@ vJoyWriteReport(
 	)
 {
 	PDEVICE_EXTENSION   pDevContext = NULL;
-    NTSTATUS            status = STATUS_SUCCESS;
+	NTSTATUS            status = STATUS_SUCCESS;
 	//WDFQUEUE			WriteQueue = NULL;
 	PHID_XFER_PACKET	transferPacket = NULL;
 	WDFREQUEST			FfbRequest = NULL;
@@ -633,7 +636,7 @@ vJoyWriteReport(
 
 
 	// Get the FFB data from the request
-	transferPacket = (PHID_XFER_PACKET) WdfRequestWdmGetIrp(Request)->UserBuffer;
+	transferPacket = (PHID_XFER_PACKET)WdfRequestWdmGetIrp(Request)->UserBuffer;
 	if (transferPacket == NULL)
 	{
 		status = STATUS_INVALID_DEVICE_REQUEST;
@@ -642,20 +645,22 @@ vJoyWriteReport(
 	};
 
 
-	status = WdfRequestRetrieveOutputBuffer( FfbRequest, transferPacket->reportBufferLen, &ForceFeedbackBuffer, &bytesReturned);
-    if (!NT_SUCCESS(status))
+	status = WdfRequestRetrieveOutputBuffer(FfbRequest, transferPacket->reportBufferLen, &ForceFeedbackBuffer, &bytesReturned);
+	if (!NT_SUCCESS(status))
 	{
 		WdfRequestComplete(FfbRequest, status);
 		return status;
 	}
 
 	// Copy the report to target read queue
-	memcpy(ForceFeedbackBuffer,transferPacket->reportBuffer,transferPacket->reportBufferLen);
+	memcpy(ForceFeedbackBuffer, transferPacket->reportBuffer, transferPacket->reportBufferLen);
 	WdfRequestCompleteWithInformation(FfbRequest, status, bytesReturned);
 
 	return status;
 }
 
+
+#endif // 0
 
 NTSTATUS
 vJoyCompleteReadReport(
@@ -813,7 +818,7 @@ vJoyGetPositionData(
 
 VOID
 vJoyEvtDriverContextCleanup(
-    IN WDFDRIVER Driver
+    IN WDFOBJECT Driver
     )
 /*++
 Routine Description:
@@ -831,8 +836,9 @@ Return Value:
 
 --*/
 {
-    PAGED_CODE ();
-    UNREFERENCED_PARAMETER(Driver);
+/*	_IRQL_requires_max_(1);
+	PAGED_CODE ();
+ */   // UNREFERENCED_PARAMETER(Driver);
 
     WPP_CLEANUP( WdfDriverWdmGetDriverObject( Driver ));
     TraceEvents(TRACE_LEVEL_INFORMATION, DBG_INIT, "Exit vJoyEvtDriverContextCleanup\n");
@@ -941,7 +947,7 @@ NTSTATUS GetHwKeyName(PWDFDEVICE_INIT  DeviceInit, PWCHAR HwKeyName)
 
 	// Get the correspondig WDM handle
 	hHwKey = WdfRegistryWdmGetHandle(WdfHwKey);
-	DbgPrint ("%x - Handle hHwKey for WdfHwKey\n", hHwKey);
+	DbgPrint ("%p - Handle hHwKey for WdfHwKey\n", hHwKey);
 
 	// Get the size of the name of the Device Parameters subkey under HW Key
 	status = ZwQueryKey(hHwKey, KeyNameInformation , NULL, 0, &Size);
@@ -949,7 +955,7 @@ NTSTATUS GetHwKeyName(PWDFDEVICE_INIT  DeviceInit, PWCHAR HwKeyName)
 	{
 		CloseHandle = ZwClose(hHwKey);
 		hHwKey = NULL;
-		DbgPrint ("%x - Handle hHwKey was closed. Status %x [1]\n", hHwKey, CloseHandle);
+		DbgPrint ("%p - Handle hHwKey was closed. Status %x [1]\n", hHwKey, CloseHandle);
 		return status;
 	}
 
@@ -963,7 +969,7 @@ NTSTATUS GetHwKeyName(PWDFDEVICE_INIT  DeviceInit, PWCHAR HwKeyName)
 	{
 		CloseHandle = ZwClose(hHwKey);
 		hHwKey = NULL;
-		DbgPrint ("%x - Handle hHwKey was closed. Status %x [2]\n", hHwKey, CloseHandle);
+		DbgPrint ("%p - Handle hHwKey was closed. Status %x [2]\n", hHwKey, CloseHandle);
 		return status;
 	}
 
@@ -1067,7 +1073,7 @@ VOID LogEvent(NTSTATUS code, PWSTR msg, PVOID pObj)
 	if (msg)
 	{
 		p->NumberOfStrings = 1;
-		wcscpy((PWSTR) ((PUCHAR) p + p->StringOffset), msg);
+		wcscpy_s((PWSTR) ((PUCHAR) p + p->StringOffset), sizeof(*msg)/sizeof(WCHAR),msg);
 	}
 	else
 		p->NumberOfStrings = 0;
@@ -1108,13 +1114,13 @@ VOID LogEventWithStatus(NTSTATUS code, PWSTR msg, PVOID pObj, NTSTATUS stat)
 	if (msg)
 	{
 		p->NumberOfStrings = 2;
-		wcscpy((PWSTR) ((PUCHAR) p + p->StringOffset), msg);
-		wcscpy((PWSTR) ((PUCHAR) p + p->StringOffset + (wcslen(msg) + 1) * sizeof(WCHAR)), strStat);
+		wcscpy_s((PWSTR) ((PUCHAR) p + p->StringOffset), sizeof(*msg) / sizeof(WCHAR), msg);
+		wcscpy_s((PWSTR) ((PUCHAR) p + p->StringOffset + (wcslen(msg) + 1) * sizeof(WCHAR)), sizeof(*strStat) / sizeof(WCHAR), strStat);
 	}
 	else
 	{
 		p->NumberOfStrings = 1;
-		wcscpy((PWSTR) ((PUCHAR) p + p->StringOffset), strStat);
+		wcscpy_s((PWSTR) ((PUCHAR) p + p->StringOffset), sizeof(*strStat) / sizeof(WCHAR), strStat);
 	};
 
 
