@@ -485,6 +485,7 @@ Return Value:
 }
 #endif
 
+
 NTSTATUS
 vJoyGetHidDescriptor(
     IN WDFDEVICE Device,
@@ -1149,9 +1150,12 @@ Return Value:
     }
 }
 
+
+_IRQL_requires_same_
+_IRQL_requires_max_(PASSIVE_LEVEL)
 VOID
 vJoyEvtDeviceContextCleanup(
-    IN WDFOBJECT Device
+    _In_ WDFDEVICE Device
     )
 /*++
 

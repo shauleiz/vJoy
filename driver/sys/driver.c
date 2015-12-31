@@ -372,7 +372,7 @@ Return Value:
 	WDF_OBJECT_ATTRIBUTES_INIT(&FfbQueueAttribs);
 	WDF_OBJECT_ATTRIBUTES_SET_CONTEXT_TYPE(&FfbQueueAttribs, FFB_QUEUE_EXTENSION);	
     WDF_IO_QUEUE_CONFIG_INIT(&queueConfig, WdfIoQueueDispatchManual);
-    queueConfig.PowerManaged = WdfTrue;
+    queueConfig.PowerManaged = WdfFalse/*WdfTrue*/;
 
 	// For each device, create a Write Queue, initialize its context space and assign notification
 	for (i = 0; i < MAX_N_DEVICES; i++)
@@ -413,7 +413,7 @@ Return Value:
 	WDF_OBJECT_ATTRIBUTES_INIT(&FfbQueueAttribs);
 	WDF_OBJECT_ATTRIBUTES_SET_CONTEXT_TYPE(&FfbQueueAttribs, FFB_QUEUE_EXTENSION);
 	WDF_IO_QUEUE_CONFIG_INIT(&queueConfig, WdfIoQueueDispatchManual);
-    queueConfig.PowerManaged = WdfTrue;
+    queueConfig.PowerManaged = WdfFalse/*WdfTrue*/;
 
 	for (i = 0; i < MAX_N_DEVICES; i++)
 	{

@@ -1396,13 +1396,21 @@ EVT_WDF_DRIVER_DEVICE_ADD vJoyEvtDeviceAdd;
 EVT_WDF_IO_QUEUE_IO_INTERNAL_DEVICE_CONTROL vJoyEvtInternalDeviceControl;
 EVT_WDF_OBJECT_CONTEXT_CLEANUP vJoyEvtDriverContextCleanup;
 EVT_WDF_TIMER vJoyEvtTimerFunction;
-EVT_WDF_OBJECT_CONTEXT_CLEANUP vJoyEvtDeviceContextCleanup;
+//EVT_WDF_DEVICE_CONTEXT_CLEANUP vJoyEvtDeviceContextCleanup;
 EVT_WDF_IO_QUEUE_IO_DEVICE_CONTROL vJoyEvtIoDeviceControl;
 EVT_WDF_TRACE_CALLBACK WppTraceCallback;
 EVT_WDF_DEVICE_RELEASE_HARDWARE  vJoyEvtDeviceReleaseHardware;
 EVT_WDF_DEVICE_PREPARE_HARDWARE vJoyEvtDevicePrepareHardware;
 EVT_WDF_DEVICE_SELF_MANAGED_IO_FLUSH vJoyEvtDeviceSelfManagedIoFlush;
 EVT_WDF_DEVICE_PNP_STATE_CHANGE_NOTIFICATION vJoyEvtDevicePnpStateChange; 
+
+_IRQL_requires_same_
+_IRQL_requires_max_(PASSIVE_LEVEL)
+VOID
+vJoyEvtDeviceContextCleanup(
+	_In_ WDFDEVICE Device
+	);
+
 #endif
 
 // Function prototypes
