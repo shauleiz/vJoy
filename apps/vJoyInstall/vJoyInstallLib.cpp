@@ -1415,39 +1415,35 @@ Return Value:
 
 --*/
 {
-    LPTSTR buffer;
-    DWORD size;
+    LPTSTR buffer = NULL;
     DWORD reqSize;
     DWORD dataType;
     LPTSTR * array;
     DWORD szChars;
+	BOOL bRegProp;
 
-    size = 8192; // initial guess, nothing magic about this
-    buffer = new TCHAR[(size/sizeof(TCHAR))+2];
-    if(!buffer) {
+
+	// Getting the size of required buffer
+	bRegProp = SetupDiGetDeviceRegistryProperty(Devs, DevInfo, Prop, &dataType, NULL, 0, &reqSize);
+	if (GetLastError() != ERROR_INSUFFICIENT_BUFFER)
+         return NULL;
+
+
+	// Allocate buffer according to required size
+    buffer = new TCHAR[(reqSize /sizeof(TCHAR))+2];
+    if(!buffer)
         return NULL;
-    }
-    while(!SetupDiGetDeviceRegistryProperty(Devs,DevInfo,Prop,&dataType,(LPBYTE)buffer,size,&reqSize)) {
-        if(GetLastError() != ERROR_INSUFFICIENT_BUFFER) {
-            goto failed;
-        }
-        if(dataType != REG_MULTI_SZ) {
-            goto failed;
-        }
-        size = reqSize;
-        delete [] buffer;
-        buffer = new TCHAR[(size/sizeof(TCHAR))+2];
-        if(!buffer) {
-            goto failed;
-        }
-    }
+
+	// Get the string into the buffer 
+	if (!SetupDiGetDeviceRegistryProperty(Devs, DevInfo, Prop, &dataType, (LPBYTE)buffer, reqSize, NULL))
+		goto failed;
+
     szChars = reqSize/sizeof(TCHAR);
     buffer[szChars] = TEXT('\0');
     buffer[szChars+1] = TEXT('\0');
     array = GetMultiSzIndexArray(buffer);
-    if(array) {
+    if(array)
         return array;
-    }
 
 failed:
     if(buffer) {
