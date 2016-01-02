@@ -332,9 +332,7 @@ BOOL GetParentDevInst(TCHAR * ParentDeviceNode, TCHAR * CompatibleId, DEVINST * 
 
 BOOL AssignCompatibleId(TCHAR * CompatibleId, DEVINST  * pdnDevInst , BOOL First)
 {
-
-	//TCHAR buf[MAX_DEVICE_ID_LEN]; // Place the Device Node here
-	DEVINST  childDevInst, dnDevInst = *pdnDevInst;
+	DEVINST  childDevInst=0, dnDevInst = *pdnDevInst;
 	CONFIGRET  rType;
 	TCHAR ErrMsg[1000];
 	SP_DEVINFO_DATA  DeviceInfoData;
@@ -473,60 +471,64 @@ BOOL AssignCompatibleId(TCHAR * CompatibleId, DEVINST  * pdnDevInst , BOOL First
 	};
 
 	// Test the existance of the child devnode
-	rType = CM_Locate_DevNode(&childDevInst, DeviceInstanceId, CM_LOCATE_DEVNODE_NORMAL);
-	if (rType == CR_NO_SUCH_DEVNODE)
-	{
-		//_ftprintf(stream,">> AssignCompatibleId: DeviceInstanceId %s is missing\n", DeviceInstanceId);
-		_stprintf_s(prt, MAX_PATH, "AssignCompatibleId: DeviceInstanceId %s is missing", DeviceInstanceId);
-		StatusMessage( NULL, prt,  INFO);
-		rType = CM_Reenumerate_DevNode(childDevInst, CM_REENUMERATE_RETRY_INSTALLATION );
-		if (rType != CR_SUCCESS)
+		rType = CM_Locate_DevNode(&childDevInst, DeviceInstanceId, CM_LOCATE_DEVNODE_NORMAL);
+
+#if 0	// No point using childDevInst if function CM_Locate_DevNode() fails
+		if (rType == CR_NO_SUCH_DEVNODE)
 		{
-			//_ftprintf(stream,"[E] AssignCompatibleId: Function CM_Reenumerate_DevNode failed with error: %08X\n", rType);
-			_stprintf_s(prt, MAX_PATH, "AssignCompatibleId: Function CM_Reenumerate_DevNode failed with error: %08X", rType);
-			StatusMessage( NULL, prt,  ERR);
+			_stprintf_s(prt, MAX_PATH, "AssignCompatibleId: DeviceInstanceId %s is missing", DeviceInstanceId);
+			StatusMessage(NULL, prt, INFO);
+			rType = CM_Reenumerate_DevNode(childDevInst, CM_REENUMERATE_RETRY_INSTALLATION);
+			if (rType != CR_SUCCESS)
+			{
+				_stprintf_s(prt, MAX_PATH, "AssignCompatibleId: Function CM_Reenumerate_DevNode failed with error: %08X", rType);
+				StatusMessage(NULL, prt, ERR);
+				delete DeviceInstanceId;
+				return FALSE;
+			}
+			else
+			{
+				//_ftprintf(stream,">> AssignCompatibleId: Function CM_Reenumerate_DevNode  OK\n");
+				_stprintf_s(prt, MAX_PATH, "AssignCompatibleId: Function CM_Reenumerate_DevNode  OK");
+				StatusMessage(NULL, prt, INFO);
+			};
+
+		}
+		else
+#endif // 0
+
+			if (rType != CR_SUCCESS)
+			{
+				//_ftprintf(stream,"[E] AssignCompatibleId: Function CM_Locate_DevNode failed with error: %08X\n", rType);
+				_stprintf_s(prt, MAX_PATH, "AssignCompatibleId: Function CM_Locate_DevNode failed with error: %08X", rType);
+				StatusMessage(NULL, prt, ERR);
+				delete DeviceInstanceId;
+				return FALSE;
+			}
+			else
+			{
+				//_ftprintf(stream,">> AssignCompatibleId: Function CM_Locate_DevNode (Device Instance Path = %s) OK\n",DeviceInstanceId);
+				_stprintf_s(prt, MAX_PATH, "AssignCompatibleId: Function CM_Locate_DevNode (Device Instance Path = %s) OK", DeviceInstanceId);
+				StatusMessage(NULL, prt, INFO);
+			};
+
+
+
+		// Accessing the HW registry key
+		HDEVINFO DeviceInfoSet = SetupDiCreateDeviceInfoList(NULL, NULL);
+		if (DeviceInfoSet == INVALID_HANDLE_VALUE)
+		{
+			GetErrorString(ErrMsg, 1000);
+			//_ftprintf(stream,"[E] SetupDiCreateDeviceInfoList failed with error: %s\n", ErrMsg);
+			_stprintf_s(prt, MAX_PATH, "SetupDiCreateDeviceInfoList failed with error: %s", ErrMsg);
+			StatusMessage(NULL, prt, ERR);
 			delete DeviceInstanceId;
 			return FALSE;
 		}
 		else
 		{
-			//_ftprintf(stream,">> AssignCompatibleId: Function CM_Reenumerate_DevNode  OK\n");
-			_stprintf_s(prt, MAX_PATH, "AssignCompatibleId: Function CM_Reenumerate_DevNode  OK");
-			StatusMessage( NULL, prt,  INFO);
-		};
-
-	} else if (rType != CR_SUCCESS)
-	{
-		//_ftprintf(stream,"[E] AssignCompatibleId: Function CM_Locate_DevNode failed with error: %08X\n", rType);
-		_stprintf_s(prt, MAX_PATH, "AssignCompatibleId: Function CM_Locate_DevNode failed with error: %08X", rType);
-		StatusMessage( NULL, prt,  ERR);
-		delete DeviceInstanceId;
-		return FALSE;
-	}
-	else
-	{
-		//_ftprintf(stream,">> AssignCompatibleId: Function CM_Locate_DevNode (Device Instance Path = %s) OK\n",DeviceInstanceId);
-		_stprintf_s(prt, MAX_PATH, "AssignCompatibleId: Function CM_Locate_DevNode (Device Instance Path = %s) OK",DeviceInstanceId);
-		StatusMessage( NULL, prt,  INFO);
-	};
-
-
-
-	// Accessing the HW registry key
-	HDEVINFO DeviceInfoSet = SetupDiCreateDeviceInfoList(NULL, NULL);
-	if (DeviceInfoSet == INVALID_HANDLE_VALUE)
-	{
-		 GetErrorString(ErrMsg,1000);
-		//_ftprintf(stream,"[E] SetupDiCreateDeviceInfoList failed with error: %s\n", ErrMsg);
-		_stprintf_s(prt, MAX_PATH, "SetupDiCreateDeviceInfoList failed with error: %s", ErrMsg);
-		StatusMessage( NULL, prt,  ERR);
-		delete DeviceInstanceId;
-		return FALSE;
-	}
-	else
-	{
-		//_ftprintf(stream,">> AssignCompatibleId: Function SetupDiCreateDeviceInfoList OK\n");
-		_stprintf_s(prt, MAX_PATH, "AssignCompatibleId: Function SetupDiCreateDeviceInfoList OK");
+			//_ftprintf(stream,">> AssignCompatibleId: Function SetupDiCreateDeviceInfoList OK\n");
+			_stprintf_s(prt, MAX_PATH, "AssignCompatibleId: Function SetupDiCreateDeviceInfoList OK");
 		StatusMessage( NULL, prt,  INFO);
 	};
 
@@ -550,7 +552,7 @@ BOOL AssignCompatibleId(TCHAR * CompatibleId, DEVINST  * pdnDevInst , BOOL First
 	};
 
 
-	delete DeviceInstanceId;
+	delete[] DeviceInstanceId;
 
 	// Setup Compatible ID (No need?)
 	TCHAR PropBufferClass[LINE_LEN];
@@ -892,7 +894,7 @@ int RemoveDevice(TCHAR *ParentDeviceNode, BOOL DelInf )
 		//_ftprintf(stream,"[E] RemoveDevice: Function CM_Get_Device_ID failed with error: %08X\n", rType);
 		_stprintf_s(prt, MAX_PATH, "RemoveDevice: Function CM_Get_Device_ID failed with error: %08X", rType);
 		StatusMessage( NULL, prt,  ERR);
-		delete DeviceInstanceId;
+		delete[] DeviceInstanceId;
 		return -104;
 	}
 	else
