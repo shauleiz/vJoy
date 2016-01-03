@@ -175,6 +175,9 @@
       <TreatWarningAsError>false</TreatWarningAsError>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
     </ClCompile>
+    <Manifest>
+      <AdditionalManifestFiles>$(ProjectDir)vJoyInstallx86.exe.manifest</AdditionalManifestFiles>
+    </Manifest>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <Link>
@@ -188,6 +191,9 @@
       <PreprocessorDefinitions>_WIN32;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
     </ClCompile>
+    <Manifest>
+      <AdditionalManifestFiles>$(ProjectDir)vJoyInstallx86.exe.manifest</AdditionalManifestFiles>
+    </Manifest>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">
     <Link>
@@ -223,6 +229,9 @@
       <TreatWarningAsError>false</TreatWarningAsError>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
     </ClCompile>
+    <Manifest>
+      <AdditionalManifestFiles>$(ProjectDir)vJoyInstallx64.exe.manifest %(AdditionalManifestFiles)</AdditionalManifestFiles>
+    </Manifest>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <Link>
@@ -238,6 +247,9 @@
     <ResourceCompile>
       <PreprocessorDefinitions>AMD64;_USING_V110_SDK71_;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ResourceCompile>
+    <Manifest>
+      <AdditionalManifestFiles>$(ProjectDir)vJoyInstallx64.exe.manifest</AdditionalManifestFiles>
+    </Manifest>
   </ItemDefinitionGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

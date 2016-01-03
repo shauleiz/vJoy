@@ -429,7 +429,7 @@ BOOL AssignCompatibleId(TCHAR * CompatibleId, DEVINST  * pdnDevInst , BOOL First
 		//_ftprintf(stream,"[E] AssignCompatibleId: Function CM_Get_Device_ID failed with error: %08X\n", rType);
 		_stprintf_s(prt, MAX_PATH, "AssignCompatibleId: Function CM_Get_Device_ID failed with error: %08X", rType);
 		StatusMessage( NULL, prt,  ERR);
-		delete DeviceInstanceId;
+		delete[] DeviceInstanceId;
 		return FALSE;
 	}
 	else
@@ -502,7 +502,7 @@ BOOL AssignCompatibleId(TCHAR * CompatibleId, DEVINST  * pdnDevInst , BOOL First
 				//_ftprintf(stream,"[E] AssignCompatibleId: Function CM_Locate_DevNode failed with error: %08X\n", rType);
 				_stprintf_s(prt, MAX_PATH, "AssignCompatibleId: Function CM_Locate_DevNode failed with error: %08X", rType);
 				StatusMessage(NULL, prt, ERR);
-				delete DeviceInstanceId;
+				delete[] DeviceInstanceId;
 				return FALSE;
 			}
 			else
@@ -522,7 +522,7 @@ BOOL AssignCompatibleId(TCHAR * CompatibleId, DEVINST  * pdnDevInst , BOOL First
 			//_ftprintf(stream,"[E] SetupDiCreateDeviceInfoList failed with error: %s\n", ErrMsg);
 			_stprintf_s(prt, MAX_PATH, "SetupDiCreateDeviceInfoList failed with error: %s", ErrMsg);
 			StatusMessage(NULL, prt, ERR);
-			delete DeviceInstanceId;
+			delete[] DeviceInstanceId;
 			return FALSE;
 		}
 		else
@@ -541,7 +541,7 @@ BOOL AssignCompatibleId(TCHAR * CompatibleId, DEVINST  * pdnDevInst , BOOL First
 		//_ftprintf(stream,"[E] SetupDiOpenDeviceInfo failed with error: %s\n", ErrMsg);
 		_stprintf_s(prt, MAX_PATH, "SetupDiOpenDeviceInfo failed with error: %s", ErrMsg);
 		StatusMessage( NULL, prt,  ERR);
-		delete DeviceInstanceId;
+		delete[] DeviceInstanceId;
 		return FALSE;
 	}
 	else
@@ -1416,16 +1416,17 @@ Return Value:
 --*/
 {
     LPTSTR buffer = NULL;
-    DWORD reqSize;
-    DWORD dataType;
+    DWORD reqSize = 0;
+    //DWORD dataType;
     LPTSTR * array;
     DWORD szChars;
 	BOOL bRegProp;
 
 
 	// Getting the size of required buffer
-	bRegProp = SetupDiGetDeviceRegistryProperty(Devs, DevInfo, Prop, &dataType, NULL, 0, &reqSize);
-	if (GetLastError() != ERROR_INSUFFICIENT_BUFFER)
+	bRegProp = SetupDiGetDeviceRegistryProperty(Devs, DevInfo, Prop, NULL, NULL, 0, &reqSize);
+	DWORD err = GetLastError();
+	if (err != ERROR_INSUFFICIENT_BUFFER)
          return NULL;
 
 
@@ -1435,8 +1436,8 @@ Return Value:
         return NULL;
 
 	// Get the string into the buffer 
-	if (!SetupDiGetDeviceRegistryProperty(Devs, DevInfo, Prop, &dataType, (LPBYTE)buffer, reqSize, NULL))
-		goto failed;
+	if (!SetupDiGetDeviceRegistryProperty(Devs, DevInfo, Prop, NULL, (LPBYTE)buffer, reqSize, NULL))
+		return NULL;
 
     szChars = reqSize/sizeof(TCHAR);
     buffer[szChars] = TEXT('\0');
@@ -1445,7 +1446,6 @@ Return Value:
     if(array)
         return array;
 
-failed:
     if(buffer) {
         delete [] buffer;
     }
@@ -1560,6 +1560,7 @@ void PrintHeader(FILE * dst)
 	ZeroMemory(&osvi, sizeof(OSVERSIONINFOEX));
 	osvi.dwOSVersionInfoSize = sizeof(OSVERSIONINFOEX);
 	lposvi = &osvi;
+#pragma warning(suppress: 28159)
 	GetVersionEx((LPOSVERSIONINFO)lposvi);
 	_ftprintf(dst, "+++++++ +++++++ OS: %d.%d %s ", osvi.dwMajorVersion,   osvi.dwMinorVersion, osvi.szCSDVersion );
 
@@ -1583,7 +1584,12 @@ void PrintHeader(FILE * dst)
 	// Vista/W7
 	if ( osvi.dwMajorVersion == 6 )
 	{
-		pGPI = (PGPI) GetProcAddress(GetModuleHandle(TEXT("kernel32.dll")), "GetProductInfo");
+		HMODULE hKernel32 = GetModuleHandle(TEXT("kernel32.dll"));
+		if (!hKernel32)
+			return;
+
+		LPVOID pProc = GetProcAddress(hKernel32, "GetProductInfo");
+		pGPI = (PGPI)pProc;
 		pGPI( osvi.dwMajorVersion, osvi.dwMinorVersion, 0, 0, &ProdType);
 
         switch( ProdType )
@@ -1771,9 +1777,10 @@ BOOL GetOEMInfFileName( HDEVINFO DeviceInfoSet, SP_DEVINFO_DATA DeviceInfoData, 
 	};
 
 	// Extract file name from path
-	TCHAR Buffer[MAX_PATH], *p=NULL;
+	TCHAR Buffer[MAX_PATH], *p;
+	p = NULL;
 	DWORD size = GetFullPathName(driverInfoDetail.InfFileName, MAX_PATH , Buffer, &p);
-	if (size || p)
+	if (size > 0 || size < MAX_PATH || p != NULL)
 	{
 		_tcsncpy_s(OEMInfFileName, size, p, size);
 		_stprintf_s(prt, MAX_PATH, "GetOEMInfFileName: Function GetFullPathName OK. INF file is %s", p);

@@ -33,7 +33,7 @@
 //
 // UpdateDriverForPlugAndPlayDevices
 //
-typedef BOOL (WINAPI *UpdateDriverForPlugAndPlayDevicesProto)(__in HWND hwndParent,
+typedef BOOL (WINAPI *UpdateDriverForPlugAndPlayDevicesProto)(_In_opt_ HWND hwndParent,
                                                               __in LPCTSTR HardwareId,
                                                               __in LPCTSTR FullInfPath,
                                                               __in DWORD InstallFlags,
