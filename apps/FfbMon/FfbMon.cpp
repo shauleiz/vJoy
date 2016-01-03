@@ -130,23 +130,23 @@ while (1)
 
 {
 
-id = (BYTE)DevID;
-iReport.bDevice = id;
+	id = (BYTE)DevID;
+	iReport.bDevice = id;
 
-Sleep(2);
+	Sleep(2);
 
-Z += 350;
+	Z += 350;
 
-iReport.wAxisZ = Z;
+	iReport.wAxisZ = Z;
 
-pPositionMessage = (PVOID)(&iReport);
+	pPositionMessage = (PVOID)(&iReport);
 
-if (!UpdateVJD(DevID, pPositionMessage))
-{
-printf("Feeding vJoy device number %d failed - try to enable device then press enter\n", DevID);
-getchar();
-AcquireVJD(DevID);
-}
+	if (!UpdateVJD(DevID, pPositionMessage))
+	{
+		printf("Feeding vJoy device number %d failed - try to enable device then press enter\n", DevID);
+		int ch = getchar();
+		AcquireVJD(DevID);
+	}
 }
 
 Exit:

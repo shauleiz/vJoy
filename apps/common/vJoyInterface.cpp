@@ -1269,21 +1269,26 @@ HANDLE	GetHandleByIndex(int index)
 
     // allocate a function class device data structure to receive the
     // goods about this particular device.
-    DWORD requiredLength=0;
-    SetupDiGetDeviceInterfaceDetail (
-        hardwareDeviceInfo,
-            &deviceInfoData,
-            NULL, // probing so no output buffer yet
-            0, // probing so output buffer length of zero
-            &requiredLength,
-            NULL); // not interested in the specific dev-node
+    DWORD requiredLength=16000;
+#if 0			  // I assume 16K buffer will be enough
+	BOOL bRes = SetupDiGetDeviceInterfaceDetail(
+		hardwareDeviceInfo,
+		&deviceInfoData,
+		NULL, // probing so no output buffer yet
+		0, // probing so output buffer length of zero
+		&requiredLength,
+		NULL); // not interested in the specific dev-node
 
-    if (!requiredLength)
-    {			
-        if (LogStream)
-            _ftprintf_s(LogStream, _T("\n[%05d]Error: GetHandleByIndex(index=%d) - Failed SetupDiGetDeviceInterfaceDetail() with requiredLength=0"), ProcessId, index);
-        return INVALID_HANDLE_VALUE;
-    }
+	DWORD  err = GetLastError();
+
+	if ((err != ERROR_INSUFFICIENT_BUFFER) || !requiredLength)
+	{
+		if (LogStream)
+			_ftprintf_s(LogStream, _T("\n[%05d]Error: GetHandleByIndex(index=%d) - Failed SetupDiGetDeviceInterfaceDetail() with requiredLength=0"), ProcessId, index);
+		return INVALID_HANDLE_VALUE;
+	}
+
+#endif // 0			  // I assume 16K buffer will be enough
 
         // Retrieve the information from Plug and Play.
         //  First, prepare the output buffer
@@ -1384,28 +1389,28 @@ int		GetDeviceIndexById(USHORT VendorId, USHORT ProductId, int BaseIndex)
     HIDD_ATTRIBUTES Attributes;
     int iFound=-1;
     ZeroMemory(&Attributes, sizeof(HIDD_ATTRIBUTES));
+	Attributes.Size = sizeof(HIDD_ATTRIBUTES);
 
     if (LogStream)
-        _ftprintf_s(LogStream, _T("\n[%05d]Info: GetDeviceIndexById(BaseIndex=%d) - Starting"), ProcessId, BaseIndex);
+		_ftprintf_s(LogStream, _T("\n[%05d]Info: GetDeviceIndexById(BaseIndex=%d) - Starting"), ProcessId, BaseIndex);
 
-    while (h = GetHandleByIndex(i++))
-    {
-        if (h==INVALID_HANDLE_VALUE)
-            continue;
-        BOOL gotit = HidD_GetAttributes(h, &Attributes);
-        CloseHandle(h);
-        if (gotit && (Attributes.VendorID == VendorId) && (Attributes.ProductID == ProductId) && (iFound==-1))
-        {
-            iFound =   i - 1;
-        }
-        if (LogStream)
-            _ftprintf_s(LogStream, _T("\n[%05d]Info: GetDeviceIndexById(BaseIndex=%d) - index=%d; VendorId=%x; ProductId=%x; VersionNumber=%x"), ProcessId, BaseIndex, i, Attributes.VendorID, Attributes.ProductID, Attributes.VersionNumber);
-    };
+	while (h = GetHandleByIndex(i++))
+	{
+		if (h == INVALID_HANDLE_VALUE)
+			continue;
+		BOOL gotit = HidD_GetAttributes(h, &Attributes);
+		CloseHandle(h);
+		if (gotit == TRUE)
+			if ((Attributes.VendorID == VendorId) && (Attributes.ProductID == ProductId) && (iFound == -1))
+			iFound = i - 1;
+		if (LogStream && (gotit == TRUE))
+			_ftprintf_s(LogStream, _T("\n[%05d]Info: GetDeviceIndexById(BaseIndex=%d) - index=%d; VendorId=%x; ProductId=%x; VersionNumber=%x"), ProcessId, BaseIndex, i, Attributes.VendorID, Attributes.ProductID, Attributes.VersionNumber);
+	};
 
-    //CloseHandle(h);
-    if (LogStream)
-        _ftprintf_s(LogStream, _T("\n[%05d]Info: GetDeviceIndexById(BaseIndex=%d) - Returning %d"), ProcessId, BaseIndex, iFound);
-    return iFound;
+	//CloseHandle(h);
+	if (LogStream)
+		_ftprintf_s(LogStream, _T("\n[%05d]Info: GetDeviceIndexById(BaseIndex=%d) - Returning %d"), ProcessId, BaseIndex, iFound);
+	return iFound;
 }
 
 int		GetDeviceIndexByReportId(USHORT VendorId, USHORT ProductId, BYTE ReportId)
@@ -1456,7 +1461,13 @@ BOOL	GetDeviceProductString(int Index, PWSTR * pProductString)
         return FALSE;
 
     PVOID Buffer = calloc(130, sizeof(USHORT));
-    if (!Buffer || !HidD_GetProductString(h, Buffer, 130))
+    if (!Buffer)
+    {
+        CloseHandle(h);
+        return FALSE;
+    };
+
+	if (TRUE != HidD_GetProductString(h, Buffer, 130))
     {
         CloseHandle(h);
         return FALSE;
@@ -1472,26 +1483,31 @@ BOOL	GetDeviceProductString(int Index, PWSTR * pProductString)
 
 BOOL	GetDeviceManufacturerString(int Index, PWSTR * pManufacturerString)
 /*
-    This function returns TRUE is it succeeds
-    and puts Manufacturer String in pManufacturerString
+	This function returns TRUE is it succeeds
+	and puts Manufacturer String in pManufacturerString
 */
 {
-    HANDLE h = GetHandleByIndex(Index);
-    if (!h || h==INVALID_HANDLE_VALUE)
-        return FALSE;
+	HANDLE h = GetHandleByIndex(Index);
+	if (!h || h == INVALID_HANDLE_VALUE)
+		return FALSE;
 
-    PVOID Buffer = calloc(130, sizeof(USHORT));
-    if (!Buffer || !HidD_GetManufacturerString(h, Buffer, 130))
-    {
-        CloseHandle(h);
-        return FALSE;
-    };
+	WCHAR Buffer[130] = { 0 };
+	if (!Buffer)
+	{
+		CloseHandle(h);
+		return FALSE;
+	};
 
-    *pManufacturerString = _wcsdup((PWSTR)Buffer);
-    free(Buffer);
-    CloseHandle(h);
+	if (TRUE != HidD_GetManufacturerString(h, Buffer, sizeof(Buffer)))
+	{
+		CloseHandle(h);
+		return FALSE;
+	};
 
-    return TRUE;
+	*pManufacturerString = _wcsdup((PWSTR)Buffer);
+	CloseHandle(h);
+
+	return TRUE;
 }
 
 
@@ -1506,7 +1522,7 @@ BOOL	GetDeviceSerialNumberString(int Index, PWSTR * pSerialNumberString)
         return FALSE;
 
     PVOID Buffer = calloc(130, sizeof(USHORT));
-    if (!Buffer || !HidD_GetSerialNumberString(h, Buffer, 130))
+    if (!Buffer || (TRUE != HidD_GetSerialNumberString(h, Buffer, 130)))
     {
         CloseHandle(h);
         return FALSE;
@@ -1533,7 +1549,7 @@ BOOL	GetDeviceVersionNumber(int Index, PUSHORT version)
     HIDD_ATTRIBUTES Attributes;
     ZeroMemory(&Attributes, sizeof(Attributes));
 
-    if (!HidD_GetAttributes(h, &Attributes))
+    if (TRUE != HidD_GetAttributes(h, &Attributes))
     {
         CloseHandle(h);
         return FALSE;
@@ -1557,7 +1573,7 @@ BOOL	GetDeviceAttributes(int Index, PUSHORT vendorID, PUSHORT ProductID, PUSHORT
 
     HIDD_ATTRIBUTES Attributes;
     ZeroMemory(&Attributes, sizeof(Attributes));
-    if (!HidD_GetAttributes(h, &Attributes))
+    if (TRUE != HidD_GetAttributes(h, &Attributes))
     {
         CloseHandle(h);
         return FALSE;
@@ -1590,7 +1606,7 @@ int		GetvJoyReportId(int Index)
     HIDP_CAPS Capabilities;
     ZeroMemory(&Capabilities, sizeof(Capabilities));
     BOOL ok = HidD_GetPreparsedData(h, &PreparsedData);
-    if (!ok)
+    if (TRUE != ok)
     {
         CloseHandle(h);
         return BAD_PREPARSED_DATA;
@@ -1628,12 +1644,12 @@ int		GetvJoyReportId(int Index)
     {
         nButtons += ((bCaps[0]).Range).UsageMax - ((bCaps[0]).Range).UsageMin + 1;
         ButtonBaseIndex = ((bCaps[0]).Range).DataIndexMin;
+		rID = bCaps[0].ReportID;
     };
 
     //HidD_FreePreparsedData(PreparsedData);
     CloseHandle(h);
 
-    rID = bCaps[0].ReportID;
     delete[](bCaps);
     return rID;
 }
@@ -1668,7 +1684,7 @@ BOOL	GetDeviceNameSpace(char ** NameSpace, int * Size, BOOL Refresh, DWORD *erro
     SP_DEVICE_INTERFACE_DATA            deviceInterfaceData;
     PSP_DEVICE_INTERFACE_DETAIL_DATA    deviceInterfaceDetailData = NULL;
     ULONG                               predictedLength = 0;
-    ULONG                               requiredLength = 0, bytes = 0;
+    ULONG                               requiredLength = 16000, bytes = 0;
     HANDLE                              file;
     ULONG                               i = 0;
     char *								DevPath = NULL;
@@ -1718,25 +1734,28 @@ BOOL	GetDeviceNameSpace(char ** NameSpace, int * Size, BOOL Refresh, DWORD *erro
         // receive the information about this particular device.
         //
         //
-        // First find out required length of the buffer
-        //
-        if (!SetupDiGetDeviceInterfaceDetail(
-            hardwareDeviceInfo,
-            &deviceInterfaceData,
-            NULL, // probing so no output buffer yet
-            0, // probing so output buffer length of zero
-            &requiredLength,
-            NULL))
-        { // not interested in the specific dev-node
-            if (ERROR_INSUFFICIENT_BUFFER != GetLastError()) {
-                if (error)
-                    *error = GetLastError();
-                if (LogStream)
-                    _ftprintf_s(LogStream, _T("\n[%05d]Error: GetDeviceNameSpace() - Failed SetupDiGetDeviceInterfaceDetail() with error %x"), ProcessId, *error);
-                SetupDiDestroyDeviceInfoList(hardwareDeviceInfo);
-                return FALSE; // INVALID_HANDLE_VALUE;
-            }
-        };  // SetupDiGetDeviceInterfaceDetail
+#if 0
+						// First find out required length of the buffer
+		//
+		if (!SetupDiGetDeviceInterfaceDetail(
+			hardwareDeviceInfo,
+			&deviceInterfaceData,
+			NULL, // probing so no output buffer yet
+			0, // probing so output buffer length of zero
+			&requiredLength,
+			NULL))
+		{ // not interested in the specific dev-node
+			if (ERROR_INSUFFICIENT_BUFFER != GetLastError()) {
+				if (error)
+					*error = GetLastError();
+				if (LogStream)
+					_ftprintf_s(LogStream, _T("\n[%05d]Error: GetDeviceNameSpace() - Failed SetupDiGetDeviceInterfaceDetail() with error %x"), ProcessId, *error);
+				SetupDiDestroyDeviceInfoList(hardwareDeviceInfo);
+				return FALSE; // INVALID_HANDLE_VALUE;
+			}
+		};  // SetupDiGetDeviceInterfaceDetail
+
+#endif // 0
 
         predictedLength = requiredLength;
         deviceInterfaceDetailData = (PSP_DEVICE_INTERFACE_DETAIL_DATA)LocalAlloc(LPTR, predictedLength);
@@ -1761,19 +1780,22 @@ BOOL	GetDeviceNameSpace(char ** NameSpace, int * Size, BOOL Refresh, DWORD *erro
             &deviceInterfaceData,
             deviceInterfaceDetailData,
             predictedLength,
-            &requiredLength,
-            NULL))
-        {
-            if (error)
-                *error = GetLastError();
-            if (LogStream)
-                _ftprintf_s(LogStream, _T("\n[%05d]Error: GetDeviceNameSpace() - Failed SetupDiGetDeviceInterfaceDetail() with error %x"), ProcessId, *error);
-            SetupDiDestroyDeviceInfoList(hardwareDeviceInfo);
-            LocalFree(deviceInterfaceDetailData);
-            return FALSE; // INVALID_HANDLE_VALUE;
-        }
+			&requiredLength,
+			NULL))
+		{
+			if (error)
+			{
+				*error = GetLastError();
+				if (LogStream)
+					_ftprintf_s(LogStream, _T("\n[%05d]Error: GetDeviceNameSpace() - Failed SetupDiGetDeviceInterfaceDetail() with error %x"), ProcessId, *error);
+			};
 
-        if (LogStream)
+			SetupDiDestroyDeviceInfoList(hardwareDeviceInfo);
+			LocalFree(deviceInterfaceDetailData);
+			return FALSE; // INVALID_HANDLE_VALUE;
+		}
+
+		if (LogStream)
             _ftprintf_s(LogStream, _T("\n[%05d]Info: GetDeviceNameSpace() - DevicePath=%s"), ProcessId, deviceInterfaceDetailData->DevicePath);
 
         // Now we have the device path of one interface
@@ -1793,7 +1815,8 @@ BOOL	GetDeviceNameSpace(char ** NameSpace, int * Size, BOOL Refresh, DWORD *erro
         { 
             if (NameSpace)
                 *NameSpace = StatNS;
-            *Size = DestSize;
+			if (Size)
+				*Size = DestSize;
             return TRUE; 
         }
         else
@@ -2454,9 +2477,9 @@ void StartLogging(void)
     // Get environment variables - if logging NOT requested then return from function
     LPTSTR LogLevel;
     DWORD dwRet=0;
-    LogLevel = new TCHAR[4];
-    dwRet = GetEnvironmentVariable(INTERFACE_LOG_LEVEL, LogLevel, sizeof(LogLevel));
-    if (!dwRet)
+    LogLevel = new TCHAR[5];
+    dwRet = GetEnvironmentVariable(INTERFACE_LOG_LEVEL, LogLevel, 4*sizeof(TCHAR));
+    if (TRUE != dwRet)
         return;
     Logging = _ttoi(LogLevel);
 
@@ -2490,7 +2513,7 @@ void StartLogging(void)
     // Open file for writing.
     errno_t err;
     err = _tfopen_s(&LogStream, LogFileName, "a+");
-    if (err)
+    if (err || (LogStream == NULL))
         return;
 
     // Write First line.
@@ -2727,19 +2750,36 @@ BOOL	IsDeviceFfbEffect(UINT rID, UINT Effect)
     }
 
     // Get output buttons
+	USHORT nb_bu;
     USHORT nb = Capabilities.NumberOutputButtonCaps;
-    HIDP_BUTTON_CAPS 	* bCaps = new HIDP_BUTTON_CAPS[nb];
+	if (nb < 4)
+		return FALSE;
+	 
+
+    HIDP_BUTTON_CAPS *	bCaps = new HIDP_BUTTON_CAPS[nb];
+	if (!bCaps)
+		return FALSE;
     SecureZeroMemory(bCaps, sizeof(HIDP_BUTTON_CAPS)*nb);
+	nb_bu = nb;
     stat = HidP_GetButtonCaps(HidP_Output, bCaps, &nb, PreparsedData);
+	if (FAILED(stat))
+		return FALSE;
+	
+	if (nb > nb_bu)
+		return FALSE;
+
     BOOL Out = FALSE;
+
+	if (nb < 1)
+		return FALSE;
 
     if (stat == HIDP_STATUS_SUCCESS)
     {
         for (int i = 0; i < nb; i++) // Loop on all values
             if ((bCaps[i].ReportID == (HID_ID_EFFREP + 0x10 * rID))     //    HID_ID_EFFREP + 0x10 * TLID	(This is for Device #1)
-                && bCaps[i].UsagePage == 0x0F //    Usage Page Physical Interface
-                && bCaps[i].LinkUsage == 0x25 //    Usage Effect Type
-                && bCaps[i].NotRange.Usage == Effect 	//    Usage Effect Type
+                && (bCaps[i].UsagePage == 0x0F) //    Usage Page Physical Interface
+                && (bCaps[i].LinkUsage == 0x25) //    Usage Effect Type
+                && (bCaps[i].NotRange.Usage == Effect) 	//    Usage Effect Type
                 )
             {
                 Out = TRUE;
@@ -2808,6 +2848,8 @@ VJOYINTERFACE_API BOOL __cdecl IsDeviceFfb(UINT rID)
     // Get array of of link collections
     PHIDP_LINK_COLLECTION_NODE vLinks = new   HIDP_LINK_COLLECTION_NODE[1 + n];
     stat = HidP_GetLinkCollectionNodes(vLinks, &n, PreparsedData);
+	if (FAILED(stat))
+		return FALSE;
 
     // Loop on every link
     BOOL Out = FALSE;
@@ -2885,7 +2927,7 @@ int	DbgGetCaps(void)
 
     ULONG   UsageLength = Capabilities.NumberOutputValueCaps;
     UsageList = new USAGE[Capabilities.NumberOutputValueCaps + 1];
-    CHAR Report[10000];
+    //CHAR Report[10000];
     PHIDP_VALUE_CAPS val_caps = new HIDP_VALUE_CAPS[100];
     USHORT n_val_caps = 100;
     bool Effect_Report = false;
@@ -2959,10 +3001,16 @@ int	DbgGetCaps(void)
     };
 
     // Get output buttons
+	USHORT nb_bu;
     USHORT nb = Capabilities.NumberOutputButtonCaps;
     HIDP_BUTTON_CAPS 	* bCaps = new HIDP_BUTTON_CAPS[nb];
     SecureZeroMemory(bCaps, sizeof(HIDP_BUTTON_CAPS)*nb);
+	nb_bu = nb;
     stat = HidP_GetButtonCaps(HidP_Output, bCaps, &nb, PreparsedData);
+	if (FAILED(stat))
+		return NO_CAPS;
+	if (nb>nb_bu)
+		return NO_CAPS;
     bool Custom_Force = false;
 
     if (stat == HIDP_STATUS_SUCCESS)
@@ -3325,7 +3373,7 @@ BOOL  Set_PreparsedData(int rID)
     BOOL ok = HidD_GetPreparsedData(h, &PreparsedData);
     CloseHandle(h);
 
-    if (!ok)
+    if (TRUE != ok)
         vJoyDevices[rID].pPreParsedData = NULL;
     else
     {
@@ -3539,6 +3587,9 @@ bool  FfbStartThread(HANDLE h)
     // Start a thread that waits for FFB data
     DWORD dwFfbThreadId;
     hFfbEvent = CreateEvent(NULL, TRUE, FALSE, NULL);
+	if (!hFfbEvent)
+		return false;
+
     HANDLE hFfbThread = CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)&FfbWaitForData, h, 0, &dwFfbThreadId);
 
     // Wait for the FFB thread to be created
