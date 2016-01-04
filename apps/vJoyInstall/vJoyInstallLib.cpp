@@ -1416,7 +1416,7 @@ Return Value:
 --*/
 {
     LPTSTR buffer = NULL;
-    DWORD reqSize = 0;
+    DWORD reqSize = 16000;
     //DWORD dataType;
     LPTSTR * array;
     DWORD szChars;
@@ -1424,10 +1424,13 @@ Return Value:
 
 
 	// Getting the size of required buffer
+#if 0
 	bRegProp = SetupDiGetDeviceRegistryProperty(Devs, DevInfo, Prop, NULL, NULL, 0, &reqSize);
 	DWORD err = GetLastError();
 	if (err != ERROR_INSUFFICIENT_BUFFER)
-         return NULL;
+		return NULL;
+
+#endif // 0
 
 
 	// Allocate buffer according to required size
@@ -1436,7 +1439,7 @@ Return Value:
         return NULL;
 
 	// Get the string into the buffer 
-	if (!SetupDiGetDeviceRegistryProperty(Devs, DevInfo, Prop, NULL, (LPBYTE)buffer, reqSize, NULL))
+	if (FALSE == SetupDiGetDeviceRegistryProperty(Devs, DevInfo, Prop, NULL, (LPBYTE)buffer, reqSize, &reqSize))
 		return NULL;
 
     szChars = reqSize/sizeof(TCHAR);
@@ -1779,18 +1782,18 @@ BOOL GetOEMInfFileName( HDEVINFO DeviceInfoSet, SP_DEVINFO_DATA DeviceInfoData, 
 	// Extract file name from path
 	TCHAR Buffer[MAX_PATH], *p;
 	p = NULL;
-	DWORD size = GetFullPathName(driverInfoDetail.InfFileName, MAX_PATH , Buffer, &p);
-	if (size > 0 || size < MAX_PATH || p != NULL)
+	DWORD size = GetFullPathName(driverInfoDetail.InfFileName, MAX_PATH, Buffer, &p);
+	if (size > 0 && size < MAX_PATH && (p != NULL))
 	{
 		_tcsncpy_s(OEMInfFileName, size, p, size);
 		_stprintf_s(prt, MAX_PATH, "GetOEMInfFileName: Function GetFullPathName OK. INF file is %s", p);
-		StatusMessage( NULL, prt,  INFO);
+		StatusMessage(NULL, prt, INFO);
 	}
 	else
 	{
-		GetErrorString(ErrMsg,1000);
+		GetErrorString(ErrMsg, 1000);
 		_stprintf_s(prt, MAX_PATH, "GetOEMInfFileName: Function GetFullPathName failed with error: %s", ErrMsg);
-		StatusMessage( NULL, prt,  ERR);
+		StatusMessage(NULL, prt, ERR);
 		return FALSE;
 	};
 
