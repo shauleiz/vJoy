@@ -7,7 +7,7 @@
 #include <assert.h>
 #include <crtdbg.h>
 
-extern "C" 
+extern "C"
 {
 #include <setupapi.h>
 #include <Hidsdi.h>
@@ -181,7 +181,7 @@ VJOYINTERFACE_API BOOL	__cdecl	AcquireVJD(UINT rID)
         return TRUE;
     }
     else
-    { 
+    {
         vJoyDeviceRemove(rID);
         return FALSE;
     }
@@ -299,11 +299,11 @@ VJOYINTERFACE_API enum VjdStat	__cdecl	GetVJDStatus(UINT rID)
     3. VJD_STAT_BUSY:	The  vJoy Device is owned by another application. It cannot be acquired by this application.
         First it is checked that the VJD is not OWNED by the application.
         Then it this function tries to open a handle to it.
-        If failes with error  ERROR_ACCESS_DENIED then it is BUSY.	
+        If failes with error  ERROR_ACCESS_DENIED then it is BUSY.
     4. VJD_STAT_MISS:	The  vJoy Device is missing. It either does not exist or the driver is down.
         First it is checked that the VJD is not OWNED by the application.
         Then it this function tries to open a handle to it.
-        If failes with error other than ERROR_ACCESS_DENIED then it is MISSing.	
+        If failes with error other than ERROR_ACCESS_DENIED then it is MISSing.
     5. VJD_STAT_UNKN: Unknown state.
 **/
 {
@@ -462,7 +462,7 @@ VJOYINTERFACE_API BOOL	__cdecl	DriverMatch(WORD * DllVer, WORD * DrvVer)
     If DrvVer a valid pointer - sets the version of driver			(e.g. 0x0205)
     */
 {
-    
+
     WORD vJoyVersion = GetvJoyVersion();
     WORD DLLVersion = (VER_X_ << 12) + (VER_H_ << 8) + (VER_M_ << 4) + VER_L_;
 
@@ -515,9 +515,9 @@ VJOYINTERFACE_API BOOL	__cdecl GetVJDAxisExist(UINT rID, UINT Axis)
     case HID_USAGE_WHL:
         return vJoyDevices[rID].DeviceControls.Wheel;
     };
-        
+
     return FALSE;
-    
+
 }
 VJOYINTERFACE_API BOOL	__cdecl GetVJDAxisMax(UINT rID, UINT Axis, LONG * Max)
 {
@@ -679,7 +679,7 @@ VJOYINTERFACE_API int	__cdecl GetVJDDiscPovNumber(UINT rID)
     if (!h || h==INVALID_HANDLE_VALUE)
         return 0;
 
-    BOOL ok = HidD_GetPreparsedData(h,&PreparsedData); 
+    BOOL ok = HidD_GetPreparsedData(h,&PreparsedData);
 #else
     HANDLE h = INVALID_HANDLE_VALUE;
     BOOL ok = Get_PreparsedData(rID, &PreparsedData);
@@ -699,7 +699,7 @@ VJOYINTERFACE_API int	__cdecl GetVJDDiscPovNumber(UINT rID)
 
     // Get data related to values (axes/POVs)
     int Usage, DataIndex;
-    USHORT n = Capabilities.NumberInputValueCaps; 
+    USHORT n = Capabilities.NumberInputValueCaps;
     if (n<1)
     {
         CloseHandle(h);
@@ -749,7 +749,7 @@ VJOYINTERFACE_API int	__cdecl GetVJDContPovNumber(UINT rID)
     if (!h || h==INVALID_HANDLE_VALUE)
         return 0;
 
-    BOOL ok = HidD_GetPreparsedData(h,&PreparsedData); 
+    BOOL ok = HidD_GetPreparsedData(h,&PreparsedData);
 #else
     HANDLE h = INVALID_HANDLE_VALUE;
     BOOL ok = Get_PreparsedData(rID, &PreparsedData);
@@ -769,7 +769,7 @@ VJOYINTERFACE_API int	__cdecl GetVJDContPovNumber(UINT rID)
 
     // Get data related to values (axes/POVs)
     int Usage, DataIndex;
-    USHORT n = Capabilities.NumberInputValueCaps; 
+    USHORT n = Capabilities.NumberInputValueCaps;
     if (n<1)
     {
         CloseHandle(h);
@@ -1015,7 +1015,7 @@ VJOYINTERFACE_API BOOL	__cdecl	SetDiscPov(int Value, UINT rID, UCHAR nPov)
 {
     // Write Value to a given descrete POV defined in the specified VDJ
     // nPov: POV serial number (1-4)
-    // Write Value to a given continuous POV defined in the specified VDJ 
+    // Write Value to a given continuous POV defined in the specified VDJ
     DWORD Mask = 0x0F;
     DWORD input;
 
@@ -1024,7 +1024,7 @@ VJOYINTERFACE_API BOOL	__cdecl	SetDiscPov(int Value, UINT rID, UCHAR nPov)
 
 	//input = (DWORD)Value;
 	Value &= 0x0F;
-    
+
 
     input = Value<<(4*(nPov-1));
     Mask = Mask<<(4*(nPov-1));
@@ -1247,7 +1247,7 @@ HANDLE	GetHandleByIndex(int index)
     deviceInfoData.cbSize = sizeof (SP_DEVICE_INTERFACE_DATA);
     BOOL isOK;
 
-    // Get Interface data for Device[index] 
+    // Get Interface data for Device[index]
     isOK = SetupDiEnumDeviceInterfaces(hardwareDeviceInfo,
         0, // No care about specific PDOs
         &HidGuid,
@@ -1264,7 +1264,7 @@ HANDLE	GetHandleByIndex(int index)
         if (lasterror == ERROR_NO_MORE_ITEMS) // 0x103
             return NULL;
         else
-            return INVALID_HANDLE_VALUE;	 // 
+            return INVALID_HANDLE_VALUE;	 //
     }
 
     // allocate a function class device data structure to receive the
@@ -1316,7 +1316,7 @@ HANDLE	GetHandleByIndex(int index)
             functionClassDeviceData,
             predictedLength,
             &requiredLength,
-            NULL)) 
+            NULL))
         {
             if (LogStream)
                 _ftprintf_s(LogStream, _T("\n[%05d]Error: GetHandleByIndex(index=%d) - Failed SetupDiGetDeviceInterfaceDetail() [2]"), ProcessId, index);
@@ -1347,7 +1347,7 @@ HANDLE	GetHandleByIndex(int index)
         // Cleanup
             if (LogStream)
                 _ftprintf_s(LogStream, _T("\n[%05d]Info: GetHandleByIndex(index=%d) - Exit OK (Handle to %s)"), ProcessId, index, functionClassDeviceData->DevicePath);
-        LocalFree(functionClassDeviceData);	
+        LocalFree(functionClassDeviceData);
         SetupDiDestroyDeviceInfoList (hardwareDeviceInfo);
 
 
@@ -1444,7 +1444,7 @@ int		GetDeviceIndexByReportId(USHORT VendorId, USHORT ProductId, BYTE ReportId)
             return DevIndex;
     } ;
 
-    // No match 		
+    // No match
     if (LogStream)
             _ftprintf_s(LogStream, _T("\n[%05d]Error: GetDeviceIndexByReportId(%d) - No match"), ProcessId, ReportId);
     return -1;
@@ -1812,18 +1812,18 @@ BOOL	GetDeviceNameSpace(char ** NameSpace, int * Size, BOOL Refresh, DWORD *erro
         LocalFree(deviceInterfaceDetailData);
         deviceInterfaceDetailData = NULL;
         if (ok)
-        { 
+        {
             if (NameSpace)
                 *NameSpace = StatNS;
 			if (Size)
 				*Size = DestSize;
-            return TRUE; 
+            return TRUE;
         }
         else
             return FALSE;
 
     } //  SetupDiEnumDeviceInterfaces <<
-    else  
+    else
     {
         if (error)
             *error = GetLastError();
@@ -1831,7 +1831,7 @@ BOOL	GetDeviceNameSpace(char ** NameSpace, int * Size, BOOL Refresh, DWORD *erro
             _ftprintf_s(LogStream, _T("\n[%05d]Info: GetDeviceNameSpace() - SetupDiEnumDeviceInterfaces() interface is not a vJoy interface"), ProcessId);
         LocalFree(deviceInterfaceDetailData);
         deviceInterfaceDetailData = NULL;
-        return FALSE; // 
+        return FALSE; //
     };
 
     return FALSE;
@@ -1872,7 +1872,7 @@ HANDLE	OpenDeviceInterface(UINT iInterFace, DWORD *error)
         OPEN_EXISTING, // No special create flags
         FILE_FLAG_OVERLAPPED, // Overlapped read/write
         NULL);
-        
+
     if (INVALID_HANDLE_VALUE == file) {
         CloseHandle(file);
         if (error)
@@ -1981,7 +1981,7 @@ bool	GetDevInfo(HANDLE h, PVOID data)
     }
 
     // Delayed/Error
-    else 
+    else
     {
         // Error getting the data
         DWORD err = GetLastError();
@@ -1998,7 +1998,7 @@ bool	GetDevInfo(HANDLE h, PVOID data)
         BOOL gotdata = GetOverlappedResult(h, &OverLapped, &nBytesTranss, TRUE);
         CloseHandle(OverLapped.hEvent);
         if (gotdata && nBytesTranss)
-        { 
+        {
             if (LogStream)
                 _ftprintf_s(LogStream, _T("\n[%05d]Info: GetDevInfo() - gotdata=%d nBytesTranss=%d  Returns TRUE"), ProcessId, gotdata, nBytesTranss);
             return true;
@@ -2507,7 +2507,7 @@ void StartLogging(void)
     LPTSTR ProcessCmd = GetCommandLine();
     if (!ProcessCmd)
         return;
-    
+
     // Open file for writing.
     errno_t err;
     err = _tfopen_s(&LogStream, LogFileName, "a+");
@@ -2579,7 +2579,7 @@ HDEVNOTIFY RegistervJoyNotification(HWND Win)
     NotificationFilter.dbcc_classguid = InterfaceClassGuid;
 
 
-    h = RegisterDeviceNotification( 
+    h = RegisterDeviceNotification(
         Win,                       // events recipient
         &NotificationFilter,        // type of device
         DEVICE_NOTIFY_WINDOW_HANDLE  /* type of recipient handle*/
@@ -2665,7 +2665,7 @@ BOOL	Update(UINT rID)
     The function will return TRUE only if the writing was successful
 **/
 {
- 
+
     PVOID pData = &(vJoyDevices[rID].position);
     if (!pData || (vJoyDevices.find(rID) == vJoyDevices.end()) || Get_h(rID) == INVALID_HANDLE_VALUE || Get_stat(rID) != VJD_STAT_OWN)
         return FALSE;
@@ -2708,7 +2708,7 @@ BOOL	Update(UINT rID)
 /*
 Test if a given device supports a specific FFB Effect
 Indicate device by Device ID
-Indicate effect by its usage 
+Indicate effect by its usage
 If Device supports the FFB effect then return TRUE
 Else return FALSE
 */
@@ -2752,7 +2752,7 @@ BOOL	IsDeviceFfbEffect(UINT rID, UINT Effect)
     USHORT nb = Capabilities.NumberOutputButtonCaps;
 	if (nb < 4)
 		return FALSE;
-	 
+
 
     HIDP_BUTTON_CAPS *	bCaps = new HIDP_BUTTON_CAPS[nb];
 	if (!bCaps)
@@ -2762,7 +2762,7 @@ BOOL	IsDeviceFfbEffect(UINT rID, UINT Effect)
     stat = HidP_GetButtonCaps(HidP_Output, bCaps, &nb, PreparsedData);
 	if (FAILED(stat))
 		return FALSE;
-	
+
 	if (nb > nb_bu)
 		return FALSE;
 
@@ -2856,7 +2856,7 @@ VJOYINTERFACE_API BOOL __cdecl IsDeviceFfb(UINT rID)
         HIDP_LINK_COLLECTION_NODE Link = vLinks[cnt];
 
         // This collection is:
-        //  Usage Set Effect Report(0x21), 
+        //  Usage Set Effect Report(0x21),
         //  Usage Page Physical Interface (0x0F),
         //	Type= Output (2)
         if (Link.LinkUsage == 0x21 && Link.LinkUsagePage == 0xf && Link.CollectionType == 2)
@@ -2968,7 +2968,7 @@ int	DbgGetCaps(void)
             return 2;
 
         // This collection is:
-        //  Usage Set Effect Report(0x21), 
+        //  Usage Set Effect Report(0x21),
         //  Usage Page Physical Interface (0x0F),
         //	Type= Output (2)
 
@@ -3070,9 +3070,9 @@ INT		GetControls(UINT rID)
     vJoyDeviceEntry(rID);
 
     // Clean  DeviceControls structure
-    vJoyDevices[rID].DeviceControls = { FALSE, 
-        FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, 
-        FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, 
+    vJoyDevices[rID].DeviceControls = { FALSE,
+        FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE,
+        FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE,
         FALSE, FALSE, FALSE, 0, 0, 0 };
 
 
@@ -3210,7 +3210,7 @@ BOOL	GetAxisCaps(UINT rID, UINT Axis, HIDP_VALUE_CAPS * ValCaps)
 
     // Get data related to values (axes/POVs)
     UINT Usage;
-    USHORT n = Capabilities.NumberInputValueCaps; 
+    USHORT n = Capabilities.NumberInputValueCaps;
     if (n<1)
     {
         CloseHandle(h);
@@ -3246,7 +3246,7 @@ LONG	GetAxisLogMin(UINT rID, UINT Axis)
 
     if (rID<1 || rID>16)
         return 0;
-    
+
     HIDP_VALUE_CAPS pValCaps;
     if (!GetAxisCaps(rID,  Axis, &pValCaps))
         return 0;
@@ -3261,7 +3261,7 @@ LONG	GetAxisLogMax(UINT rID, UINT Axis)
 
     if (rID<1 || rID>16)
         return 0;
-    
+
     HIDP_VALUE_CAPS pValCaps;
     if (!GetAxisCaps(rID,  Axis, &pValCaps))
         return 0;
@@ -3315,7 +3315,7 @@ BOOL vJoyDeviceRemove(int rID)
 
     // Free Preparsed data
     if (vJoyDevices[rID].pPreParsedData)
-    { 
+    {
         HidD_FreePreparsedData((PHIDP_PREPARSED_DATA)vJoyDevices[rID].pPreParsedData);
         vJoyDevices[rID].pPreParsedData = NULL;
     };
@@ -3728,7 +3728,7 @@ int	  WINAPI FfbWaitForData(HANDLE *h)
 
 #define BUFFERSIZE 100 // TODO: Change to correct number
     UINT	IoCode = GET_FFB_DATA;
-    UINT	IoSize = BUFFERSIZE; 
+    UINT	IoSize = BUFFERSIZE;
     ULONG	bytes;
     UCHAR	FfbData[BUFFERSIZE];
     BOOL	gotdata;
@@ -3742,7 +3742,7 @@ int	  WINAPI FfbWaitForData(HANDLE *h)
     // Send joystick position structure to vJoy device
     hIoctlEvent = CreateEvent(NULL, TRUE, TRUE, NULL);
 
-    // Prepare container for incoming data 
+    // Prepare container for incoming data
     FfbDataPacket.size = 0;
     FfbDataPacket.cmd = 0;
     FfbDataPacket.data = new UCHAR[BUFFERSIZE];
@@ -3815,16 +3815,16 @@ BOOL FfbGetEffectState(void)
         ( FfbDataPacket.data[2] == 2) 		// or Start Solo
         )&&
         ( FfbDataPacket.data[3] > 0)			// Loop at least once
-        ) 
+        )
         FfbEffectState = TRUE;
 
     // Condition to stop effect
-    if ( 
+    if (
         (FfbDataPacket.cmd == IOCTL_HID_WRITE_REPORT)	&&		// Write data
         ( FfbDataPacket.data[0] == 0xA)	&&		// Report ID is 0xA
         ( FfbDataPacket.data[1] == 1)	&&		// Block index is 1
         ( FfbDataPacket.data[2] == 3)	  		// Stop
-        ) 
+        )
         FfbEffectState = FALSE;
 
     return FfbEffectState;
@@ -3840,7 +3840,7 @@ FFBEType FfbGetEffectType(void)
         };
     };
     return FfbEffectType;
-} 
+}
 
 // FFB Helper functions
 
@@ -3849,7 +3849,7 @@ VJOYINTERFACE_API DWORD __cdecl Ffb_h_DeviceID(const FFB_DATA * Packet, int *Dev
 // If Packet is NULL then returns ERROR_INVALID_PARAMETER. DeviceID is undefined.
 // If Packet is malformed or Device ID is out of range then returns ERROR_INVALID_DATA. DeviceID is undefined.
 {
-    // Routine validity checks 
+    // Routine validity checks
     if (!Packet)
         return ERROR_INVALID_PARAMETER;
     if (Packet->size <10)
@@ -3866,7 +3866,7 @@ VJOYINTERFACE_API DWORD __cdecl Ffb_h_Type(const FFB_DATA * Packet, FFBPType *Ty
 //If Packet is NULL then returns ERROR_INVALID_PARAMETER. Feature  is undefined.
 //If Packet is malformed then returns ERROR_INVALID_DATA. Feature is undefined.
 {
-    // Routine validity checks 
+    // Routine validity checks
     if (!Packet)
         return ERROR_INVALID_PARAMETER;
     if (Packet->size <10)
@@ -3890,7 +3890,7 @@ VJOYINTERFACE_API DWORD __cdecl Ffb_h_Packet(const FFB_DATA * Packet, WORD *Type
 //If Packet is NULL then returns ERROR_INVALID_PARAMETER. Output parameters are undefined.
 //If Packet is malformed then returns ERROR_INVALID_DATA. Output parameters are undefined.
 {
-    // Routine validity checks 
+    // Routine validity checks
     if (!Packet)
         return ERROR_INVALID_PARAMETER;
     if (Packet->size <10)
@@ -3907,7 +3907,7 @@ VJOYINTERFACE_API DWORD __cdecl Ffb_h_EBI(const FFB_DATA * Packet, int *Index)
 //If Packet is NULL then returns ERROR_INVALID_PARAMETER. Output parameters are undefined.
 //If Packet is malformed or does not contain an Effect Block Index then returns ERROR_INVALID_DATA. Output parameters are undefined.
 {
-    // Routine validity checks 
+    // Routine validity checks
     if (!Packet)
         return ERROR_INVALID_PARAMETER;
     if (Packet->size <10)
@@ -3930,7 +3930,7 @@ VJOYINTERFACE_API DWORD __cdecl Ffb_h_Eff_Report(const FFB_DATA * Packet, FFB_EF
 //If Packet is NULL then returns ERROR_INVALID_PARAMETER. Output parameters are undefined.
 //If Packet is malformed  then returns ERROR_INVALID_DATA. Output parameters are undefined.
 {
-    // Routine validity checks 
+    // Routine validity checks
     if (!Packet)
         return ERROR_INVALID_PARAMETER;
     if (Packet->size <22)
@@ -3965,7 +3965,7 @@ VJOYINTERFACE_API DWORD		__cdecl Ffb_h_Eff_Constant(const FFB_DATA * Packet, FFB
 //If Packet is NULL then returns ERROR_INVALID_PARAMETER. Output parameters are undefined.
 //If Packet is malformed  then returns ERROR_INVALID_DATA. Output parameters are undefined.
 {
-    // Routine validity checks 
+    // Routine validity checks
     if (!Packet)
         return ERROR_INVALID_PARAMETER;
     if (Packet->size <12)
@@ -3989,7 +3989,7 @@ VJOYINTERFACE_API DWORD __cdecl Ffb_h_Eff_Ramp(const FFB_DATA * Packet, FFB_EFF_
 //If Packet is NULL then returns ERROR_INVALID_PARAMETER. Output parameters are undefined.
 //If Packet is malformed  then returns ERROR_INVALID_DATA. Output parameters are undefined.
 {
-    // Routine validity checks 
+    // Routine validity checks
     if (!Packet)
         return ERROR_INVALID_PARAMETER;
     if (Packet->size <14)
@@ -4014,7 +4014,7 @@ VJOYINTERFACE_API DWORD __cdecl Ffb_h_EffOp(const FFB_DATA * Packet,  FFB_EFF_OP
 //If Packet is NULL then returns ERROR_INVALID_PARAMETER. Output parameters are undefined.
 //If Packet is malformed  then returns ERROR_INVALID_DATA. Output parameters are undefined.
 {
-    // Routine validity checks 
+    // Routine validity checks
     if (!Packet)
         return ERROR_INVALID_PARAMETER;
     if (Packet->size <12)
@@ -4038,7 +4038,7 @@ VJOYINTERFACE_API DWORD __cdecl Ffb_h_EffNew(const FFB_DATA * Packet, FFBEType *
 //If Packet is NULL then returns ERROR_INVALID_PARAMETER. Output parameters are undefined.
 //If Packet is malformed  then returns ERROR_INVALID_DATA. Output parameters are undefined.
 {
-    // Routine validity checks 
+    // Routine validity checks
     if (!Packet)
         return ERROR_INVALID_PARAMETER;
     if (Packet->size <12)
@@ -4060,7 +4060,7 @@ VJOYINTERFACE_API DWORD __cdecl Ffb_h_DevCtrl(const FFB_DATA * Packet,  FFB_CTRL
 //If Packet is NULL then returns ERROR_INVALID_PARAMETER. Output parameters are undefined.
 //If Packet is malformed  then returns ERROR_INVALID_DATA. Output parameters are undefined.
 {
-    // Routine validity checks 
+    // Routine validity checks
     if (!Packet)
         return ERROR_INVALID_PARAMETER;
     if (Packet->size <10)
@@ -4082,7 +4082,7 @@ VJOYINTERFACE_API DWORD __cdecl Ffb_h_DevGain(const FFB_DATA * Packet,  BYTE * G
 //If Packet is NULL then returns ERROR_INVALID_PARAMETER. Output parameters are undefined.
 //If Packet is malformed  then returns ERROR_INVALID_DATA. Output parameters are undefined.
 {
-    // Routine validity checks 
+    // Routine validity checks
     if (!Packet)
         return ERROR_INVALID_PARAMETER;
     if (Packet->size <10)
@@ -4105,7 +4105,7 @@ VJOYINTERFACE_API DWORD __cdecl Ffb_h_Eff_Period(const FFB_DATA * Packet,  FFB_E
 //If Packet is NULL then returns ERROR_INVALID_PARAMETER. Output parameters are undefined.
 //If Packet is malformed  then returns ERROR_INVALID_DATA. Output parameters are undefined.
 {
-    // Routine validity checks 
+    // Routine validity checks
     if (!Packet)
         return ERROR_INVALID_PARAMETER;
     if (Packet->size <20)
@@ -4131,7 +4131,7 @@ VJOYINTERFACE_API DWORD __cdecl Ffb_h_Eff_Cond(const FFB_DATA * Packet,  FFB_EFF
 //If Packet is NULL then returns ERROR_INVALID_PARAMETER. Output parameters are undefined.
 //If Packet is malformed  then returns ERROR_INVALID_DATA. Output parameters are undefined.
 {
-    // Routine validity checks 
+    // Routine validity checks
     if (!Packet)
         return ERROR_INVALID_PARAMETER;
     if (Packet->size <23)
@@ -4156,11 +4156,11 @@ VJOYINTERFACE_API DWORD __cdecl Ffb_h_Eff_Cond(const FFB_DATA * Packet,  FFB_EFF
 }
 
 VJOYINTERFACE_API DWORD __cdecl Ffb_h_Eff_Envlp(const FFB_DATA * Packet,  FFB_EFF_ENVLP*  Envelope)
-//If valid Packet was found then returns ERROR_SUCCESS and fills structure Envelope - 
+//If valid Packet was found then returns ERROR_SUCCESS and fills structure Envelope -
 //If Packet is NULL then returns ERROR_INVALID_PARAMETER. Output parameters are undefined.
 //If Packet is malformed  then returns ERROR_INVALID_DATA. Output parameters are undefined.
 {
-    // Routine validity checks 
+    // Routine validity checks
     if (!Packet)
         return ERROR_INVALID_PARAMETER;
     if (Packet->size <22)
