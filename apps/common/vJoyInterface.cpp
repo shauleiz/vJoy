@@ -2475,9 +2475,8 @@ This function is called from WndProc when message WM_DEVICECHANGE is received
 void StartLogging(void)
 {
     // Get environment variables - if logging NOT requested then return from function
-    LPTSTR LogLevel;
     DWORD dwRet=0;
-    LogLevel = new TCHAR[5];
+    TCHAR LogLevel[5];
     dwRet = GetEnvironmentVariable(INTERFACE_LOG_LEVEL, LogLevel, 4*sizeof(TCHAR));
     if (TRUE != dwRet)
         return;
@@ -2485,9 +2484,8 @@ void StartLogging(void)
 
     // Logging requested - Get the of output file name from the environment
     // If no output file name then use default file name (and path)
-    LPTSTR PathName, TempName;
-    PathName = new TCHAR[MAX_PATH];
-    TempName = new TCHAR[MAX_PATH];
+    TCHAR PathName[MAX_PATH];
+    TCHAR TempName[MAX_PATH];
     dwRet = GetEnvironmentVariable(INTERFACE_LOG_FILE, PathName, MAX_PATH);
     if (dwRet && dwRet < MAX_PATH)
         LogFileName = _tcsdup(PathName);
@@ -3258,7 +3256,7 @@ LONG	GetAxisLogMin(UINT rID, UINT Axis)
 
 LONG	GetAxisLogMax(UINT rID, UINT Axis)
 {
-    // Get the logical Minimum of a given axis in a given device
+    // Get the logical Maximum of a given axis in a given device
     // Default value is 0
 
     if (rID<1 || rID>16)
@@ -3734,7 +3732,6 @@ int	  WINAPI FfbWaitForData(HANDLE *h)
     ULONG	bytes;
     UCHAR	FfbData[BUFFERSIZE];
     BOOL	gotdata;
-    int i=0;
     DWORD	nBytesTranss = 1;
     HANDLE hIoctlEvent;
 
