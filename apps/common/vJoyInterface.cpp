@@ -272,7 +272,7 @@ VJOYINTERFACE_API BOOL	__cdecl	isVJDExists(UINT rID)
             _ftprintf_s(LogStream, _T("\n[%05d]Info: isVJDExists(%d) - Exit OK"), ProcessId, rID);
         CloseHandle(h);
         return TRUE;
-    };
+    }
 
     if (e == ERROR_ACCESS_DENIED)
     {
@@ -609,7 +609,7 @@ VJOYINTERFACE_API int	__cdecl GetVJDButtonNumber(UINT rID)
             _ftprintf_s(LogStream, _T("\n[%05d]Error: GetVJDButtonNumber(rID=%d) - Number of button Caps is %d"), ProcessId, rID, n);
         CloseHandle(h);
         return BAD_N_BTN_CAPS;
-    };
+    }
     HIDP_BUTTON_CAPS 	* bCaps = new HIDP_BUTTON_CAPS[n];
     SecureZeroMemory(bCaps, sizeof(HIDP_BUTTON_CAPS)*n);
     stat = HidP_GetButtonCaps(HidP_Input, bCaps, &n, PreparsedData);
@@ -620,7 +620,7 @@ VJOYINTERFACE_API int	__cdecl GetVJDButtonNumber(UINT rID)
         CloseHandle(h);
         delete[] 	bCaps;
         return BAD_BTN_CAPS;
-    };
+    }
 
     if (LogStream)
     {
@@ -645,7 +645,7 @@ VJOYINTERFACE_API int	__cdecl GetVJDButtonNumber(UINT rID)
         CloseHandle(h);
         delete[] 	bCaps;
         return BAD_BTN_RANGE;
-    };
+    }
 
     delete[] 	bCaps;
 //	HidD_FreePreparsedData(PreparsedData);
@@ -695,7 +695,7 @@ VJOYINTERFACE_API int	__cdecl GetVJDDiscPovNumber(UINT rID)
     {
         CloseHandle(h);
         return 0;
-    };
+    }
 
     // Get data related to values (axes/POVs)
     int Usage, DataIndex;
@@ -704,7 +704,7 @@ VJOYINTERFACE_API int	__cdecl GetVJDDiscPovNumber(UINT rID)
     {
         CloseHandle(h);
         return 0;
-    };
+    }
 
     PHIDP_VALUE_CAPS vCaps = new HIDP_VALUE_CAPS[1+n]; // Added 1 just to make the Analyzer happy
     stat = HidP_GetValueCaps(HidP_Input, vCaps, &n, PreparsedData);
@@ -718,8 +718,8 @@ VJOYINTERFACE_API int	__cdecl GetVJDDiscPovNumber(UINT rID)
                 res++;
             }
             DataIndex = ((vCaps[i]).NotRange).DataIndex; // Every control has an index
-        };
-    };
+        }
+    }
 
     //HidD_FreePreparsedData(PreparsedData);
     delete[](vCaps);
@@ -759,7 +759,7 @@ VJOYINTERFACE_API int	__cdecl GetVJDContPovNumber(UINT rID)
     {
         CloseHandle(h);
         return 0;
-    };
+    }
     stat = HidP_GetCaps(PreparsedData,&Capabilities);
     if (stat != HIDP_STATUS_SUCCESS)
     {
@@ -774,7 +774,7 @@ VJOYINTERFACE_API int	__cdecl GetVJDContPovNumber(UINT rID)
     {
         CloseHandle(h);
         return 0;
-    };
+    }
 
     PHIDP_VALUE_CAPS vCaps = new HIDP_VALUE_CAPS[1 + n]; // Added 1 just to make the Analyzer happy
     stat = HidP_GetValueCaps(HidP_Input, vCaps, &n, PreparsedData);
@@ -787,10 +787,10 @@ VJOYINTERFACE_API int	__cdecl GetVJDContPovNumber(UINT rID)
             {
                 //CloseHandle(h);
                 res++;
-            };
+            }
             DataIndex = ((vCaps[i]).NotRange).DataIndex; // Every control has an index
-        };
-    };
+        }
+    }
 
     //HidD_FreePreparsedData(PreparsedData);
     delete[](vCaps);
@@ -855,7 +855,7 @@ VJOYINTERFACE_API BOOL	__cdecl	ResetVJD(UINT rID)
                 return FALSE;
             }
         }
-    };
+    }
     CloseHandle(OverLapped.hEvent);
     if (LogStream)
         _ftprintf_s(LogStream, _T("\n[%05d]Info: UpdateVJD() - DeviceIoControl successful"), ProcessId);
@@ -873,7 +873,7 @@ VJOYINTERFACE_API VOID	__cdecl	ResetAll(void)
             continue;
         InitPosition(i);
         UpdateVJD(i, &(vJoyDevices[i].position));
-    };
+    }
 #else
     // Reset all controls to predefined values in all VDJ
     ResetVJD(0);
@@ -1005,7 +1005,7 @@ VJOYINTERFACE_API BOOL	__cdecl	SetBtn(BOOL Value, UINT rID, UCHAR nBtn)
         Mask = Mask<<(Shift);
         Mask = ~Mask;
         *Target &= Mask;
-    };
+    }
 
 
     return UpdateVJD(rID, &(vJoyDevices[rID].position));
@@ -1307,7 +1307,7 @@ HANDLE	GetHandleByIndex(int index)
             LocalFree(functionClassDeviceData);
             SetupDiDestroyDeviceInfoList (hardwareDeviceInfo);
             return NULL;
-        };
+        }
 
         //  Now, get the data into 'functionClassDeviceData'
         if (! SetupDiGetDeviceInterfaceDetail (
@@ -1405,7 +1405,7 @@ int		GetDeviceIndexById(USHORT VendorId, USHORT ProductId, int BaseIndex)
 			iFound = i - 1;
 		if (LogStream && (gotit == TRUE))
 			_ftprintf_s(LogStream, _T("\n[%05d]Info: GetDeviceIndexById(BaseIndex=%d) - index=%d; VendorId=%x; ProductId=%x; VersionNumber=%x"), ProcessId, BaseIndex, i, Attributes.VendorID, Attributes.ProductID, Attributes.VersionNumber);
-	};
+	}
 
 	//CloseHandle(h);
 	if (LogStream)
@@ -1465,13 +1465,13 @@ BOOL	GetDeviceProductString(int Index, PWSTR * pProductString)
     {
         CloseHandle(h);
         return FALSE;
-    };
+    }
 
 	if (TRUE != HidD_GetProductString(h, Buffer, 130))
     {
         CloseHandle(h);
         return FALSE;
-    };
+    }
 
     *pProductString = _wcsdup((PWSTR)Buffer);
     free(Buffer);
@@ -1496,13 +1496,13 @@ BOOL	GetDeviceManufacturerString(int Index, PWSTR * pManufacturerString)
 	{
 		CloseHandle(h);
 		return FALSE;
-	};
+	}
 
 	if (TRUE != HidD_GetManufacturerString(h, Buffer, sizeof(Buffer)))
 	{
 		CloseHandle(h);
 		return FALSE;
-	};
+	}
 
 	*pManufacturerString = _wcsdup((PWSTR)Buffer);
 	CloseHandle(h);
@@ -1526,7 +1526,7 @@ BOOL	GetDeviceSerialNumberString(int Index, PWSTR * pSerialNumberString)
     {
         CloseHandle(h);
         return FALSE;
-    };
+    }
 
     *pSerialNumberString = _wcsdup((PWSTR)Buffer);
     free(Buffer);
@@ -1553,7 +1553,7 @@ BOOL	GetDeviceVersionNumber(int Index, PUSHORT version)
     {
         CloseHandle(h);
         return FALSE;
-    };
+    }
 
     *version = Attributes.VersionNumber;
     CloseHandle(h);
@@ -1577,7 +1577,7 @@ BOOL	GetDeviceAttributes(int Index, PUSHORT vendorID, PUSHORT ProductID, PUSHORT
     {
         CloseHandle(h);
         return FALSE;
-    };
+    }
 
     *version = Attributes.VersionNumber;
     *vendorID = Attributes.VendorID;
@@ -1610,7 +1610,7 @@ int		GetvJoyReportId(int Index)
     {
         CloseHandle(h);
         return BAD_PREPARSED_DATA;
-    };
+    }
     stat = HidP_GetCaps(PreparsedData,&Capabilities);
     if (stat != HIDP_STATUS_SUCCESS)
     {
@@ -1631,8 +1631,8 @@ int		GetvJoyReportId(int Index)
             rID = bVals[0].ReportID;
             delete[](bVals);
             return rID;
-        };
-    };
+        }
+    }
 
     // Get Button data
     int ButtonBaseIndex, nButtons=0;
@@ -1645,7 +1645,7 @@ int		GetvJoyReportId(int Index)
         nButtons += ((bCaps[0]).Range).UsageMax - ((bCaps[0]).Range).UsageMin + 1;
         ButtonBaseIndex = ((bCaps[0]).Range).DataIndexMin;
 		rID = bCaps[0].ReportID;
-    };
+    }
 
     //HidD_FreePreparsedData(PreparsedData);
     CloseHandle(h);
@@ -1697,7 +1697,7 @@ BOOL	GetDeviceNameSpace(char ** NameSpace, int * Size, BOOL Refresh, DWORD *erro
         *NameSpace = StatNS;
         *Size = strlen(StatNS) + 1;
         return true;
-    };
+    }
 
     //
     // Open a handle to the device interface information set of class interfaces.
@@ -1753,7 +1753,7 @@ BOOL	GetDeviceNameSpace(char ** NameSpace, int * Size, BOOL Refresh, DWORD *erro
 				SetupDiDestroyDeviceInfoList(hardwareDeviceInfo);
 				return FALSE; // INVALID_HANDLE_VALUE;
 			}
-		};  // SetupDiGetDeviceInterfaceDetail
+		}  // SetupDiGetDeviceInterfaceDetail
 
 #endif // 0
 
@@ -1788,7 +1788,7 @@ BOOL	GetDeviceNameSpace(char ** NameSpace, int * Size, BOOL Refresh, DWORD *erro
 				*error = GetLastError();
 				if (LogStream)
 					_ftprintf_s(LogStream, _T("\n[%05d]Error: GetDeviceNameSpace() - Failed SetupDiGetDeviceInterfaceDetail() with error %x"), ProcessId, *error);
-			};
+			}
 
 			SetupDiDestroyDeviceInfoList(hardwareDeviceInfo);
 			LocalFree(deviceInterfaceDetailData);
@@ -1832,7 +1832,7 @@ BOOL	GetDeviceNameSpace(char ** NameSpace, int * Size, BOOL Refresh, DWORD *erro
         LocalFree(deviceInterfaceDetailData);
         deviceInterfaceDetailData = NULL;
         return FALSE; //
-    };
+    }
 
     return FALSE;
 
@@ -1897,7 +1897,7 @@ HANDLE	OpenDeviceInterface(UINT iInterFace, DWORD *error)
         if (LogStream)
             _ftprintf_s(LogStream, _T("\n[%05d]Error: OpenDeviceInterface(%d) - Failed GetDevInfo()"), ProcessId, iInterFace);
         return INVALID_HANDLE_VALUE;
-    };
+    }
     if (LogStream)
         _ftprintf_s(LogStream, _T("\n[%05d]Info: OpenDeviceInterface(%d) - GetDevInfo() returned successfully for device %d"), ProcessId, iInterFace, info.DeviceID);
 
@@ -2009,7 +2009,7 @@ bool	GetDevInfo(HANDLE h, PVOID data)
                 _ftprintf_s(LogStream, _T("\n[%05d]Info: GetDevInfo() - gotdata=%d nBytesTranss=%d  Returns FALSE"), ProcessId, gotdata, nBytesTranss);
             return false;
         }
-    };
+    }
 }
 
 // Get device status for a given device
@@ -2092,8 +2092,7 @@ bool	GetDevStat(BYTE id, int * nbytes, BYTE * buffer)
                 _ftprintf_s(LogStream, _T("\n[%05d]Info: GetDevStat() - gotdata=%d nBytesTranss=%d  Returns FALSE"), ProcessId, gotdata, nBytesTranss);
             return false;
         }
-    };
-
+    }
 
 }
 
@@ -2173,7 +2172,7 @@ bool	GetDrvStat(int * nbytes, BYTE * buffer)
                 _ftprintf_s(LogStream, _T("\n[%05d]Info: GetDrvStat() - gotdata=%d nBytesTranss=%d  Returns FALSE"), ProcessId, gotdata, nBytesTranss);
             return false;
         }
-    };
+    }
 
 }
 /*
@@ -2209,7 +2208,7 @@ bool ExtractNamespace(const char *SrcDevicePath, char * DestDevicePath, int * De
     {
         *DestSize = size;
         return true;
-    };
+    }
 
     // If output buffer is too small return false
     if (size<*DestSize)
@@ -2428,7 +2427,7 @@ This function is called from WndProc when message WM_DEVICECHANGE is received
                 cnt_complete = 0;
             }
 
-        };
+        }
 
         // Request to disable/remove Raw PDO
         // First, it sends a message that the open handle should be released
@@ -2441,7 +2440,7 @@ This function is called from WndProc when message WM_DEVICECHANGE is received
             Set_hNotify(i, NULL);
             RelinquishVJD(i);
             vJoyDeviceRemove(i);
-        };
+        }
 
         // Releases the handle to the control file
         UnregisterDeviceNotification(hDeviceNotifyHandle0);
@@ -2452,7 +2451,7 @@ This function is called from WndProc when message WM_DEVICECHANGE is received
         vJoyDeviceClear();
         mFfbEffect.clear();
         return;
-    };
+    }
 
     if (wParam == DBT_DEVICEARRIVAL)
     {
@@ -2463,12 +2462,12 @@ This function is called from WndProc when message WM_DEVICECHANGE is received
         {
             RemovalFunc(FALSE, FALSE, RemovalData);
             cnt_arrive = 0;
-        };
+        }
         return;
         // Request to enable/install Raw PDO
         // It sends a message for each of the 16 interfaces that are enabled
         // This is how we know that it has been installed
-    };
+    }
 
 }
 
@@ -2534,7 +2533,7 @@ void	InitDll(void)
     {
         MessageBox(NULL, _T("Create window process on another thread failed!"), _T("vJoyInterface DLL"), NULL);
         return;
-    };
+    }
 
     HANDLE hThread = CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)&CreateDummyWindow,0,0,&dwThreadId);
 
@@ -2554,7 +2553,7 @@ void	InitDll(void)
     {
         Init=TRUE;
         hDeviceNotifyInterFace = RegistervJoyNotification(hWnd);
-    };
+    }
 }
 HDEVNOTIFY RegistervJoyNotification(HWND Win)
 // Register event to catch changes in vJoy device interfaces
@@ -2700,7 +2699,7 @@ BOOL	Update(UINT rID)
             else
                 res = FALSE;
         }
-    };
+    }
     CloseHandle(OverLapped.hEvent);
     return res;
 }
@@ -2736,7 +2735,7 @@ BOOL	IsDeviceFfbEffect(UINT rID, UINT Effect)
         //HidD_FreePreparsedData(PreparsedData);
         CloseHandle(h);
         return FALSE;
-    };
+    }
 
     // returns a top-level collection's HIDP_CAPS structure.
     stat = HidP_GetCaps(PreparsedData, &Capabilities);
@@ -2783,7 +2782,7 @@ BOOL	IsDeviceFfbEffect(UINT rID, UINT Effect)
                 Out = TRUE;
                 break;
             }
-    };
+    }
 
 
     //HidD_FreePreparsedData(PreparsedData);
@@ -2822,7 +2821,7 @@ VJOYINTERFACE_API BOOL __cdecl IsDeviceFfb(UINT rID)
         //HidD_FreePreparsedData(PreparsedData);
         CloseHandle(h);
         return FALSE;
-    };
+    }
 
     // returns a top-level collection's HIDP_CAPS structure.
     stat = HidP_GetCaps(PreparsedData, &Capabilities);
@@ -2841,7 +2840,7 @@ VJOYINTERFACE_API BOOL __cdecl IsDeviceFfb(UINT rID)
         CloseHandle(h);
         //HidD_FreePreparsedData(PreparsedData);
         return FALSE;
-    };
+    }
 
     // Get array of of link collections
     PHIDP_LINK_COLLECTION_NODE vLinks = new   HIDP_LINK_COLLECTION_NODE[1 + n];
@@ -2865,7 +2864,7 @@ VJOYINTERFACE_API BOOL __cdecl IsDeviceFfb(UINT rID)
             Out = TRUE;
             break;
         }
-    };
+    }
 
     // Cleanuo & Exit
     //HidD_FreePreparsedData(PreparsedData);
@@ -2900,7 +2899,7 @@ int	DbgGetCaps(void)
     {
         CloseHandle(h);
         return BAD_PREPARSED_DATA;
-    };
+    }
 
     // returns a top-level collection's HIDP_CAPS structure.
     stat = HidP_GetCaps(PreparsedData, &Capabilities);
@@ -2917,7 +2916,7 @@ int	DbgGetCaps(void)
     {
         CloseHandle(h);
         return BAD_N_VAL_CAPS;
-    };
+    }
 
     // Get array of of link collections
     PHIDP_LINK_COLLECTION_NODE vLinks = new   HIDP_LINK_COLLECTION_NODE[1 + n];
@@ -2983,7 +2982,7 @@ int	DbgGetCaps(void)
     {
         CloseHandle(h);
         return BAD_N_VAL_CAPS;
-    };
+    }
 
     bool  Effect_Block = false;
     PHIDP_VALUE_CAPS vCaps = new HIDP_VALUE_CAPS[1 + ns]; // Added 1 just to make the Analyzer happy
@@ -2996,7 +2995,7 @@ int	DbgGetCaps(void)
                 && vCaps[i].LinkUsage == 0x21 //    Usage Set Effect Report
                 )
                 Effect_Block = true;
-    };
+    }
 
     // Get output buttons
 	USHORT nb_bu;
@@ -3020,7 +3019,7 @@ int	DbgGetCaps(void)
                 && bCaps[i].NotRange.Usage == 0x28 	//    Usage ET Custom Force Data (Do it for all 12 effects)
                 )
                 Custom_Force = true;
-    };
+    }
 
 
     //HidD_FreePreparsedData(PreparsedData);
@@ -3056,7 +3055,7 @@ INT		GetControls(UINT rID)
     {
         CloseHandle(h);
         return BAD_PREPARSED_DATA;
-    };
+    }
 
     // Get device's capabilities
     stat = HidP_GetCaps(PreparsedData, &Capabilities);
@@ -3083,7 +3082,7 @@ INT		GetControls(UINT rID)
     {
         CloseHandle(h);
         return BAD_N_BTN_CAPS;
-    };
+    }
 
     HIDP_BUTTON_CAPS 	* bCaps = new HIDP_BUTTON_CAPS[n];
     SecureZeroMemory(bCaps, sizeof(HIDP_BUTTON_CAPS)*n);
@@ -3093,7 +3092,7 @@ INT		GetControls(UINT rID)
         CloseHandle(h);
         delete[] 	bCaps;
         return BAD_BTN_CAPS;
-    };
+    }
 
     if (bCaps[0].IsRange)
         vJoyDevices[rID].DeviceControls.nButtons = (bCaps[0].Range).UsageMax - (bCaps[0].Range).UsageMin + 1;
@@ -3106,7 +3105,7 @@ INT		GetControls(UINT rID)
     {
         CloseHandle(h);
         return BAD_N_VAL_CAPS;
-    };
+    }
 
 
     PHIDP_VALUE_CAPS vCaps = new HIDP_VALUE_CAPS[1 + n]; // Added 1 just to make the Analyzer happy
@@ -3154,8 +3153,8 @@ INT		GetControls(UINT rID)
             default:
                 break;
             }
-        };
-    };
+        }
+    }
 
     vJoyDevices[rID].DeviceControls.Init = TRUE;
     //HidD_FreePreparsedData(PreparsedData);
@@ -3200,7 +3199,7 @@ BOOL	GetAxisCaps(UINT rID, UINT Axis, HIDP_VALUE_CAPS * ValCaps)
     {
         CloseHandle(h);
         return BAD_PREPARSED_DATA;
-    };
+    }
     stat = HidP_GetCaps(PreparsedData,&Capabilities);
     if (stat != HIDP_STATUS_SUCCESS)
     {
@@ -3215,7 +3214,7 @@ BOOL	GetAxisCaps(UINT rID, UINT Axis, HIDP_VALUE_CAPS * ValCaps)
     {
         CloseHandle(h);
         return BAD_N_VAL_CAPS;
-    };
+    }
     PHIDP_VALUE_CAPS vCaps = new HIDP_VALUE_CAPS[1 + n]; // Added 1 just to make the Analyzer happy
     stat = HidP_GetValueCaps(HidP_Input, vCaps, &n, PreparsedData);
     if (stat==HIDP_STATUS_SUCCESS)
@@ -3229,9 +3228,9 @@ BOOL	GetAxisCaps(UINT rID, UINT Axis, HIDP_VALUE_CAPS * ValCaps)
                 memcpy(ValCaps, (void *)(&(vCaps[i])), sizeof(HIDP_VALUE_CAPS));
                 delete[](vCaps);
                 return TRUE;
-            };
-        };
-    };
+            }
+        }
+    }
 
     //HidD_FreePreparsedData(PreparsedData);
     delete[](vCaps);
@@ -3318,7 +3317,7 @@ BOOL vJoyDeviceRemove(int rID)
     {
         HidD_FreePreparsedData((PHIDP_PREPARSED_DATA)vJoyDevices[rID].pPreParsedData);
         vJoyDevices[rID].pPreParsedData = NULL;
-    };
+    }
 
     // Close handle to device
     CloseHandle(vJoyDevices[rID].h);
@@ -3359,7 +3358,7 @@ BOOL  Set_PreparsedData(int rID)
     {
         HidD_FreePreparsedData((PHIDP_PREPARSED_DATA)vJoyDevices[rID].pPreParsedData);
         vJoyDevices[rID].pPreParsedData = NULL;
-    };
+    }
 
     // Get handle to top-level collection
     PHIDP_PREPARSED_DATA PreparsedData = NULL;
@@ -3376,7 +3375,7 @@ BOOL  Set_PreparsedData(int rID)
     else
     {
         vJoyDevices[rID].pPreParsedData = PreparsedData;
-    };
+    }
     return ok;
 }
 
@@ -3402,7 +3401,7 @@ BOOL Get_PreparsedData(int rID, PHIDP_PREPARSED_DATA * pPPData)
         NTSTATUS stat = HidP_GetCaps(*pPPData, &Capabilities);
         if (stat == HIDP_STATUS_SUCCESS)
             return TRUE;
-    };
+    }
 
     if (Set_PreparsedData(rID))
     {
@@ -3553,7 +3552,7 @@ bool  FfbStart(HANDLE h) // Obsolete
                 return FALSE;
             }
         }
-    };
+    }
     CloseHandle(OverLapped.hEvent);
     if (LogStream)
         _ftprintf_s(LogStream, _T("\n[%05d]Info: FfbStart() - DeviceIoControl successful"), ProcessId);
@@ -3570,7 +3569,7 @@ bool  FfbStart(HANDLE h) // Obsolete
     {
         MessageBox(NULL, _T("Creation of Ffb data-loop failed!"),	_T("vJoyInterface DLL"), NULL);
         return false;
-    };
+    }
 
 
     if (dwFfbThreadId)
@@ -3596,7 +3595,7 @@ bool  FfbStartThread(HANDLE h)
     {
         MessageBox(NULL, _T("Creation of Ffb data-loop failed!"), _T("vJoyInterface DLL"), NULL);
         return false;
-    };
+    }
 
 
     if (dwFfbThreadId)
@@ -3648,7 +3647,7 @@ bool	FfbStop(HANDLE h)	// Obsolete
                 return FALSE;
             }
         }
-    };
+    }
     CloseHandle(OverLapped.hEvent);
     if (LogStream)
         _ftprintf_s(LogStream, _T("\n[%05d]Info: FfbStop() - DeviceIoControl successful"), ProcessId);
@@ -3701,7 +3700,7 @@ bool	FfbIsStarted(HANDLE h)
                 _ftprintf_s(LogStream, _T("\n[%05d]Error: FfbIsStarted() - error (0x%X) Returns FALSE"), ProcessId, err);
             CloseHandle(OverLapped.hEvent);
             return false;
-        };
+        }
 
         // Wait until data ready
         DWORD nBytesTranss = 0;
@@ -3718,8 +3717,8 @@ bool	FfbIsStarted(HANDLE h)
             if (LogStream)
                 _ftprintf_s(LogStream, _T("\n[%05d]Info: FfbIsStarted() - gotdata=%d nBytesTranss=%d  Returns FALSE"), ProcessId, gotdata, nBytesTranss);
             return false;
-        };
-    };
+        }
+    }
 }
 
 int	  WINAPI FfbWaitForData(HANDLE *h)
@@ -3837,8 +3836,8 @@ FFBEType FfbGetEffectType(void)
         if (FfbDataPacket.data[0] == 0x01)
         { // This is "Effect Type"
             FfbEffectType = (FFBEType)FfbDataPacket.data[1];
-        };
-    };
+        }
+    }
     return FfbEffectType;
 }
 
@@ -3957,7 +3956,7 @@ VJOYINTERFACE_API DWORD __cdecl Ffb_h_Eff_Report(const FFB_DATA * Packet, FFB_EF
     {
         Effect->DirX = Packet->data[12];
         Effect->DirY = Packet->data[13];
-    };
+    }
     return ERROR_SUCCESS;
 }
 VJOYINTERFACE_API DWORD		__cdecl Ffb_h_Eff_Constant(const FFB_DATA * Packet, FFB_EFF_CONSTANT *  ConstantEffect)
