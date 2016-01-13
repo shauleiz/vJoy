@@ -7,7 +7,7 @@
 #include <assert.h>
 #include <crtdbg.h>
 
-extern "C" 
+extern "C"
 {
 #include <setupapi.h>
 #include <Hidsdi.h>
@@ -181,7 +181,7 @@ VJOYINTERFACE_API BOOL	__cdecl	AcquireVJD(UINT rID)
         return TRUE;
     }
     else
-    { 
+    {
         vJoyDeviceRemove(rID);
         return FALSE;
     }
@@ -272,7 +272,7 @@ VJOYINTERFACE_API BOOL	__cdecl	isVJDExists(UINT rID)
             _ftprintf_s(LogStream, _T("\n[%05d]Info: isVJDExists(%d) - Exit OK"), ProcessId, rID);
         CloseHandle(h);
         return TRUE;
-    };
+    }
 
     if (e == ERROR_ACCESS_DENIED)
     {
@@ -299,11 +299,11 @@ VJOYINTERFACE_API enum VjdStat	__cdecl	GetVJDStatus(UINT rID)
     3. VJD_STAT_BUSY:	The  vJoy Device is owned by another application. It cannot be acquired by this application.
         First it is checked that the VJD is not OWNED by the application.
         Then it this function tries to open a handle to it.
-        If failes with error  ERROR_ACCESS_DENIED then it is BUSY.	
+        If failes with error  ERROR_ACCESS_DENIED then it is BUSY.
     4. VJD_STAT_MISS:	The  vJoy Device is missing. It either does not exist or the driver is down.
         First it is checked that the VJD is not OWNED by the application.
         Then it this function tries to open a handle to it.
-        If failes with error other than ERROR_ACCESS_DENIED then it is MISSing.	
+        If failes with error other than ERROR_ACCESS_DENIED then it is MISSing.
     5. VJD_STAT_UNKN: Unknown state.
 **/
 {
@@ -462,7 +462,7 @@ VJOYINTERFACE_API BOOL	__cdecl	DriverMatch(WORD * DllVer, WORD * DrvVer)
     If DrvVer a valid pointer - sets the version of driver			(e.g. 0x0205)
     */
 {
-    
+
     WORD vJoyVersion = GetvJoyVersion();
     WORD DLLVersion = (VER_X_ << 12) + (VER_H_ << 8) + (VER_M_ << 4) + VER_L_;
 
@@ -515,9 +515,9 @@ VJOYINTERFACE_API BOOL	__cdecl GetVJDAxisExist(UINT rID, UINT Axis)
     case HID_USAGE_WHL:
         return vJoyDevices[rID].DeviceControls.Wheel;
     };
-        
+
     return FALSE;
-    
+
 }
 VJOYINTERFACE_API BOOL	__cdecl GetVJDAxisMax(UINT rID, UINT Axis, LONG * Max)
 {
@@ -609,7 +609,7 @@ VJOYINTERFACE_API int	__cdecl GetVJDButtonNumber(UINT rID)
             _ftprintf_s(LogStream, _T("\n[%05d]Error: GetVJDButtonNumber(rID=%d) - Number of button Caps is %d"), ProcessId, rID, n);
         CloseHandle(h);
         return BAD_N_BTN_CAPS;
-    };
+    }
     HIDP_BUTTON_CAPS 	* bCaps = new HIDP_BUTTON_CAPS[n];
     SecureZeroMemory(bCaps, sizeof(HIDP_BUTTON_CAPS)*n);
     stat = HidP_GetButtonCaps(HidP_Input, bCaps, &n, PreparsedData);
@@ -620,7 +620,7 @@ VJOYINTERFACE_API int	__cdecl GetVJDButtonNumber(UINT rID)
         CloseHandle(h);
         delete[] 	bCaps;
         return BAD_BTN_CAPS;
-    };
+    }
 
     if (LogStream)
     {
@@ -645,7 +645,7 @@ VJOYINTERFACE_API int	__cdecl GetVJDButtonNumber(UINT rID)
         CloseHandle(h);
         delete[] 	bCaps;
         return BAD_BTN_RANGE;
-    };
+    }
 
     delete[] 	bCaps;
 //	HidD_FreePreparsedData(PreparsedData);
@@ -679,7 +679,7 @@ VJOYINTERFACE_API int	__cdecl GetVJDDiscPovNumber(UINT rID)
     if (!h || h==INVALID_HANDLE_VALUE)
         return 0;
 
-    BOOL ok = HidD_GetPreparsedData(h,&PreparsedData); 
+    BOOL ok = HidD_GetPreparsedData(h,&PreparsedData);
 #else
     HANDLE h = INVALID_HANDLE_VALUE;
     BOOL ok = Get_PreparsedData(rID, &PreparsedData);
@@ -695,16 +695,16 @@ VJOYINTERFACE_API int	__cdecl GetVJDDiscPovNumber(UINT rID)
     {
         CloseHandle(h);
         return 0;
-    };
+    }
 
     // Get data related to values (axes/POVs)
     int Usage, DataIndex;
-    USHORT n = Capabilities.NumberInputValueCaps; 
+    USHORT n = Capabilities.NumberInputValueCaps;
     if (n<1)
     {
         CloseHandle(h);
         return 0;
-    };
+    }
 
     PHIDP_VALUE_CAPS vCaps = new HIDP_VALUE_CAPS[1+n]; // Added 1 just to make the Analyzer happy
     stat = HidP_GetValueCaps(HidP_Input, vCaps, &n, PreparsedData);
@@ -718,8 +718,8 @@ VJOYINTERFACE_API int	__cdecl GetVJDDiscPovNumber(UINT rID)
                 res++;
             }
             DataIndex = ((vCaps[i]).NotRange).DataIndex; // Every control has an index
-        };
-    };
+        }
+    }
 
     //HidD_FreePreparsedData(PreparsedData);
     delete[](vCaps);
@@ -749,7 +749,7 @@ VJOYINTERFACE_API int	__cdecl GetVJDContPovNumber(UINT rID)
     if (!h || h==INVALID_HANDLE_VALUE)
         return 0;
 
-    BOOL ok = HidD_GetPreparsedData(h,&PreparsedData); 
+    BOOL ok = HidD_GetPreparsedData(h,&PreparsedData);
 #else
     HANDLE h = INVALID_HANDLE_VALUE;
     BOOL ok = Get_PreparsedData(rID, &PreparsedData);
@@ -759,7 +759,7 @@ VJOYINTERFACE_API int	__cdecl GetVJDContPovNumber(UINT rID)
     {
         CloseHandle(h);
         return 0;
-    };
+    }
     stat = HidP_GetCaps(PreparsedData,&Capabilities);
     if (stat != HIDP_STATUS_SUCCESS)
     {
@@ -769,12 +769,12 @@ VJOYINTERFACE_API int	__cdecl GetVJDContPovNumber(UINT rID)
 
     // Get data related to values (axes/POVs)
     int Usage, DataIndex;
-    USHORT n = Capabilities.NumberInputValueCaps; 
+    USHORT n = Capabilities.NumberInputValueCaps;
     if (n<1)
     {
         CloseHandle(h);
         return 0;
-    };
+    }
 
     PHIDP_VALUE_CAPS vCaps = new HIDP_VALUE_CAPS[1 + n]; // Added 1 just to make the Analyzer happy
     stat = HidP_GetValueCaps(HidP_Input, vCaps, &n, PreparsedData);
@@ -787,10 +787,10 @@ VJOYINTERFACE_API int	__cdecl GetVJDContPovNumber(UINT rID)
             {
                 //CloseHandle(h);
                 res++;
-            };
+            }
             DataIndex = ((vCaps[i]).NotRange).DataIndex; // Every control has an index
-        };
-    };
+        }
+    }
 
     //HidD_FreePreparsedData(PreparsedData);
     delete[](vCaps);
@@ -855,7 +855,7 @@ VJOYINTERFACE_API BOOL	__cdecl	ResetVJD(UINT rID)
                 return FALSE;
             }
         }
-    };
+    }
     CloseHandle(OverLapped.hEvent);
     if (LogStream)
         _ftprintf_s(LogStream, _T("\n[%05d]Info: UpdateVJD() - DeviceIoControl successful"), ProcessId);
@@ -873,7 +873,7 @@ VJOYINTERFACE_API VOID	__cdecl	ResetAll(void)
             continue;
         InitPosition(i);
         UpdateVJD(i, &(vJoyDevices[i].position));
-    };
+    }
 #else
     // Reset all controls to predefined values in all VDJ
     ResetVJD(0);
@@ -1005,7 +1005,7 @@ VJOYINTERFACE_API BOOL	__cdecl	SetBtn(BOOL Value, UINT rID, UCHAR nBtn)
         Mask = Mask<<(Shift);
         Mask = ~Mask;
         *Target &= Mask;
-    };
+    }
 
 
     return UpdateVJD(rID, &(vJoyDevices[rID].position));
@@ -1015,7 +1015,7 @@ VJOYINTERFACE_API BOOL	__cdecl	SetDiscPov(int Value, UINT rID, UCHAR nPov)
 {
     // Write Value to a given descrete POV defined in the specified VDJ
     // nPov: POV serial number (1-4)
-    // Write Value to a given continuous POV defined in the specified VDJ 
+    // Write Value to a given continuous POV defined in the specified VDJ
     DWORD Mask = 0x0F;
     DWORD input;
 
@@ -1024,7 +1024,7 @@ VJOYINTERFACE_API BOOL	__cdecl	SetDiscPov(int Value, UINT rID, UCHAR nPov)
 
 	//input = (DWORD)Value;
 	Value &= 0x0F;
-    
+
 
     input = Value<<(4*(nPov-1));
     Mask = Mask<<(4*(nPov-1));
@@ -1247,7 +1247,7 @@ HANDLE	GetHandleByIndex(int index)
     deviceInfoData.cbSize = sizeof (SP_DEVICE_INTERFACE_DATA);
     BOOL isOK;
 
-    // Get Interface data for Device[index] 
+    // Get Interface data for Device[index]
     isOK = SetupDiEnumDeviceInterfaces(hardwareDeviceInfo,
         0, // No care about specific PDOs
         &HidGuid,
@@ -1264,7 +1264,7 @@ HANDLE	GetHandleByIndex(int index)
         if (lasterror == ERROR_NO_MORE_ITEMS) // 0x103
             return NULL;
         else
-            return INVALID_HANDLE_VALUE;	 // 
+            return INVALID_HANDLE_VALUE;	 //
     }
 
     // allocate a function class device data structure to receive the
@@ -1307,7 +1307,7 @@ HANDLE	GetHandleByIndex(int index)
             LocalFree(functionClassDeviceData);
             SetupDiDestroyDeviceInfoList (hardwareDeviceInfo);
             return NULL;
-        };
+        }
 
         //  Now, get the data into 'functionClassDeviceData'
         if (! SetupDiGetDeviceInterfaceDetail (
@@ -1316,7 +1316,7 @@ HANDLE	GetHandleByIndex(int index)
             functionClassDeviceData,
             predictedLength,
             &requiredLength,
-            NULL)) 
+            NULL))
         {
             if (LogStream)
                 _ftprintf_s(LogStream, _T("\n[%05d]Error: GetHandleByIndex(index=%d) - Failed SetupDiGetDeviceInterfaceDetail() [2]"), ProcessId, index);
@@ -1347,7 +1347,7 @@ HANDLE	GetHandleByIndex(int index)
         // Cleanup
             if (LogStream)
                 _ftprintf_s(LogStream, _T("\n[%05d]Info: GetHandleByIndex(index=%d) - Exit OK (Handle to %s)"), ProcessId, index, functionClassDeviceData->DevicePath);
-        LocalFree(functionClassDeviceData);	
+        LocalFree(functionClassDeviceData);
         SetupDiDestroyDeviceInfoList (hardwareDeviceInfo);
 
 
@@ -1405,7 +1405,7 @@ int		GetDeviceIndexById(USHORT VendorId, USHORT ProductId, int BaseIndex)
 			iFound = i - 1;
 		if (LogStream && (gotit == TRUE))
 			_ftprintf_s(LogStream, _T("\n[%05d]Info: GetDeviceIndexById(BaseIndex=%d) - index=%d; VendorId=%x; ProductId=%x; VersionNumber=%x"), ProcessId, BaseIndex, i, Attributes.VendorID, Attributes.ProductID, Attributes.VersionNumber);
-	};
+	}
 
 	//CloseHandle(h);
 	if (LogStream)
@@ -1444,7 +1444,7 @@ int		GetDeviceIndexByReportId(USHORT VendorId, USHORT ProductId, BYTE ReportId)
             return DevIndex;
     } ;
 
-    // No match 		
+    // No match
     if (LogStream)
             _ftprintf_s(LogStream, _T("\n[%05d]Error: GetDeviceIndexByReportId(%d) - No match"), ProcessId, ReportId);
     return -1;
@@ -1465,13 +1465,13 @@ BOOL	GetDeviceProductString(int Index, PWSTR * pProductString)
     {
         CloseHandle(h);
         return FALSE;
-    };
+    }
 
 	if (TRUE != HidD_GetProductString(h, Buffer, 130))
     {
         CloseHandle(h);
         return FALSE;
-    };
+    }
 
     *pProductString = _wcsdup((PWSTR)Buffer);
     free(Buffer);
@@ -1496,13 +1496,13 @@ BOOL	GetDeviceManufacturerString(int Index, PWSTR * pManufacturerString)
 	{
 		CloseHandle(h);
 		return FALSE;
-	};
+	}
 
 	if (TRUE != HidD_GetManufacturerString(h, Buffer, sizeof(Buffer)))
 	{
 		CloseHandle(h);
 		return FALSE;
-	};
+	}
 
 	*pManufacturerString = _wcsdup((PWSTR)Buffer);
 	CloseHandle(h);
@@ -1526,7 +1526,7 @@ BOOL	GetDeviceSerialNumberString(int Index, PWSTR * pSerialNumberString)
     {
         CloseHandle(h);
         return FALSE;
-    };
+    }
 
     *pSerialNumberString = _wcsdup((PWSTR)Buffer);
     free(Buffer);
@@ -1553,7 +1553,7 @@ BOOL	GetDeviceVersionNumber(int Index, PUSHORT version)
     {
         CloseHandle(h);
         return FALSE;
-    };
+    }
 
     *version = Attributes.VersionNumber;
     CloseHandle(h);
@@ -1577,7 +1577,7 @@ BOOL	GetDeviceAttributes(int Index, PUSHORT vendorID, PUSHORT ProductID, PUSHORT
     {
         CloseHandle(h);
         return FALSE;
-    };
+    }
 
     *version = Attributes.VersionNumber;
     *vendorID = Attributes.VendorID;
@@ -1610,7 +1610,7 @@ int		GetvJoyReportId(int Index)
     {
         CloseHandle(h);
         return BAD_PREPARSED_DATA;
-    };
+    }
     stat = HidP_GetCaps(PreparsedData,&Capabilities);
     if (stat != HIDP_STATUS_SUCCESS)
     {
@@ -1631,8 +1631,8 @@ int		GetvJoyReportId(int Index)
             rID = bVals[0].ReportID;
             delete[](bVals);
             return rID;
-        };
-    };
+        }
+    }
 
     // Get Button data
     int ButtonBaseIndex, nButtons=0;
@@ -1645,7 +1645,7 @@ int		GetvJoyReportId(int Index)
         nButtons += ((bCaps[0]).Range).UsageMax - ((bCaps[0]).Range).UsageMin + 1;
         ButtonBaseIndex = ((bCaps[0]).Range).DataIndexMin;
 		rID = bCaps[0].ReportID;
-    };
+    }
 
     //HidD_FreePreparsedData(PreparsedData);
     CloseHandle(h);
@@ -1697,7 +1697,7 @@ BOOL	GetDeviceNameSpace(char ** NameSpace, int * Size, BOOL Refresh, DWORD *erro
         *NameSpace = StatNS;
         *Size = strlen(StatNS) + 1;
         return true;
-    };
+    }
 
     //
     // Open a handle to the device interface information set of class interfaces.
@@ -1753,7 +1753,7 @@ BOOL	GetDeviceNameSpace(char ** NameSpace, int * Size, BOOL Refresh, DWORD *erro
 				SetupDiDestroyDeviceInfoList(hardwareDeviceInfo);
 				return FALSE; // INVALID_HANDLE_VALUE;
 			}
-		};  // SetupDiGetDeviceInterfaceDetail
+		}  // SetupDiGetDeviceInterfaceDetail
 
 #endif // 0
 
@@ -1788,7 +1788,7 @@ BOOL	GetDeviceNameSpace(char ** NameSpace, int * Size, BOOL Refresh, DWORD *erro
 				*error = GetLastError();
 				if (LogStream)
 					_ftprintf_s(LogStream, _T("\n[%05d]Error: GetDeviceNameSpace() - Failed SetupDiGetDeviceInterfaceDetail() with error %x"), ProcessId, *error);
-			};
+			}
 
 			SetupDiDestroyDeviceInfoList(hardwareDeviceInfo);
 			LocalFree(deviceInterfaceDetailData);
@@ -1812,18 +1812,18 @@ BOOL	GetDeviceNameSpace(char ** NameSpace, int * Size, BOOL Refresh, DWORD *erro
         LocalFree(deviceInterfaceDetailData);
         deviceInterfaceDetailData = NULL;
         if (ok)
-        { 
+        {
             if (NameSpace)
                 *NameSpace = StatNS;
 			if (Size)
 				*Size = DestSize;
-            return TRUE; 
+            return TRUE;
         }
         else
             return FALSE;
 
     } //  SetupDiEnumDeviceInterfaces <<
-    else  
+    else
     {
         if (error)
             *error = GetLastError();
@@ -1831,8 +1831,8 @@ BOOL	GetDeviceNameSpace(char ** NameSpace, int * Size, BOOL Refresh, DWORD *erro
             _ftprintf_s(LogStream, _T("\n[%05d]Info: GetDeviceNameSpace() - SetupDiEnumDeviceInterfaces() interface is not a vJoy interface"), ProcessId);
         LocalFree(deviceInterfaceDetailData);
         deviceInterfaceDetailData = NULL;
-        return FALSE; // 
-    };
+        return FALSE; //
+    }
 
     return FALSE;
 
@@ -1872,7 +1872,7 @@ HANDLE	OpenDeviceInterface(UINT iInterFace, DWORD *error)
         OPEN_EXISTING, // No special create flags
         FILE_FLAG_OVERLAPPED, // Overlapped read/write
         NULL);
-        
+
     if (INVALID_HANDLE_VALUE == file) {
         CloseHandle(file);
         if (error)
@@ -1897,7 +1897,7 @@ HANDLE	OpenDeviceInterface(UINT iInterFace, DWORD *error)
         if (LogStream)
             _ftprintf_s(LogStream, _T("\n[%05d]Error: OpenDeviceInterface(%d) - Failed GetDevInfo()"), ProcessId, iInterFace);
         return INVALID_HANDLE_VALUE;
-    };
+    }
     if (LogStream)
         _ftprintf_s(LogStream, _T("\n[%05d]Info: OpenDeviceInterface(%d) - GetDevInfo() returned successfully for device %d"), ProcessId, iInterFace, info.DeviceID);
 
@@ -1981,7 +1981,7 @@ bool	GetDevInfo(HANDLE h, PVOID data)
     }
 
     // Delayed/Error
-    else 
+    else
     {
         // Error getting the data
         DWORD err = GetLastError();
@@ -1998,7 +1998,7 @@ bool	GetDevInfo(HANDLE h, PVOID data)
         BOOL gotdata = GetOverlappedResult(h, &OverLapped, &nBytesTranss, TRUE);
         CloseHandle(OverLapped.hEvent);
         if (gotdata && nBytesTranss)
-        { 
+        {
             if (LogStream)
                 _ftprintf_s(LogStream, _T("\n[%05d]Info: GetDevInfo() - gotdata=%d nBytesTranss=%d  Returns TRUE"), ProcessId, gotdata, nBytesTranss);
             return true;
@@ -2009,7 +2009,7 @@ bool	GetDevInfo(HANDLE h, PVOID data)
                 _ftprintf_s(LogStream, _T("\n[%05d]Info: GetDevInfo() - gotdata=%d nBytesTranss=%d  Returns FALSE"), ProcessId, gotdata, nBytesTranss);
             return false;
         }
-    };
+    }
 }
 
 // Get device status for a given device
@@ -2092,8 +2092,7 @@ bool	GetDevStat(BYTE id, int * nbytes, BYTE * buffer)
                 _ftprintf_s(LogStream, _T("\n[%05d]Info: GetDevStat() - gotdata=%d nBytesTranss=%d  Returns FALSE"), ProcessId, gotdata, nBytesTranss);
             return false;
         }
-    };
-
+    }
 
 }
 
@@ -2173,7 +2172,7 @@ bool	GetDrvStat(int * nbytes, BYTE * buffer)
                 _ftprintf_s(LogStream, _T("\n[%05d]Info: GetDrvStat() - gotdata=%d nBytesTranss=%d  Returns FALSE"), ProcessId, gotdata, nBytesTranss);
             return false;
         }
-    };
+    }
 
 }
 /*
@@ -2209,7 +2208,7 @@ bool ExtractNamespace(const char *SrcDevicePath, char * DestDevicePath, int * De
     {
         *DestSize = size;
         return true;
-    };
+    }
 
     // If output buffer is too small return false
     if (size<*DestSize)
@@ -2428,7 +2427,7 @@ This function is called from WndProc when message WM_DEVICECHANGE is received
                 cnt_complete = 0;
             }
 
-        };
+        }
 
         // Request to disable/remove Raw PDO
         // First, it sends a message that the open handle should be released
@@ -2441,7 +2440,7 @@ This function is called from WndProc when message WM_DEVICECHANGE is received
             Set_hNotify(i, NULL);
             RelinquishVJD(i);
             vJoyDeviceRemove(i);
-        };
+        }
 
         // Releases the handle to the control file
         UnregisterDeviceNotification(hDeviceNotifyHandle0);
@@ -2452,7 +2451,7 @@ This function is called from WndProc when message WM_DEVICECHANGE is received
         vJoyDeviceClear();
         mFfbEffect.clear();
         return;
-    };
+    }
 
     if (wParam == DBT_DEVICEARRIVAL)
     {
@@ -2463,21 +2462,20 @@ This function is called from WndProc when message WM_DEVICECHANGE is received
         {
             RemovalFunc(FALSE, FALSE, RemovalData);
             cnt_arrive = 0;
-        };
+        }
         return;
         // Request to enable/install Raw PDO
         // It sends a message for each of the 16 interfaces that are enabled
         // This is how we know that it has been installed
-    };
+    }
 
 }
 
 void StartLogging(void)
 {
     // Get environment variables - if logging NOT requested then return from function
-    LPTSTR LogLevel;
     DWORD dwRet=0;
-    LogLevel = new TCHAR[5];
+    TCHAR LogLevel[5];
     dwRet = GetEnvironmentVariable(INTERFACE_LOG_LEVEL, LogLevel, 4*sizeof(TCHAR));
     if (TRUE != dwRet)
         return;
@@ -2485,9 +2483,8 @@ void StartLogging(void)
 
     // Logging requested - Get the of output file name from the environment
     // If no output file name then use default file name (and path)
-    LPTSTR PathName, TempName;
-    PathName = new TCHAR[MAX_PATH];
-    TempName = new TCHAR[MAX_PATH];
+    TCHAR PathName[MAX_PATH];
+    TCHAR TempName[MAX_PATH];
     dwRet = GetEnvironmentVariable(INTERFACE_LOG_FILE, PathName, MAX_PATH);
     if (dwRet && dwRet < MAX_PATH)
         LogFileName = _tcsdup(PathName);
@@ -2509,7 +2506,7 @@ void StartLogging(void)
     LPTSTR ProcessCmd = GetCommandLine();
     if (!ProcessCmd)
         return;
-    
+
     // Open file for writing.
     errno_t err;
     err = _tfopen_s(&LogStream, LogFileName, "a+");
@@ -2536,7 +2533,7 @@ void	InitDll(void)
     {
         MessageBox(NULL, _T("Create window process on another thread failed!"), _T("vJoyInterface DLL"), NULL);
         return;
-    };
+    }
 
     HANDLE hThread = CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)&CreateDummyWindow,0,0,&dwThreadId);
 
@@ -2556,7 +2553,7 @@ void	InitDll(void)
     {
         Init=TRUE;
         hDeviceNotifyInterFace = RegistervJoyNotification(hWnd);
-    };
+    }
 }
 HDEVNOTIFY RegistervJoyNotification(HWND Win)
 // Register event to catch changes in vJoy device interfaces
@@ -2581,7 +2578,7 @@ HDEVNOTIFY RegistervJoyNotification(HWND Win)
     NotificationFilter.dbcc_classguid = InterfaceClassGuid;
 
 
-    h = RegisterDeviceNotification( 
+    h = RegisterDeviceNotification(
         Win,                       // events recipient
         &NotificationFilter,        // type of device
         DEVICE_NOTIFY_WINDOW_HANDLE  /* type of recipient handle*/
@@ -2667,7 +2664,7 @@ BOOL	Update(UINT rID)
     The function will return TRUE only if the writing was successful
 **/
 {
- 
+
     PVOID pData = &(vJoyDevices[rID].position);
     if (!pData || (vJoyDevices.find(rID) == vJoyDevices.end()) || Get_h(rID) == INVALID_HANDLE_VALUE || Get_stat(rID) != VJD_STAT_OWN)
         return FALSE;
@@ -2702,7 +2699,7 @@ BOOL	Update(UINT rID)
             else
                 res = FALSE;
         }
-    };
+    }
     CloseHandle(OverLapped.hEvent);
     return res;
 }
@@ -2710,7 +2707,7 @@ BOOL	Update(UINT rID)
 /*
 Test if a given device supports a specific FFB Effect
 Indicate device by Device ID
-Indicate effect by its usage 
+Indicate effect by its usage
 If Device supports the FFB effect then return TRUE
 Else return FALSE
 */
@@ -2738,7 +2735,7 @@ BOOL	IsDeviceFfbEffect(UINT rID, UINT Effect)
         //HidD_FreePreparsedData(PreparsedData);
         CloseHandle(h);
         return FALSE;
-    };
+    }
 
     // returns a top-level collection's HIDP_CAPS structure.
     stat = HidP_GetCaps(PreparsedData, &Capabilities);
@@ -2754,7 +2751,7 @@ BOOL	IsDeviceFfbEffect(UINT rID, UINT Effect)
     USHORT nb = Capabilities.NumberOutputButtonCaps;
 	if (nb < 4)
 		return FALSE;
-	 
+
 
     HIDP_BUTTON_CAPS *	bCaps = new HIDP_BUTTON_CAPS[nb];
 	if (!bCaps)
@@ -2764,7 +2761,7 @@ BOOL	IsDeviceFfbEffect(UINT rID, UINT Effect)
     stat = HidP_GetButtonCaps(HidP_Output, bCaps, &nb, PreparsedData);
 	if (FAILED(stat))
 		return FALSE;
-	
+
 	if (nb > nb_bu)
 		return FALSE;
 
@@ -2785,7 +2782,7 @@ BOOL	IsDeviceFfbEffect(UINT rID, UINT Effect)
                 Out = TRUE;
                 break;
             }
-    };
+    }
 
 
     //HidD_FreePreparsedData(PreparsedData);
@@ -2824,7 +2821,7 @@ VJOYINTERFACE_API BOOL __cdecl IsDeviceFfb(UINT rID)
         //HidD_FreePreparsedData(PreparsedData);
         CloseHandle(h);
         return FALSE;
-    };
+    }
 
     // returns a top-level collection's HIDP_CAPS structure.
     stat = HidP_GetCaps(PreparsedData, &Capabilities);
@@ -2843,7 +2840,7 @@ VJOYINTERFACE_API BOOL __cdecl IsDeviceFfb(UINT rID)
         CloseHandle(h);
         //HidD_FreePreparsedData(PreparsedData);
         return FALSE;
-    };
+    }
 
     // Get array of of link collections
     PHIDP_LINK_COLLECTION_NODE vLinks = new   HIDP_LINK_COLLECTION_NODE[1 + n];
@@ -2858,7 +2855,7 @@ VJOYINTERFACE_API BOOL __cdecl IsDeviceFfb(UINT rID)
         HIDP_LINK_COLLECTION_NODE Link = vLinks[cnt];
 
         // This collection is:
-        //  Usage Set Effect Report(0x21), 
+        //  Usage Set Effect Report(0x21),
         //  Usage Page Physical Interface (0x0F),
         //	Type= Output (2)
         if (Link.LinkUsage == 0x21 && Link.LinkUsagePage == 0xf && Link.CollectionType == 2)
@@ -2867,7 +2864,7 @@ VJOYINTERFACE_API BOOL __cdecl IsDeviceFfb(UINT rID)
             Out = TRUE;
             break;
         }
-    };
+    }
 
     // Cleanuo & Exit
     //HidD_FreePreparsedData(PreparsedData);
@@ -2902,7 +2899,7 @@ int	DbgGetCaps(void)
     {
         CloseHandle(h);
         return BAD_PREPARSED_DATA;
-    };
+    }
 
     // returns a top-level collection's HIDP_CAPS structure.
     stat = HidP_GetCaps(PreparsedData, &Capabilities);
@@ -2919,7 +2916,7 @@ int	DbgGetCaps(void)
     {
         CloseHandle(h);
         return BAD_N_VAL_CAPS;
-    };
+    }
 
     // Get array of of link collections
     PHIDP_LINK_COLLECTION_NODE vLinks = new   HIDP_LINK_COLLECTION_NODE[1 + n];
@@ -2970,7 +2967,7 @@ int	DbgGetCaps(void)
             return 2;
 
         // This collection is:
-        //  Usage Set Effect Report(0x21), 
+        //  Usage Set Effect Report(0x21),
         //  Usage Page Physical Interface (0x0F),
         //	Type= Output (2)
 
@@ -2985,7 +2982,7 @@ int	DbgGetCaps(void)
     {
         CloseHandle(h);
         return BAD_N_VAL_CAPS;
-    };
+    }
 
     bool  Effect_Block = false;
     PHIDP_VALUE_CAPS vCaps = new HIDP_VALUE_CAPS[1 + ns]; // Added 1 just to make the Analyzer happy
@@ -2998,7 +2995,7 @@ int	DbgGetCaps(void)
                 && vCaps[i].LinkUsage == 0x21 //    Usage Set Effect Report
                 )
                 Effect_Block = true;
-    };
+    }
 
     // Get output buttons
 	USHORT nb_bu;
@@ -3022,7 +3019,7 @@ int	DbgGetCaps(void)
                 && bCaps[i].NotRange.Usage == 0x28 	//    Usage ET Custom Force Data (Do it for all 12 effects)
                 )
                 Custom_Force = true;
-    };
+    }
 
 
     //HidD_FreePreparsedData(PreparsedData);
@@ -3058,7 +3055,7 @@ INT		GetControls(UINT rID)
     {
         CloseHandle(h);
         return BAD_PREPARSED_DATA;
-    };
+    }
 
     // Get device's capabilities
     stat = HidP_GetCaps(PreparsedData, &Capabilities);
@@ -3072,9 +3069,9 @@ INT		GetControls(UINT rID)
     vJoyDeviceEntry(rID);
 
     // Clean  DeviceControls structure
-    vJoyDevices[rID].DeviceControls = { FALSE, 
-        FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, 
-        FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, 
+    vJoyDevices[rID].DeviceControls = { FALSE,
+        FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE,
+        FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE,
         FALSE, FALSE, FALSE, 0, 0, 0 };
 
 
@@ -3085,7 +3082,7 @@ INT		GetControls(UINT rID)
     {
         CloseHandle(h);
         return BAD_N_BTN_CAPS;
-    };
+    }
 
     HIDP_BUTTON_CAPS 	* bCaps = new HIDP_BUTTON_CAPS[n];
     SecureZeroMemory(bCaps, sizeof(HIDP_BUTTON_CAPS)*n);
@@ -3095,7 +3092,7 @@ INT		GetControls(UINT rID)
         CloseHandle(h);
         delete[] 	bCaps;
         return BAD_BTN_CAPS;
-    };
+    }
 
     if (bCaps[0].IsRange)
         vJoyDevices[rID].DeviceControls.nButtons = (bCaps[0].Range).UsageMax - (bCaps[0].Range).UsageMin + 1;
@@ -3108,7 +3105,7 @@ INT		GetControls(UINT rID)
     {
         CloseHandle(h);
         return BAD_N_VAL_CAPS;
-    };
+    }
 
 
     PHIDP_VALUE_CAPS vCaps = new HIDP_VALUE_CAPS[1 + n]; // Added 1 just to make the Analyzer happy
@@ -3156,8 +3153,8 @@ INT		GetControls(UINT rID)
             default:
                 break;
             }
-        };
-    };
+        }
+    }
 
     vJoyDevices[rID].DeviceControls.Init = TRUE;
     //HidD_FreePreparsedData(PreparsedData);
@@ -3202,7 +3199,7 @@ BOOL	GetAxisCaps(UINT rID, UINT Axis, HIDP_VALUE_CAPS * ValCaps)
     {
         CloseHandle(h);
         return BAD_PREPARSED_DATA;
-    };
+    }
     stat = HidP_GetCaps(PreparsedData,&Capabilities);
     if (stat != HIDP_STATUS_SUCCESS)
     {
@@ -3212,12 +3209,12 @@ BOOL	GetAxisCaps(UINT rID, UINT Axis, HIDP_VALUE_CAPS * ValCaps)
 
     // Get data related to values (axes/POVs)
     UINT Usage;
-    USHORT n = Capabilities.NumberInputValueCaps; 
+    USHORT n = Capabilities.NumberInputValueCaps;
     if (n<1)
     {
         CloseHandle(h);
         return BAD_N_VAL_CAPS;
-    };
+    }
     PHIDP_VALUE_CAPS vCaps = new HIDP_VALUE_CAPS[1 + n]; // Added 1 just to make the Analyzer happy
     stat = HidP_GetValueCaps(HidP_Input, vCaps, &n, PreparsedData);
     if (stat==HIDP_STATUS_SUCCESS)
@@ -3231,9 +3228,9 @@ BOOL	GetAxisCaps(UINT rID, UINT Axis, HIDP_VALUE_CAPS * ValCaps)
                 memcpy(ValCaps, (void *)(&(vCaps[i])), sizeof(HIDP_VALUE_CAPS));
                 delete[](vCaps);
                 return TRUE;
-            };
-        };
-    };
+            }
+        }
+    }
 
     //HidD_FreePreparsedData(PreparsedData);
     delete[](vCaps);
@@ -3248,7 +3245,7 @@ LONG	GetAxisLogMin(UINT rID, UINT Axis)
 
     if (rID<1 || rID>16)
         return 0;
-    
+
     HIDP_VALUE_CAPS pValCaps;
     if (!GetAxisCaps(rID,  Axis, &pValCaps))
         return 0;
@@ -3258,12 +3255,12 @@ LONG	GetAxisLogMin(UINT rID, UINT Axis)
 
 LONG	GetAxisLogMax(UINT rID, UINT Axis)
 {
-    // Get the logical Minimum of a given axis in a given device
+    // Get the logical Maximum of a given axis in a given device
     // Default value is 0
 
     if (rID<1 || rID>16)
         return 0;
-    
+
     HIDP_VALUE_CAPS pValCaps;
     if (!GetAxisCaps(rID,  Axis, &pValCaps))
         return 0;
@@ -3317,10 +3314,10 @@ BOOL vJoyDeviceRemove(int rID)
 
     // Free Preparsed data
     if (vJoyDevices[rID].pPreParsedData)
-    { 
+    {
         HidD_FreePreparsedData((PHIDP_PREPARSED_DATA)vJoyDevices[rID].pPreParsedData);
         vJoyDevices[rID].pPreParsedData = NULL;
-    };
+    }
 
     // Close handle to device
     CloseHandle(vJoyDevices[rID].h);
@@ -3361,7 +3358,7 @@ BOOL  Set_PreparsedData(int rID)
     {
         HidD_FreePreparsedData((PHIDP_PREPARSED_DATA)vJoyDevices[rID].pPreParsedData);
         vJoyDevices[rID].pPreParsedData = NULL;
-    };
+    }
 
     // Get handle to top-level collection
     PHIDP_PREPARSED_DATA PreparsedData = NULL;
@@ -3378,7 +3375,7 @@ BOOL  Set_PreparsedData(int rID)
     else
     {
         vJoyDevices[rID].pPreParsedData = PreparsedData;
-    };
+    }
     return ok;
 }
 
@@ -3404,7 +3401,7 @@ BOOL Get_PreparsedData(int rID, PHIDP_PREPARSED_DATA * pPPData)
         NTSTATUS stat = HidP_GetCaps(*pPPData, &Capabilities);
         if (stat == HIDP_STATUS_SUCCESS)
             return TRUE;
-    };
+    }
 
     if (Set_PreparsedData(rID))
     {
@@ -3555,7 +3552,7 @@ bool  FfbStart(HANDLE h) // Obsolete
                 return FALSE;
             }
         }
-    };
+    }
     CloseHandle(OverLapped.hEvent);
     if (LogStream)
         _ftprintf_s(LogStream, _T("\n[%05d]Info: FfbStart() - DeviceIoControl successful"), ProcessId);
@@ -3572,7 +3569,7 @@ bool  FfbStart(HANDLE h) // Obsolete
     {
         MessageBox(NULL, _T("Creation of Ffb data-loop failed!"),	_T("vJoyInterface DLL"), NULL);
         return false;
-    };
+    }
 
 
     if (dwFfbThreadId)
@@ -3598,7 +3595,7 @@ bool  FfbStartThread(HANDLE h)
     {
         MessageBox(NULL, _T("Creation of Ffb data-loop failed!"), _T("vJoyInterface DLL"), NULL);
         return false;
-    };
+    }
 
 
     if (dwFfbThreadId)
@@ -3650,7 +3647,7 @@ bool	FfbStop(HANDLE h)	// Obsolete
                 return FALSE;
             }
         }
-    };
+    }
     CloseHandle(OverLapped.hEvent);
     if (LogStream)
         _ftprintf_s(LogStream, _T("\n[%05d]Info: FfbStop() - DeviceIoControl successful"), ProcessId);
@@ -3703,7 +3700,7 @@ bool	FfbIsStarted(HANDLE h)
                 _ftprintf_s(LogStream, _T("\n[%05d]Error: FfbIsStarted() - error (0x%X) Returns FALSE"), ProcessId, err);
             CloseHandle(OverLapped.hEvent);
             return false;
-        };
+        }
 
         // Wait until data ready
         DWORD nBytesTranss = 0;
@@ -3720,8 +3717,8 @@ bool	FfbIsStarted(HANDLE h)
             if (LogStream)
                 _ftprintf_s(LogStream, _T("\n[%05d]Info: FfbIsStarted() - gotdata=%d nBytesTranss=%d  Returns FALSE"), ProcessId, gotdata, nBytesTranss);
             return false;
-        };
-    };
+        }
+    }
 }
 
 int	  WINAPI FfbWaitForData(HANDLE *h)
@@ -3730,11 +3727,10 @@ int	  WINAPI FfbWaitForData(HANDLE *h)
 
 #define BUFFERSIZE 100 // TODO: Change to correct number
     UINT	IoCode = GET_FFB_DATA;
-    UINT	IoSize = BUFFERSIZE; 
+    UINT	IoSize = BUFFERSIZE;
     ULONG	bytes;
     UCHAR	FfbData[BUFFERSIZE];
     BOOL	gotdata;
-    int i=0;
     DWORD	nBytesTranss = 1;
     HANDLE hIoctlEvent;
 
@@ -3745,7 +3741,7 @@ int	  WINAPI FfbWaitForData(HANDLE *h)
     // Send joystick position structure to vJoy device
     hIoctlEvent = CreateEvent(NULL, TRUE, TRUE, NULL);
 
-    // Prepare container for incoming data 
+    // Prepare container for incoming data
     FfbDataPacket.size = 0;
     FfbDataPacket.cmd = 0;
     FfbDataPacket.data = new UCHAR[BUFFERSIZE];
@@ -3818,16 +3814,16 @@ BOOL FfbGetEffectState(void)
         ( FfbDataPacket.data[2] == 2) 		// or Start Solo
         )&&
         ( FfbDataPacket.data[3] > 0)			// Loop at least once
-        ) 
+        )
         FfbEffectState = TRUE;
 
     // Condition to stop effect
-    if ( 
+    if (
         (FfbDataPacket.cmd == IOCTL_HID_WRITE_REPORT)	&&		// Write data
         ( FfbDataPacket.data[0] == 0xA)	&&		// Report ID is 0xA
         ( FfbDataPacket.data[1] == 1)	&&		// Block index is 1
         ( FfbDataPacket.data[2] == 3)	  		// Stop
-        ) 
+        )
         FfbEffectState = FALSE;
 
     return FfbEffectState;
@@ -3840,10 +3836,10 @@ FFBEType FfbGetEffectType(void)
         if (FfbDataPacket.data[0] == 0x01)
         { // This is "Effect Type"
             FfbEffectType = (FFBEType)FfbDataPacket.data[1];
-        };
-    };
+        }
+    }
     return FfbEffectType;
-} 
+}
 
 // FFB Helper functions
 
@@ -3852,7 +3848,7 @@ VJOYINTERFACE_API DWORD __cdecl Ffb_h_DeviceID(const FFB_DATA * Packet, int *Dev
 // If Packet is NULL then returns ERROR_INVALID_PARAMETER. DeviceID is undefined.
 // If Packet is malformed or Device ID is out of range then returns ERROR_INVALID_DATA. DeviceID is undefined.
 {
-    // Routine validity checks 
+    // Routine validity checks
     if (!Packet)
         return ERROR_INVALID_PARAMETER;
     if (Packet->size <10)
@@ -3869,7 +3865,7 @@ VJOYINTERFACE_API DWORD __cdecl Ffb_h_Type(const FFB_DATA * Packet, FFBPType *Ty
 //If Packet is NULL then returns ERROR_INVALID_PARAMETER. Feature  is undefined.
 //If Packet is malformed then returns ERROR_INVALID_DATA. Feature is undefined.
 {
-    // Routine validity checks 
+    // Routine validity checks
     if (!Packet)
         return ERROR_INVALID_PARAMETER;
     if (Packet->size <10)
@@ -3893,7 +3889,7 @@ VJOYINTERFACE_API DWORD __cdecl Ffb_h_Packet(const FFB_DATA * Packet, WORD *Type
 //If Packet is NULL then returns ERROR_INVALID_PARAMETER. Output parameters are undefined.
 //If Packet is malformed then returns ERROR_INVALID_DATA. Output parameters are undefined.
 {
-    // Routine validity checks 
+    // Routine validity checks
     if (!Packet)
         return ERROR_INVALID_PARAMETER;
     if (Packet->size <10)
@@ -3910,7 +3906,7 @@ VJOYINTERFACE_API DWORD __cdecl Ffb_h_EBI(const FFB_DATA * Packet, int *Index)
 //If Packet is NULL then returns ERROR_INVALID_PARAMETER. Output parameters are undefined.
 //If Packet is malformed or does not contain an Effect Block Index then returns ERROR_INVALID_DATA. Output parameters are undefined.
 {
-    // Routine validity checks 
+    // Routine validity checks
     if (!Packet)
         return ERROR_INVALID_PARAMETER;
     if (Packet->size <10)
@@ -3933,7 +3929,7 @@ VJOYINTERFACE_API DWORD __cdecl Ffb_h_Eff_Report(const FFB_DATA * Packet, FFB_EF
 //If Packet is NULL then returns ERROR_INVALID_PARAMETER. Output parameters are undefined.
 //If Packet is malformed  then returns ERROR_INVALID_DATA. Output parameters are undefined.
 {
-    // Routine validity checks 
+    // Routine validity checks
     if (!Packet)
         return ERROR_INVALID_PARAMETER;
     if (Packet->size <22)
@@ -3960,7 +3956,7 @@ VJOYINTERFACE_API DWORD __cdecl Ffb_h_Eff_Report(const FFB_DATA * Packet, FFB_EF
     {
         Effect->DirX = Packet->data[12];
         Effect->DirY = Packet->data[13];
-    };
+    }
     return ERROR_SUCCESS;
 }
 VJOYINTERFACE_API DWORD		__cdecl Ffb_h_Eff_Constant(const FFB_DATA * Packet, FFB_EFF_CONSTANT *  ConstantEffect)
@@ -3968,7 +3964,7 @@ VJOYINTERFACE_API DWORD		__cdecl Ffb_h_Eff_Constant(const FFB_DATA * Packet, FFB
 //If Packet is NULL then returns ERROR_INVALID_PARAMETER. Output parameters are undefined.
 //If Packet is malformed  then returns ERROR_INVALID_DATA. Output parameters are undefined.
 {
-    // Routine validity checks 
+    // Routine validity checks
     if (!Packet)
         return ERROR_INVALID_PARAMETER;
     if (Packet->size <12)
@@ -3992,7 +3988,7 @@ VJOYINTERFACE_API DWORD __cdecl Ffb_h_Eff_Ramp(const FFB_DATA * Packet, FFB_EFF_
 //If Packet is NULL then returns ERROR_INVALID_PARAMETER. Output parameters are undefined.
 //If Packet is malformed  then returns ERROR_INVALID_DATA. Output parameters are undefined.
 {
-    // Routine validity checks 
+    // Routine validity checks
     if (!Packet)
         return ERROR_INVALID_PARAMETER;
     if (Packet->size <14)
@@ -4017,7 +4013,7 @@ VJOYINTERFACE_API DWORD __cdecl Ffb_h_EffOp(const FFB_DATA * Packet,  FFB_EFF_OP
 //If Packet is NULL then returns ERROR_INVALID_PARAMETER. Output parameters are undefined.
 //If Packet is malformed  then returns ERROR_INVALID_DATA. Output parameters are undefined.
 {
-    // Routine validity checks 
+    // Routine validity checks
     if (!Packet)
         return ERROR_INVALID_PARAMETER;
     if (Packet->size <12)
@@ -4041,7 +4037,7 @@ VJOYINTERFACE_API DWORD __cdecl Ffb_h_EffNew(const FFB_DATA * Packet, FFBEType *
 //If Packet is NULL then returns ERROR_INVALID_PARAMETER. Output parameters are undefined.
 //If Packet is malformed  then returns ERROR_INVALID_DATA. Output parameters are undefined.
 {
-    // Routine validity checks 
+    // Routine validity checks
     if (!Packet)
         return ERROR_INVALID_PARAMETER;
     if (Packet->size <12)
@@ -4063,7 +4059,7 @@ VJOYINTERFACE_API DWORD __cdecl Ffb_h_DevCtrl(const FFB_DATA * Packet,  FFB_CTRL
 //If Packet is NULL then returns ERROR_INVALID_PARAMETER. Output parameters are undefined.
 //If Packet is malformed  then returns ERROR_INVALID_DATA. Output parameters are undefined.
 {
-    // Routine validity checks 
+    // Routine validity checks
     if (!Packet)
         return ERROR_INVALID_PARAMETER;
     if (Packet->size <10)
@@ -4085,7 +4081,7 @@ VJOYINTERFACE_API DWORD __cdecl Ffb_h_DevGain(const FFB_DATA * Packet,  BYTE * G
 //If Packet is NULL then returns ERROR_INVALID_PARAMETER. Output parameters are undefined.
 //If Packet is malformed  then returns ERROR_INVALID_DATA. Output parameters are undefined.
 {
-    // Routine validity checks 
+    // Routine validity checks
     if (!Packet)
         return ERROR_INVALID_PARAMETER;
     if (Packet->size <10)
@@ -4108,7 +4104,7 @@ VJOYINTERFACE_API DWORD __cdecl Ffb_h_Eff_Period(const FFB_DATA * Packet,  FFB_E
 //If Packet is NULL then returns ERROR_INVALID_PARAMETER. Output parameters are undefined.
 //If Packet is malformed  then returns ERROR_INVALID_DATA. Output parameters are undefined.
 {
-    // Routine validity checks 
+    // Routine validity checks
     if (!Packet)
         return ERROR_INVALID_PARAMETER;
     if (Packet->size <20)
@@ -4134,7 +4130,7 @@ VJOYINTERFACE_API DWORD __cdecl Ffb_h_Eff_Cond(const FFB_DATA * Packet,  FFB_EFF
 //If Packet is NULL then returns ERROR_INVALID_PARAMETER. Output parameters are undefined.
 //If Packet is malformed  then returns ERROR_INVALID_DATA. Output parameters are undefined.
 {
-    // Routine validity checks 
+    // Routine validity checks
     if (!Packet)
         return ERROR_INVALID_PARAMETER;
     if (Packet->size <23)
@@ -4159,11 +4155,11 @@ VJOYINTERFACE_API DWORD __cdecl Ffb_h_Eff_Cond(const FFB_DATA * Packet,  FFB_EFF
 }
 
 VJOYINTERFACE_API DWORD __cdecl Ffb_h_Eff_Envlp(const FFB_DATA * Packet,  FFB_EFF_ENVLP*  Envelope)
-//If valid Packet was found then returns ERROR_SUCCESS and fills structure Envelope - 
+//If valid Packet was found then returns ERROR_SUCCESS and fills structure Envelope -
 //If Packet is NULL then returns ERROR_INVALID_PARAMETER. Output parameters are undefined.
 //If Packet is malformed  then returns ERROR_INVALID_DATA. Output parameters are undefined.
 {
-    // Routine validity checks 
+    // Routine validity checks
     if (!Packet)
         return ERROR_INVALID_PARAMETER;
     if (Packet->size <22)
