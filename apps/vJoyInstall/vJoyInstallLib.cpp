@@ -1417,10 +1417,10 @@ Return Value:
 {
     LPTSTR buffer = NULL;
     DWORD reqSize = 16000;
-    //DWORD dataType;
+    DWORD dataType;
     LPTSTR * array;
     DWORD szChars;
-	BOOL bRegProp;
+	BOOL bRes;
 
 
 	// Getting the size of required buffer
@@ -1436,16 +1436,17 @@ Return Value:
 	// Allocate buffer according to required size
     buffer = new TCHAR[(reqSize /sizeof(TCHAR))+2];
     if(!buffer)
-        return NULL;
-
-	// Get the string into the buffer 
-	if (FALSE == SetupDiGetDeviceRegistryProperty(Devs, DevInfo, Prop, NULL, (LPBYTE)buffer, reqSize, &reqSize))
 		return NULL;
 
-    szChars = reqSize/sizeof(TCHAR);
-    buffer[szChars] = TEXT('\0');
-    buffer[szChars+1] = TEXT('\0');
-    array = GetMultiSzIndexArray(buffer);
+	// Get the string into the buffer 
+	bRes = SetupDiGetDeviceRegistryProperty(Devs, DevInfo, Prop, &dataType, (LPBYTE)buffer, reqSize, &reqSize);
+	if (!bRes || ((dataType != REG_SZ) && (dataType != REG_MULTI_SZ)))
+		return NULL;
+
+	szChars = reqSize / sizeof(TCHAR);
+	buffer[szChars] = TEXT('\0');
+	buffer[szChars + 1] = TEXT('\0');
+	array = GetMultiSzIndexArray(buffer);
     if(array)
         return array;
 
