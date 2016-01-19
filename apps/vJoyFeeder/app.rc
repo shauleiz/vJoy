@@ -6,9 +6,8 @@
 #include <commctrl.h>
 #include <richedit.h>
 #include "resource.h"
-#include "..\..\inc\public.h"
-//#include "svn_version.h"
-
+//#include "..\..\inc\public.h"
+#include <gen-versioninfo.h>
 
 
 
@@ -28,9 +27,9 @@ IDI_ICON1          ICON           ".\\Joystick-Feeder-icon.ico"
 #define FILEDESC_STR1				"Demo feeder- controls 8 axes, 128 buttons, 4 POV"
 
 #ifdef X64
-#define BITNESS_STR					"X64"
+#define BITNESS_STR					"x64"
 #else
-#define BITNESS_STR					"X32"
+#define BITNESS_STR					"x86"
 #endif
 
 #ifdef _DEBUG
@@ -39,10 +38,10 @@ IDI_ICON1          ICON           ".\\Joystick-Feeder-icon.ico"
 #define CONF_STR					""
 #endif
 
-#define FILEDESC_STR				FILEDESC_STR1 " [" BITNESS_STR CONF_STR "]"
+#define PRODVER					PRODVER_TAG " Commit:" PRODVER_SHA1 " Compile:" BITNESS_STR CONF_STR 
 
 VS_VERSION_INFO VERSIONINFO
-FILEVERSION VER_H_, VER_M_, VER_L_, 999
+FILEVERSION VER_H_, VER_M_, VER_L_, BUILD
  PRODUCTVERSION 6,3,9600,17298
  FILEFLAGSMASK 0x3fL
 #ifdef _DEBUG
@@ -59,13 +58,13 @@ BEGIN
         BLOCK "040904B0"
         BEGIN
 			VALUE "CompanyName", "Shaul Eizikovich"
-			VALUE "FileDescription", FILEDESC_STR
+			VALUE "FileDescription",  "vJoyFeeder"
             VALUE "FileVersion", "0.0.0"
             VALUE "InternalName", "vJoyFeeder.exe"
             VALUE "LegalCopyright", "© Shaul Eizikovich. All rights reserved."
             VALUE "OriginalFilename", "vJoyFeeder.exe"
-			VALUE "ProductName", PRODUCT_STR_ID
-			VALUE "ProductVersion", SERIALNUMBER_STR
+			VALUE "ProductName", "vJoy"
+			VALUE "ProductVersion", PRODVER
         END
     END
     BLOCK "VarFileInfo"

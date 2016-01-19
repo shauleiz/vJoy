@@ -1,6 +1,7 @@
 #include <windows.h>
 #include <ntverp.h>
-#include "../../inc/public.h"
+#include "..\..\inc\public.h"
+#include <gen-versioninfo.h>
 
 #undef	VER_PRODUCTNAME_STR
 #undef	VER_COMPANYNAME_STR
@@ -14,12 +15,13 @@
 #define VER_ORIGINALFILENAME_STR    "vJoy.sys"
 #define VER_PRODUCTNAME_STR			"vJoy"
 #define VER_COMPANYNAME_STR			"Shaul Eizikovich"
-#define VER_FILEVERSION				VER_X_,VER_H_,VER_M_,VER_L_
+#define VER_FILEVERSION				VER_H_,VER_M_,VER_L_ ,BUILD
+#define PRODVER						PRODVER_TAG " Commit:" PRODVER_SHA1
 
-#if defined(X64)
-#define VER_PRODUCTVERSION_STRX		LVER_PRODUCTVERSION_STR " (x64" 
+#if defined(AMD64)
+#define VER_PRODUCTVERSION_STRX		PRODVER " (x64" 
 #else
-#define VER_PRODUCTVERSION_STRX		LVER_PRODUCTVERSION_STR " (x86"
+#define VER_PRODUCTVERSION_STRX		PRODVER " (x86"
 #endif
 
 #if (DBG==1)

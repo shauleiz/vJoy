@@ -8,14 +8,24 @@ SET InnoCompiler=%ProgramFiles(x86)%\Inno Setup 5\ISCC.exe
 
 
 :build32
+echo Cleaning vJoy (x86)
+"%BUILDER%"  vjoy.sln  /maxcpucount:1 /t:clean /p:Platform=Win32;Configuration=Release
+set BUILD_STATUS=%ERRORLEVEL%
+if not %BUILD_STATUS%==0 goto fail
+
 echo Building vJoy (x86)
-"%BUILDER%"  vjoy.sln  /maxcpucount:1 /t:rebuild /p:Platform=Win32;Configuration=Release
+"%BUILDER%"  vjoy.sln  /maxcpucount:4  /p:Platform=Win32;Configuration=Release
 set BUILD_STATUS=%ERRORLEVEL%
 if not %BUILD_STATUS%==0 goto fail
 
 :build64
+echo Cleaning vJoy (x64)
+"%BUILDER%"  vjoy.sln  /maxcpucount:1 /t:clean /p:Platform=x64;Configuration=Release
+set BUILD_STATUS=%ERRORLEVEL%
+if not %BUILD_STATUS%==0 goto fail
+
 echo Building vJoy (x64)
-"%BUILDER%"  vjoy.sln  /maxcpucount:1 /t:rebuild /p:Platform=x64;Configuration=Release
+"%BUILDER%"  vjoy.sln  /maxcpucount:4  /p:Platform=x64;Configuration=Release
 set BUILD_STATUS=%ERRORLEVEL%
 if not %BUILD_STATUS%==0 goto fail
 
