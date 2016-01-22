@@ -160,7 +160,7 @@ const
     RunOnceName = 'vJoy Setup restart';
     RunOnceKey  = 'Software\Microsoft\Windows\CurrentVersion\RunOnce';
     Ph2Flag			=	'ph2';
-    Ph2Param    = ' -'+Ph2Flag+' 1' + '  /VERYSILENT';
+    Ph2Param    = ' -'+Ph2Flag+' 1';
     QuitMessageReboot = 'The installer will now set your computer to TestSigning mode. You will need to restart your computer to complete that installation.'#13#13'After restarting your computer, Setup will continue next time an administrator logs in.';
     WaitingForRestart = 'You should now restat your computer.'#13#13'Press OK then restart your computer manually'#13'Press Cancel to cancel installation';
     ErrorRunOnce      = 'Failed to update RunOnce registry entry';
@@ -354,7 +354,7 @@ begin
       Exit; 
     end
     else begin
-      Log('Supressed Message Box: ' + Text);
+      Log('Suppressed Message Box: ' + Text);
       case Buttons of
        MB_OK: 
         begin
@@ -966,7 +966,8 @@ end;
 procedure PreparePh2;
 begin
   Log('PreparePh2() - Start');
-  RegWriteStringValue(HKEY_LOCAL_MACHINE, RunOnceKey, 'vJoy Installer Phase 2', expandconstant('{srcexe}')+' '+ Ph2Param)
+  if  not IsVerySilent then RegWriteStringValue(HKEY_LOCAL_MACHINE, RunOnceKey, 'vJoy Installer Phase 2', expandconstant('{srcexe}')+' '+ Ph2Param)
+  else  RegWriteStringValue(HKEY_LOCAL_MACHINE, RunOnceKey, 'vJoy Installer Phase 2', expandconstant('{srcexe}')+' '+ Ph2Param + '  /VERYSILENT');
 end;
 
 
