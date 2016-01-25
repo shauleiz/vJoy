@@ -1179,14 +1179,14 @@ Return Value:
  // 	_IRQL_requires_max_(DISPATCH_LEVEL);
 	PAGED_CODE();
 
-   int   nDevices = 0;
+
+    int   nDevices = 0;
     PDEVICE_EXTENSION             devContext = NULL;
 
     TraceEvents(TRACE_LEVEL_INFORMATION, DBG_INIT, "Entered FilterEvtDeviceContextCleanup\n");
 
     nDevices = DeviceCount(TRUE, -1); // Decrementing device count
     TraceEvents(TRACE_LEVEL_INFORMATION, DBG_INIT, "Device Count before decrementing is %d\n", nDevices);
-    TraceEvents(TRACE_LEVEL_INFORMATION, DBG_INIT, "Device Count after decrementing is %d\n", DeviceCount(TRUE, 0));
 
     WdfWaitLockAcquire(vJoyDeviceCollectionLock, NULL);
 
@@ -1206,11 +1206,12 @@ Return Value:
          vJoyDeleteControlDevice(Device);
      }
 
-    WdfCollectionRemove(vJoyDeviceCollection, Device);
-
     devContext = GetDeviceContext(Device);
     CleanUpDev(devContext);
 
+	TraceEvents(TRACE_LEVEL_INFORMATION, DBG_INIT, "Device Count after decrementing is %d\n", DeviceCount(TRUE, 0));
+
+    WdfCollectionRemove(vJoyDeviceCollection, Device);
     WdfWaitLockRelease(vJoyDeviceCollectionLock);
 }
 
@@ -1317,14 +1318,14 @@ Routine Description:
                     If bit n is set then Report ID n+1 is valid.
 
 --*/
-PVOID GetReportDescriptorFromRegistry(size_t * Size, USHORT * IdMask)
+PVOID GetReportDescriptorFromRegistry(USHORT * Size, USHORT * IdMask)
 {
 
     NTSTATUS				status = STATUS_SUCCESS;
     WDFKEY					KeyDevice, KeyParameters;
     UNICODE_STRING			strDev, strDescName, strDescSize;
     ULONG					ValueLengthQueried;
-    DWORD					dDescSize=0, dDescSizePrev=0;
+	USHORT					dDescSize=0, dDescSizePrev=0;
     PVOID					out=NULL;
     HANDLE					hKeyParameters=NULL;
     int						iDevice=0;
@@ -1689,7 +1690,7 @@ void UpdateHidDescriptor(void)
     PVOID	out;
 
     // Get the size from the registry
-    out = GetReportDescriptorFromRegistry((size_t *)&Size, &Mask);
+    out = GetReportDescriptorFromRegistry(&Size, &Mask);
 
     if (Size)
     {
@@ -1723,7 +1724,7 @@ void UpdateCollections(WDFDEVICE Device)
     CleanUpDev(devContext);
 
     // Get the data, size and IDs from the registry
-    out = GetReportDescriptorFromRegistry((size_t *)&Size, &Mask);
+    out = GetReportDescriptorFromRegistry(&Size, &Mask);
     if (out && Mask && Size)
     {	/* Registry holds valid data */
         InitializeDev(devContext, Mask, FALSE);

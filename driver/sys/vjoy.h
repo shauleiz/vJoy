@@ -1605,7 +1605,7 @@ void CleanUpDev(
 
 PVOID 
 GetReportDescriptorFromRegistry(
-	size_t * Size,
+	USHORT * Size,
 	USHORT * IdMask
 	);
 

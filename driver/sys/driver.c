@@ -102,6 +102,10 @@ Return Value:
     // will create a collection object and store filter device objects.        
     // The collection object has the driver object as a default parent.
     //
+
+	// To build a single driver binary that runs both in Windows 8 and in earlier versions of Windows, use the POOL_NX_OPTIN opt-in mechanism. 
+	ExInitializeDriverRuntime(DrvRtPoolNxOptIn);
+
     status = WdfCollectionCreate(WDF_NO_OBJECT_ATTRIBUTES, &vJoyDeviceCollection);
     if (!NT_SUCCESS(status))
     {
