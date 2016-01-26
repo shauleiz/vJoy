@@ -793,19 +793,6 @@ Return Value:
 	ParentDeviceObject = WdfDeviceWdmGetDeviceObject(Device);
 	RawPdoDeviceObject->StackSize = ParentDeviceObject->StackSize+1;
 
-#if 0
-	// Create a wait-lock object that will be used to synch access to positions[i]
-	// The lock is created when the raw device is created so the raw device is set to be its parent
-	WDF_OBJECT_ATTRIBUTES_INIT(&LockAttributes);
-	LockAttributes.ParentObject = RawPdoDevice;
-	status =  WdfWaitLockCreate(&LockAttributes, &(devExt->positionLock));
-    if (!NT_SUCCESS(status)) {
-		TraceEvents(TRACE_LEVEL_ERROR, DBG_INIT, "WdfWaitLockCreate failed 0x%x\n", status);
-  		LogEventWithStatus(ERRLOG_RAW_DEV_FAILED ,L"WdfWaitLockCreate", WdfDriverWdmGetDriverObject(WdfGetDriver()), status);
-        goto Cleanup;
-    }
-#endif
-
     //
     // Configure the default queue associated with the control device object
     // to be Serial so that request passed to EvtIoDeviceControl are serialized.

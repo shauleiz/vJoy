@@ -318,7 +318,6 @@ Return Value:
 	// Get the pointer to the device context structure of type DEVICE_EXTENSION
 	devContext = GetDeviceContext(hDevice);
 	InitializeDeviceContext(devContext);
-	InitializeDefaultDev(devContext);
 
 	///////////////  Create Wait-Lock Object ///////////////////////////////////////
 	// Create a wait-lock object that will be used to synch access to positions[i]
@@ -330,6 +329,8 @@ Return Value:
 		LogEventWithStatus(ERRLOG_RAW_DEV_FAILED, L"WdfWaitLockCreate", WdfDriverWdmGetDriverObject(WdfGetDriver()), status);
 		return status;
 	}
+
+	InitializeDefaultDev(devContext);
 
 	///////////// Default queue that handles Internal Device Control IRPs ////////////////////
 	WDF_IO_QUEUE_CONFIG_INIT_DEFAULT_QUEUE(&queueConfig, WdfIoQueueDispatchParallel);
