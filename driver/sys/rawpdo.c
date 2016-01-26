@@ -600,7 +600,7 @@ Return Value:
     NTSTATUS                    status;
     PWDFDEVICE_INIT             pDeviceInit = NULL;
     PRPDO_DEVICE_DATA           pdoData = NULL;
-    WDFDEVICE                   hChild = NULL;
+    WDFDEVICE                   RawPdoDevice = NULL;
     WDF_OBJECT_ATTRIBUTES       pdoAttributes;
     WDF_DEVICE_PNP_CAPABILITIES pnpCaps;
     WDF_IO_QUEUE_CONFIG         ioQueueConfig;
@@ -611,7 +611,7 @@ Return Value:
     //DECLARE_CONST_UNICODE_STRING(hardwareId,VJOY_HARDWARE_ID );
     DECLARE_CONST_UNICODE_STRING(deviceLocation,L"vJoy Raw Device\0" );
     DECLARE_UNICODE_STRING_SIZE(buffer, MAX_ID_LEN);
-	PDEVICE_OBJECT				ChildDeviceObject;
+	PDEVICE_OBJECT				RawPdoDeviceObject;
 	PDEVICE_OBJECT				ParentDeviceObject;
 	//DECLARE_CONST_UNICODE_STRING(
 	//	SDDL_DEVOBJ_SYS_ALL_ADM_RWX_WORLD_R_RES_R,
@@ -627,8 +627,6 @@ Return Value:
 	UNICODE_STRING RefStr2;
 	WDF_FILEOBJECT_CONFIG FileObjInit;
 	WDF_OBJECT_ATTRIBUTES       FileObjAttributes;
-
-	WDF_OBJECT_ATTRIBUTES		LockAttributes;
 
 
 	TraceEvents(TRACE_LEVEL_INFORMATION, DBG_INIT, "Entered vJoy_CreateRawPdo\n");
@@ -773,7 +771,7 @@ Return Value:
     //WdfPdoInitAllowForwardingRequestToParent(pDeviceInit);
 	// TODO: Replace the above because it is needed for WdfRequestForwardToParentDeviceIoQueue()
 
-    status = WdfDeviceCreate(&pDeviceInit, &pdoAttributes, &hChild);
+    status = WdfDeviceCreate(&pDeviceInit, &pdoAttributes, &RawPdoDevice);
     if (!NT_SUCCESS(status)) {
   		LogEventWithStatus(ERRLOG_RAW_DEV_FAILED ,L"WdfDeviceCreate", WdfDriverWdmGetDriverObject(WdfGetDriver()), status);
         goto Cleanup;
@@ -782,7 +780,7 @@ Return Value:
     //
     // Get the device context.
     //
-    pdoData = PdoGetData(hChild);
+    pdoData = PdoGetData(RawPdoDevice);
 	pdoData->InstanceNo = InstanceNo;
 	pdoData->hParentDevice = Device;
 
@@ -791,20 +789,22 @@ Return Value:
     //
     devExt = GetDeviceContext(Device);
     pdoData->IoTargetToParent = devExt->IoTargetToSelf;
-	ChildDeviceObject = WdfDeviceWdmGetDeviceObject(hChild);
+	RawPdoDeviceObject = WdfDeviceWdmGetDeviceObject(RawPdoDevice);
 	ParentDeviceObject = WdfDeviceWdmGetDeviceObject(Device);
-	ChildDeviceObject->StackSize = ParentDeviceObject->StackSize+1;
+	RawPdoDeviceObject->StackSize = ParentDeviceObject->StackSize+1;
 
+#if 0
 	// Create a wait-lock object that will be used to synch access to positions[i]
 	// The lock is created when the raw device is created so the raw device is set to be its parent
 	WDF_OBJECT_ATTRIBUTES_INIT(&LockAttributes);
-	LockAttributes.ParentObject = hChild;
+	LockAttributes.ParentObject = RawPdoDevice;
 	status =  WdfWaitLockCreate(&LockAttributes, &(devExt->positionLock));
     if (!NT_SUCCESS(status)) {
 		TraceEvents(TRACE_LEVEL_ERROR, DBG_INIT, "WdfWaitLockCreate failed 0x%x\n", status);
   		LogEventWithStatus(ERRLOG_RAW_DEV_FAILED ,L"WdfWaitLockCreate", WdfDriverWdmGetDriverObject(WdfGetDriver()), status);
         goto Cleanup;
     }
+#endif
 
     //
     // Configure the default queue associated with the control device object
@@ -818,7 +818,7 @@ Return Value:
 
     ioQueueConfig.EvtIoDeviceControl = vJoy_EvtIoDeviceControlForRawPdo;
 
-    status = WdfIoQueueCreate(hChild,
+    status = WdfIoQueueCreate(RawPdoDevice,
                                         &ioQueueConfig,
                                         WDF_NO_OBJECT_ATTRIBUTES,
                                         &queue // pointer to default queue
@@ -841,7 +841,7 @@ Return Value:
     // pnpCaps.Address  = InstanceNo;
     pnpCaps.UINumber = 0;
 
-    WdfDeviceSetPnpCapabilities(hChild, &pnpCaps);
+    WdfDeviceSetPnpCapabilities(RawPdoDevice, &pnpCaps);
 
     //
     // TODO: In addition to setting NoDisplayInUI in DeviceCaps, we
@@ -851,7 +851,7 @@ Return Value:
     //
     WDF_DEVICE_STATE_INIT(&deviceState);
     deviceState.DontDisplayInUI = WdfTrue; // Remove Icon from Device manager
-    WdfDeviceSetDeviceState(hChild, &deviceState);
+    WdfDeviceSetDeviceState(RawPdoDevice, &deviceState);
 
 	//
 	// Create 16 interfaces
@@ -860,7 +860,7 @@ Return Value:
 	{
 		RtlStringCchPrintfW((NTSTRSAFE_PWSTR)RefStr, 20, VJOY_INTERFACE L"%03d", iInterface);
 		RtlInitUnicodeString(&RefStr2, (PCWSTR)RefStr);
-		status = WdfDeviceCreateDeviceInterface(hChild,&GUID_DEVINTERFACE_VJOY,&RefStr2);
+		status = WdfDeviceCreateDeviceInterface(RawPdoDevice,&GUID_DEVINTERFACE_VJOY,&RefStr2);
 
 		if (!NT_SUCCESS (status)) {
 			TraceEvents(TRACE_LEVEL_ERROR, DBG_INIT, "WdfDeviceCreateDeviceInterface number %d failed 0x%x\n", iInterface, status);
@@ -879,7 +879,7 @@ Return Value:
     // driver must call WdfPdoMarkMissing to get the device deleted. It
     // shouldn't delete the child device directly by calling WdfObjectDelete.
     //
-    status = WdfFdoAddStaticChild(Device, hChild);
+    status = WdfFdoAddStaticChild(Device, RawPdoDevice);
     if (!NT_SUCCESS(status)) {
    		LogEventWithStatus(ERRLOG_RAW_DEV_FAILED ,L"WdfFdoAddStaticChild", WdfDriverWdmGetDriverObject(WdfGetDriver()), status);
         goto Cleanup;
@@ -899,8 +899,8 @@ Cleanup:
         WdfDeviceInitFree(pDeviceInit);
     }
 
-    if(hChild) {
-        WdfObjectDelete(hChild);
+    if(RawPdoDevice) {
+        WdfObjectDelete(RawPdoDevice);
     }
 
     return status;

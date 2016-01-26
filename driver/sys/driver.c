@@ -320,6 +320,16 @@ Return Value:
 	InitializeDeviceContext(devContext);
 	InitializeDefaultDev(devContext);
 
+	///////////////  Create Wait-Lock Object ///////////////////////////////////////
+	// Create a wait-lock object that will be used to synch access to positions[i]
+	WDF_OBJECT_ATTRIBUTES_INIT(&attributes);
+	attributes.ParentObject = hDevice;
+	status = WdfWaitLockCreate(&attributes, &(devContext->positionLock));
+	if (!NT_SUCCESS(status)) {
+		TraceEvents(TRACE_LEVEL_ERROR, DBG_INIT, "WdfWaitLockCreate failed 0x%x\n", status);
+		LogEventWithStatus(ERRLOG_RAW_DEV_FAILED, L"WdfWaitLockCreate", WdfDriverWdmGetDriverObject(WdfGetDriver()), status);
+		return status;
+	}
 
 	///////////// Default queue that handles Internal Device Control IRPs ////////////////////
 	WDF_IO_QUEUE_CONFIG_INIT_DEFAULT_QUEUE(&queueConfig, WdfIoQueueDispatchParallel);
