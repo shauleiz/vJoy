@@ -820,148 +820,50 @@ final:
 
 
 
-int RemoveDevice(TCHAR *ParentDeviceNode, BOOL DelInf )
+int RemoveDevice(TCHAR *ParentDeviceNode, BOOL DelInf)
 {
 	DEVINST  dnDevInst;
 	SP_DEVINFO_DATA  DeviceInfoData;
-	TCHAR ErrMsg[1000];
 	BOOL rDi;
 	CONFIGRET  rType;
 
 
 	/////////////////////////////////////////////////////////////////////////////////////////////////
-	//_ftprintf(stream,">> RemoveDevice: ParentDeviceNode = %s\n", ParentDeviceNode);
 	_stprintf_s(prt, MAX_PATH, "RemoveDevice: ParentDeviceNode = %s", ParentDeviceNode);
-	StatusMessage( NULL, prt,  INFO);
+	StatusMessage(NULL, prt, INFO);
 
-	// Accessing the HW registry key
-	HDEVINFO DeviceInfoSet = SetupDiCreateDeviceInfoList(NULL, NULL);
+	// Creating a clean Device Info Set
+	HDEVINFO DeviceInfoSet = hlp_CreateDeviceInfoList();
 	if (DeviceInfoSet == INVALID_HANDLE_VALUE)
-	{
-		GetErrorString(ErrMsg,1000);
-		//_ftprintf(stream,"[E] RemoveDevice: Function SetupDiCreateDeviceInfoList failed with error: %s\n", ErrMsg);
-		_stprintf_s(prt, MAX_PATH, "RemoveDevice: Function SetupDiCreateDeviceInfoList failed with error: %s", ErrMsg);
-		StatusMessage( NULL, prt,  ERR);
 		return -101;
-	}
-	else
-	{
-		//_ftprintf(stream,">> RemoveDevice: Function SetupDiCreateDeviceInfoList OK\n");
-		_stprintf_s(prt, MAX_PATH, "RemoveDevice: Function SetupDiCreateDeviceInfoList OK");
-		StatusMessage( NULL, prt,  INFO);
-	};
+
 
 	// Obtains device instance handle to the device node (dnDevInst)
-	// that is associated with a specified device instance identifier (buf)
-	rType = CM_Locate_DevNode(&dnDevInst, ParentDeviceNode ,0);
+	// that is associated with a specified device instance identifier
+	rType = hlp_LocateDevNode(&dnDevInst, ParentDeviceNode);
 	if (rType != CR_SUCCESS)
-	{
-		//_ftprintf(stream,"[E] RemoveDevice: Function CM_Locate_DevNode failed with error: %08X\n", rType);
-		_stprintf_s(prt, MAX_PATH, "RemoveDevice: Function CM_Locate_DevNode failed with error: %08X", rType);
-		StatusMessage( NULL, prt,  ERR);
 		return -102;
-	}
-	else
-	{
-		//_ftprintf(stream,">> RemoveDevice: Function CM_Locate_DevNode OK\n");
-		_stprintf_s(prt, MAX_PATH, "RemoveDevice: Function CM_Locate_DevNode failed with error: %08X", rType);
-		StatusMessage( NULL, prt,  INFO);
-	};
-
-	// Get the ID of the device instance
-	ULONG  Len;
-	rType = CM_Get_Device_ID_Size(&Len, dnDevInst, 0);
-	if (rType != CR_SUCCESS)
-	{
-		//_ftprintf(stream,"[E] RemoveDevice: Function CM_Get_Device_ID_Size failed with error: %08X\n", rType);
-		_stprintf_s(prt, MAX_PATH, "RemoveDevice: Function CM_Get_Device_ID_Size failed with error: %08X", rType);
-		StatusMessage( NULL, prt,  ERR);
-		return -103;
-	}	
-	else
-	{
-		//_ftprintf(stream,">> RemoveDevice: Function CM_Get_Device_ID_Size OK\n");
-		_stprintf_s(prt, MAX_PATH, "RemoveDevice: Function CM_Get_Device_ID_Size OK");
-		StatusMessage( NULL, prt,  INFO);
-	};
-
-
-	Len+=2;
-	TCHAR * DeviceInstanceId = new TCHAR[Len];
-	rType = CM_Get_Device_ID(dnDevInst, DeviceInstanceId, Len, 0);
-	if (rType != CR_SUCCESS)
-	{
-		//_ftprintf(stream,"[E] RemoveDevice: Function CM_Get_Device_ID failed with error: %08X\n", rType);
-		_stprintf_s(prt, MAX_PATH, "RemoveDevice: Function CM_Get_Device_ID failed with error: %08X", rType);
-		StatusMessage( NULL, prt,  ERR);
-		delete[] DeviceInstanceId;
-		return -104;
-	}
-	else
-	{
-		//_ftprintf(stream,">> RemoveDevice: Function CM_Get_Device_ID (Device Instance Path = %s) OK\n",DeviceInstanceId);
-		_stprintf_s(prt, MAX_PATH, "RemoveDevice: Function CM_Get_Device_ID (Device Instance Path = %s) OK",DeviceInstanceId);
-		StatusMessage( NULL, prt,  INFO);
-	};
 
 
 	// Get the Device Info Data
-	DeviceInfoData.cbSize = sizeof(SP_DEVINFO_DATA);
-	rDi = SetupDiOpenDeviceInfo(DeviceInfoSet, DeviceInstanceId, NULL, 0, &DeviceInfoData);
+	rDi = hlp_OpenDeviceInfo(DeviceInfoSet, ParentDeviceNode, &DeviceInfoData);
 	if (!rDi)
-	{
-		 GetErrorString(ErrMsg,1000);
-		//_ftprintf(stream,"[E] RemoveDevice: Function SetupDiOpenDeviceInfo failed with error: %s\n", ErrMsg);
-		_stprintf_s(prt, MAX_PATH, "RemoveDevice: Function SetupDiOpenDeviceInfo failed with error: %s", ErrMsg);
-		StatusMessage( NULL, prt,  ERR);
 		return -105;
-	}
-	else
-	{
-		//_ftprintf(stream,">> RemoveDevice: Function SetupDiOpenDeviceInfo OK\n");
-		_stprintf_s(prt, MAX_PATH, "RemoveDevice: Function SetupDiOpenDeviceInfo OK");
-		StatusMessage( NULL, prt,  INFO);
-	};
 
-	// If Requested to Delete INF file from inf directoy - Get the name of file OEMx.INF
-	TCHAR OEMInfFileName[MAX_PATH];
+
+	// If Requested to Delete INF file from inf directoy - Get the name of file OEMx.INF  and remove it
 	if (DelInf)
-		GetOEMInfFileName(DeviceInfoSet, DeviceInfoData, OEMInfFileName); 
+	{		
+		rDi = hlp_UninstallOEMInf(DeviceInfoSet, DeviceInfoData);
+		if (!rDi)
+			return -116;
+	}
 
 	// Remove
-	rDi = SetupDiRemoveDevice(DeviceInfoSet, &DeviceInfoData);
+	rDi = hlp_RemoveDevice(DeviceInfoSet, &DeviceInfoData);
 	if (!rDi)
-	{
-		 GetErrorString(ErrMsg,1000);
-		//_ftprintf(stream,"[E] RemoveDevice: Function SetupDiRemoveDevice failed with error: %s\n", ErrMsg);
-		_stprintf_s(prt, MAX_PATH, "RemoveDevice: Function SetupDiRemoveDevice failed with error: %s", ErrMsg);
-		StatusMessage( NULL, prt,  ERR);
 		return -106;
-	}
-	else
-	{
-		//_ftprintf(stream,">> RemoveDevice: Function SetupDiRemoveDevice OK\n");
-		_stprintf_s(prt, MAX_PATH, "RemoveDevice: Function SetupDiRemoveDevice OK");
-		StatusMessage( NULL, prt,  INFO);
-	};
 
-	// If not requested to Delete INF file from inf directoy - just return
-	if (!DelInf)
-		return 0;
-
-	////// If Requested to Delete INF file from inf directoy ///////
-	_stprintf_s(prt, MAX_PATH, "RemoveDevice: Going to remove file %s", OEMInfFileName);
-	StatusMessage( NULL, prt,  INFO);
-	rDi = SetupUninstallOEMInf(OEMInfFileName, SUOI_FORCEDELETE, NULL);
-	if (!rDi)
-	{
-		GetErrorString(ErrMsg,1000);
-		_stprintf_s(prt, MAX_PATH, "RemoveDevice: Function SetupUninstallOEMInf failed with error: %s", ErrMsg);
-		StatusMessage( NULL, prt,  ERR);
-		return -116;
-	};
-	_stprintf_s(prt, MAX_PATH, "RemoveDevice: File %s removed", OEMInfFileName);
-	StatusMessage( NULL, prt,  INFO);
 
 	return 0;
 }
@@ -1829,5 +1731,101 @@ BOOL RemoveRevStr(LPCTSTR DeviceHWID, LPTSTR DeviceHWID_NoRev)
 	size_t lenrev = _tcslen(revstr);
 	//_tcsncpy(DeviceHWID_NoRev, DeviceHWID, lenall-lenrev);
 	_tcsncpy_s(DeviceHWID_NoRev, _tcslen(DeviceHWID), DeviceHWID, lenall - lenrev);
+	return TRUE;
+}
+
+// Accessing the HW registry key
+HDEVINFO hlp_CreateDeviceInfoList(void)
+{
+	TCHAR ErrMsg[1000];
+
+	HDEVINFO DeviceInfoSet = SetupDiCreateDeviceInfoList(NULL, NULL);
+	if (DeviceInfoSet == INVALID_HANDLE_VALUE)
+	{
+		GetErrorString(ErrMsg, 1000);
+		_stprintf_s(prt, MAX_PATH, "RemoveDevice: Function SetupDiCreateDeviceInfoList failed with error: %s", ErrMsg);
+		StatusMessage(NULL, prt, ERR);
+		return INVALID_HANDLE_VALUE;
+	}
+
+	_stprintf_s(prt, MAX_PATH, "RemoveDevice: Function SetupDiCreateDeviceInfoList OK");
+	StatusMessage(NULL, prt, INFO);
+	return DeviceInfoSet;
+}
+
+// Obtains device instance handle to the device node (dnDevInst)
+// that is associated with a specified device instance identifier (buf)
+CONFIGRET hlp_LocateDevNode(PDEVINST pdnDevInst, DEVINSTID pDeviceID)
+{
+	CONFIGRET rType = CM_Locate_DevNode(pdnDevInst, pDeviceID, 0);
+	if (rType != CR_SUCCESS)
+	{
+		_stprintf_s(prt, MAX_PATH, "RemoveDevice: Function CM_Locate_DevNode failed with error: %08X", rType);
+		StatusMessage(NULL, prt, ERR);
+		return rType;
+	}
+
+	_stprintf_s(prt, MAX_PATH, "RemoveDevice: Function CM_Locate_DevNode failed with error: %08X", rType);
+	StatusMessage(NULL, prt, INFO);
+	return rType;
+}
+
+// Get the Device Info Data
+BOOL hlp_OpenDeviceInfo(HDEVINFO DeviceInfoSet, PCTSTR DeviceInstanceId, PSP_DEVINFO_DATA DeviceInfoData)
+{
+	TCHAR ErrMsg[1000];
+
+	DeviceInfoData->cbSize = sizeof(SP_DEVINFO_DATA);
+	BOOL rDi = SetupDiOpenDeviceInfo(DeviceInfoSet, DeviceInstanceId, NULL, 0, DeviceInfoData);
+	if (!rDi)
+	{
+		GetErrorString(ErrMsg, 1000);
+		_stprintf_s(prt, MAX_PATH, "RemoveDevice: Function SetupDiOpenDeviceInfo failed with error: %s", ErrMsg);
+		StatusMessage(NULL, prt, ERR);
+		return FALSE;
+	}
+ 
+	_stprintf_s(prt, MAX_PATH, "RemoveDevice: Function SetupDiOpenDeviceInfo OK");
+	StatusMessage(NULL, prt, INFO);
+	return TRUE;
+}
+
+// Remove node
+BOOL hlp_RemoveDevice(HDEVINFO DeviceInfoSet, PSP_DEVINFO_DATA DeviceInfoData)
+{
+	TCHAR ErrMsg[1000];
+
+	BOOL rDi = SetupDiRemoveDevice(DeviceInfoSet, DeviceInfoData);
+	if (!rDi)
+	{
+		GetErrorString(ErrMsg, 1000);
+		_stprintf_s(prt, MAX_PATH, "RemoveDevice: Function SetupDiRemoveDevice failed with error: %s", ErrMsg);
+		StatusMessage(NULL, prt, ERR);
+		return FALSE;
+	}
+		_stprintf_s(prt, MAX_PATH, "RemoveDevice: Function SetupDiRemoveDevice OK");
+		StatusMessage(NULL, prt, INFO);
+		return TRUE;
+}
+
+// Delete INF file from inf directoy
+BOOL hlp_UninstallOEMInf(HDEVINFO DeviceInfoSet, SP_DEVINFO_DATA DeviceInfoData)
+{
+	TCHAR ErrMsg[1000];
+	TCHAR OEMInfFileName[MAX_PATH];
+
+	GetOEMInfFileName(DeviceInfoSet, DeviceInfoData, OEMInfFileName);
+	_stprintf_s(prt, MAX_PATH, "RemoveDevice: Going to remove file %s", OEMInfFileName);
+	StatusMessage(NULL, prt, INFO);
+	BOOL rDi = SetupUninstallOEMInf(OEMInfFileName, SUOI_FORCEDELETE, NULL);
+	if (!rDi)
+	{
+		GetErrorString(ErrMsg, 1000);
+		_stprintf_s(prt, MAX_PATH, "RemoveDevice: Function SetupUninstallOEMInf failed with error: %s", ErrMsg);
+		StatusMessage(NULL, prt, ERR);
+		return FALSE;
+	};
+	_stprintf_s(prt, MAX_PATH, "RemoveDevice: File %s removed", OEMInfFileName);
+	StatusMessage(NULL, prt, INFO);
 	return TRUE;
 }
