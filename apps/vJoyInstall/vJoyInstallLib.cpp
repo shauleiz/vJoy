@@ -8,7 +8,7 @@ TCHAR prt[MAX_PATH];
 
 BOOL FindInstalled(LPCTSTR hwid, TCHAR *InstanceId)
 {
-	return ChangeInstalled(hwid, InstanceId, TRUE, TRUE);
+	return ChangeInstalled(hwid, InstanceId, FALSE, FALSE);
 }
 
 BOOL EnableInstalled(LPCTSTR hwid, TCHAR *InstanceId)
@@ -87,7 +87,8 @@ BOOL ChangeInstalled(LPCTSTR hwid, TCHAR *InstanceId, BOOL Enable, BOOL Disable)
 			 _stprintf_s(prt, MAX_PATH, "FindInstalled: DevID[%d] is %s", devIndex, InstanceId);
 			StatusMessage( NULL, prt,  INFO);
 			// This is done for rare case where the child was removed manually
-			ChangeDeviceStat(devs, &devInfo, Enable, Disable);
+			if (Enable || Disable)
+				ChangeDeviceStat(devs, &devInfo, Enable, Disable);
 			out = TRUE;
 			break;
 		}
