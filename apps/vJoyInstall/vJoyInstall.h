@@ -93,6 +93,7 @@ BOOL GetErrorString(TCHAR * Msg, int Size);
 BOOL  GetInputInfFullPath(TCHAR * Str);
 int RemoveDevice(TCHAR *ParentDeviceNode, BOOL DelInf);
 int   RemoveAllDevices(DEVINST hDevInst, BOOL isRoot, BOOL DelInf);
+int RemDev(DEVINST h, BOOL DelInf);
 VERBTYPE GetVerb(int argc, PZPWSTR argv);
 BOOL GetInfFile(int argc, PZPWSTR argv, TCHAR * InfFile);
 BOOL GetDevHwId(int argc, PZPWSTR argv, TCHAR * DeviceHWID);

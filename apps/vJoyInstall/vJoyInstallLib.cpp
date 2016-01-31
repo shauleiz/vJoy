@@ -854,6 +854,31 @@ int RemoveDevice(TCHAR *ParentDeviceNode, BOOL DelInf)
 int   RemoveAllDevices(DEVINST hDevInst, BOOL isRoot, BOOL DelInf)
 {
 
+	DEVINST h;
+	CONFIGRET cr;
+
+	// If Device does not exist just return
+	if (!hDevInst)
+		return 0;
+
+	// If this is a root device - get the first child.
+	// If this is NOT the root device - get the next sibling.
+	if (isRoot)
+		cr = CM_Get_Child(&h, hDevInst, 0);
+	else
+		cr = CM_Get_Sibling(&h, hDevInst, 0);
+
+	// If the next device node has been obtained - remove it
+	if (cr == CR_SUCCESS)
+		RemoveAllDevices(h, FALSE, FALSE);
+
+	// Remove THIS device node
+	return 	RemDev( hDevInst,  DelInf);
+}
+
+int RemDev(DEVINST hDevInst, BOOL DelInf)
+{
+
 	TCHAR * DeviceInstanceId;
 	SP_DEVINFO_DATA  DeviceInfoData;
 	BOOL rDi;
@@ -1840,7 +1865,13 @@ BOOL hlp_UninstallOEMInf(HDEVINFO DeviceInfoSet, SP_DEVINFO_DATA DeviceInfoData)
 	TCHAR ErrMsg[1000];
 	TCHAR OEMInfFileName[MAX_PATH];
 
-	GetOEMInfFileName(DeviceInfoSet, DeviceInfoData, OEMInfFileName);
+	BOOL FileNameRes = GetOEMInfFileName(DeviceInfoSet, DeviceInfoData, OEMInfFileName);
+	if (!FileNameRes)
+	{
+		_stprintf_s(prt, MAX_PATH, "RemoveDevice: Failed to obtain OEM INF file name - Perhaps system device");
+		StatusMessage(NULL, prt, INFO);
+		return TRUE;
+	}
 	_stprintf_s(prt, MAX_PATH, "RemoveDevice: Going to remove file %s", OEMInfFileName);
 	StatusMessage(NULL, prt, INFO);
 	BOOL rDi = SetupUninstallOEMInf(OEMInfFileName, SUOI_FORCEDELETE, NULL);
