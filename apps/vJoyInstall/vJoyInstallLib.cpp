@@ -819,25 +819,16 @@ final:
 
 
 
-
+// Remove vJoy device-node and its children
 int RemoveDevice(TCHAR *ParentDeviceNode, BOOL DelInf)
 {
 	DEVINST  dnDevInst;
-	SP_DEVINFO_DATA  DeviceInfoData;
-	BOOL rDi;
 	CONFIGRET  rType;
-	TCHAR * DeviceInstanceId;
 
 
 	/////////////////////////////////////////////////////////////////////////////////////////////////
 	_stprintf_s(prt, MAX_PATH, "RemoveDevice: ParentDeviceNode = %s", ParentDeviceNode);
 	StatusMessage(NULL, prt, INFO);
-
-	// Creating a clean Device Info Set
-	HDEVINFO DeviceInfoSet = hlp_CreateDeviceInfoList();
-	if (DeviceInfoSet == INVALID_HANDLE_VALUE)
-		return -101;
-
 
 	// Obtains device instance handle to the device node (dnDevInst)
 	// that is associated with a specified device instance identifier
@@ -845,8 +836,37 @@ int RemoveDevice(TCHAR *ParentDeviceNode, BOOL DelInf)
 	if (rType != CR_SUCCESS)
 		return -102;
 
+	// Remove all devices under this device node (including this device node)
+	return RemoveAllDevices(dnDevInst, TRUE, DelInf);
+}
+
+
+// Remove all device nodes starting with hDevInst
+// 
+// hDevInst: Handle to device node to remove
+// isRoot: TRUE if this device node is the root of the operation. 
+//         If this is the root, Remove all of its children then remove the root
+//         If this is NOT the root, Remove its sibling then remove this device node
+// DelInf: If TRUE - remove driver from driver store
+//
+// Return 0 if success.
+// Return negative error code id failure
+int   RemoveAllDevices(DEVINST hDevInst, BOOL isRoot, BOOL DelInf)
+{
+
+	TCHAR * DeviceInstanceId;
+	SP_DEVINFO_DATA  DeviceInfoData;
+	BOOL rDi;
+
+	// Creating a clean Device Info Set
+	HDEVINFO DeviceInfoSet = hlp_CreateDeviceInfoList();
+	if (DeviceInfoSet == INVALID_HANDLE_VALUE)
+		return -101;
+
+
+
 	// Obtains Device ID from Device Handle
-	int iRet = hlp_DeviceHandle2ID( dnDevInst, &DeviceInstanceId);
+	int iRet = hlp_DeviceHandle2ID(hDevInst, &DeviceInstanceId);
 	if (iRet)
 		return iRet;
 
