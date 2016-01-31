@@ -105,5 +105,7 @@ CONFIGRET hlp_LocateDevNode(PDEVINST pdnDevInst, DEVINSTID pDeviceID);
 BOOL hlp_OpenDeviceInfo(HDEVINFO DeviceInfoSet, PCTSTR DeviceInstanceId, PSP_DEVINFO_DATA DeviceInfoData);
 BOOL hlp_RemoveDevice(HDEVINFO DeviceInfoSet, PSP_DEVINFO_DATA DeviceInfoData);
 BOOL hlp_UninstallOEMInf(HDEVINFO DeviceInfoSet, SP_DEVINFO_DATA DeviceInfoData);
+int hlp_DeviceHandle2ID(DEVINST dnDevInst, TCHAR **  DeviceInstanceId);
+
 
 

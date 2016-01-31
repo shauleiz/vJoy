@@ -826,6 +826,7 @@ int RemoveDevice(TCHAR *ParentDeviceNode, BOOL DelInf)
 	SP_DEVINFO_DATA  DeviceInfoData;
 	BOOL rDi;
 	CONFIGRET  rType;
+	TCHAR * DeviceInstanceId;
 
 
 	/////////////////////////////////////////////////////////////////////////////////////////////////
@@ -844,12 +845,17 @@ int RemoveDevice(TCHAR *ParentDeviceNode, BOOL DelInf)
 	if (rType != CR_SUCCESS)
 		return -102;
 
+	// Obtains Device ID from Device Handle
+	int iRet = hlp_DeviceHandle2ID( dnDevInst, &DeviceInstanceId);
+	if (iRet)
+		return iRet;
+
 
 	// Get the Device Info Data
-	rDi = hlp_OpenDeviceInfo(DeviceInfoSet, ParentDeviceNode, &DeviceInfoData);
+	rDi = hlp_OpenDeviceInfo(DeviceInfoSet, DeviceInstanceId, &DeviceInfoData);
 	if (!rDi)
 		return -105;
-
+	delete[] DeviceInstanceId;
 
 	// If Requested to Delete INF file from inf directoy - Get the name of file OEMx.INF  and remove it
 	if (DelInf)
@@ -1771,7 +1777,7 @@ CONFIGRET hlp_LocateDevNode(PDEVINST pdnDevInst, DEVINSTID pDeviceID)
 }
 
 // Get the Device Info Data
-BOOL hlp_OpenDeviceInfo(HDEVINFO DeviceInfoSet, PCTSTR DeviceInstanceId, PSP_DEVINFO_DATA DeviceInfoData)
+BOOL hlp_OpenDeviceInfo(HDEVINFO DeviceInfoSet, PCTSTR  DeviceInstanceId, PSP_DEVINFO_DATA DeviceInfoData)
 {
 	TCHAR ErrMsg[1000];
 
@@ -1828,4 +1834,46 @@ BOOL hlp_UninstallOEMInf(HDEVINFO DeviceInfoSet, SP_DEVINFO_DATA DeviceInfoData)
 	_stprintf_s(prt, MAX_PATH, "RemoveDevice: File %s removed", OEMInfFileName);
 	StatusMessage(NULL, prt, INFO);
 	return TRUE;
+}
+
+
+// Get the ID of the device instance
+int hlp_DeviceHandle2ID(DEVINST dnDevInst, TCHAR **  DeviceId)
+{	
+	ULONG  Len;
+	
+	CONFIGRET rType = CM_Get_Device_ID_Size(&Len, dnDevInst, 0);
+	if (rType != CR_SUCCESS)
+	{
+		_stprintf_s(prt, MAX_PATH, "RemoveDevice: Function CM_Get_Device_ID_Size failed with error: %08X", rType);
+		StatusMessage(NULL, prt, ERR);
+		return -103;
+	}
+	else
+	{
+		_stprintf_s(prt, MAX_PATH, "RemoveDevice: Function CM_Get_Device_ID_Size OK");
+		StatusMessage(NULL, prt, INFO);
+	};
+
+
+	if (!DeviceId)
+		return -1031;
+
+	Len += 2;
+	TCHAR * DeviceInstanceId = new TCHAR[Len];
+ 	if (!DeviceInstanceId)
+		return -1032;
+
+	rType = CM_Get_Device_ID(dnDevInst, DeviceInstanceId, Len, 0);
+	if (rType != CR_SUCCESS)
+	{
+		_stprintf_s(prt, MAX_PATH, "RemoveDevice: Function CM_Get_Device_ID failed with error: %08X", rType);
+		StatusMessage(NULL, prt, ERR);
+		delete[] DeviceInstanceId;
+		return -104;
+	}
+	_stprintf_s(prt, MAX_PATH, "RemoveDevice: Function CM_Get_Device_ID (Device Instance Path = %s) OK", DeviceInstanceId);
+	StatusMessage(NULL, prt, INFO);
+	*DeviceId = DeviceInstanceId;
+	return 0;
 }
