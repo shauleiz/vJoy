@@ -201,6 +201,11 @@ namespace WrapperTest
             joystick.SetBtn(Btn81.Checked, id, 81);
         }
 
+        private void Btn128_CheckedChanged(object sender, EventArgs e)
+        {
+            joystick.SetBtn(Btn128.Checked, id, 128);
+        }
+
         private void groupBox2_Enter(object sender, EventArgs e)
         {
 
@@ -286,6 +291,7 @@ namespace WrapperTest
             dlg = dialog;
             joystick = dialog.joystick;
             // FFB
+#if false
 #pragma warning disable 0618
             if (!joystick.FfbStart(id))
                 throw new Exception(String.Format("Failed to start Forcefeedback on device {0}", id));
@@ -296,7 +302,8 @@ namespace WrapperTest
             IntPtr parameter = (IntPtr)h;
             // joystick.FfbRegisterGenCB(OnEffect, parameter);
             joystick.FfbRegisterGenCB(OnEffectObj, dialog);
-        }
+ #endif
+       }
 
         public FfbInterface()
         {

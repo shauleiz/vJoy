@@ -361,7 +361,7 @@ namespace vJoyInterfaceWrap
         private static extern bool _SetAxis(Int32 Value, UInt32 rID, HID_USAGES Axis);
 
         [DllImport("vJoyInterface.dll", EntryPoint = "SetBtn")]
-        private static extern bool _SetBtn(bool Value, UInt32 rID, char nBtn);
+        private static extern bool _SetBtn(bool Value, UInt32 rID, Byte nBtn);
 
         [DllImport("vJoyInterface.dll", EntryPoint = "SetDiscPov")]
         private static extern bool _SetDiscPov(Int32 Value, UInt32 rID, uint nPov);
@@ -516,7 +516,7 @@ namespace vJoyInterfaceWrap
 
         ////// Write data
         public bool SetAxis(Int32 Value, UInt32 rID, HID_USAGES Axis) { return _SetAxis(Value, rID, Axis); }
-        public bool SetBtn(bool Value, UInt32 rID, uint nBtn) { return _SetBtn( Value, rID, (char)nBtn); }
+        public bool SetBtn(bool Value, UInt32 rID, uint nBtn) { return _SetBtn( Value, rID, (Byte)nBtn); }
         public bool SetDiscPov(Int32 Value, UInt32 rID, uint nPov) { return _SetDiscPov(Value, rID, nPov); }
         public bool SetContPov(Int32 Value, UInt32 rID, uint nPov) { return _SetContPov(Value, rID, nPov); }
         

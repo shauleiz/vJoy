@@ -41,6 +41,7 @@
             this.trackBar_RX = new System.Windows.Forms.TrackBar();
             this.trackBar_Z = new System.Windows.Forms.TrackBar();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
+            this.Btn128 = new System.Windows.Forms.CheckBox();
             this.Btn81 = new System.Windows.Forms.CheckBox();
             this.Btn8 = new System.Windows.Forms.CheckBox();
             this.Btn7 = new System.Windows.Forms.CheckBox();
@@ -202,6 +203,7 @@
             // 
             // groupBox1
             // 
+            this.groupBox1.Controls.Add(this.Btn128);
             this.groupBox1.Controls.Add(this.Btn81);
             this.groupBox1.Controls.Add(this.Btn8);
             this.groupBox1.Controls.Add(this.Btn7);
@@ -217,6 +219,18 @@
             this.groupBox1.TabIndex = 8;
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "Buttons";
+            // 
+            // Btn128
+            // 
+            this.Btn128.Appearance = System.Windows.Forms.Appearance.Button;
+            this.Btn128.AutoSize = true;
+            this.Btn128.Location = new System.Drawing.Point(401, 26);
+            this.Btn128.Name = "Btn128";
+            this.Btn128.Size = new System.Drawing.Size(35, 23);
+            this.Btn128.TabIndex = 9;
+            this.Btn128.Text = "128";
+            this.Btn128.UseVisualStyleBackColor = true;
+            this.Btn128.CheckedChanged += new System.EventHandler(this.Btn128_CheckedChanged);
             // 
             // Btn81
             // 
@@ -544,6 +558,7 @@
         private System.Windows.Forms.CheckBox checkBox7;
         private System.Windows.Forms.CheckBox checkBox8;
         private System.Windows.Forms.CheckBox checkBox9;
+        private System.Windows.Forms.CheckBox Btn128;
     }
 }
 
