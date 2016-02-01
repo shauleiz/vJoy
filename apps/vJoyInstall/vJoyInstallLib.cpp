@@ -836,6 +836,7 @@ int RemoveDevice(TCHAR *ParentDeviceNode, BOOL DelInf)
 	if (rType != CR_SUCCESS)
 		return -102;
 
+
 	// Remove all devices under this device node (including this device node)
 	return RemoveAllDevices(dnDevInst, TRUE, DelInf);
 }
@@ -882,6 +883,14 @@ int RemDev(DEVINST hDevInst, BOOL DelInf)
 	TCHAR * DeviceInstanceId;
 	SP_DEVINFO_DATA  DeviceInfoData;
 	BOOL rDi;
+	CONFIGRET cr;
+
+
+	// Enable vJoy device node because the removal works only on enabled devices
+	cr = CM_Enable_DevNode(hDevInst, 0);
+	if (cr != CR_SUCCESS)
+ 		return -1010;
+
 
 	// Creating a clean Device Info Set
 	HDEVINFO DeviceInfoSet = hlp_CreateDeviceInfoList();
