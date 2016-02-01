@@ -862,6 +862,11 @@ int   RemoveAllDevices(DEVINST hDevInst, BOOL isRoot, BOOL DelInf)
 	if (!hDevInst)
 		return 0;
 
+	// Enable vJoy device node because the removal works only on enabled devices
+	cr = CM_Enable_DevNode(hDevInst, 0);
+	if (cr != CR_SUCCESS)
+		return -1010;
+
 	// If this is a root device - get the first child.
 	// If this is NOT the root device - get the next sibling.
 	if (isRoot)
@@ -886,17 +891,10 @@ int RemDev(DEVINST hDevInst, BOOL DelInf)
 	CONFIGRET cr;
 
 
-	// Enable vJoy device node because the removal works only on enabled devices
-	cr = CM_Enable_DevNode(hDevInst, 0);
-	if (cr != CR_SUCCESS)
- 		return -1010;
-
-
 	// Creating a clean Device Info Set
 	HDEVINFO DeviceInfoSet = hlp_CreateDeviceInfoList();
 	if (DeviceInfoSet == INVALID_HANDLE_VALUE)
 		return -101;
-
 
 
 	// Obtains Device ID from Device Handle
