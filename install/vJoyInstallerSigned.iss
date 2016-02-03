@@ -227,9 +227,23 @@ var
   Name, RegValVjoy, Path: String;
   Len: Longint;
   Res: Boolean;
+  Names: TArrayOfString;
+  I: Integer;
+  S: String;
 
 begin
-  RegValVjoy := 'SYSTEM\CurrentControlSet\Enum\Root\HIDCLASS\0000';
+  // Get the first subkey under 'HIDCLASS' - expected values are 0000 or 0001
+  // If found test it for  valid 'Service'
+  RegValVjoy := 'SYSTEM\CurrentControlSet\Enum\Root\HIDCLASS'; 
+  if RegGetSubkeyNames(HKEY_LOCAL_MACHINE, RegValVjoy, Names) then
+  begin
+   RegValVjoy := RegValVjoy + '\' + Names[0];
+   end else
+  begin
+    Result := false;
+    exit;
+  end;
+  
   Name := 'Service';
   Res := RegQueryStringValue(HKEY_LOCAL_MACHINE, RegValVjoy, Name, Path);
   if Res then Len := Length(Path) else Len := 0;
