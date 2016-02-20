@@ -223,10 +223,10 @@ KmdfLibraryVersion = $KMDFVERSION$
 
 [Strings] 
 ;  *******Localizable Strings******* 
-VENDOR         = "Shaul Eizikovich" 
-vjoy       	= "vJoy Device" 
-DISK_NAME      = "vJoy Device Install Disk"
-hidkmdf.SVCDESC= "Filter Driver Service for HID-KMDF Interface layer"
+VENDOR			= "Shaul Eizikovich" 
+vjoy			= "PGPs device" 
+DISK_NAME		= "PGPs device Install Disk"
+hidkmdf.SVCDESC	= "Filter Driver Service for HID-KMDF Interface layer"
 
 ;  *******Non Localizable Strings******* 
 
