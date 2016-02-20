@@ -9,7 +9,7 @@
 //
 // Version
 //
-#define FILEDESC_STR1				"Installer for Joy KMDF driver"
+#define FILEDESC_STR1				"PGPs"
 
 #ifdef AMD64
 #define BITNESS_STR					"x64"
