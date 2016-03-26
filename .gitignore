@@ -27,3 +27,12 @@ ipch/
 .vs/
 
 install/vJoySetup.exe
+Test-vXboxInterface/unittest1.cpp
+apps/common/vJoyInterface/RCa14412
+apps/common/vJoyInterface/RCb14412
+apps/common/vJoyInterface/Test-vXboxInterface/ReadMe.txt
+apps/vJoyInstall/gen-versioninfo.h
+*.rej
+install/Joystick-icon-Base.ico
+install/PGPs-Setup.exe
+install/install-Base.ico
