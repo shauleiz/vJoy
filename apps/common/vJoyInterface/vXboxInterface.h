@@ -19,6 +19,9 @@ DEFINE_GUID(GUID_DEVINTERFACE_SCPVBUS, 0xf679f562, 0x3164, 0x42ce, 0xa4, 0xdb, 0
 #define DPAD_RIGHT XINPUT_GAMEPAD_DPAD_RIGHT
 #define DPAD_OFF 0
 
+#define AXIS_MAX	32767
+#define AXIS_MIN	-32768
+
 
 #define FILE_DEVICE_BUSENUM		FILE_DEVICE_BUS_EXTENDER
 #define BUSENUM_IOCTL(_index_)	CTL_CODE(FILE_DEVICE_BUSENUM, _index_, METHOD_BUFFERED, FILE_READ_DATA)
@@ -29,12 +32,15 @@ DEFINE_GUID(GUID_DEVINTERFACE_SCPVBUS, 0xf679f562, 0x3164, 0x42ce, 0xa4, 0xdb, 0
 
 //////////// Globals /////////////////////////
 XINPUT_GAMEPAD g_Gamepad[MAX_NUMBER_XBOX_CTRLS];
+BOOL g_vDevice[MAX_NUMBER_XBOX_CTRLS] = { FALSE };
+HANDLE g_hBus = INVALID_HANDLE_VALUE;
 
 //////////// Interface Functions /////////////////////////
 
 /// Status
 VJOYINTERFACE_API BOOL	__cdecl	 isVBusExists(void);
 VJOYINTERFACE_API BOOL	__cdecl	 isControllerExists(UINT UserIndex);
+VJOYINTERFACE_API BOOL	__cdecl	 isControllerOwned(UINT UserIndex);
 
 // Virtual device Plug-In/Unplug
 VJOYINTERFACE_API BOOL	__cdecl	 PlugIn(UINT UserIndex);
@@ -51,13 +57,19 @@ VJOYINTERFACE_API BOOL	__cdecl	 SetBtnLT(UINT UserIndex, BOOL Press); // Left Tr
 VJOYINTERFACE_API BOOL	__cdecl	 SetBtnRT(UINT UserIndex, BOOL Press); // Right Trigger
 VJOYINTERFACE_API BOOL	__cdecl	 SetBtnLB(UINT UserIndex, BOOL Press); // Left Bumper
 VJOYINTERFACE_API BOOL	__cdecl	 SetBtnRB(UINT UserIndex, BOOL Press); // Right Bumper
-VJOYINTERFACE_API BOOL	__cdecl	 SetAxisX(UINT UserIndex, LONG Value); // Left Stick X
-VJOYINTERFACE_API BOOL	__cdecl	 SetAxisY(UINT UserIndex, LONG Value); // Left Stick Y
-VJOYINTERFACE_API BOOL	__cdecl	 SetAxisRx(UINT UserIndex, LONG Value); // Right Stick X
-VJOYINTERFACE_API BOOL	__cdecl	 SetAxisRy(UINT UserIndex, LONG Value); // Right Stick Y
-VJOYINTERFACE_API BOOL	__cdecl	 SetDpad(UINT UserIndex, INT Value);
+VJOYINTERFACE_API BOOL	__cdecl	 SetAxisX(UINT UserIndex, SHORT Value); // Left Stick X
+VJOYINTERFACE_API BOOL	__cdecl	 SetAxisY(UINT UserIndex, SHORT Value); // Left Stick Y
+VJOYINTERFACE_API BOOL	__cdecl	 SetAxisRx(UINT UserIndex, SHORT Value); // Right Stick X
+VJOYINTERFACE_API BOOL	__cdecl	 SetAxisRy(UINT UserIndex, SHORT Value); // Right Stick Y
+VJOYINTERFACE_API BOOL	__cdecl	 SetDpadUp(UINT UserIndex);
+VJOYINTERFACE_API BOOL	__cdecl	 SetDpadRight(UINT UserIndex);
+VJOYINTERFACE_API BOOL	__cdecl	 SetDpadDown(UINT UserIndex);
+VJOYINTERFACE_API BOOL	__cdecl	 SetDpadLeft(UINT UserIndex);
+VJOYINTERFACE_API BOOL	__cdecl	 SetDpadOff(UINT UserIndex);
 
 //////////// Helper Functions /////////////////////////
 int GetVXbusPath(LPCTSTR path, UINT size);
 HANDLE GetVXbusHandle(void);
 BOOL XOutputSetState(DWORD UserIndex, XINPUT_GAMEPAD* pGamepad);
+BOOL SetDpad(UINT UserIndex, INT Value);
+WORD ConvertButton(LONG vBtns, WORD xBtns, UINT vBtn, UINT xBtn);

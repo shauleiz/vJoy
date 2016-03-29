@@ -1,6 +1,5 @@
 
 #pragma once
-
 namespace vJoyDemo {
 
     using namespace System;
@@ -13,7 +12,8 @@ namespace vJoyDemo {
     // Must add file LBIndustrialCtrls.dll to exeutable folder
     using namespace LBSoft::IndustrialCtrls;
     using namespace LBSoft::IndustrialCtrls::Knobs;
-    using namespace LBSoft::IndustrialCtrls::Buttons;
+	using namespace LBSoft::IndustrialCtrls::Buttons;
+	using namespace System::Diagnostics;
 
 
     // from http://www.codeproject.com/KB/miscctrl/NextUIknob.aspx
@@ -276,9 +276,7 @@ private: System::Windows::Forms::Label^  label1;
                     AxisXmin = min;
                  };
 
-                 if (max < 0 || min < 0)
-                     GetVJDAxisMax(ReportId, HID_USAGE_Y, &max) && GetVJDAxisMin(ReportId, HID_USAGE_Y, &min);
-                 if ((max >= 0) && (min >= 0))
+                  if (GetVJDAxisMax(ReportId, HID_USAGE_Y, &max) && GetVJDAxisMin(ReportId, HID_USAGE_Y, &min))
                  {
                      trackBarY->Value = ConvPercentage((max + min + 1) / 2, max, min);
                      textBoxY->Text = System::Convert::ToString((int)trackBarY->Value);
@@ -286,9 +284,7 @@ private: System::Windows::Forms::Label^  label1;
                      AxisYmin = min;
                  };
 
-                 if (max < 0 || min < 0)
-                     GetVJDAxisMax(ReportId, HID_USAGE_Z, &max) && GetVJDAxisMin(ReportId, HID_USAGE_Z, &min);
-                 if ((max >= 0) && (min >= 0))
+                 if (GetVJDAxisMax(ReportId, HID_USAGE_Z, &max) && GetVJDAxisMin(ReportId, HID_USAGE_Z, &min))
                  {
                      trackBarZ->Value = ConvPercentage((max + min + 1) / 2, max, min);
                      textBoxZ->Text = System::Convert::ToString((int)trackBarZ->Value);
@@ -296,51 +292,41 @@ private: System::Windows::Forms::Label^  label1;
                      AxisZmin = min;
                  };
 
-                 if (max < 0 || min < 0)
-                     GetVJDAxisMax(ReportId, HID_USAGE_RX, &max) && GetVJDAxisMin(ReportId, HID_USAGE_RX, &min);
-                 if ((max >= 0) && (min >= 0))
+                 if (GetVJDAxisMax(ReportId, HID_USAGE_RX, &max) && GetVJDAxisMin(ReportId, HID_USAGE_RX, &min))
                  {
-                    trackBarRx->Value = min;
+                    trackBarRx->Value = ConvPercentage(min, max, min);
                     textBoxRx->Text = System::Convert::ToString((int)trackBarRx->Value);
                     AxisRXmax=max;
                     AxisRXmin=min;
                  };
 
-                 if (max < 0 || min < 0)
-                     GetVJDAxisMax(ReportId, HID_USAGE_RY, &max) && GetVJDAxisMin(ReportId, HID_USAGE_RY, &min);
-                 if ((max >= 0) && (min >= 0))
+                 if (GetVJDAxisMax(ReportId, HID_USAGE_RY, &max) && GetVJDAxisMin(ReportId, HID_USAGE_RY, &min))
                  {
-                    trackBarRy->Value = min;
+                    trackBarRy->Value = ConvPercentage(min, max, min);
                     textBoxRy->Text = System::Convert::ToString((int)trackBarRy->Value);
                     AxisRYmax=max;
                     AxisRYmin=min;
                  };
 
-                 if (max < 0 || min < 0)
-                     GetVJDAxisMax(ReportId, HID_USAGE_RZ, &max) && GetVJDAxisMin(ReportId, HID_USAGE_RZ, &min);
-                 if ((max >= 0) && (min >= 0))
+                 if (GetVJDAxisMax(ReportId, HID_USAGE_RZ, &max) && GetVJDAxisMin(ReportId, HID_USAGE_RZ, &min))
                  {
-                    trackBarRz->Value = min;
+                    trackBarRz->Value = ConvPercentage(min, max, min);
                     textBoxRz->Text = System::Convert::ToString((int)trackBarRz->Value);
                     AxisRZmax=max;
                     AxisRZmin=min;
                  };
 
-                 if (max < 0 || min < 0)
-                     GetVJDAxisMax(ReportId, HID_USAGE_SL0, &max) && GetVJDAxisMin(ReportId, HID_USAGE_SL0, &min);
-                 if ((max >= 0) && (min >= 0))
+                 if (GetVJDAxisMax(ReportId, HID_USAGE_SL0, &max) && GetVJDAxisMin(ReportId, HID_USAGE_SL0, &min))
                  {
-                    trackBarSL0->Value = min;
+                    trackBarSL0->Value = ConvPercentage(min, max, min);
                     textBoxSL0->Text = System::Convert::ToString((int)trackBarSL0->Value);
                     AxisSL0max=max;
                     AxisSL0min=min;
                  };
 
-                 if (max < 0 || min < 0)
-                     GetVJDAxisMax(ReportId, HID_USAGE_SL1, &max) && GetVJDAxisMin(ReportId, HID_USAGE_SL1, &min);
-                 if ((max >= 0) && (min >= 0))
+                 if (GetVJDAxisMax(ReportId, HID_USAGE_SL1, &max) && GetVJDAxisMin(ReportId, HID_USAGE_SL1, &min))
                  {
-                    trackBarSL1->Value = min;
+                    trackBarSL1->Value = ConvPercentage(min, max, min);
                     textBoxSL1->Text = System::Convert::ToString((int)trackBarSL1->Value);
                     AxisSL1max=max;
                     AxisSL1min=min;
@@ -1803,8 +1789,12 @@ private: long ConvAbsolute(long val, long max, long min)
     // Covert to absolute value from a number in the range 0-100
     if (max==min)
         return 0;
-
-    return val*(max-min)/100+min+1;
+#ifdef XBOX
+	max = 32767;
+	min = 0/*-32768*/;
+	return val*(max - min) / 100 + min;
+#endif
+	return val*(max - min) / 100 + min + 1;
 }
 
 private: System::Void WatchDog_Tick(System::Object^  sender, System::EventArgs^  e) {		

@@ -56,22 +56,22 @@ int main()
 		switch (T)
 		{
 			case 0:
-				SetDpad(1, DPAD_UP);
+				SetDpadUp(1);
 				SetBtnA(1, FALSE);
 				SetBtnB(1, TRUE);
 				break;
 			case 20:
-				SetDpad(1, DPAD_RIGHT);
+				SetDpadRight(1);
 				SetBtnB(1, FALSE);
 				break;
 			case 40:
-				SetDpad(1, DPAD_DOWN);
+				SetDpadDown(1);
 				break;
 			case 60:
-				SetDpad(1, DPAD_LEFT);
+				SetDpadLeft(1);
 				break;
 			case 80:
-				SetDpad(1, DPAD_OFF);
+				SetDpadOff(1);
 				SetBtnA(1, TRUE);
 				break;
 		}
