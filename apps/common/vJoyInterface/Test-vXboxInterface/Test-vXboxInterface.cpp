@@ -46,6 +46,8 @@ int main()
 		printf("Plug-in device %d: %X\n", i, res);
 	}
 	printf("\n");
+	SetTriggerL(2, 0);
+	SetTriggerR(2, 0);
 
 	for (int T = 0; T < 100; T++)
 	{
@@ -76,8 +78,12 @@ int main()
 				break;
 		}
 		
+		SetTriggerL(1, 2 * T);
+		SetTriggerR(1, 57 +(2 * T));
 		Sleep(100);
 	}
+	SetTriggerL(1, 255);
+	SetTriggerR(1, 255);
 
 	printf("Press any key to remove devices \n");
 	getchar();

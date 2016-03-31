@@ -31,7 +31,6 @@ extern "C"
 			return FALSE;
 	}
 
-
 	VJOYINTERFACE_API BOOL	__cdecl	 isControllerExists(UINT UserIndex)
 	{
 		// TODO: This is not correct:
@@ -251,6 +250,21 @@ extern "C"
 		g_Gamepad[UserIndex - 1].wButtons |= Btn*Press;
 		return XOutputSetState(UserIndex, &g_Gamepad[UserIndex - 1]);
 	}
+
+	VJOYINTERFACE_API BOOL	__cdecl	 SetTriggerL(UINT UserIndex, BYTE Value) // Left Trigger
+	{
+		g_Gamepad[UserIndex - 1].bLeftTrigger = Value;
+		return XOutputSetState(UserIndex, &g_Gamepad[UserIndex - 1]); 
+	}
+
+	VJOYINTERFACE_API BOOL	__cdecl	 SetTriggerR(UINT UserIndex, BYTE Value) // Right Trigger
+	{
+		g_Gamepad[UserIndex - 1].bRightTrigger = Value;
+		return XOutputSetState(UserIndex, &g_Gamepad[UserIndex - 1]);
+	}
+
+	VJOYINTERFACE_API BOOL	__cdecl	 SetTriggerR(UINT UserIndex, BYTE Value); // Right Trigger
+
 }
 
 #ifdef XBOX
