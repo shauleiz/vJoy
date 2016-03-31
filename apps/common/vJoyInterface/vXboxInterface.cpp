@@ -76,6 +76,22 @@ extern "C"
 		};
 
 		//CloseHandle(h);
+		DWORD error = 0 ;
+		if (out)
+		{ 
+#ifdef _DEBUG
+			printf("IOCTL_BUSENUM_PLUGIN_HARDWARE 0X%x OK\n", IOCTL_BUSENUM_PLUGIN_HARDWARE);
+#endif
+			error = 0;
+		}
+		else
+		{
+			error = GetLastError();
+#ifdef _DEBUG
+			printf("IOCTL_BUSENUM_PLUGIN_HARDWARE 0X%x Failed (Error:0X%x)\n", IOCTL_BUSENUM_PLUGIN_HARDWARE, error);
+#endif
+		}
+
 		return out;
 	}
 

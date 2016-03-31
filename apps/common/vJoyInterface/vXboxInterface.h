@@ -25,10 +25,23 @@ DEFINE_GUID(GUID_DEVINTERFACE_SCPVBUS, 0xf679f562, 0x3164, 0x42ce, 0xa4, 0xdb, 0
 
 #define FILE_DEVICE_BUSENUM		FILE_DEVICE_BUS_EXTENDER
 #define BUSENUM_IOCTL(_index_)	CTL_CODE(FILE_DEVICE_BUSENUM, _index_, METHOD_BUFFERED, FILE_READ_DATA)
+#define BUSENUM_W_IOCTL(_index_)	CTL_CODE(FILE_DEVICE_BUSENUM, _index_, METHOD_BUFFERED, FILE_WRITE_DATA)
+#define BUSENUM_R_IOCTL(_index_)	CTL_CODE(FILE_DEVICE_BUSENUM, _index_, METHOD_BUFFERED, FILE_READ_DATA)
+#define BUSENUM_RW_IOCTL(_index_)	CTL_CODE(FILE_DEVICE_BUSENUM, _index_, METHOD_BUFFERED, FILE_WRITE_DATA | FILE_READ_DATA)
+
+#define IOCTL_BUSENUM_BASE 0x801
+
+#ifdef VBOX_BUS
+#define IOCTL_BUSENUM_PLUGIN_HARDWARE	BUSENUM_W_IOCTL(IOCTL_BUSENUM_BASE+0x0)
+#define IOCTL_BUSENUM_UNPLUG_HARDWARE	BUSENUM_W_IOCTL(IOCTL_BUSENUM_BASE+0x1)
+#define IOCTL_BUSENUM_EJECT_HARDWARE	BUSENUM_W_IOCTL(IOCTL_BUSENUM_BASE+0x2)
+#define IOCTL_BUSENUM_REPORT_HARDWARE	BUSENUM_RW_IOCTL(IOCTL_BUSENUM_BASE+0x3)
+#else
 #define IOCTL_BUSENUM_PLUGIN_HARDWARE	BUSENUM_IOCTL(0x0)
 #define IOCTL_BUSENUM_UNPLUG_HARDWARE	BUSENUM_IOCTL(0x1)
 #define IOCTL_BUSENUM_EJECT_HARDWARE	BUSENUM_IOCTL(0x2)
 #define IOCTL_BUSENUM_REPORT_HARDWARE	BUSENUM_IOCTL(0x3)
+#endif
 
 //////////// Globals /////////////////////////
 XINPUT_GAMEPAD g_Gamepad[MAX_NUMBER_XBOX_CTRLS];
@@ -39,35 +52,35 @@ HANDLE g_hBus = INVALID_HANDLE_VALUE;
 extern "C"
 {
 
-/// Status
-VJOYINTERFACE_API BOOL	__cdecl	 isVBusExists(void);
-VJOYINTERFACE_API BOOL	__cdecl	 isControllerExists(UINT UserIndex);
-VJOYINTERFACE_API BOOL	__cdecl	 isControllerOwned(UINT UserIndex);
+	/// Status
+	VJOYINTERFACE_API BOOL	__cdecl	 isVBusExists(void);
+	VJOYINTERFACE_API BOOL	__cdecl	 isControllerExists(UINT UserIndex);
+	VJOYINTERFACE_API BOOL	__cdecl	 isControllerOwned(UINT UserIndex);
 
-// Virtual device Plug-In/Unplug
-VJOYINTERFACE_API BOOL	__cdecl	 PlugIn(UINT UserIndex);
-VJOYINTERFACE_API BOOL	__cdecl	 UnPlug(UINT UserIndex);
+	// Virtual device Plug-In/Unplug
+	VJOYINTERFACE_API BOOL	__cdecl	 PlugIn(UINT UserIndex);
+	VJOYINTERFACE_API BOOL	__cdecl	 UnPlug(UINT UserIndex);
 
-// Data Transfer
-VJOYINTERFACE_API BOOL	__cdecl	 SetBtnA(UINT UserIndex, BOOL Press);
-VJOYINTERFACE_API BOOL	__cdecl	 SetBtnB(UINT UserIndex, BOOL Press);
-VJOYINTERFACE_API BOOL	__cdecl	 SetBtnX(UINT UserIndex, BOOL Press);
-VJOYINTERFACE_API BOOL	__cdecl	 SetBtnY(UINT UserIndex, BOOL Press);
-VJOYINTERFACE_API BOOL	__cdecl	 SetBtnStart(UINT UserIndex, BOOL Press);
-VJOYINTERFACE_API BOOL	__cdecl	 SetBtnBack(UINT UserIndex, BOOL Press);
-VJOYINTERFACE_API BOOL	__cdecl	 SetBtnLT(UINT UserIndex, BOOL Press); // Left Trigger
-VJOYINTERFACE_API BOOL	__cdecl	 SetBtnRT(UINT UserIndex, BOOL Press); // Right Trigger
-VJOYINTERFACE_API BOOL	__cdecl	 SetBtnLB(UINT UserIndex, BOOL Press); // Left Bumper
-VJOYINTERFACE_API BOOL	__cdecl	 SetBtnRB(UINT UserIndex, BOOL Press); // Right Bumper
-VJOYINTERFACE_API BOOL	__cdecl	 SetAxisX(UINT UserIndex, SHORT Value); // Left Stick X
-VJOYINTERFACE_API BOOL	__cdecl	 SetAxisY(UINT UserIndex, SHORT Value); // Left Stick Y
-VJOYINTERFACE_API BOOL	__cdecl	 SetAxisRx(UINT UserIndex, SHORT Value); // Right Stick X
-VJOYINTERFACE_API BOOL	__cdecl	 SetAxisRy(UINT UserIndex, SHORT Value); // Right Stick Y
-VJOYINTERFACE_API BOOL	__cdecl	 SetDpadUp(UINT UserIndex);
-VJOYINTERFACE_API BOOL	__cdecl	 SetDpadRight(UINT UserIndex);
-VJOYINTERFACE_API BOOL	__cdecl	 SetDpadDown(UINT UserIndex);
-VJOYINTERFACE_API BOOL	__cdecl	 SetDpadLeft(UINT UserIndex);
-VJOYINTERFACE_API BOOL	__cdecl	 SetDpadOff(UINT UserIndex);
+	// Data Transfer
+	VJOYINTERFACE_API BOOL	__cdecl	 SetBtnA(UINT UserIndex, BOOL Press);
+	VJOYINTERFACE_API BOOL	__cdecl	 SetBtnB(UINT UserIndex, BOOL Press);
+	VJOYINTERFACE_API BOOL	__cdecl	 SetBtnX(UINT UserIndex, BOOL Press);
+	VJOYINTERFACE_API BOOL	__cdecl	 SetBtnY(UINT UserIndex, BOOL Press);
+	VJOYINTERFACE_API BOOL	__cdecl	 SetBtnStart(UINT UserIndex, BOOL Press);
+	VJOYINTERFACE_API BOOL	__cdecl	 SetBtnBack(UINT UserIndex, BOOL Press);
+	VJOYINTERFACE_API BOOL	__cdecl	 SetBtnLT(UINT UserIndex, BOOL Press); // Left Trigger
+	VJOYINTERFACE_API BOOL	__cdecl	 SetBtnRT(UINT UserIndex, BOOL Press); // Right Trigger
+	VJOYINTERFACE_API BOOL	__cdecl	 SetBtnLB(UINT UserIndex, BOOL Press); // Left Bumper
+	VJOYINTERFACE_API BOOL	__cdecl	 SetBtnRB(UINT UserIndex, BOOL Press); // Right Bumper
+	VJOYINTERFACE_API BOOL	__cdecl	 SetAxisX(UINT UserIndex, SHORT Value); // Left Stick X
+	VJOYINTERFACE_API BOOL	__cdecl	 SetAxisY(UINT UserIndex, SHORT Value); // Left Stick Y
+	VJOYINTERFACE_API BOOL	__cdecl	 SetAxisRx(UINT UserIndex, SHORT Value); // Right Stick X
+	VJOYINTERFACE_API BOOL	__cdecl	 SetAxisRy(UINT UserIndex, SHORT Value); // Right Stick Y
+	VJOYINTERFACE_API BOOL	__cdecl	 SetDpadUp(UINT UserIndex);
+	VJOYINTERFACE_API BOOL	__cdecl	 SetDpadRight(UINT UserIndex);
+	VJOYINTERFACE_API BOOL	__cdecl	 SetDpadDown(UINT UserIndex);
+	VJOYINTERFACE_API BOOL	__cdecl	 SetDpadLeft(UINT UserIndex);
+	VJOYINTERFACE_API BOOL	__cdecl	 SetDpadOff(UINT UserIndex);
 }  // extern "C"
 
 //////////// Helper Functions /////////////////////////
