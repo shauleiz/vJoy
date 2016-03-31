@@ -1728,9 +1728,9 @@ private: System::Void TargetChanged(System::Object^  sender, System::EventArgs^ 
                  //listBoxTarget->SelectedIndex = index;
                  String^ message;
                  if (ReportId>0)
-                    message = L"vJoy Device " + ReportId + " cannot be accessed\r\nPerhaps some other device has alredy opened a handle to it\r\n";
+                    message = L"vJoy Device " + ReportId + " cannot be accessed\r\nPerhaps some other device has already opened a handle to it\r\n";
                  else
-                    message = L"vJoy Device cannot be accessed\r\nPerhaps some other device has alredy opened a handle to it\r\n";
+                    message = L"vJoy Device cannot be accessed\r\nPerhaps some other device has already opened a handle to it\r\n";
                  String^ title = L"vJoyFeeder";
                  textBoxInfo->Text = message;
                  MessageBox::Show(this, textBoxInfo->Text, title, MessageBoxButtons::OK, MessageBoxIcon::Warning);				

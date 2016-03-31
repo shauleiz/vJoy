@@ -1364,8 +1364,8 @@ Global
 		{9EB6193B-FCC1-450F-9B1F-B64E8B380940}.Release-Xbox|ARM.Build.0 = Release|x64
 		{9EB6193B-FCC1-450F-9B1F-B64E8B380940}.Release-Xbox|ARM64.ActiveCfg = Release|x64
 		{9EB6193B-FCC1-450F-9B1F-B64E8B380940}.Release-Xbox|ARM64.Build.0 = Release|x64
-		{9EB6193B-FCC1-450F-9B1F-B64E8B380940}.Release-Xbox|Win32.ActiveCfg = Release|Win32
-		{9EB6193B-FCC1-450F-9B1F-B64E8B380940}.Release-Xbox|Win32.Build.0 = Release|Win32
+		{9EB6193B-FCC1-450F-9B1F-B64E8B380940}.Release-Xbox|Win32.ActiveCfg = Release-Xbox|Win32
+		{9EB6193B-FCC1-450F-9B1F-B64E8B380940}.Release-Xbox|Win32.Build.0 = Release-Xbox|Win32
 		{9EB6193B-FCC1-450F-9B1F-B64E8B380940}.Release-Xbox|x64.ActiveCfg = Release-Xbox|x64
 		{9EB6193B-FCC1-450F-9B1F-B64E8B380940}.Release-Xbox|x64.Build.0 = Release-Xbox|x64
 		{9EB6193B-FCC1-450F-9B1F-B64E8B380940}.Vista Debug|Any CPU.ActiveCfg = Release|x64

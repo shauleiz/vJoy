@@ -16,224 +16,226 @@ extern "C"
 #include "vXboxInterface.h"
 
 
-
-VJOYINTERFACE_API BOOL	__cdecl	 isVBusExists(void)
+extern "C"
 {
-	TCHAR path[MAX_PATH];
 
-	int n = GetVXbusPath( path, MAX_PATH);
-
-	if (n > 0)
-		return TRUE;
-	else
-		return FALSE;
-}
-
-
-VJOYINTERFACE_API BOOL	__cdecl	 isControllerExists(UINT UserIndex)
-{
-	// TODO: This is not correct:
-	return TRUE;
-}
-
-VJOYINTERFACE_API BOOL	__cdecl	 isControllerOwned(UINT UserIndex)
-{
-	if (UserIndex < 1 || UserIndex>4)
-		return FALSE;
-
-	return g_vDevice[UserIndex-1];
-}
-
-VJOYINTERFACE_API BOOL	__cdecl	 PlugIn(UINT UserIndex)
-{
-	BOOL out = FALSE;
-
-
-	if (UserIndex < 1 || UserIndex>4)
-		return out;
-
-	if (g_hBus == INVALID_HANDLE_VALUE)
-		g_hBus = GetVXbusHandle();
-	if (g_hBus == INVALID_HANDLE_VALUE)
-		return out;
-
-	DWORD trasfered = 0;
-	UCHAR buffer[16] = {};
-
-	buffer[0] = 0x10;
-
-	buffer[4] = ((UserIndex >> 0) & 0xFF);
-	buffer[5] = ((UserIndex >> 8) & 0xFF);
-	buffer[6] = ((UserIndex >> 16) & 0xFF);
-	buffer[8] = ((UserIndex >> 24) & 0xFF);
-
-	if (DeviceIoControl(g_hBus, IOCTL_BUSENUM_PLUGIN_HARDWARE, buffer, _countof(buffer), nullptr, 0, &trasfered, nullptr))
+	VJOYINTERFACE_API BOOL	__cdecl	 isVBusExists(void)
 	{
-		out = TRUE;
-		g_vDevice[UserIndex - 1] = TRUE;
-	};
+		TCHAR path[MAX_PATH];
 
-	//CloseHandle(h);
-	return out;
-}
+		int n = GetVXbusPath(path, MAX_PATH);
 
-VJOYINTERFACE_API BOOL	__cdecl	 UnPlug(UINT UserIndex)
-{
-	BOOL out = FALSE;
-
-	if (UserIndex < 1 || UserIndex>4)
-		return out;
-
-	if (g_hBus == INVALID_HANDLE_VALUE)
-		g_hBus = GetVXbusHandle();
-	if (g_hBus == INVALID_HANDLE_VALUE)
-		return out;
-
-	DWORD trasfered = 0;
-	UCHAR buffer[16] = {};
-
-	buffer[0] = 0x10;
-
-	buffer[4] = ((UserIndex >> 0) & 0xFF);
-	buffer[5] = ((UserIndex >> 8) & 0xFF);
-	buffer[6] = ((UserIndex >> 16) & 0xFF);
-	buffer[8] = ((UserIndex >> 24) & 0xFF);
-
-	if (DeviceIoControl(g_hBus, IOCTL_BUSENUM_UNPLUG_HARDWARE, buffer, _countof(buffer), nullptr, 0, &trasfered, nullptr))
-	{ 
-		out = TRUE;
-		g_vDevice[UserIndex - 1] = FALSE;
+		if (n > 0)
+			return TRUE;
+		else
+			return FALSE;
 	}
-		
-	//CloseHandle(h);
-	return out;
-}
 
-VJOYINTERFACE_API BOOL	__cdecl	 SetAxisX(UINT UserIndex, SHORT Value) // Left Stick X
-{
-	g_Gamepad[UserIndex - 1].sThumbLX = Value;
-	return XOutputSetState(UserIndex, &g_Gamepad[UserIndex - 1]);
-}
 
-VJOYINTERFACE_API BOOL	__cdecl	 SetAxisY(UINT UserIndex, SHORT Value) // Left Stick X
-{
-	g_Gamepad[UserIndex - 1].sThumbLY = Value;
-	return XOutputSetState(UserIndex, &g_Gamepad[UserIndex - 1]);
-}
+	VJOYINTERFACE_API BOOL	__cdecl	 isControllerExists(UINT UserIndex)
+	{
+		// TODO: This is not correct:
+		return TRUE;
+	}
 
-VJOYINTERFACE_API BOOL	__cdecl	 SetAxisRx(UINT UserIndex, SHORT Value) // Left Stick X
-{
-	g_Gamepad[UserIndex - 1].sThumbRX = Value;
-	return XOutputSetState(UserIndex, &g_Gamepad[UserIndex - 1]);
-}
+	VJOYINTERFACE_API BOOL	__cdecl	 isControllerOwned(UINT UserIndex)
+	{
+		if (UserIndex < 1 || UserIndex>4)
+			return FALSE;
 
-VJOYINTERFACE_API BOOL	__cdecl	 SetAxisRy(UINT UserIndex, SHORT Value) // Left Stick X
-{
-	g_Gamepad[UserIndex - 1].sThumbRY = Value;
-	return XOutputSetState(UserIndex, &g_Gamepad[UserIndex - 1]);
-}
-VJOYINTERFACE_API BOOL	__cdecl	 SetDpadUp(UINT UserIndex)
-{
-	return SetDpad(UserIndex, DPAD_UP);
-}
-VJOYINTERFACE_API BOOL	__cdecl	 SetDpadRight(UINT UserIndex)
-{
-	return SetDpad(UserIndex, DPAD_RIGHT);
-}
+		return g_vDevice[UserIndex - 1];
+	}
 
-VJOYINTERFACE_API BOOL	__cdecl	 SetDpadDown(UINT UserIndex)
-{
-	return SetDpad(UserIndex, DPAD_DOWN);
-}
+	VJOYINTERFACE_API BOOL	__cdecl	 PlugIn(UINT UserIndex)
+	{
+		BOOL out = FALSE;
 
-VJOYINTERFACE_API BOOL	__cdecl	 SetDpadLeft(UINT UserIndex)
-{
-	return SetDpad(UserIndex, DPAD_LEFT);
-}
-VJOYINTERFACE_API BOOL	__cdecl	 SetDpadOff(UINT UserIndex)
-{
-	return SetDpad(UserIndex, 0);
-}
 
-VJOYINTERFACE_API BOOL	__cdecl	 SetBtnA(UINT UserIndex, BOOL Press)
-{
-	UINT Btn = XINPUT_GAMEPAD_A;
-	g_Gamepad[UserIndex - 1].wButtons &= ~Btn;
-	g_Gamepad[UserIndex - 1].wButtons |= Btn*Press;
-	return XOutputSetState(UserIndex, &g_Gamepad[UserIndex - 1]);
-}
-VJOYINTERFACE_API BOOL	__cdecl	 SetBtnB(UINT UserIndex, BOOL Press)
-{
-	UINT Btn = XINPUT_GAMEPAD_B;
-	g_Gamepad[UserIndex - 1].wButtons &= ~Btn;
-	g_Gamepad[UserIndex - 1].wButtons |= Btn*Press;
-	return XOutputSetState(UserIndex, &g_Gamepad[UserIndex - 1]);
-}
+		if (UserIndex < 1 || UserIndex>4)
+			return out;
 
-VJOYINTERFACE_API BOOL	__cdecl	 SetBtnX(UINT UserIndex, BOOL Press)
-{
-	UINT Btn = XINPUT_GAMEPAD_X;
-	g_Gamepad[UserIndex - 1].wButtons &= ~Btn;
-	g_Gamepad[UserIndex - 1].wButtons |= Btn*Press;
-	return XOutputSetState(UserIndex, &g_Gamepad[UserIndex - 1]);
-}
+		if (g_hBus == INVALID_HANDLE_VALUE)
+			g_hBus = GetVXbusHandle();
+		if (g_hBus == INVALID_HANDLE_VALUE)
+			return out;
 
-VJOYINTERFACE_API BOOL	__cdecl	 SetBtnY(UINT UserIndex, BOOL Press)
-{
-	UINT Btn = XINPUT_GAMEPAD_Y;
-	g_Gamepad[UserIndex - 1].wButtons &= ~Btn;
-	g_Gamepad[UserIndex - 1].wButtons |= Btn*Press;
-	return XOutputSetState(UserIndex, &g_Gamepad[UserIndex - 1]);
-}
+		DWORD trasfered = 0;
+		UCHAR buffer[16] = {};
 
-VJOYINTERFACE_API BOOL	__cdecl	 SetBtnStart(UINT UserIndex, BOOL Press)
-{
-	UINT Btn = XINPUT_GAMEPAD_START;
-	g_Gamepad[UserIndex - 1].wButtons &= ~Btn;
-	g_Gamepad[UserIndex - 1].wButtons |= Btn*Press;
-	return XOutputSetState(UserIndex, &g_Gamepad[UserIndex - 1]);
-}
+		buffer[0] = 0x10;
 
-VJOYINTERFACE_API BOOL	__cdecl	 SetBtnBack(UINT UserIndex, BOOL Press)
-{
-	UINT Btn = XINPUT_GAMEPAD_BACK;
-	g_Gamepad[UserIndex - 1].wButtons &= ~Btn;
-	g_Gamepad[UserIndex - 1].wButtons |= Btn*Press;
-	return XOutputSetState(UserIndex, &g_Gamepad[UserIndex - 1]);
-}
+		buffer[4] = ((UserIndex >> 0) & 0xFF);
+		buffer[5] = ((UserIndex >> 8) & 0xFF);
+		buffer[6] = ((UserIndex >> 16) & 0xFF);
+		buffer[8] = ((UserIndex >> 24) & 0xFF);
 
-VJOYINTERFACE_API BOOL	__cdecl	 SetBtnLT(UINT UserIndex, BOOL Press)
-{
-	UINT Btn = XINPUT_GAMEPAD_LEFT_THUMB;
-	g_Gamepad[UserIndex - 1].wButtons &= ~Btn;
-	g_Gamepad[UserIndex - 1].wButtons |= Btn*Press;
-	return XOutputSetState(UserIndex, &g_Gamepad[UserIndex - 1]);
-}
+		if (DeviceIoControl(g_hBus, IOCTL_BUSENUM_PLUGIN_HARDWARE, buffer, _countof(buffer), nullptr, 0, &trasfered, nullptr))
+		{
+			out = TRUE;
+			g_vDevice[UserIndex - 1] = TRUE;
+		};
 
-VJOYINTERFACE_API BOOL	__cdecl	 SetBtnRT(UINT UserIndex, BOOL Press)
-{
-	UINT Btn = XINPUT_GAMEPAD_RIGHT_THUMB;
-	g_Gamepad[UserIndex - 1].wButtons &= ~Btn;
-	g_Gamepad[UserIndex - 1].wButtons |= Btn*Press;
-	return XOutputSetState(UserIndex, &g_Gamepad[UserIndex - 1]);
-}
+		//CloseHandle(h);
+		return out;
+	}
 
-VJOYINTERFACE_API BOOL	__cdecl	 SetBtnLB(UINT UserIndex, BOOL Press)
-{
-	UINT Btn = XINPUT_GAMEPAD_LEFT_SHOULDER;
-	g_Gamepad[UserIndex - 1].wButtons &= ~Btn;
-	g_Gamepad[UserIndex - 1].wButtons |= Btn*Press;
-	return XOutputSetState(UserIndex, &g_Gamepad[UserIndex - 1]);
-}
+	VJOYINTERFACE_API BOOL	__cdecl	 UnPlug(UINT UserIndex)
+	{
+		BOOL out = FALSE;
 
-VJOYINTERFACE_API BOOL	__cdecl	 SetBtnRB(UINT UserIndex, BOOL Press)
-{
-	UINT Btn = XINPUT_GAMEPAD_RIGHT_SHOULDER;
-	g_Gamepad[UserIndex - 1].wButtons &= ~Btn;
-	g_Gamepad[UserIndex - 1].wButtons |= Btn*Press;
-	return XOutputSetState(UserIndex, &g_Gamepad[UserIndex - 1]);
-}
+		if (UserIndex < 1 || UserIndex>4)
+			return out;
 
+		if (g_hBus == INVALID_HANDLE_VALUE)
+			g_hBus = GetVXbusHandle();
+		if (g_hBus == INVALID_HANDLE_VALUE)
+			return out;
+
+		DWORD trasfered = 0;
+		UCHAR buffer[16] = {};
+
+		buffer[0] = 0x10;
+
+		buffer[4] = ((UserIndex >> 0) & 0xFF);
+		buffer[5] = ((UserIndex >> 8) & 0xFF);
+		buffer[6] = ((UserIndex >> 16) & 0xFF);
+		buffer[8] = ((UserIndex >> 24) & 0xFF);
+
+		if (DeviceIoControl(g_hBus, IOCTL_BUSENUM_UNPLUG_HARDWARE, buffer, _countof(buffer), nullptr, 0, &trasfered, nullptr))
+		{
+			out = TRUE;
+			g_vDevice[UserIndex - 1] = FALSE;
+		}
+
+		//CloseHandle(h);
+		return out;
+	}
+
+	VJOYINTERFACE_API BOOL	__cdecl	 SetAxisX(UINT UserIndex, SHORT Value) // Left Stick X
+	{
+		g_Gamepad[UserIndex - 1].sThumbLX = Value;
+		return XOutputSetState(UserIndex, &g_Gamepad[UserIndex - 1]);
+	}
+
+	VJOYINTERFACE_API BOOL	__cdecl	 SetAxisY(UINT UserIndex, SHORT Value) // Left Stick X
+	{
+		g_Gamepad[UserIndex - 1].sThumbLY = Value;
+		return XOutputSetState(UserIndex, &g_Gamepad[UserIndex - 1]);
+	}
+
+	VJOYINTERFACE_API BOOL	__cdecl	 SetAxisRx(UINT UserIndex, SHORT Value) // Left Stick X
+	{
+		g_Gamepad[UserIndex - 1].sThumbRX = Value;
+		return XOutputSetState(UserIndex, &g_Gamepad[UserIndex - 1]);
+	}
+
+	VJOYINTERFACE_API BOOL	__cdecl	 SetAxisRy(UINT UserIndex, SHORT Value) // Left Stick X
+	{
+		g_Gamepad[UserIndex - 1].sThumbRY = Value;
+		return XOutputSetState(UserIndex, &g_Gamepad[UserIndex - 1]);
+	}
+	VJOYINTERFACE_API BOOL	__cdecl	 SetDpadUp(UINT UserIndex)
+	{
+		return SetDpad(UserIndex, DPAD_UP);
+	}
+	VJOYINTERFACE_API BOOL	__cdecl	 SetDpadRight(UINT UserIndex)
+	{
+		return SetDpad(UserIndex, DPAD_RIGHT);
+	}
+
+	VJOYINTERFACE_API BOOL	__cdecl	 SetDpadDown(UINT UserIndex)
+	{
+		return SetDpad(UserIndex, DPAD_DOWN);
+	}
+
+	VJOYINTERFACE_API BOOL	__cdecl	 SetDpadLeft(UINT UserIndex)
+	{
+		return SetDpad(UserIndex, DPAD_LEFT);
+	}
+	VJOYINTERFACE_API BOOL	__cdecl	 SetDpadOff(UINT UserIndex)
+	{
+		return SetDpad(UserIndex, 0);
+	}
+
+	VJOYINTERFACE_API BOOL	__cdecl	 SetBtnA(UINT UserIndex, BOOL Press)
+	{
+		UINT Btn = XINPUT_GAMEPAD_A;
+		g_Gamepad[UserIndex - 1].wButtons &= ~Btn;
+		g_Gamepad[UserIndex - 1].wButtons |= Btn*Press;
+		return XOutputSetState(UserIndex, &g_Gamepad[UserIndex - 1]);
+	}
+	VJOYINTERFACE_API BOOL	__cdecl	 SetBtnB(UINT UserIndex, BOOL Press)
+	{
+		UINT Btn = XINPUT_GAMEPAD_B;
+		g_Gamepad[UserIndex - 1].wButtons &= ~Btn;
+		g_Gamepad[UserIndex - 1].wButtons |= Btn*Press;
+		return XOutputSetState(UserIndex, &g_Gamepad[UserIndex - 1]);
+	}
+
+	VJOYINTERFACE_API BOOL	__cdecl	 SetBtnX(UINT UserIndex, BOOL Press)
+	{
+		UINT Btn = XINPUT_GAMEPAD_X;
+		g_Gamepad[UserIndex - 1].wButtons &= ~Btn;
+		g_Gamepad[UserIndex - 1].wButtons |= Btn*Press;
+		return XOutputSetState(UserIndex, &g_Gamepad[UserIndex - 1]);
+	}
+
+	VJOYINTERFACE_API BOOL	__cdecl	 SetBtnY(UINT UserIndex, BOOL Press)
+	{
+		UINT Btn = XINPUT_GAMEPAD_Y;
+		g_Gamepad[UserIndex - 1].wButtons &= ~Btn;
+		g_Gamepad[UserIndex - 1].wButtons |= Btn*Press;
+		return XOutputSetState(UserIndex, &g_Gamepad[UserIndex - 1]);
+	}
+
+	VJOYINTERFACE_API BOOL	__cdecl	 SetBtnStart(UINT UserIndex, BOOL Press)
+	{
+		UINT Btn = XINPUT_GAMEPAD_START;
+		g_Gamepad[UserIndex - 1].wButtons &= ~Btn;
+		g_Gamepad[UserIndex - 1].wButtons |= Btn*Press;
+		return XOutputSetState(UserIndex, &g_Gamepad[UserIndex - 1]);
+	}
+
+	VJOYINTERFACE_API BOOL	__cdecl	 SetBtnBack(UINT UserIndex, BOOL Press)
+	{
+		UINT Btn = XINPUT_GAMEPAD_BACK;
+		g_Gamepad[UserIndex - 1].wButtons &= ~Btn;
+		g_Gamepad[UserIndex - 1].wButtons |= Btn*Press;
+		return XOutputSetState(UserIndex, &g_Gamepad[UserIndex - 1]);
+	}
+
+	VJOYINTERFACE_API BOOL	__cdecl	 SetBtnLT(UINT UserIndex, BOOL Press)
+	{
+		UINT Btn = XINPUT_GAMEPAD_LEFT_THUMB;
+		g_Gamepad[UserIndex - 1].wButtons &= ~Btn;
+		g_Gamepad[UserIndex - 1].wButtons |= Btn*Press;
+		return XOutputSetState(UserIndex, &g_Gamepad[UserIndex - 1]);
+	}
+
+	VJOYINTERFACE_API BOOL	__cdecl	 SetBtnRT(UINT UserIndex, BOOL Press)
+	{
+		UINT Btn = XINPUT_GAMEPAD_RIGHT_THUMB;
+		g_Gamepad[UserIndex - 1].wButtons &= ~Btn;
+		g_Gamepad[UserIndex - 1].wButtons |= Btn*Press;
+		return XOutputSetState(UserIndex, &g_Gamepad[UserIndex - 1]);
+	}
+
+	VJOYINTERFACE_API BOOL	__cdecl	 SetBtnLB(UINT UserIndex, BOOL Press)
+	{
+		UINT Btn = XINPUT_GAMEPAD_LEFT_SHOULDER;
+		g_Gamepad[UserIndex - 1].wButtons &= ~Btn;
+		g_Gamepad[UserIndex - 1].wButtons |= Btn*Press;
+		return XOutputSetState(UserIndex, &g_Gamepad[UserIndex - 1]);
+	}
+
+	VJOYINTERFACE_API BOOL	__cdecl	 SetBtnRB(UINT UserIndex, BOOL Press)
+	{
+		UINT Btn = XINPUT_GAMEPAD_RIGHT_SHOULDER;
+		g_Gamepad[UserIndex - 1].wButtons &= ~Btn;
+		g_Gamepad[UserIndex - 1].wButtons |= Btn*Press;
+		return XOutputSetState(UserIndex, &g_Gamepad[UserIndex - 1]);
+	}
+}
 
 #ifdef XBOX
 #pragma region Legacy Interface Functions
@@ -622,7 +624,7 @@ BOOL XOutputSetState(DWORD UserIndex, XINPUT_GAMEPAD* pGamepad)
 		BYTE output[FEEDBACK_BUFFER_LENGTH] = {};
 
 		// send report to bus, receive vibration and LED status
-		if (!DeviceIoControl(g_hBus, 0x2A400C, buffer, _countof(buffer), output, FEEDBACK_BUFFER_LENGTH, &trasfered, nullptr))
+		if (!DeviceIoControl(g_hBus, IOCTL_BUSENUM_REPORT_HARDWARE, buffer, _countof(buffer), output, FEEDBACK_BUFFER_LENGTH, &trasfered, nullptr))
 		{
 			return FALSE;
 		}
@@ -668,8 +670,7 @@ int GetVXbusPath(LPCTSTR path, UINT size)
 	if (SetupDiEnumDeviceInterfaces(deviceInfoSet, nullptr, &deviceClassGuid, memberIndex, &deviceInterfaceData))
 	{
 		// get required target buffer size
-		if (!SetupDiGetDeviceInterfaceDetail(deviceInfoSet, &deviceInterfaceData, nullptr, 0, &requiredSize, nullptr))
-			return -1;
+		SetupDiGetDeviceInterfaceDetail(deviceInfoSet, &deviceInterfaceData, nullptr, 0, &requiredSize, nullptr);
 
 		// allocate target buffer
 		auto detailDataBuffer = static_cast<PSP_DEVICE_INTERFACE_DETAIL_DATA>(malloc(requiredSize));

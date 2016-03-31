@@ -36,3 +36,6 @@ apps/vJoyInstall/gen-versioninfo.h
 install/Joystick-icon-Base.ico
 install/PGPs-Setup.exe
 install/install-Base.ico
+apps/vJoyConf/gen-versioninfo.h
+apps/vJoyConf/vJoyConfig/gen-versioninfo.h
+*.opendb

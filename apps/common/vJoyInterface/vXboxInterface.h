@@ -36,6 +36,8 @@ BOOL g_vDevice[MAX_NUMBER_XBOX_CTRLS] = { FALSE };
 HANDLE g_hBus = INVALID_HANDLE_VALUE;
 
 //////////// Interface Functions /////////////////////////
+extern "C"
+{
 
 /// Status
 VJOYINTERFACE_API BOOL	__cdecl	 isVBusExists(void);
@@ -66,6 +68,7 @@ VJOYINTERFACE_API BOOL	__cdecl	 SetDpadRight(UINT UserIndex);
 VJOYINTERFACE_API BOOL	__cdecl	 SetDpadDown(UINT UserIndex);
 VJOYINTERFACE_API BOOL	__cdecl	 SetDpadLeft(UINT UserIndex);
 VJOYINTERFACE_API BOOL	__cdecl	 SetDpadOff(UINT UserIndex);
+}  // extern "C"
 
 //////////// Helper Functions /////////////////////////
 int GetVXbusPath(LPCTSTR path, UINT size);
