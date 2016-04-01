@@ -33,8 +33,30 @@ extern "C"
 
 	VJOYINTERFACE_API BOOL	__cdecl	 isControllerExists(UINT UserIndex)
 	{
-		// TODO: This is not correct:
-		return TRUE;
+		BOOL out = FALSE;
+		ULONG buffer[1];
+		ULONG output[1];
+		DWORD trasfered = 0;
+
+		if (UserIndex < 1 || UserIndex>4)
+			return out;
+
+		if (g_hBus == INVALID_HANDLE_VALUE)
+			g_hBus = GetVXbusHandle();
+		if (g_hBus == INVALID_HANDLE_VALUE)
+			return out;
+
+		// Prepare the User Index for sending
+		buffer[0] = UserIndex;
+		 
+		// Send request to bus
+		if (DeviceIoControl(g_hBus, IOCTL_BUSENUM_ISDEVPLUGGED, buffer, _countof(buffer), output, 4, &trasfered, nullptr))
+		{
+			if (*output != 0)
+				out = TRUE;
+		};
+
+		return out;
 	}
 
 	VJOYINTERFACE_API BOOL	__cdecl	 isControllerOwned(UINT UserIndex)

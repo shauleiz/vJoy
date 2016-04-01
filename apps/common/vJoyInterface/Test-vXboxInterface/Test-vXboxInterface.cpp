@@ -42,8 +42,12 @@ int main()
 	// Install Virtual Devices
 	for (UINT i = 0; i < 6; i++)
 	{
+		res = isControllerExists(i);
+		printf("\n\nisControllerExists(%d): %X\n", i, res);
 		res = PlugIn(i);
 		printf("Plug-in device %d: %X\n", i, res);
+		res = isControllerExists(i);
+		printf("isControllerExists(%d): %X\n", i, res);
 	}
 	printf("\n");
 	SetTriggerL(2, 0);
