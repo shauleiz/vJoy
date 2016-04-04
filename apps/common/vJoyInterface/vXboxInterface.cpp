@@ -31,6 +31,27 @@ extern "C"
 			return FALSE;
 	}
 
+	VJOYINTERFACE_API BOOL	__cdecl	 GetNumEmptyBusSlots(UCHAR * nSlots)
+	{
+		UCHAR output[1];
+		DWORD trasfered = 0;
+
+
+		if (g_hBus == INVALID_HANDLE_VALUE)
+			g_hBus = GetVXbusHandle();
+		if (g_hBus == INVALID_HANDLE_VALUE)
+			return FALSE;
+
+		// Send request to bus
+		if (DeviceIoControl(g_hBus, IOCTL_BUSENUM_EMPTY_SLOTS, nullptr, 0, output, 1, &trasfered, nullptr))
+		{
+			*nSlots = *output;
+			return TRUE;
+		}
+
+		return FALSE;
+	}
+
 	VJOYINTERFACE_API BOOL	__cdecl	 isControllerExists(UINT UserIndex)
 	{
 		BOOL out = FALSE;
@@ -61,10 +82,32 @@ extern "C"
 
 	VJOYINTERFACE_API BOOL	__cdecl	 isControllerOwned(UINT UserIndex)
 	{
+		ULONG OrigProcID = 0;
+		ULONG ThisProcID = 0;
+
+		// Sanity Check
 		if (UserIndex < 1 || UserIndex>4)
 			return FALSE;
 
-		return g_vDevice[UserIndex - 1];
+		// Does controler exist?
+		if (!isControllerExists(UserIndex))
+			return FALSE;
+
+		// Get ID of the process that created the controler?
+		if (!GetCreateProcID(UserIndex, &OrigProcID) || !OrigProcID)
+			return FALSE;
+
+		// Get ID of current process
+		ThisProcID = GetCurrentProcessId();
+		if (!ThisProcID)
+ 			return FALSE;
+
+		// Compare
+		if (ThisProcID!=OrigProcID)
+  			return FALSE;
+
+		return TRUE;
+
 	}
 
 	VJOYINTERFACE_API BOOL	__cdecl	 PlugIn(UINT UserIndex)
@@ -695,6 +738,34 @@ BOOL XOutputSetState(DWORD UserIndex, XINPUT_GAMEPAD* pGamepad)
 }
 
 
+BOOL GetCreateProcID(DWORD UserIndex, PULONG ProcID)
+{
+	BOOL out = FALSE;
+	ULONG buffer[1];
+	ULONG output[1];
+	DWORD trasfered = 0;
+
+	if (UserIndex < 1 || UserIndex>4)
+		return out;
+
+	if (g_hBus == INVALID_HANDLE_VALUE)
+		g_hBus = GetVXbusHandle();
+	if (g_hBus == INVALID_HANDLE_VALUE)
+		return out;
+
+	// Prepare the User Index for sending
+	buffer[0] = UserIndex;
+
+	// Send request to bus
+	if (DeviceIoControl(g_hBus, IOCTL_BUSENUM_PROC_ID, buffer, _countof(buffer), output, 4, &trasfered, nullptr))
+	{
+		*ProcID = output[0];
+		out = TRUE;
+	};
+
+	return out;
+
+}
 
 ///-------------------------------------------------------------------------------------------------
 /// <summary>	Get Device Interface path. </summary>

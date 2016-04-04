@@ -43,7 +43,9 @@ DEFINE_GUID(GUID_DEVINTERFACE_SCPVBUS, 0xf679f562, 0x3164, 0x42ce, 0xa4, 0xdb, 0
 #define IOCTL_BUSENUM_REPORT_HARDWARE	BUSENUM_IOCTL(0x3)
 #endif
 
-#define IOCTL_BUSENUM_ISDEVPLUGGED	BUSENUM_W_IOCTL(IOCTL_BUSENUM_BASE+0x100)
+#define IOCTL_BUSENUM_ISDEVPLUGGED	BUSENUM_RW_IOCTL(IOCTL_BUSENUM_BASE+0x100)
+#define IOCTL_BUSENUM_EMPTY_SLOTS	BUSENUM_RW_IOCTL(IOCTL_BUSENUM_BASE+0x101)
+#define IOCTL_BUSENUM_PROC_ID		BUSENUM_RW_IOCTL(IOCTL_BUSENUM_BASE+0x102)
 
 
 //////////// Globals /////////////////////////
@@ -57,8 +59,10 @@ extern "C"
 
 	/// Status
 	VJOYINTERFACE_API BOOL	__cdecl	 isVBusExists(void);
+	VJOYINTERFACE_API BOOL	__cdecl	 GetNumEmptyBusSlots(UCHAR * nSlots);
 	VJOYINTERFACE_API BOOL	__cdecl	 isControllerExists(UINT UserIndex);
 	VJOYINTERFACE_API BOOL	__cdecl	 isControllerOwned(UINT UserIndex);
+
 
 	// Virtual device Plug-In/Unplug
 	VJOYINTERFACE_API BOOL	__cdecl	 PlugIn(UINT UserIndex);
@@ -91,6 +95,7 @@ extern "C"
 //////////// Helper Functions /////////////////////////
 int GetVXbusPath(LPCTSTR path, UINT size);
 HANDLE GetVXbusHandle(void);
+BOOL GetCreateProcID(DWORD UserIndex, PULONG ProcID);
 BOOL XOutputSetState(DWORD UserIndex, XINPUT_GAMEPAD* pGamepad);
 BOOL SetDpad(UINT UserIndex, INT Value);
 WORD ConvertButton(LONG vBtns, WORD xBtns, UINT vBtn, UINT xBtn);

@@ -25,6 +25,7 @@ extern "C"
 int main()
 {
 	BOOL res;
+	UCHAR nEmpty;
 
 
 	// Test if bus exists
@@ -42,12 +43,22 @@ int main()
 	// Install Virtual Devices
 	for (UINT i = 0; i < 6; i++)
 	{
+		res = GetNumEmptyBusSlots(&nEmpty);
+		if (res)
+			printf("\n\nNumber of Empty Slots: %d\n",nEmpty);
+		else
+			printf("\n\nCannot determine Number of Empty Slots");
+
 		res = isControllerExists(i);
-		printf("\n\nisControllerExists(%d): %X\n", i, res);
+		printf("\nisControllerExists(%d): %X\n", i, res);
+		res = isControllerOwned(i);
+		printf("\nisControllerOwned(%d): %X\n", i, res);
 		res = PlugIn(i);
 		printf("Plug-in device %d: %X\n", i, res);
 		res = isControllerExists(i);
 		printf("isControllerExists(%d): %X\n", i, res);
+		res = isControllerOwned(i);
+		printf("\nisControllerOwned(%d): %X\n", i, res);
 	}
 	printf("\n");
 	SetTriggerL(2, 0);
