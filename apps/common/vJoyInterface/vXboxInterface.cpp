@@ -444,11 +444,14 @@ VJOYINTERFACE_API BOOL	__cdecl  GetVJDAxisMin(UINT rID, UINT Axis, LONG * Min) /
 }
 VJOYINTERFACE_API enum VjdStat	__cdecl	GetVJDStatus(UINT rID)			// Get the status of the specified vJoy Device.
 {
-	// TODO: Inaccurate results
+	if (!isControllerExists(rID))
+		return VJD_STAT_MISS;
+
 	if (isControllerOwned(rID))
 		return 	VJD_STAT_OWN;
-	if (isControllerExists(rID))
-		return VJD_STAT_FREE;
+	else
+		return VJD_STAT_BUSY;
+
 	return 	 VJD_STAT_UNKN;
 }
 VJOYINTERFACE_API BOOL		__cdecl	isVJDExists(UINT rID)					// TRUE if the specified vJoy Device exists
@@ -457,13 +460,71 @@ VJOYINTERFACE_API BOOL		__cdecl	isVJDExists(UINT rID)					// TRUE if the specifi
 }																		/////	Write access to vJoy Device - Basic
 VJOYINTERFACE_API BOOL		__cdecl	AcquireVJD(UINT rID)				// Acquire the specified vJoy Device.
 {
-	UnPlug(rID);
-	return PlugIn(rID);
+	BOOL res;
+
+	// If the device is owned by another application - unplug it
+	if (GetVJDStatus(rID) == VJD_STAT_BUSY)
+	{
+		res = UnPlug(rID);
+		if (!res)
+			return res;
+	}
+
+	// If the device does not exist - plug it in
+ 	if (GetVJDStatus(rID) == VJD_STAT_FREE || GetVJDStatus(rID) == VJD_STAT_MISS)
+	{
+		res = PlugIn(rID);
+		if (!res)
+			return res;
+	}
+
+	// If device not Owned then it is a problem
+	if (GetVJDStatus(rID) != VJD_STAT_OWN)
+		return 	FALSE;
+
+	return TRUE;
 }
+
 VJOYINTERFACE_API VOID		__cdecl	RelinquishVJD(UINT rID)			// Relinquish the specified vJoy Device.
 {
 	UnPlug(rID);
 }
+																		
+
+//// Reset functions
+VJOYINTERFACE_API BOOL		__cdecl	ResetVJD(UINT rID)			// Reset all controls to predefined values in the specified VDJ
+{
+	XINPUT_GAMEPAD Gamepad;
+
+	// Init
+	memset(&Gamepad, 0, sizeof(XINPUT_GAMEPAD));
+
+	// Send joystick position structure to vJoy device
+	return  XOutputSetState(rID, &Gamepad);
+
+}
+VJOYINTERFACE_API VOID		__cdecl	ResetAll(void)				// Reset all controls to predefined values in all VDJ
+{
+	ResetVJD(1);
+	ResetVJD(2);
+	ResetVJD(3);
+	ResetVJD(4);
+}
+VJOYINTERFACE_API BOOL		__cdecl	ResetButtons(UINT rID)		// Reset all buttons (To 0) in the specified VDJ
+{
+	g_Gamepad[rID].wButtons &= 0x000F;
+	// Send joystick position structure to vJoy device
+	return  XOutputSetState(rID, &g_Gamepad[rID]);
+}
+VJOYINTERFACE_API BOOL		__cdecl	ResetPovs(UINT rID)		// Reset all POV Switches (To -1) in the specified VDJ
+{
+	g_Gamepad[rID].wButtons &= 0xFFF0;
+	// Send joystick position structure to vJoy device
+	return  XOutputSetState(rID, &g_Gamepad[rID]);
+
+}
+
+// Write data
 VJOYINTERFACE_API BOOL		__cdecl	UpdateVJD(UINT rID, PVOID pData)	// Update the position data of the specified vJoy Device.
 {    
 	PJOYSTICK_POSITION_V2 pJoyPos = (PJOYSTICK_POSITION_V2)pData;
@@ -525,42 +586,6 @@ VJOYINTERFACE_API BOOL		__cdecl	UpdateVJD(UINT rID, PVOID pData)	// Update the p
 	// Send joystick position structure to vJoy device
 	return  XOutputSetState(rID, &Gamepad);
 }
-																		
-
-//// Reset functions
-VJOYINTERFACE_API BOOL		__cdecl	ResetVJD(UINT rID)			// Reset all controls to predefined values in the specified VDJ
-{
-	XINPUT_GAMEPAD Gamepad;
-
-	// Init
-	memset(&Gamepad, 0, sizeof(XINPUT_GAMEPAD));
-
-	// Send joystick position structure to vJoy device
-	return  XOutputSetState(rID, &Gamepad);
-
-}
-VJOYINTERFACE_API VOID		__cdecl	ResetAll(void)				// Reset all controls to predefined values in all VDJ
-{
-	ResetVJD(1);
-	ResetVJD(2);
-	ResetVJD(3);
-	ResetVJD(4);
-}
-VJOYINTERFACE_API BOOL		__cdecl	ResetButtons(UINT rID)		// Reset all buttons (To 0) in the specified VDJ
-{
-	g_Gamepad[rID].wButtons &= 0x000F;
-	// Send joystick position structure to vJoy device
-	return  XOutputSetState(rID, &g_Gamepad[rID]);
-}
-VJOYINTERFACE_API BOOL		__cdecl	ResetPovs(UINT rID)		// Reset all POV Switches (To -1) in the specified VDJ
-{
-	g_Gamepad[rID].wButtons &= 0xFFF0;
-	// Send joystick position structure to vJoy device
-	return  XOutputSetState(rID, &g_Gamepad[rID]);
-
-}
-
-// Write data
 VJOYINTERFACE_API BOOL		__cdecl	SetAxis(LONG Value, UINT rID, UINT Axis)		// Write Value to a given axis defined in the specified VDJ 
 {
 	LONG NormVal = 2 * Value - 32768;
