@@ -533,11 +533,12 @@ VJOYINTERFACE_API BOOL		__cdecl	UpdateVJD(UINT rID, PVOID pData)	// Update the p
 
 
 	/////  Axes
-	Gamepad.sThumbLX = 2*(pJoyPos->wAxisX) - 32768;
-	Gamepad.sThumbLY = 2*(pJoyPos->wAxisY) - 32768;
-	Gamepad.sThumbRX = 2*(pJoyPos->wAxisXRot) - 32768;
-	Gamepad.sThumbRY = 2*(pJoyPos->wAxisYRot) - 32768;
-	//Gamepad.bLeftTrigger = Gamepad.bRightTrigger = pJoyPos->wAxisZRot;
+	Gamepad.sThumbLX = 2*(pJoyPos->wAxisX-1) - 32767;
+	Gamepad.sThumbLY = 2*(pJoyPos->wAxisY - 1) - 32767;
+	Gamepad.sThumbRX = 2*(pJoyPos->wAxisXRot - 1) - 32767;
+	Gamepad.sThumbRY = 2*(pJoyPos->wAxisYRot - 1) - 32767;
+	Gamepad.bLeftTrigger = (pJoyPos->wAxisZRot - 1) / 128;
+	Gamepad.bRightTrigger = (pJoyPos->wAxisZ - 1) / 128;
 
 	//// Buttons
 	// Button 1 ==> Button A
@@ -586,7 +587,7 @@ VJOYINTERFACE_API BOOL		__cdecl	UpdateVJD(UINT rID, PVOID pData)	// Update the p
 }
 VJOYINTERFACE_API BOOL		__cdecl	SetAxis(LONG Value, UINT rID, UINT Axis)		// Write Value to a given axis defined in the specified VDJ 
 {
-	LONG NormVal = 2 * Value - 32768;
+	LONG NormVal = 2 * (Value-1) - 32767;
 	BYTE TrigVal = (Value-1) / 128;
 
 	switch (Axis) 
