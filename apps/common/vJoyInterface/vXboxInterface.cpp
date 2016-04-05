@@ -328,8 +328,6 @@ extern "C"
 		return XOutputSetState(UserIndex, &g_Gamepad[UserIndex - 1]);
 	}
 
-	VJOYINTERFACE_API BOOL	__cdecl	 SetTriggerR(UINT UserIndex, BYTE Value); // Right Trigger
-
 }
 
 #ifdef XBOX
@@ -589,6 +587,8 @@ VJOYINTERFACE_API BOOL		__cdecl	UpdateVJD(UINT rID, PVOID pData)	// Update the p
 VJOYINTERFACE_API BOOL		__cdecl	SetAxis(LONG Value, UINT rID, UINT Axis)		// Write Value to a given axis defined in the specified VDJ 
 {
 	LONG NormVal = 2 * Value - 32768;
+	BYTE TrigVal = (Value-1) / 128;
+
 	switch (Axis) 
 	{
 		case HID_USAGE_X:
@@ -602,6 +602,12 @@ VJOYINTERFACE_API BOOL		__cdecl	SetAxis(LONG Value, UINT rID, UINT Axis)		// Wri
 			break;
 		case HID_USAGE_RY:
 			SetAxisRy(rID, NormVal);
+			break;
+		case HID_USAGE_Z:
+			SetTriggerR(rID, TrigVal);
+			break;
+		case HID_USAGE_RZ:
+			SetTriggerL(rID, TrigVal);
 			break;
 		default:
 			return FALSE;
