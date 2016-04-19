@@ -29,6 +29,7 @@ namespace vJoyDemo {
     public:
         Form1(void)
         {
+			
             // Form init
             ReportId = -1;
 

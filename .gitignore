@@ -39,3 +39,4 @@ install/install-Base.ico
 apps/vJoyConf/gen-versioninfo.h
 apps/vJoyConf/vJoyConfig/gen-versioninfo.h
 *.opendb
+*.db

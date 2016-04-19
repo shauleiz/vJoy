@@ -3,13 +3,24 @@
 
 //////////// Definitions /////////////////////////
 
-// Position Data structure
+typedef struct _BUSENUM_UNPLUG_HARDWARE {
+
+	__in ULONG Size;
+
+	__in ULONG SerialNo;
+
+	__in ULONG Flags;
+
+	ULONG Reserved[1];
+
+} BUSENUM_UNPLUG_HARDWARE, *PBUSENUM_UNPLUG_HARDWARE;
 
 
 
 //{F679F562-3164-42CE-A4DB-E7DDBE723909}  
 DEFINE_GUID(GUID_DEVINTERFACE_SCPVBUS, 0xf679f562, 0x3164, 0x42ce, 0xa4, 0xdb, 0xe7, 0xdd, 0xbe, 0x72, 0x39, 0x9);
 
+#define VBOX_BUS
 #define FEEDBACK_BUFFER_LENGTH 9
 #define MAX_NUMBER_XBOX_CTRLS 4
 
@@ -48,6 +59,7 @@ DEFINE_GUID(GUID_DEVINTERFACE_SCPVBUS, 0xf679f562, 0x3164, 0x42ce, 0xa4, 0xdb, 0
 #define IOCTL_BUSENUM_PROC_ID		BUSENUM_RW_IOCTL(IOCTL_BUSENUM_BASE+0x102)
 
 
+
 //////////// Globals /////////////////////////
 XINPUT_GAMEPAD g_Gamepad[MAX_NUMBER_XBOX_CTRLS];
 BOOL g_vDevice[MAX_NUMBER_XBOX_CTRLS] = { FALSE };
@@ -67,8 +79,9 @@ extern "C"
 	// Virtual device Plug-In/Unplug
 	VJOYINTERFACE_API BOOL	__cdecl	 PlugIn(UINT UserIndex);
 	VJOYINTERFACE_API BOOL	__cdecl	 UnPlug(UINT UserIndex);
+	VJOYINTERFACE_API BOOL	__cdecl	 UnPlugForce(UINT UserIndex);
 
-	// Data Transfer
+	// Data Transfer (Data to the device)
 	VJOYINTERFACE_API BOOL	__cdecl	 SetBtnA(UINT UserIndex, BOOL Press);
 	VJOYINTERFACE_API BOOL	__cdecl	 SetBtnB(UINT UserIndex, BOOL Press);
 	VJOYINTERFACE_API BOOL	__cdecl	 SetBtnX(UINT UserIndex, BOOL Press);
@@ -90,6 +103,11 @@ extern "C"
 	VJOYINTERFACE_API BOOL	__cdecl	 SetDpadDown(UINT UserIndex);
 	VJOYINTERFACE_API BOOL	__cdecl	 SetDpadLeft(UINT UserIndex);
 	VJOYINTERFACE_API BOOL	__cdecl	 SetDpadOff(UINT UserIndex);
+
+	// Data Transfer (Feedback from the device)
+	VJOYINTERFACE_API BOOL	__cdecl	 GetLedNumber(UINT UserIndex, PBYTE pLed);
+	VJOYINTERFACE_API BOOL	__cdecl	 GetVibration(UINT UserIndex, PXINPUT_VIBRATION pVib);
+
 }  // extern "C"
 
 //////////// Helper Functions /////////////////////////
@@ -97,5 +115,7 @@ int GetVXbusPath(LPCTSTR path, UINT size);
 HANDLE GetVXbusHandle(void);
 BOOL GetCreateProcID(DWORD UserIndex, PULONG ProcID);
 BOOL XOutputSetState(DWORD UserIndex, XINPUT_GAMEPAD* pGamepad);
+BOOL XOutputSetGetState(DWORD UserIndex, XINPUT_GAMEPAD* pGamepad, PBYTE bVibrate, PBYTE bLargeMotor, PBYTE bSmallMotor, PBYTE bLed);
 BOOL SetDpad(UINT UserIndex, INT Value);
 WORD ConvertButton(LONG vBtns, WORD xBtns, UINT vBtn, UINT xBtn);
+BOOL UnPlug_Opt(UINT UserIndex, BOOL Force);

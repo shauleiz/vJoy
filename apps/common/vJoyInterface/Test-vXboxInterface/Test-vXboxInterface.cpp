@@ -39,6 +39,29 @@ int main()
 		return -1;
 	}
 
+	res = AcquireVJD(1);
+	printf("\n\nAcquireVJD(%d): %d\n", 1, res);
+	//Sleep(500);
+
+	res = AcquireVJD(1);
+	printf("\n\nAcquireVJD(%d): %d\n", 1, res);
+	//Sleep(500);
+
+	res = AcquireVJD(1);
+	printf("\n\nAcquireVJD(%d): %d\n", 1, res);
+	//Sleep(500);
+
+	res = AcquireVJD(1);
+	printf("\n\nAcquireVJD(%d): %d\n", 1, res);
+	//Sleep(500);
+
+
+
+
+	printf("Press any key to continue \n");
+	getchar();
+
+
 
 	// Install Virtual Devices
 	for (UINT i = 0; i < 6; i++)
@@ -100,6 +123,24 @@ int main()
 	SetTriggerL(1, 255);
 	SetTriggerR(1, 255);
 
+	printf("Press any key to detect device feedback \n");
+	getchar();
+
+	WORD LeftMotor, RightMotor;
+	UCHAR Led;
+	BOOL Led_Ok, Vib_Ok;
+	XINPUT_VIBRATION Vib;
+	int iDev = 0;
+	while (getchar() != 'q')
+	{
+		for (iDev = 1; iDev < 5; iDev++)
+		{
+			Led_Ok = GetLedNumber(iDev, &Led);
+			Vib_Ok = GetVibration(iDev, &Vib);
+			printf("LED: %d; Left Motor: %d; Right Motor: %d  \n", Led, Vib.wLeftMotorSpeed, Vib.wRightMotorSpeed);
+		};
+	}
+
 	printf("Press any key to remove devices \n");
 	getchar();
 
@@ -107,8 +148,8 @@ int main()
 	// UnInstall Virtual Devices
 	for (UINT i = 0; i < 6; i++)
 	{
-		res = UnPlug(i);
-		printf("UnPlug device %d: %X\n", i, res);
+		res = UnPlugForce(i);
+		printf("UnPlug (Forced) device %d: %X\n", i, res);
 	}
 #endif // 0
 

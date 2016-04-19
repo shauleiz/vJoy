@@ -3,6 +3,8 @@
 #include <stdlib.h>
 #include <assert.h>
 #include <crtdbg.h>
+#include <iostream>
+using namespace std;
 
 extern "C"
 {
@@ -143,17 +145,13 @@ extern "C"
 		DWORD error = 0 ;
 		if (out)
 		{ 
-#ifdef _DEBUG
-			printf("IOCTL_BUSENUM_PLUGIN_HARDWARE 0X%x OK\n", IOCTL_BUSENUM_PLUGIN_HARDWARE);
-#endif
+			//std::cout << "IOCTL_BUSENUM_PLUGIN_HARDWARE 0X" << IOCTL_BUSENUM_PLUGIN_HARDWARE << "\n" << endl;
 			error = 0;
 		}
 		else
 		{
 			error = GetLastError();
-#ifdef _DEBUG
-			printf("IOCTL_BUSENUM_PLUGIN_HARDWARE 0X%x Failed (Error:0X%x)\n", IOCTL_BUSENUM_PLUGIN_HARDWARE, error);
-#endif
+			//std::cout << "IOCTL_BUSENUM_PLUGIN_HARDWARE 0X" << IOCTL_BUSENUM_PLUGIN_HARDWARE << "Failed (Error:0X" << error << ")\n" << endl;
 		}
 
 		return out;
@@ -161,34 +159,12 @@ extern "C"
 
 	VJOYINTERFACE_API BOOL	__cdecl	 UnPlug(UINT UserIndex)
 	{
-		BOOL out = FALSE;
+		return UnPlug_Opt(UserIndex, FALSE);
+	}
 
-		if (UserIndex < 1 || UserIndex>4)
-			return out;
-
-		if (g_hBus == INVALID_HANDLE_VALUE)
-			g_hBus = GetVXbusHandle();
-		if (g_hBus == INVALID_HANDLE_VALUE)
-			return out;
-
-		DWORD trasfered = 0;
-		UCHAR buffer[16] = {};
-
-		buffer[0] = 0x10;
-
-		buffer[4] = ((UserIndex >> 0) & 0xFF);
-		buffer[5] = ((UserIndex >> 8) & 0xFF);
-		buffer[6] = ((UserIndex >> 16) & 0xFF);
-		buffer[8] = ((UserIndex >> 24) & 0xFF);
-
-		if (DeviceIoControl(g_hBus, IOCTL_BUSENUM_UNPLUG_HARDWARE, buffer, _countof(buffer), nullptr, 0, &trasfered, nullptr))
-		{
-			out = TRUE;
-			g_vDevice[UserIndex - 1] = FALSE;
-		}
-
-		//CloseHandle(h);
-		return out;
+	VJOYINTERFACE_API BOOL	__cdecl	 UnPlugForce(UINT UserIndex)
+	{
+		return UnPlug_Opt(UserIndex, TRUE);
 	}
 
 	VJOYINTERFACE_API BOOL	__cdecl	 SetAxisX(UINT UserIndex, SHORT Value) // Left Stick X
@@ -328,7 +304,33 @@ extern "C"
 		return XOutputSetState(UserIndex, &g_Gamepad[UserIndex - 1]);
 	}
 
+	VJOYINTERFACE_API BOOL	__cdecl	 GetLedNumber(UINT UserIndex, PBYTE pLed)
+	{
+		BOOL ref = XOutputSetGetState(UserIndex, &g_Gamepad[UserIndex - 1], nullptr, nullptr, nullptr, pLed);
+		if (ref)
+			*pLed++;
+		return ref;
+	}
+
+	VJOYINTERFACE_API BOOL GetVibration(UINT UserIndex, PXINPUT_VIBRATION pVib)
+	{
+		BYTE LargeMotor, SmallMotor, Vibrate;
+		BOOL ref = XOutputSetGetState(UserIndex, &g_Gamepad[UserIndex - 1], &Vibrate, &LargeMotor, &SmallMotor, nullptr);
+		if (ref)
+		{
+			if (Vibrate)
+			{
+				(*pVib).wLeftMotorSpeed  = LargeMotor * 256;
+				(*pVib).wRightMotorSpeed = SmallMotor * 256;
+			}
+			else
+				(*pVib).wLeftMotorSpeed = (*pVib).wRightMotorSpeed = 0;
+		};
+		return ref;
+	}
+
 }
+
 
 #ifdef XBOX
 #pragma region Legacy Interface Functions
@@ -455,7 +457,10 @@ VJOYINTERFACE_API enum VjdStat	__cdecl	GetVJDStatus(UINT rID)			// Get the statu
 VJOYINTERFACE_API BOOL		__cdecl	isVJDExists(UINT rID)					// TRUE if the specified vJoy Device exists
 {
 	return isControllerExists(rID);
-}																		/////	Write access to vJoy Device - Basic
+}																		
+
+/////	Write access to vJoy Device - Basic
+
 VJOYINTERFACE_API BOOL		__cdecl	AcquireVJD(UINT rID)				// Acquire the specified vJoy Device.
 {
 	BOOL res;
@@ -759,14 +764,70 @@ BOOL XOutputSetState(DWORD UserIndex, XINPUT_GAMEPAD* pGamepad)
 		// Save last successful position data
 		memcpy_s(&g_Gamepad[UserIndex-1], sizeof(XINPUT_GAMEPAD), pGamepad, sizeof(XINPUT_GAMEPAD));
 
-#ifdef FEEDBACK_SUPPORTED
-		// cache feedback
-		memcpy_s(g_Feedback[(UserIndex - 1)], FEEDBACK_BUFFER_LENGTH, output, FEEDBACK_BUFFER_LENGTH);
-
-#endif // FEEDBACK_SUPPORTED
-
 		return TRUE;
 	}
+}
+
+BOOL XOutputSetGetState(DWORD UserIndex, XINPUT_GAMEPAD * pGamepad, PBYTE bVibrate, PBYTE bLargeMotor, PBYTE bSmallMotor, PBYTE bLed)
+{
+	BOOL out = FALSE;
+
+	if (UserIndex < 1 || UserIndex>4)
+		return out;
+
+	if (!g_vDevice[UserIndex - 1])
+		return out;
+
+	DWORD trasfered = 0;
+	BYTE buffer[28] = {};
+
+	buffer[0] = 0x1C;
+
+	// encode user index
+	buffer[4] = ((UserIndex >> 0) & 0xFF);
+	buffer[5] = ((UserIndex >> 8) & 0xFF);
+	buffer[6] = ((UserIndex >> 16) & 0xFF);
+	buffer[7] = ((UserIndex >> 24) & 0xFF);
+
+	buffer[9] = 0x14;
+
+	// concat gamepad info to buffer
+	memcpy_s(&buffer[10], _countof(buffer), pGamepad, sizeof(XINPUT_GAMEPAD));
+
+	// vibration and LED info end up here
+	BYTE output[FEEDBACK_BUFFER_LENGTH] = {};
+
+	// send report to bus, receive vibration and LED status
+	if (!DeviceIoControl(g_hBus, IOCTL_BUSENUM_REPORT_HARDWARE, buffer, _countof(buffer), output, FEEDBACK_BUFFER_LENGTH, &trasfered, nullptr))
+	{
+		return FALSE;
+	}
+
+	// Save last successful position data
+	memcpy_s(&g_Gamepad[UserIndex - 1], sizeof(XINPUT_GAMEPAD), pGamepad, sizeof(XINPUT_GAMEPAD));
+
+	// cache feedback
+	if (bVibrate != nullptr)
+	{
+		*bVibrate = (output[1] == 0x08) ? 0x01 : 0x00;
+	}
+
+	if (bLargeMotor != nullptr)
+	{
+		*bLargeMotor = output[3];
+	}
+
+	if (bSmallMotor != nullptr)
+	{
+		*bSmallMotor = output[4];
+	}
+
+	if (bLed != nullptr)
+	{
+		*bLed = output[8];
+	}
+
+	return TRUE;
 }
 
 
@@ -888,3 +949,35 @@ BOOL SetDpad(UINT UserIndex, INT Value)
 	return XOutputSetState(UserIndex, &g_Gamepad[UserIndex - 1]);
 }
 
+BOOL UnPlug_Opt(UINT UserIndex, BOOL Force)
+{
+	BOOL out = FALSE;
+
+	if (UserIndex < 1 || UserIndex>4)
+		return out;
+
+	if (g_hBus == INVALID_HANDLE_VALUE)
+		g_hBus = GetVXbusHandle();
+	if (g_hBus == INVALID_HANDLE_VALUE)
+		return out;
+
+	DWORD trasfered = 0;
+	BUSENUM_UNPLUG_HARDWARE buffer = {};
+
+
+	buffer.Size = sizeof(BUSENUM_UNPLUG_HARDWARE);
+	buffer.SerialNo = UserIndex;
+
+	if (Force)
+		buffer.Flags = 0x0001;
+	else
+		buffer.Flags = 0x0000;
+
+	if (DeviceIoControl(g_hBus, IOCTL_BUSENUM_UNPLUG_HARDWARE, (LPVOID)(&buffer), buffer.Size, nullptr, 0, &trasfered, nullptr))
+	{
+		out = TRUE;
+		g_vDevice[UserIndex - 1] = FALSE;
+	}
+
+	return out;
+}
