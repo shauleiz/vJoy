@@ -1,9 +1,9 @@
 // Microsoft Visual C++ generated resource script.
 //
-#include "resource.h"
+//#include "resource.h"
 /////////////////////////////////////////////////////////////////////////////
 // Hebrew (Israel) resources
-
+#include "Public.h"
 
 #undef	VER_PRODUCTNAME_STR
 #undef	VER_COMPANYNAME_STR

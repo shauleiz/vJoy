@@ -4,7 +4,15 @@
     <SignMode>TestSign</SignMode>
     <ProductionCertificate>CN=Shaul Eizikovich, O=Shaul Eizikovich, L=Hod HaSharon, S=Tel Aviv, C=IL | 6D5471DF6BBFAFA5D5900C88C08DF0E9C513690A</ProductionCertificate>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug_CPP|Win32'">
+    <SignMode>TestSign</SignMode>
+    <ProductionCertificate>CN=Shaul Eizikovich, O=Shaul Eizikovich, L=Hod HaSharon, S=Tel Aviv, C=IL | 6D5471DF6BBFAFA5D5900C88C08DF0E9C513690A</ProductionCertificate>
+  </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <SignMode>ProductionSign</SignMode>
+    <ProductionCertificate>CN=Shaul Eizikovich, O=Shaul Eizikovich, L=Hod HaSharon, S=Tel Aviv, C=IL | 6D5471DF6BBFAFA5D5900C88C08DF0E9C513690A</ProductionCertificate>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release_CPP|Win32'">
     <SignMode>ProductionSign</SignMode>
     <ProductionCertificate>CN=Shaul Eizikovich, O=Shaul Eizikovich, L=Hod HaSharon, S=Tel Aviv, C=IL | 6D5471DF6BBFAFA5D5900C88C08DF0E9C513690A</ProductionCertificate>
   </PropertyGroup>
@@ -14,7 +22,17 @@
     <DebugDeployment>True</DebugDeployment>
     <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug_CPP|x64'">
+    <SignMode>TestSign</SignMode>
+    <ProductionCertificate>CN=Shaul Eizikovich, O=Shaul Eizikovich, L=Hod HaSharon, S=Tel Aviv, C=IL | 6D5471DF6BBFAFA5D5900C88C08DF0E9C513690A</ProductionCertificate>
+    <DebugDeployment>True</DebugDeployment>
+    <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
+  </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <SignMode>ProductionSign</SignMode>
+    <ProductionCertificate>CN=Shaul Eizikovich, O=Shaul Eizikovich, L=Hod HaSharon, S=Tel Aviv, C=IL | 6D5471DF6BBFAFA5D5900C88C08DF0E9C513690A</ProductionCertificate>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release_CPP|x64'">
     <SignMode>ProductionSign</SignMode>
     <ProductionCertificate>CN=Shaul Eizikovich, O=Shaul Eizikovich, L=Hod HaSharon, S=Tel Aviv, C=IL | 6D5471DF6BBFAFA5D5900C88C08DF0E9C513690A</ProductionCertificate>
   </PropertyGroup>
@@ -22,7 +40,15 @@
     <SignMode>ProductionSign</SignMode>
     <ProductionCertificate>CN=Shaul Eizikovich, O=Shaul Eizikovich, L=Hod HaSharon, S=Tel Aviv, C=IL | 6D5471DF6BBFAFA5D5900C88C08DF0E9C513690A</ProductionCertificate>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release_CPP|ARM64'">
+    <SignMode>ProductionSign</SignMode>
+    <ProductionCertificate>CN=Shaul Eizikovich, O=Shaul Eizikovich, L=Hod HaSharon, S=Tel Aviv, C=IL | 6D5471DF6BBFAFA5D5900C88C08DF0E9C513690A</ProductionCertificate>
+  </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">
+    <SignMode>ProductionSign</SignMode>
+    <ProductionCertificate>CN=Shaul Eizikovich, O=Shaul Eizikovich, L=Hod HaSharon, S=Tel Aviv, C=IL | 6D5471DF6BBFAFA5D5900C88C08DF0E9C513690A</ProductionCertificate>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release_CPP|ARM'">
     <SignMode>ProductionSign</SignMode>
     <ProductionCertificate>CN=Shaul Eizikovich, O=Shaul Eizikovich, L=Hod HaSharon, S=Tel Aviv, C=IL | 6D5471DF6BBFAFA5D5900C88C08DF0E9C513690A</ProductionCertificate>
   </PropertyGroup>
