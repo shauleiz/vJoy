@@ -75,14 +75,26 @@ typedef UINT HDEVICE;
 
 	VGENINTERFACE_API	SHORT		__cdecl GetvJoyVersion(void);
 
-	// vXbox Interface
+	//////////////////////////////////////////////////////////////////////////////////////
+	/// 
+	///  vXbox interface fuctions
+	///
+	///  Device range: 1-4 (Not necessarily related to Led number)
+	///
+	//////////////////////////////////////////////////////////////////////////////////////
+
+	// Virtual vXbox bus information
 	VGENINTERFACE_API	BOOL		__cdecl isVBusExists(void);
 	VGENINTERFACE_API	BOOL		__cdecl GetNumEmptyBusSlots(UCHAR * nSlots);
+
+	// Device Status (Plugin/Unplug and check ownership)
+	VGENINTERFACE_API	BOOL		__cdecl isControllerExists(UINT UserIndex);
 	VGENINTERFACE_API	BOOL		__cdecl isControllerOwned(UINT UserIndex);
 	VGENINTERFACE_API	BOOL		__cdecl PlugIn(UINT UserIndex);
 	VGENINTERFACE_API	BOOL		__cdecl UnPlug(UINT UserIndex);
 	VGENINTERFACE_API	BOOL		__cdecl UnPlugForce(UINT UserIndex);
 
+	// Button functions: Per-button Press/Release
 	VGENINTERFACE_API	BOOL		__cdecl SetBtnA(UINT UserIndex, BOOL Press);
 	VGENINTERFACE_API	BOOL		__cdecl SetBtnB(UINT UserIndex, BOOL Press);
 	VGENINTERFACE_API	BOOL		__cdecl SetBtnX(UINT UserIndex, BOOL Press);
@@ -94,17 +106,22 @@ typedef UINT HDEVICE;
 	VGENINTERFACE_API	BOOL		__cdecl SetBtnStart(UINT UserIndex, BOOL Press);
 	VGENINTERFACE_API	BOOL		__cdecl SetBtnBack(UINT UserIndex, BOOL Press);
 
+	// Trigger/Axis functions: Set value in the range
 	VGENINTERFACE_API	BOOL		__cdecl SetTriggerL(UINT UserIndex, BYTE Value);
 	VGENINTERFACE_API	BOOL		__cdecl SetTriggerR(UINT UserIndex, BYTE Value);
 	VGENINTERFACE_API	BOOL		__cdecl	SetAxisX(UINT UserIndex, SHORT Value); // Left Stick X
 	VGENINTERFACE_API	BOOL		__cdecl	SetAxisY(UINT UserIndex, SHORT Value); // Left Stick Y
 	VGENINTERFACE_API	BOOL		__cdecl	SetAxisRx(UINT UserIndex, SHORT Value); // Right Stick X
 	VGENINTERFACE_API	BOOL		__cdecl	SetAxisRy(UINT UserIndex, SHORT Value); // Right Stick Y
+
+	// DPAD Functions
 	VGENINTERFACE_API	BOOL		__cdecl	SetDpad(UINT UserIndex, INT Value); // DPAD Set Value
 	VGENINTERFACE_API	BOOL		__cdecl	SetDpadUp(UINT UserIndex); // DPAD Up
 	VGENINTERFACE_API	BOOL		__cdecl	SetDpadRight(UINT UserIndex); // DPAD Right
 	VGENINTERFACE_API	BOOL		__cdecl	SetDpadDown(UINT UserIndex); // DPAD Down
 	VGENINTERFACE_API	BOOL		__cdecl	SetDpadLeft(UINT UserIndex); // DPAD Left
 	VGENINTERFACE_API	BOOL		__cdecl	SetDpadOff(UINT UserIndex); // DPAD Off
+
+	// Feadback Polling: Assigned Led number / Vibration values
 	VGENINTERFACE_API	BOOL		__cdecl	GetLedNumber(UINT UserIndex, PBYTE pLed);
 	VGENINTERFACE_API	BOOL		__cdecl	GetVibration(UINT UserIndex, PXINPUT_VIBRATION pVib);

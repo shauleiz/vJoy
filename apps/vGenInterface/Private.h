@@ -28,9 +28,9 @@ typedef struct
 std::map<HDEVICE, DEVICE> DevContainer;
 
 // Macros
-#define Range_vJoy(x) (x<=16 && x>0):TRUE?FALSE
-#define Range_vXbox(x) (x<=1004 && x>1000):TRUE?FALSE
-#define to_vXbox(x) (x-1000)
+#define Range_vJoy(x) ((x)<=16 && (x)>0)?TRUE:FALSE
+#define Range_vXbox(x) ((x)<=1004 && (x)>1000)?TRUE:FALSE
+#define to_vXbox(x) ((x)-1000)
 
 //
 // Constants for gamepad buttons

@@ -17,7 +17,15 @@ int main()
 
 	BOOL Plugged, UnPlugged, Pressed, GetN;
 	UCHAR nSlots;
+
+	int res1 = GetVJDButtonNumber(1);
+	int res80 = GetVJDButtonNumber(80);
+	int res2 = GetVJDButtonNumber(2);
+
 	Plugged = PlugIn(1);
+	int resX1 = GetVJDButtonNumber(1001);
+	int resX2 = GetVJDButtonNumber(1002);
+
 	Pressed = SetBtnA(1, TRUE);
 	GetN  = GetNumEmptyBusSlots(&nSlots);
 	UnPlugged = UnPlug(1);	

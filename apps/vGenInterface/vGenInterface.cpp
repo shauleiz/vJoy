@@ -17,10 +17,27 @@
 #pragma comment(lib, "vJoyInterfaceStat.lib")
 #pragma comment(lib, "XOutputStatic_1_2.lib")
 
+
+#pragma region Interface Functions (vJoy)
 VGENINTERFACE_API SHORT GetvJoyVersion(void)
 {
 	return vJoyNS::GetvJoyVersion();
 }
+
+VGENINTERFACE_API int GetVJDButtonNumber(UINT rID)	// Get the number of buttons defined in the specified device
+{
+	if (Range_vXbox(rID))
+	{
+		if (!isControllerExists(to_vXbox(rID)))
+			return 0;
+		else
+			return 10;
+	}
+	else
+		return vJoyNS::GetVJDButtonNumber(rID);
+}
+
+#pragma endregion Interface Functions (vJoy)
 
 #pragma region Interface Functions (vXbox)
 VGENINTERFACE_API BOOL isVBusExists(void)
