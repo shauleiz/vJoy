@@ -93,6 +93,7 @@ EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "vGenTest", "apps\vGenInterface\vGenTest\vGenTest.vcxproj", "{DC028017-F92D-4A70-ABA1-0208737AA5A5}"
 	ProjectSection(ProjectDependencies) = postProject
 		{B9272D99-836B-4201-A168-4AD780550D1E} = {B9272D99-836B-4201-A168-4AD780550D1E}
+		{F7AB57BB-BA05-44F7-BD41-C39290DFE829} = {F7AB57BB-BA05-44F7-BD41-C39290DFE829}
 	EndProjectSection
 EndProject
 Global

@@ -64,3 +64,4 @@ apps/common/vJoyInterfaceStat/sources
 apps/common/vJoyInterfaceStat/svn_version.h.tmpl
 apps/common/vJoyInterface/RCa11008
 apps/common/vJoyInterfaceStat/_vjoyinterface.h
+apps/common/vJoyInterface/RCa11704

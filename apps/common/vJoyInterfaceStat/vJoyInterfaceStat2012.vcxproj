@@ -30,7 +30,6 @@
     <ResourceCompile Include="..\vJoyInterface\version.rc" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\stdafx.cpp" />
     <ClCompile Include="..\vJoyInterface.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
