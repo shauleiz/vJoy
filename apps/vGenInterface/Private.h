@@ -10,8 +10,6 @@
 //////////////////////////////////////////////////////////
 
 //////////////////////////////////
-// Device Type
-enum DevType { vJoy, vXbox };
 
 // Device Structure
 typedef struct 
@@ -31,6 +29,7 @@ std::map<HDEVICE, DEVICE> DevContainer;
 #define Range_vJoy(x) ((x)<=16 && (x)>0)?TRUE:FALSE
 #define Range_vXbox(x) ((x)<=1004 && (x)>1000)?TRUE:FALSE
 #define to_vXbox(x) ((x)-1000)
+#define to_vJoy(x) ((x)+1000)
 
 //
 // Constants for gamepad buttons
@@ -63,6 +62,14 @@ BOOL	IX_isControllerOwned(UINT UserIndex);
 BOOL	IX_PlugIn(UINT UserIndex);
 BOOL	IX_UnPlug(UINT UserIndex);
 BOOL	IX_UnPlugForce(UINT UserIndex);
+// Reset Devices
+BOOL	IX_ResetController(UINT UserIndex);
+BOOL	IX_ResetController(HDEVICE hDev);
+BOOL	IX_ResetAllControllers();
+BOOL	IX_ResetControllerBtns(UINT UserIndex);
+BOOL	IX_ResetControllerBtns(HDEVICE hDev);
+BOOL	IX_ResetControllerDPad(UINT UserIndex);
+BOOL	IX_ResetControllerDPad(HDEVICE hDev);
 // Data Transfer (Data to the device)
 BOOL	IX_SetBtn(UINT UserIndex, BOOL Press, WORD Button);
 BOOL	IX_SetBtnA(UINT UserIndex, BOOL Press);
@@ -87,6 +94,29 @@ BOOL	IX_SetDpadRight(UINT UserIndex);
 BOOL	IX_SetDpadDown(UINT UserIndex);
 BOOL	IX_SetDpadLeft(UINT UserIndex);
 BOOL	IX_SetDpadOff(UINT UserIndex);
+BOOL	IX_SetBtn(HDEVICE hDev, BOOL Press, WORD Button);
+BOOL	IX_SetBtnA(HDEVICE hDev, BOOL Press);
+BOOL	IX_SetBtnB(HDEVICE hDev, BOOL Press);
+BOOL	IX_SetBtnX(HDEVICE hDev, BOOL Press);
+BOOL	IX_SetBtnY(HDEVICE hDev, BOOL Press);
+BOOL	IX_SetBtnStart(HDEVICE hDev, BOOL Press);
+BOOL	IX_SetBtnBack(HDEVICE hDev, BOOL Press);
+BOOL	IX_SetBtnLT(HDEVICE hDev, BOOL Press); // Left Thumb/Stick
+BOOL	IX_SetBtnRT(HDEVICE hDev, BOOL Press); // Right Thumb/Stick
+BOOL	IX_SetBtnLB(HDEVICE hDev, BOOL Press); // Left Bumper
+BOOL	IX_SetBtnRB(HDEVICE hDev, BOOL Press); // Right Bumper
+BOOL	IX_SetTriggerL(HDEVICE hDev, BYTE Value); // Left Trigger
+BOOL	IX_SetTriggerR(HDEVICE hDev, BYTE Value); // Right Trigger
+BOOL	IX_SetAxisX(HDEVICE hDev, SHORT Value); // Left Stick X
+BOOL	IX_SetAxisY(HDEVICE hDev, SHORT Value); // Left Stick Y
+BOOL	IX_SetAxisRx(HDEVICE hDev, SHORT Value); // Right Stick X
+BOOL	IX_SetAxisRy(HDEVICE hDev, SHORT Value); // Right Stick Y
+BOOL	IX_SetDpad(HDEVICE hDev, INT Value);
+BOOL	IX_SetDpadUp(HDEVICE hDev);
+BOOL	IX_SetDpadRight(HDEVICE hDev);
+BOOL	IX_SetDpadDown(HDEVICE hDev);
+BOOL	IX_SetDpadLeft(HDEVICE hDev);
+BOOL	IX_SetDpadOff(HDEVICE hDev);
 // Data Transfer (Feedback from the device)
 BOOL	IX_GetLedNumber(UINT UserIndex, PBYTE pLed);
 BOOL	IX_GetVibration(UINT UserIndex, PXINPUT_VIBRATION pVib);
@@ -97,4 +127,10 @@ BOOL	IX_GetVibration(UINT UserIndex, PXINPUT_VIBRATION pVib);
 HDEVICE CreateDevice(DevType Type, UINT i);
 void DestroyDevice(HDEVICE dev);
 HDEVICE GetDevice(DevType Type, UINT i);
+UINT GetDeviceId(HDEVICE h);
 void * GetDevicePos(HDEVICE h);
+
+// Other helper functions
+BOOL ConvertPosition_vJoy2vXbox(void *vJoyPos, void *vXboxPos);
+WORD ConvertButton(LONG vBtns, WORD xBtns, UINT vBtn, UINT xBtn);
+

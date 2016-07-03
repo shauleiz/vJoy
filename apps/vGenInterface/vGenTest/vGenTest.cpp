@@ -2,6 +2,7 @@
 #include "../stdafx.h"
 #include <Xinput.h>
 #include "../vGenInterface.h"
+#include "../../../inc/public.h"
 
 int main()
 {
@@ -9,6 +10,7 @@ int main()
 	BOOL exist = isVBusExists();
 	BYTE Led[4];
 	XINPUT_VIBRATION Vib;
+	LONG MaxX;
 	
 	UnPlugForce(1);
 	UnPlugForce(2);
@@ -18,25 +20,35 @@ int main()
 	BOOL Plugged, UnPlugged, Pressed, GetN;
 	UCHAR nSlots;
 
-	int res1 = GetVJDButtonNumber(1);
-	int res80 = GetVJDButtonNumber(80);
-	int res2 = GetVJDButtonNumber(2);
+	int res1 = GetVJDDiscPovNumber(1);
+	int res80 = GetVJDDiscPovNumber(80);
+	int res2 = GetVJDDiscPovNumber(2);
 
 	Plugged = PlugIn(1);
-	int resX1 = GetVJDButtonNumber(1001);
-	int resX2 = GetVJDButtonNumber(1002);
+	int resX1 = GetVJDDiscPovNumber(1001);
+	int resX2 = GetVJDDiscPovNumber(1002);
+
 
 	Pressed = SetBtnA(1, TRUE);
 	GetN  = GetNumEmptyBusSlots(&nSlots);
 	UnPlugged = UnPlug(1);	
 	Plugged = PlugIn(1);
 	SetBtnA(1, TRUE);
-	SetBtnA(1, FALSE);
+	//SetBtnA(1, FALSE);
 	SetDpad(1, DPAD_UP);
+
+	SetTriggerR(1, 100);
+	SetTriggerL(1, 200);
+	SetAxisX(1, 10000);
+	SetAxisY(1, 30000);
+	SetAxisRx(1, 10001);
+	SetAxisRy(1, 30002);
+
+	GetVJDAxisMax(1, HID_USAGE_X, &MaxX);
+
 	UnPlugged = UnPlug(2);
 	Plugged = PlugIn(4);
-	SetTriggerR(4, 100);
-	SetTriggerL(4, 200);
+
 	Plugged = PlugIn(5);
 	SetDpadLeft(1);
 	SetDpadOff(1);
