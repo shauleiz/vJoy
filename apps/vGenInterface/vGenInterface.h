@@ -30,6 +30,8 @@
 
 // Definition to Device Handle
 typedef INT HDEVICE;
+#define  INVALID_DEV (HDEVICE)0
+#define ValidDev(x) ((x == INVALID_DEV)?FALSE:TRUE)
 
 // Device Type
 enum DevType { vJoy, vXbox };
@@ -195,5 +197,5 @@ VGENINTERFACE_API	SHORT		__cdecl GetvJoyVersion(void);
 	// Position Setting
 	VGENINTERFACE_API BOOL			__cdecl SetDevButton(HDEVICE hDev, UINT Button, BOOL Press);
 	VGENINTERFACE_API BOOL			__cdecl SetDevAxis(HDEVICE hDev, UINT Axis, FLOAT Value);
-	VGENINTERFACE_API BOOL			__cdecl SetDevPov(HDEVICE hDev, UINT Axis, FLOAT Value);
+	VGENINTERFACE_API BOOL			__cdecl SetDevPov(HDEVICE hDev, UINT nPov, FLOAT Value);
 #pragma endregion

@@ -57,7 +57,9 @@ std::map<HDEVICE, DEVICE> DevContainer;
 BOOL	IX_isVBusExists(void);
 BOOL	IX_GetNumEmptyBusSlots(UCHAR * nSlots);
 BOOL	IX_isControllerExists(UINT UserIndex);
+BOOL	IX_isControllerExists(HDEVICE hDev);
 BOOL	IX_isControllerOwned(UINT UserIndex);
+BOOL	IX_isControllerOwned(HDEVICE hDev);
 // Virtual device Plug-In/Unplug
 BOOL	IX_PlugIn(UINT UserIndex);
 BOOL	IX_UnPlug(UINT UserIndex);
@@ -123,11 +125,29 @@ BOOL	IX_GetVibration(UINT UserIndex, PXINPUT_VIBRATION pVib);
 
 #pragma endregion // vXbox Internal Functions
 
+#pragma region vJoy Internal Functions
+HDEVICE	IJ_AcquireVJD(UINT rID);				// Acquire the specified vJoy Device.
+VOID IJ_RelinquishVJD(HDEVICE hDev);			// Relinquise the specified vJoy Device.
+BOOL IJ_isVJDExists(HDEVICE hDev);
+enum VjdStat IJ_GetVJDStatus(HDEVICE hDev);			// Get the status of the specified vJoy Device.
+BOOL IJ_GetVJDAxisExist(HDEVICE hDev, UINT Axis); // Test if given axis defined in the specified VDJ
+int	IJ_GetVJDButtonNumber(HDEVICE hDev);	// Get the number of buttons defined in the specified VDJ
+int IJ_GetVJDDiscPovNumber(HDEVICE hDev);   // Get the number of POVs defined in the specified device
+int IJ_GetVJDContPovNumber(HDEVICE hDev);	// Get the number of descrete-type POV hats defined in the specified VDJ
+BOOL IJ_SetAxis(LONG Value, HDEVICE hDev, UINT Axis);		// Write Value to a given axis defined in the specified VDJ 
+BOOL IJ_SetBtn(BOOL Value, HDEVICE hDev, UCHAR nBtn);		// Write Value to a given button defined in the specified VDJ 
+BOOL IJ_SetDiscPov(int Value, HDEVICE hDev, UCHAR nPov);	// Write Value to a given descrete POV defined in the specified VDJ 
+BOOL IJ_SetContPov(DWORD Value, HDEVICE hDev, UCHAR nPov);	// Write Value to a given continuous POV defined in the specified VDJ 
+
+#pragma endregion
+
 //// Device Container and Device Handle functions
 HDEVICE CreateDevice(DevType Type, UINT i);
 void DestroyDevice(HDEVICE dev);
 HDEVICE GetDevice(DevType Type, UINT i);
 UINT GetDeviceId(HDEVICE h);
+BOOL isDevice_vJoy(HDEVICE h);
+BOOL isDevice_vXbox(HDEVICE h);
 void * GetDevicePos(HDEVICE h);
 
 // Other helper functions
