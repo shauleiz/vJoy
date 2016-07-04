@@ -317,6 +317,48 @@ VGENINTERFACE_API BOOL SetContPov(DWORD Value, UINT rID, UCHAR nPov)	// Write Va
 
 }
 
+VGENINTERFACE_API BOOL ResetVJD(UINT rID)			// Reset all controls to predefined values in the specified VDJ
+{
+	if (Range_vJoy(rID))
+		return vJoyNS::ResetVJD( rID);
+
+	if (Range_vXbox(rID))
+		return IX_ResetController(to_vXbox(rID));
+
+	return FALSE;
+}
+
+VGENINTERFACE_API VOID ResetAll(void) // Reset all controls to predefined values in all VDJ
+{
+	vJoyNS::ResetAll();
+	IX_ResetAllControllers();
+}
+
+VGENINTERFACE_API BOOL ResetButtons(UINT rID)		// Reset all buttons (To 0) in the specified VDJ
+{
+	if (Range_vJoy(rID))
+		return vJoyNS::ResetButtons(rID);
+
+	if (Range_vXbox(rID))
+		return IX_ResetControllerBtns(to_vXbox(rID));
+
+	return FALSE;
+
+}
+
+VGENINTERFACE_API BOOL ResetPovs(UINT rID)		// Reset all POV Switches (To -1) in the specified VDJ
+{
+	if (Range_vJoy(rID))
+		return vJoyNS::ResetPovs(rID);
+
+	if (Range_vXbox(rID))
+		return IX_ResetControllerDPad(to_vXbox(rID));
+
+	return FALSE;
+
+}
+
+
 #pragma endregion Interface Functions (vJoy)
 
 #pragma region Interface Functions (vXbox)
