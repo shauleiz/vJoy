@@ -49,6 +49,12 @@ std::map<HDEVICE, DEVICE> DevContainer;
 #define XINPUT_GAMEPAD_X                0x4000
 #define XINPUT_GAMEPAD_Y                0x8000
 
+// Mapping the buttons to an array
+WORD g_xButtons[10] = { 
+	XINPUT_GAMEPAD_A , XINPUT_GAMEPAD_B, XINPUT_GAMEPAD_X, XINPUT_GAMEPAD_Y, \
+	XINPUT_GAMEPAD_LEFT_SHOULDER, XINPUT_GAMEPAD_RIGHT_SHOULDER, XINPUT_GAMEPAD_BACK,\
+	XINPUT_GAMEPAD_START, XINPUT_GAMEPAD_LEFT_THUMB, XINPUT_GAMEPAD_RIGHT_THUMB
+};
 
 #pragma region vXbox Internal Functions
 				//////////// vXbox Internal Functions ////////////

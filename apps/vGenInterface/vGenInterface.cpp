@@ -144,7 +144,7 @@ VGENINTERFACE_API BOOL isVJDExists(UINT rID)					// TRUE if the specified vJoy D
 	if (Range_vXbox(rID))
 		return (IX_isControllerExists(to_vXbox(rID)));
 	else
-		return vJoyNS::GetVJDStatus(rID);
+		return vJoyNS::isVJDExists(rID);
 }
 
 VGENINTERFACE_API BOOL AcquireVJD(UINT rID)				// Acquire the specified vJoy Device.
@@ -374,7 +374,7 @@ VGENINTERFACE_API BOOL GetNumEmptyBusSlots(UCHAR * nSlots)
 
 VGENINTERFACE_API BOOL isControllerExists(UINT UserIndex)
 {
-	return (UserIndex);
+	return IX_isControllerExists(UserIndex);
 }
 
 VGENINTERFACE_API BOOL isControllerOwned(UINT UserIndex)
@@ -552,7 +552,7 @@ VGENINTERFACE_API HDEVICE AcquireDev(UINT DevId, DevType dType)
 	if (dType == vXbox)
 	{
 		if (IX_PlugIn(DevId))
-			return CreateDevice(vJoy, DevId);
+			return GetDevHandle(DevId, vXbox);
 		else
 			return INVALID_DEV;
 	}
@@ -577,17 +577,18 @@ VGENINTERFACE_API DevType GetDevType(HDEVICE hDev)			// Get device type (vJoy/vX
 		return vXbox;
 }
 
-VGENINTERFACE_API BOOL isDevExists(HDEVICE hDev)
+VGENINTERFACE_API BOOL isDevExists(UINT DevId, DevType dType)
 {
-	if (isDevice_vJoy(hDev))
-		return IJ_isVJDExists( hDev);
+	if (dType == vJoy)
+		return vJoyNS::isVJDExists(DevId);
 
-	if (isDevice_vXbox(hDev))
-		return IX_isControllerExists(hDev);
+	if (dType == vXbox)
+		return IX_isControllerExists(DevId);
 
 	return FALSE;
 }
 
+#if 0
 VGENINTERFACE_API BOOL isDevOwned(HDEVICE hDev)
 {
 	if (isDevice_vJoy(hDev))
@@ -604,6 +605,7 @@ VGENINTERFACE_API BOOL isDevOwned(HDEVICE hDev)
 
 	return FALSE;
 }
+#endif // 0
 
 VGENINTERFACE_API UINT GetDevNumber(HDEVICE hDev)// If vJoy: Number=Id; If vXbox: Number=Led#
 {
@@ -1052,9 +1054,10 @@ BOOL	IX_SetBtn(HDEVICE hDev, BOOL Press, WORD Button)
 	if (!position)
 		return FALSE;
 
+	WORD Mask = g_xButtons[Button - 1];
 	// Change position value
-	position->wButtons &= ~Button;
-	position->wButtons |= Button*Press;
+	position->wButtons &= ~Mask;
+	position->wButtons |= Mask*Press;
 	if (ERROR_SUCCESS != XOutputSetState(UserIndex - 1, position))
 		return FALSE;
 	else
@@ -1559,6 +1562,8 @@ HDEVICE CreateDevice(DevType Type, UINT i)
 		*(pdev->PPosition.vXboxPos) = { 0 };
 		h = i + 1000;
 	};
+
+	h+= (rand() % 1000 + 1)<<16;
 
 	// Insert in container
 	std::pair <std::map<HDEVICE, DEVICE>::iterator, bool> res;

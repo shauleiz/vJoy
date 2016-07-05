@@ -185,10 +185,9 @@ VGENINTERFACE_API	SHORT		__cdecl GetvJoyVersion(void);
 	VGENINTERFACE_API HDEVICE		__cdecl	AcquireDev(UINT DevId, DevType dType);	// Acquire a Device.
 	VGENINTERFACE_API VOID			__cdecl	RelinquishDev(HDEVICE hDev);			// Relinquish a Device.
 	VGENINTERFACE_API DevType		__cdecl GetDevType(HDEVICE hDev);				// Get device type (vJoy/vXbox)
-	VGENINTERFACE_API BOOL			__cdecl isDevExists(HDEVICE hDev);				// Is device plugged-in/Configured
-	VGENINTERFACE_API BOOL			__cdecl isDevOwned(HDEVICE hDev);				// Is device acquired by this application
 	VGENINTERFACE_API UINT			__cdecl GetDevNumber(HDEVICE hDev);				// If vJoy: Number=Id; If vXbox: Number=Led#
 	VGENINTERFACE_API UINT			__cdecl GetDevId(HDEVICE hDev);					// Return Device ID to be used with vXbox API and Backward compatibility API
+	VGENINTERFACE_API BOOL			__cdecl isDevExists(UINT DevId, DevType dType);				// Is device plugged-in/Configured
 	VGENINTERFACE_API HDEVICE		__cdecl	GetDevHandle(UINT DevId, DevType dType);// Return device handle from Device ID and Device type
 	VGENINTERFACE_API BOOL			__cdecl isAxisExists(HDEVICE hDev, UINT nAxis);	// Does Axis exist. See above table
 	VGENINTERFACE_API UINT			__cdecl GetDevButtonN(HDEVICE hDev);			// Get number of buttons in device
