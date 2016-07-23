@@ -8,17 +8,19 @@ void C_DisplayStatus();
 HDEVICE C_AcqDevice();
 void C_PressButton(HDEVICE hDev);
 void C_TestPov(HDEVICE hDev);
-void C_TesAxis(HDEVICE hDev);
+void C_TestAxis(HDEVICE hDev);
+void C_Test(HDEVICE hDev);
 
 int main()
 {
+	// Clean-up vXbox devices
 	UnPlugForce(1);
 	UnPlugForce(2);
 	UnPlugForce(3);
 	UnPlugForce(4);
 
+	// Display status and wait
 	C_DisplayStatus();
-
 	getchar();
 
 	SHORT vJoyVer = GetvJoyVersion();
@@ -27,59 +29,21 @@ int main()
 	XINPUT_VIBRATION Vib;
 	LONG MaxX;
 	char c[3];
-	
-
 	BOOL Plugged, UnPlugged, Pressed, GetN;
 	UCHAR nSlots;
 
-	int res1 = GetVJDDiscPovNumber(1);
-	int res80 = GetVJDDiscPovNumber(80);
-	int res2 = GetVJDDiscPovNumber(2);
-
+	// Plug-in vBox device 1, Display status and wait
 	Plugged = PlugIn(1);
-	int resX1 = GetVJDDiscPovNumber(1001);
-	int resX2 = GetVJDDiscPovNumber(1002);
-
 	C_DisplayStatus();
-
 	getchar();
 
+	// Interactive: Ask user which device to acquire
 	HDEVICE h1 = C_AcqDevice();
 	getchar();
 
-	C_TesAxis(h1);
-	// C_PressButton(h1);
-	//C_TestPov(h1);
-	return (0);
-
-
-	Pressed = SetBtnA(1, TRUE);
-	GetN  = GetNumEmptyBusSlots(&nSlots);
-	UnPlugged = UnPlug(1);	
-	Plugged = PlugIn(1);
-	SetBtnA(1, TRUE);
-	//SetBtnA(1, FALSE);
-	SetDpad(1, DPAD_UP);
-
-	SetTriggerR(1, 100);
-	SetTriggerL(1, 200);
-	SetAxisX(1, 10000);
-	SetAxisY(1, 30000);
-	SetAxisRx(1, 10001);
-	SetAxisRy(1, 30002);
-
-	GetVJDAxisMax(1, HID_USAGE_X, &MaxX);
-
-	UnPlugged = UnPlug(2);
-	Plugged = PlugIn(4);
-
-	Plugged = PlugIn(5);
-	SetDpadLeft(1);
-	SetDpadOff(1);
-	GetLedNumber(1, &(Led[0]));
-	GetLedNumber(4, &(Led[3]));
-	GetVibration(1, &Vib);
-	GetVibration(4, &Vib);
+	// Loop through interactive tests
+	C_Test(h1);
+	return (0);	
 }
 
 void C_DisplayStatus()
@@ -215,7 +179,7 @@ void C_TestPov(HDEVICE hDev)
 
 }
 
-void C_TesAxis(HDEVICE hDev)
+void C_TestAxis(HDEVICE hDev)
 {
 	printf("Testing Axes - using range 0-100\n");
 
@@ -238,4 +202,19 @@ void C_TesAxis(HDEVICE hDev)
 		BOOL ok = SetDevAxis(hDev, Axis, f_val);
 	}
 
+}
+
+void C_Test(HDEVICE hDev)
+{
+	printf("Testing [A]xes, [B]uttons or [P]OVs\n");
+
+	char Test;
+	scanf("%c%*s", &Test);
+
+	if (tolower(Test) == 'a')
+		C_TestAxis(hDev);
+	else if (tolower(Test) == 'b')
+		C_PressButton(hDev);
+	else if (tolower(Test) == 'p')
+		C_TestPov(hDev);
 }
