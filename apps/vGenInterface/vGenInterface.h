@@ -33,9 +33,158 @@ typedef INT HDEVICE;
 #define  INVALID_DEV (HDEVICE)0
 #define ValidDev(x) ((x == INVALID_DEV)?FALSE:TRUE)
 
-// Device Type
-enum DevType { vJoy, vXbox };
 
+#ifndef VJOYHEADERUSED
+#pragma region FFB Re-Definitions
+enum FFBEType // FFB Effect Type
+{
+
+	// Effect Type
+	ET_NONE = 0,	  //    No Force
+	ET_CONST = 1,    //    Constant Force
+	ET_RAMP = 2,    //    Ramp
+	ET_SQR = 3,    //    Square
+	ET_SINE = 4,    //    Sine
+	ET_TRNGL = 5,    //    Triangle
+	ET_STUP = 6,    //    Sawtooth Up
+	ET_STDN = 7,    //    Sawtooth Down
+	ET_SPRNG = 8,    //    Spring
+	ET_DMPR = 9,    //    Damper
+	ET_INRT = 10,   //    Inertia
+	ET_FRCTN = 11,   //    Friction
+	ET_CSTM = 12,   //    Custom Force Data
+};
+
+enum FFBPType // FFB Packet Type
+{
+	// Write
+	PT_EFFREP = HID_ID_EFFREP,	// Usage Set Effect Report
+	PT_ENVREP = HID_ID_ENVREP,	// Usage Set Envelope Report
+	PT_CONDREP = HID_ID_CONDREP,	// Usage Set Condition Report
+	PT_PRIDREP = HID_ID_PRIDREP,	// Usage Set Periodic Report
+	PT_CONSTREP = HID_ID_CONSTREP,	// Usage Set Constant Force Report
+	PT_RAMPREP = HID_ID_RAMPREP,	// Usage Set Ramp Force Report
+	PT_CSTMREP = HID_ID_CSTMREP,	// Usage Custom Force Data Report
+	PT_SMPLREP = HID_ID_SMPLREP,	// Usage Download Force Sample
+	PT_EFOPREP = HID_ID_EFOPREP,	// Usage Effect Operation Report
+	PT_BLKFRREP = HID_ID_BLKFRREP,	// Usage PID Block Free Report
+	PT_CTRLREP = HID_ID_CTRLREP,	// Usage PID Device Control
+	PT_GAINREP = HID_ID_GAINREP,	// Usage Device Gain Report
+	PT_SETCREP = HID_ID_SETCREP,	// Usage Set Custom Force Report
+
+									// Feature
+									PT_NEWEFREP = HID_ID_NEWEFREP + 0x10,	// Usage Create New Effect Report
+									PT_BLKLDREP = HID_ID_BLKLDREP + 0x10,	// Usage Block Load Report
+									PT_POOLREP = HID_ID_POOLREP + 0x10,		// Usage PID Pool Report
+};
+
+enum FFBOP
+{
+	EFF_START = 1, // EFFECT START
+	EFF_SOLO = 2, // EFFECT SOLO START
+	EFF_STOP = 3, // EFFECT STOP
+};
+
+enum FFB_CTRL
+{
+	CTRL_ENACT = 1,	// Enable all device actuators.
+	CTRL_DISACT = 2,	// Disable all the device actuators.
+	CTRL_STOPALL = 3,	// Stop All Effects­ Issues a stop on every running effect.
+	CTRL_DEVRST = 4,	// Device Reset– Clears any device paused condition, enables all actuators and clears all effects from memory.
+	CTRL_DEVPAUSE = 5,	// Device Pause– The all effects on the device are paused at the current time step.
+	CTRL_DEVCONT = 6,	// Device Continue– The all effects that running when the device was paused are restarted from their last time step.
+};
+
+enum FFB_EFFECTS {
+	Constant = 0x0001,
+	Ramp = 0x0002,
+	Square = 0x0004,
+	Sine = 0x0008,
+	Triangle = 0x0010,
+	Sawtooth_Up = 0x0020,
+	Sawtooth_Dn = 0x0040,
+	Spring = 0x0080,
+	Damper = 0x0100,
+	Inertia = 0x0200,
+	Friction = 0x0400,
+	Custom = 0x0800,
+};
+
+typedef struct _FFB_DATA {
+	ULONG	size;
+	ULONG	cmd;
+	UCHAR	*data;
+} FFB_DATA, *PFFB_DATA;
+
+typedef struct _FFB_EFF_CONSTANT {
+	BYTE EffectBlockIndex;
+	LONG Magnitude; 			  // Constant force magnitude: 	-10000 - 10000
+} FFB_EFF_CONSTANT, *PFFB_EFF_CONSTANT;
+
+typedef struct _FFB_EFF_RAMP {
+	BYTE		EffectBlockIndex;
+	LONG 		Start;             // The Normalized magnitude at the start of the effect (-10000 - 10000)
+	LONG 		End;               // The Normalized magnitude at the end of the effect	(-10000 - 10000)
+} FFB_EFF_RAMP, *PFFB_EFF_RAMP;
+
+//typedef struct _FFB_EFF_CONST {
+typedef struct _FFB_EFF_REPORT {
+	BYTE		EffectBlockIndex;
+	FFBEType	EffectType;
+	WORD		Duration;// Value in milliseconds. 0xFFFF means infinite
+	WORD		TrigerRpt;
+	WORD		SamplePrd;
+	BYTE		Gain;
+	BYTE		TrigerBtn;
+	BOOL		Polar; // How to interpret force direction Polar (0-360°) or Cartesian (X,Y)
+	union
+	{
+		BYTE	Direction; // Polar direction: (0x00-0xFF correspond to 0-360°)
+		BYTE	DirX; // X direction: Positive values are To the right of the center (X); Negative are Two's complement
+	};
+	BYTE		DirY; // Y direction: Positive values are below the center (Y); Negative are Two's complement
+} FFB_EFF_REPORT, *PFFB_EFF_REPORT;
+//} FFB_EFF_CONST, *PFFB_EFF_CONST;
+
+typedef struct _FFB_EFF_OP {
+	BYTE		EffectBlockIndex;
+	FFBOP		EffectOp;
+	BYTE		LoopCount;
+} FFB_EFF_OP, *PFFB_EFF_OP;
+
+typedef struct _FFB_EFF_PERIOD {
+	BYTE		EffectBlockIndex;
+	DWORD		Magnitude;			// Range: 0 - 10000
+	LONG 		Offset;				// Range: –10000 - 10000
+	DWORD 		Phase;				// Range: 0 - 35999
+	DWORD 		Period;				// Range: 0 - 32767
+} FFB_EFF_PERIOD, *PFFB_EFF_PERIOD;
+
+typedef struct _FFB_EFF_COND {
+	BYTE		EffectBlockIndex;
+	BOOL		isY;
+	LONG 		CenterPointOffset; // CP Offset:  Range -­10000 ­- 10000
+	LONG 		PosCoeff; // Positive Coefficient: Range -­10000 ­- 10000
+	LONG 		NegCoeff; // Negative Coefficient: Range -­10000 ­- 10000
+	DWORD 		PosSatur; // Positive Saturation: Range 0 – 10000
+	DWORD 		NegSatur; // Negative Saturation: Range 0 – 10000
+	LONG 		DeadBand; // Dead Band: : Range 0 – 1000
+} FFB_EFF_COND, *PFFB_EFF_COND;
+
+typedef struct _FFB_EFF_ENVLP {
+	BYTE		EffectBlockIndex;
+	DWORD 		AttackLevel;   // The Normalized magnitude of the stating point: 0 - 10000
+	DWORD 		FadeLevel;	   // The Normalized magnitude of the stopping point: 0 - 10000
+	DWORD 		AttackTime;	   // Time of the attack: 0 - 4294967295
+	DWORD 		FadeTime;	   // Time of the fading: 0 - 4294967295
+} FFB_EFF_ENVLP, *PFFB_EFF_ENVLP;
+
+#define FFB_DATA_READY	 WM_USER+31
+
+typedef void (CALLBACK *FfbGenCB)(PVOID, PVOID);
+#pragma endregion
+
+#endif // !VJOYHEADERUSED
 //////////////////////////////////////////////////////////////////////////////////////
 /// 
 ///  vJoy interface fuctions (Native vJoy)
@@ -83,8 +232,11 @@ enum DevType { vJoy, vXbox };
 
 ///
 #pragma region Backward compatibility API
-				//////////////////////////////////////////////////////////////////////////////////////
-	/////	vJoy/vXbox Device properties
+//////////////////////////////////////////////////////////////////////////////////////
+// Version
+VGENINTERFACE_API	SHORT		__cdecl GetvJoyVersion(void);
+
+/////	vJoy/vXbox Device properties
 VGENINTERFACE_API int	__cdecl  GetVJDButtonNumber(UINT rID);	// Get the number of buttons defined in the specified VDJ
 VGENINTERFACE_API int	__cdecl  GetVJDDiscPovNumber(UINT rID);	// Get the number of descrete-type POV hats defined in the specified VDJ
 VGENINTERFACE_API int	__cdecl  GetVJDContPovNumber(UINT rID);	// Get the number of descrete-type POV hats defined in the specified VDJ
@@ -103,7 +255,7 @@ VGENINTERFACE_API BOOL		__cdecl	UpdateVJD(UINT rID, PVOID pData);	// Update the 
 // This group of functions modify the current value of the position data
 // They replace the need to create a structure of position data then call UpdateVJD
 
-//// Reset functions
+//// Device-Reset functions
 VGENINTERFACE_API BOOL		__cdecl	ResetVJD(UINT rID);			// Reset all controls to predefined values in the specified VDJ
 VGENINTERFACE_API VOID		__cdecl	ResetAll(void);				// Reset all controls to predefined values in all VDJ
 VGENINTERFACE_API BOOL		__cdecl	ResetButtons(UINT rID);		// Reset all buttons (To 0) in the specified VDJ
@@ -115,9 +267,37 @@ VGENINTERFACE_API BOOL		__cdecl	SetBtn(BOOL Value, UINT rID, UCHAR nBtn);		// Wr
 VGENINTERFACE_API BOOL		__cdecl	SetDiscPov(int Value, UINT rID, UCHAR nPov);	// Write Value to a given descrete POV defined in the specified VDJ 
 VGENINTERFACE_API BOOL		__cdecl	SetContPov(DWORD Value, UINT rID, UCHAR nPov);	// Write Value to a given continuous POV defined in the specified VDJ 
 
+// FFB function
+VGENINTERFACE_API FFBEType	__cdecl	FfbGetEffect();	// Returns effect serial number if active, 0 if inactive
+VGENINTERFACE_API VOID		__cdecl	FfbRegisterGenCB(FfbGenCB cb, PVOID data);
+__declspec(deprecated("** FfbStart function was deprecated - you can remove it from your code **")) \
+VGENINTERFACE_API BOOL		__cdecl	FfbStart(UINT rID);				  // Start the FFB queues of the specified vJoy Device.
+__declspec(deprecated("** FfbStop function was deprecated - you can remove it from your code **")) \
+VGENINTERFACE_API VOID		__cdecl	FfbStop(UINT rID);				  // Stop the FFB queues of the specified vJoy Device.
 
+																	  // Added in 2.1.6
+VGENINTERFACE_API BOOL		__cdecl	IsDeviceFfb(UINT rID);
+VGENINTERFACE_API BOOL		__cdecl	IsDeviceFfbEffect(UINT rID, UINT Effect);
 
-VGENINTERFACE_API	SHORT		__cdecl GetvJoyVersion(void);
+//  Force Feedback (FFB) helper functions
+VGENINTERFACE_API DWORD 	__cdecl	Ffb_h_DeviceID(const FFB_DATA * Packet, int *DeviceID);
+VGENINTERFACE_API DWORD 	__cdecl Ffb_h_Type(const FFB_DATA * Packet, FFBPType *Type);
+VGENINTERFACE_API DWORD 	__cdecl Ffb_h_Packet(const FFB_DATA * Packet, WORD *Type, int *DataSize, BYTE *Data[]);
+VGENINTERFACE_API DWORD 	__cdecl Ffb_h_EBI(const FFB_DATA * Packet, int *Index);
+VGENINTERFACE_API DWORD 	__cdecl Ffb_h_Eff_Report(const FFB_DATA * Packet, FFB_EFF_REPORT*  Effect);
+//__declspec(deprecated("** Ffb_h_Eff_Const function was deprecated - Use function Ffb_h_Eff_Report **")) \
+//VGENINTERFACE_API DWORD 	__cdecl Ffb_h_Eff_Const(const FFB_DATA * Packet, FFB_EFF_REPORT*  Effect);
+VGENINTERFACE_API DWORD		__cdecl Ffb_h_Eff_Ramp(const FFB_DATA * Packet, FFB_EFF_RAMP*  RampEffect);
+VGENINTERFACE_API DWORD 	__cdecl Ffb_h_EffOp(const FFB_DATA * Packet, FFB_EFF_OP*  Operation);
+VGENINTERFACE_API DWORD 	__cdecl Ffb_h_DevCtrl(const FFB_DATA * Packet, FFB_CTRL *  Control);
+VGENINTERFACE_API DWORD 	__cdecl Ffb_h_Eff_Period(const FFB_DATA * Packet, FFB_EFF_PERIOD*  Effect);
+VGENINTERFACE_API DWORD 	__cdecl Ffb_h_Eff_Cond(const FFB_DATA * Packet, FFB_EFF_COND*  Condition);
+VGENINTERFACE_API DWORD 	__cdecl Ffb_h_DevGain(const FFB_DATA * Packet, BYTE * Gain);
+VGENINTERFACE_API DWORD		__cdecl Ffb_h_Eff_Envlp(const FFB_DATA * Packet, FFB_EFF_ENVLP*  Envelope);
+VGENINTERFACE_API DWORD		__cdecl Ffb_h_EffNew(const FFB_DATA * Packet, FFBEType * Effect);
+
+// Added in 2.1.6
+VGENINTERFACE_API DWORD		__cdecl Ffb_h_Eff_Constant(const FFB_DATA * Packet, FFB_EFF_CONSTANT *  ConstantEffect);
 #pragma endregion
 
 #pragma region vXbox API

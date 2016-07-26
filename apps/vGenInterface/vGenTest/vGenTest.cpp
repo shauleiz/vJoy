@@ -1,8 +1,8 @@
 // Test vGenInterface - Unified API for vJoy and vXbox
 #include "../stdafx.h"
 #include <Xinput.h>
-#include "../vGenInterface.h"
 #include "../../../inc/public.h"
+#include "../vGenInterface.h"
 
 void C_DisplayStatus();
 HDEVICE C_AcqDevice();

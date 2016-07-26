@@ -5,14 +5,14 @@
 // Compilation directives
 #define USE_STATIC
 #define STATIC
+#define VJOYHEADERUSED
 
 #include <Xinput.h>
-#include "vGenInterface.h"
 #include "public.h"
-#include "private.h"
-
 #include "vjoyinterface.h"
 #include "XOutput.h"
+#include "vGenInterface.h"
+#include "private.h"
 
 #pragma comment(lib, "vJoyInterfaceStat.lib")
 #pragma comment(lib, "XOutputStatic_1_2.lib")
@@ -358,6 +358,32 @@ VGENINTERFACE_API BOOL ResetPovs(UINT rID)		// Reset all POV Switches (To -1) in
 
 }
 
+#pragma region FFB API
+#pragma warning( push )
+#pragma warning( disable : 4996 )
+VGENINTERFACE_API FFBEType FfbGetEffect() { return  vJoyNS::FfbGetEffect(); }
+VGENINTERFACE_API VOID FfbRegisterGenCB(FfbGenCB cb, PVOID data) { return  vJoyNS::FfbRegisterGenCB( cb,  data); }
+VGENINTERFACE_API BOOL 	FfbStart(UINT rID) { return  TRUE; }
+VGENINTERFACE_API VOID 	FfbStop(UINT rID) { return; }
+VGENINTERFACE_API BOOL 	IsDeviceFfb(UINT rID) { return  vJoyNS::IsDeviceFfb(rID); }
+VGENINTERFACE_API BOOL 	IsDeviceFfbEffect(UINT rID, UINT Effect) { return  vJoyNS::IsDeviceFfbEffect(rID, Effect); }
+VGENINTERFACE_API DWORD Ffb_h_DeviceID(const FFB_DATA * Packet, int *DeviceID) { return  vJoyNS::Ffb_h_DeviceID(Packet, DeviceID); }
+VGENINTERFACE_API DWORD Ffb_h_Type(const FFB_DATA * Packet, FFBPType *Type) { return  vJoyNS::Ffb_h_Type(Packet, Type); }
+VGENINTERFACE_API DWORD Ffb_h_Packet(const FFB_DATA * Packet, WORD *Type, int *DataSize, BYTE *Data[]) { return  vJoyNS::Ffb_h_Packet(Packet, Type, DataSize, Data); }
+VGENINTERFACE_API DWORD Ffb_h_EBI(const FFB_DATA * Packet, int *Index) { return  vJoyNS::Ffb_h_EBI(Packet, Index); }
+VGENINTERFACE_API DWORD Ffb_h_Eff_Report(const FFB_DATA * Packet, FFB_EFF_REPORT*  Effect) { return  vJoyNS::Ffb_h_Eff_Report(Packet, Effect); }
+//VGENINTERFACE_API DWORD Ffb_h_Eff_Const(const FFB_DATA * Packet, FFB_EFF_REPORT*  Effect) { return  vJoyNS::Ffb_h_Eff_Report(Packet, Effect); }
+VGENINTERFACE_API DWORD Ffb_h_Eff_Ramp(const FFB_DATA * Packet, FFB_EFF_RAMP*  RampEffect) { return  vJoyNS::Ffb_h_Eff_Ramp(Packet,   RampEffect); }
+VGENINTERFACE_API DWORD Ffb_h_EffOp(const FFB_DATA * Packet, FFB_EFF_OP*  Operation) { return  vJoyNS::Ffb_h_EffOp(Packet,  Operation); }
+VGENINTERFACE_API DWORD Ffb_h_DevCtrl(const FFB_DATA * Packet, FFB_CTRL *  Control) { return  vJoyNS::Ffb_h_DevCtrl(Packet,  Control); }
+VGENINTERFACE_API DWORD Ffb_h_Eff_Period(const FFB_DATA * Packet, FFB_EFF_PERIOD*  Effect) { return  vJoyNS::Ffb_h_Eff_Period(Packet,  Effect); }
+VGENINTERFACE_API DWORD Ffb_h_Eff_Cond(const FFB_DATA * Packet, FFB_EFF_COND*  Condition) { return  vJoyNS::Ffb_h_Eff_Cond(Packet, Condition); }
+VGENINTERFACE_API DWORD Ffb_h_DevGain(const FFB_DATA * Packet, BYTE * Gain) { return  vJoyNS::Ffb_h_DevGain(Packet, Gain); }
+VGENINTERFACE_API DWORD Ffb_h_Eff_Envlp(const FFB_DATA * Packet, FFB_EFF_ENVLP*  Envelope) { return  vJoyNS::Ffb_h_Eff_Envlp(Packet, Envelope); }
+VGENINTERFACE_API DWORD Ffb_h_EffNew(const FFB_DATA * Packet, FFBEType * Effect) { return  vJoyNS::Ffb_h_EffNew(Packet, Effect); }
+VGENINTERFACE_API DWORD Ffb_h_Eff_Constant(const FFB_DATA * Packet, FFB_EFF_CONSTANT *  ConstantEffect) { return  vJoyNS::Ffb_h_Eff_Constant(Packet, ConstantEffect); }
+#pragma warning( pop )
+#pragma endregion  FFB API
 
 #pragma endregion Interface Functions (vJoy)
 
