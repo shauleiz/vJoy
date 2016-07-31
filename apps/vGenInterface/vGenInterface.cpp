@@ -28,7 +28,7 @@ VGENINTERFACE_API int GetVJDButtonNumber(UINT rID)	// Get the number of buttons 
 {
 	if (Range_vXbox(rID))
 	{
-		if (!IX_isControllerExists(to_vXbox(rID)))
+		if (!IX_isControllerPluggedIn(to_vXbox(rID)))
 			return 0;
 		else
 			return 10;
@@ -41,7 +41,7 @@ VGENINTERFACE_API int GetVJDDiscPovNumber(UINT rID)	// Get the number of POVs de
 {
 	if (Range_vXbox(rID))
 	{
-		if (!IX_isControllerExists(to_vXbox(rID)))
+		if (!IX_isControllerPluggedIn(to_vXbox(rID)))
 			return 0;
 		else
 			return 1;
@@ -62,7 +62,7 @@ VGENINTERFACE_API BOOL GetVJDAxisExist(UINT rID, UINT Axis) // Test if given axi
 {
 	if (Range_vXbox(rID))
 	{
-		if (!IX_isControllerExists(to_vXbox(rID)))
+		if (!IX_isControllerPluggedIn(to_vXbox(rID)))
 			return FALSE;
 			
 		if ((Axis == HID_USAGE_X) || (Axis == HID_USAGE_Y) || (Axis == HID_USAGE_Z) || (Axis == HID_USAGE_RX) || (Axis == HID_USAGE_RY) || (Axis == HID_USAGE_RZ))
@@ -78,7 +78,7 @@ VGENINTERFACE_API BOOL GetVJDAxisMax(UINT rID, UINT Axis, LONG * Max) // Get log
 {
 	if (Range_vXbox(rID))
 	{
-		if (!IX_isControllerExists(to_vXbox(rID)))
+		if (!IX_isControllerPluggedIn(to_vXbox(rID)))
 			return FALSE;
 
 		if ((Axis == HID_USAGE_X) || (Axis == HID_USAGE_Y) || (Axis == HID_USAGE_RX) || (Axis == HID_USAGE_RY))
@@ -103,7 +103,7 @@ VGENINTERFACE_API BOOL GetVJDAxisMin(UINT rID, UINT Axis, LONG * Min) // Get log
 {
 	if (Range_vXbox(rID))
 	{
-		if (!IX_isControllerExists(to_vXbox(rID)))
+		if (!IX_isControllerPluggedIn(to_vXbox(rID)))
 			return FALSE;
 
 		if ((Axis == HID_USAGE_X) || (Axis == HID_USAGE_Y)  || (Axis == HID_USAGE_RX) || (Axis == HID_USAGE_RY))
@@ -128,12 +128,10 @@ VGENINTERFACE_API enum VjdStat GetVJDStatus(UINT rID)			// Get the status of the
 {
 	if (Range_vXbox(rID))
 	{
-		if (!IX_isControllerOwned(to_vXbox(rID)))
+		if (IX_isControllerPluggedIn(to_vXbox(rID)))
 			return VJD_STAT_OWN;
-		if (IX_isControllerExists(to_vXbox(rID)))
-			return VJD_STAT_BUSY;
 		else
-			return VJD_STAT_MISS;
+			return VJD_STAT_UNKN;
 	}
 	else
 		return vJoyNS::GetVJDStatus(rID);
@@ -142,7 +140,7 @@ VGENINTERFACE_API enum VjdStat GetVJDStatus(UINT rID)			// Get the status of the
 VGENINTERFACE_API BOOL isVJDExists(UINT rID)					// TRUE if the specified vJoy Device exists
 {
 	if (Range_vXbox(rID))
-		return (IX_isControllerExists(to_vXbox(rID)));
+		return (IX_isControllerPluggedIn(to_vXbox(rID)));
 	else
 		return vJoyNS::isVJDExists(rID);
 }
@@ -198,7 +196,7 @@ VGENINTERFACE_API BOOL SetAxis(LONG Value, UINT rID, UINT Axis)		// Write Value 
 
 	if (Range_vXbox(rID))
 	{
-		if (!IX_isControllerExists(to_vXbox(rID)))
+		if (!IX_isControllerPluggedIn(to_vXbox(rID)))
 			return FALSE;
 
 		// If Axis is X,Y,RX,RY (1,2,4,5) then remap range:
@@ -398,9 +396,9 @@ VGENINTERFACE_API BOOL GetNumEmptyBusSlots(UCHAR * nSlots)
 	return IX_GetNumEmptyBusSlots(nSlots);
 }
 
-VGENINTERFACE_API BOOL isControllerExists(UINT UserIndex)
+VGENINTERFACE_API BOOL isControllerPluggedIn(UINT UserIndex)
 {
-	return IX_isControllerExists(UserIndex);
+	return IX_isControllerPluggedIn(UserIndex);
 }
 
 VGENINTERFACE_API BOOL isControllerOwned(UINT UserIndex)
@@ -603,17 +601,19 @@ VGENINTERFACE_API DevType GetDevType(HDEVICE hDev)			// Get device type (vJoy/vX
 		return vXbox;
 }
 
-VGENINTERFACE_API BOOL isDevExists(UINT DevId, DevType dType)
+VGENINTERFACE_API BOOL isDevOwned(UINT DevId, DevType dType)
 {
 	if (dType == vJoy)
-		return vJoyNS::isVJDExists(DevId);
+		return (vJoyNS::GetVJDStatus(DevId) == VJD_STAT_OWN);
 
 	if (dType == vXbox)
-		return IX_isControllerExists(DevId);
+		return IX_isControllerPluggedIn(DevId);
 
 	return FALSE;
 }
 
+// Cannot implement isDevOwned(h) because only an OWNED device has a handle
+// BUSY device is is owned by another feeder so it does not have a handle 
 #if 0
 VGENINTERFACE_API BOOL isDevOwned(HDEVICE hDev)
 {
@@ -842,7 +842,7 @@ BOOL	IX_GetNumEmptyBusSlots(UCHAR * nSlots)
 		return FALSE;
 }
 
-BOOL	IX_isControllerExists(UINT UserIndex)
+BOOL	IX_isControllerPluggedIn(UINT UserIndex)
 {
 	BOOL Exist;
 	if (ERROR_SUCCESS == XOutputIsPluggedIn(UserIndex - 1, &Exist))
@@ -851,7 +851,7 @@ BOOL	IX_isControllerExists(UINT UserIndex)
 		return FALSE;
 }
 
-BOOL	IX_isControllerExists(HDEVICE hDev)
+BOOL	IX_isControllerPluggedIn(HDEVICE hDev)
 {
 	if (!hDev)
 		return FALSE;
@@ -937,7 +937,7 @@ BOOL	IX_UnPlug(UINT UserIndex)
 	// Wait for device to be unplugged
 	for (int i = 0; i < 1000; i++)
 	{
-		if (!IX_isControllerExists(UserIndex))
+		if (!IX_isControllerPluggedIn(UserIndex))
 			break;
 		Sleep(1);
 	}
@@ -945,7 +945,7 @@ BOOL	IX_UnPlug(UINT UserIndex)
 	Sleep(1000); // Temporary - replace with detection code
 
 	// If still exists - error
-	if (IX_isControllerExists(UserIndex))
+	if (IX_isControllerPluggedIn(UserIndex))
 		return FALSE;
 	
 

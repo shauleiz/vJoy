@@ -62,8 +62,8 @@ WORD g_xButtons[10] = {
 /// Status
 BOOL	IX_isVBusExists(void);
 BOOL	IX_GetNumEmptyBusSlots(UCHAR * nSlots);
-BOOL	IX_isControllerExists(UINT UserIndex);
-BOOL	IX_isControllerExists(HDEVICE hDev);
+BOOL	IX_isControllerPluggedIn(UINT UserIndex);
+BOOL	IX_isControllerPluggedIn(HDEVICE hDev);
 BOOL	IX_isControllerOwned(UINT UserIndex);
 BOOL	IX_isControllerOwned(HDEVICE hDev);
 // Virtual device Plug-In/Unplug

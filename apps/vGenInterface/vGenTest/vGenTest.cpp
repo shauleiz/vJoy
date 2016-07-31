@@ -4,12 +4,18 @@
 #include "../../../inc/public.h"
 #include "../vGenInterface.h"
 
+// C_xxxx Functions: Common API
 void C_DisplayStatus();
 HDEVICE C_AcqDevice();
 void C_PressButton(HDEVICE hDev);
 void C_TestPov(HDEVICE hDev);
 void C_TestAxis(HDEVICE hDev);
 void C_Test(HDEVICE hDev);
+void C_DisplayDeviceInfo(HDEVICE hDev);
+
+// B_xxxx Functions: Backward compatibility API
+void B_DisplayStatus();
+
 
 int main()
 {
@@ -21,6 +27,7 @@ int main()
 
 	// Display status and wait
 	C_DisplayStatus();
+	B_DisplayStatus();
 	getchar();
 
 	SHORT vJoyVer = GetvJoyVersion();
@@ -35,10 +42,16 @@ int main()
 	// Plug-in vBox device 1, Display status and wait
 	Plugged = PlugIn(1);
 	C_DisplayStatus();
+	B_DisplayStatus();
 	getchar();
 
 	// Interactive: Ask user which device to acquire
 	HDEVICE h1 = C_AcqDevice();
+	C_DisplayDeviceInfo(h1);
+	getchar();
+
+	C_DisplayStatus();
+	B_DisplayStatus();
 	getchar();
 
 	// Loop through interactive tests
@@ -46,10 +59,11 @@ int main()
 	return (0);	
 }
 
+
 void C_DisplayStatus()
 {
 	// Printout and Wait for any key
-	printf("Print the state of the system - Press any key to continue\n");
+	printf("Common API: Print the state of the system - Press any key to continue\n");
 	getchar();
 
 	// Test if vXbox bus exists
@@ -71,26 +85,27 @@ void C_DisplayStatus()
 	printf(" 1  2  3  4  5  6  7  8  9  10 11 12 13 14 15 16\n");
 	for (int i = 1; i <= 16; i++)
 	{
-		if (ValidDev(GetDevHandle(i, vJoy)))
+		VjdStat stat = GetVJDStatus(i);
+		if (stat == VJD_STAT_OWN)
 			printf(" O ");
-		else if (isDevExists(i,vJoy))
+		else if (stat == VJD_STAT_FREE)
 			printf(" F ");
+		else if (stat == VJD_STAT_BUSY)
+			printf(" B ");
 		else
 			printf(" M ");
 	}
 	printf("\n\n\n");
 
 	// Scan which vXbox devices are installed
-	printf("vXbox Devices: [F]ree, [O]wned, [E]xists\n");
+	printf("vXbox Devices: [O]wned\n");
 	printf(" 1  2  3  4 \n");
 	for (int i = 1; i <= 4; i++)
 	{
-		if (ValidDev(GetDevHandle(i, vXbox)))
+		if (isDevOwned(i, vXbox))
 			printf(" O ");
-		else if (isDevExists(i, vXbox))
-			printf(" E ");
 		else
-			printf(" F ");
+			printf(" ? ");
 	}
 	printf("\n");
 }
@@ -109,7 +124,7 @@ HDEVICE C_AcqDevice()
 	{ 
 		if (ValidDev(GetDevHandle(DevId, vJoy)))
 			printf("vJoy device %d already acquired\n", DevId);
-		else if (!isDevExists(DevId, vJoy))
+		else if (!isVJDExists(DevId))
 			printf("vJoy device %d does not exist", DevId);
 
 		return AcquireDev( DevId, vJoy);
@@ -118,8 +133,6 @@ HDEVICE C_AcqDevice()
 	{
 		if (ValidDev(GetDevHandle(DevId, vXbox)))
 			printf("vXbox device %d already acquired\n", DevId);
-		else if (isDevExists(DevId, vXbox))
-			printf("vXbox device %d already exists\n", DevId);
 
 		return AcquireDev( DevId, vXbox);
 	}
@@ -217,4 +230,86 @@ void C_Test(HDEVICE hDev)
 		C_PressButton(hDev);
 	else if (tolower(Test) == 'p')
 		C_TestPov(hDev);
+}
+
+void C_DisplayDeviceInfo(HDEVICE hDev)
+{
+	// Get device and test validity
+	if (!ValidDev(hDev))
+	{
+		printf("Invalid Device\n");
+		return;
+	}
+	// Valid, get type and Device Number
+	DevType	type = GetDevType(hDev);
+	UINT n = GetDevNumber(hDev);
+	UINT id = GetDevId(hDev);
+
+	// Print
+	if (type == vJoy)
+	{
+		printf("Type: vJoy; ID: %u; Device Number: %u\n", id, n);
+		return;
+	};
+
+	if (type == vXbox)
+	{
+		printf("Type: vXbox; ID: %u; LED Number: %u\n", id, n);
+		return;
+	};
+
+	printf("Invalid Device type\n");
+	return;
+}
+
+void B_DisplayStatus()
+{
+	// Printout and Wait for any key
+	printf("Compatible API: Print the state of the system - Press any key to continue\n");
+	getchar();
+
+	// Test if vXbox bus exists
+	if (isVBusExists())
+		printf("Virtual Xbox bus exists\n");
+	else
+		printf("Virtual Xbox bus does NOT exist\n");
+
+
+	// Test if vJoy installed and get its version
+	SHORT vJoyVer = GetvJoyVersion();
+	if (vJoyVer)
+		printf("vJoy Version %04X\n", vJoyVer);
+	else
+		printf("vJoy not installed\n", vJoyVer);
+
+	// Scan which vJoy devices are installed
+	VjdStat stat;
+	printf("vJoy Devices: [M]issing, [O]wned, [F]ree\n");
+	printf(" 1  2  3  4  5  6  7  8  9  10 11 12 13 14 15 16\n");
+	for (int i = 1; i <= 16; i++)
+	{
+		stat = GetVJDStatus(i);
+		if (stat == VJD_STAT_OWN)
+			printf(" O ");
+		else if (stat == VJD_STAT_FREE)
+			printf(" F ");
+		else if (stat == VJD_STAT_BUSY)
+			printf(" B ");
+		else
+			printf(" M ");
+	}
+	printf("\n\n\n");
+
+	// Scan which vXbox devices are installed
+	printf("vXbox Devices: [U]nknown, [O]wned\n");
+	printf(" 1  2  3  4 \n");
+	for (int i = 1001; i <= 1004; i++)
+	{
+		stat = GetVJDStatus(i);
+		if (stat == VJD_STAT_OWN)
+			printf(" O ");
+		else
+			printf(" ? ");
+	}
+	printf("\n");
 }

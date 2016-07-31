@@ -33,6 +33,17 @@ typedef INT HDEVICE;
 #define  INVALID_DEV (HDEVICE)0
 #define ValidDev(x) ((x == INVALID_DEV)?FALSE:TRUE)
 
+#ifndef VJDSTAT
+#define VJDSTAT
+enum VjdStat  /* Declares an enumeration data type */
+{
+	VJD_STAT_OWN,	// The  vJoy Device is owned by this application.
+	VJD_STAT_FREE,	// The  vJoy Device is NOT owned by any application (including this one).
+	VJD_STAT_BUSY,	// The  vJoy Device is owned by another application. It cannot be acquired by this application.
+	VJD_STAT_MISS,	// The  vJoy Device is missing. It either does not exist or the driver is down.
+	VJD_STAT_UNKN	// Unknown
+};
+#endif
 
 #ifndef VJOYHEADERUSED
 #pragma region FFB Re-Definitions
@@ -315,7 +326,7 @@ VGENINTERFACE_API DWORD		__cdecl Ffb_h_Eff_Constant(const FFB_DATA * Packet, FFB
 	VGENINTERFACE_API	BOOL		__cdecl GetNumEmptyBusSlots(UCHAR * nSlots);
 
 	// Device Status (Plugin/Unplug and check ownership)
-	VGENINTERFACE_API	BOOL		__cdecl isControllerExists(UINT UserIndex);
+	VGENINTERFACE_API	BOOL		__cdecl isControllerPluggedIn(UINT UserIndex);
 	VGENINTERFACE_API	BOOL		__cdecl isControllerOwned(UINT UserIndex);
 	VGENINTERFACE_API	BOOL		__cdecl PlugIn(UINT UserIndex);
 	VGENINTERFACE_API	BOOL		__cdecl UnPlug(UINT UserIndex);
@@ -367,7 +378,7 @@ VGENINTERFACE_API DWORD		__cdecl Ffb_h_Eff_Constant(const FFB_DATA * Packet, FFB
 	VGENINTERFACE_API DevType		__cdecl GetDevType(HDEVICE hDev);				// Get device type (vJoy/vXbox)
 	VGENINTERFACE_API UINT			__cdecl GetDevNumber(HDEVICE hDev);				// If vJoy: Number=Id; If vXbox: Number=Led#
 	VGENINTERFACE_API UINT			__cdecl GetDevId(HDEVICE hDev);					// Return Device ID to be used with vXbox API and Backward compatibility API
-	VGENINTERFACE_API BOOL			__cdecl isDevExists(UINT DevId, DevType dType);				// Is device plugged-in/Configured
+	VGENINTERFACE_API BOOL			__cdecl isDevOwned(UINT DevId, DevType dType);	// Is device plugged-in/Configured
 	VGENINTERFACE_API HDEVICE		__cdecl	GetDevHandle(UINT DevId, DevType dType);// Return device handle from Device ID and Device type
 	VGENINTERFACE_API BOOL			__cdecl isAxisExists(HDEVICE hDev, UINT nAxis);	// Does Axis exist. See above table
 	VGENINTERFACE_API UINT			__cdecl GetDevButtonN(HDEVICE hDev);			// Get number of buttons in device
