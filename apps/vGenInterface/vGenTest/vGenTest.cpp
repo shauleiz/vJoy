@@ -19,28 +19,40 @@ void B_DisplayStatus();
 
 int main()
 {
+	DWORD dwRes;
+
+#if 1
 	// Clean-up vXbox devices
-	UnPlugForce(1);
-	UnPlugForce(2);
-	UnPlugForce(3);
-	UnPlugForce(4);
+	dwRes = UnPlugForce(1);
+	dwRes = UnPlugForce(2);
+	dwRes = UnPlugForce(3);
+	dwRes = UnPlugForce(4);
+
+#endif // 0
 
 	// Display status and wait
 	C_DisplayStatus();
 	B_DisplayStatus();
 	getchar();
 
+	UCHAR nSlots = 100;
+	dwRes = GetNumEmptyBusSlots(&nSlots);
+
 	SHORT vJoyVer = GetvJoyVersion();
-	BOOL exist = isVBusExists();
+	BOOL exist = (STATUS_SUCCESS == isVBusExists());
 	BYTE Led[4];
 	XINPUT_VIBRATION Vib;
 	LONG MaxX;
 	char c[3];
 	BOOL Plugged, UnPlugged, Pressed, GetN;
-	UCHAR nSlots;
+	UINT iSlot;
 
 	// Plug-in vBox device 1, Display status and wait
-	Plugged = PlugIn(1);
+	dwRes = isControllerPluggedIn(1, &Plugged);
+	dwRes = PlugIn(1);
+	dwRes = isControllerPluggedIn(1, &Plugged);
+	dwRes = ResetController(1);
+
 	C_DisplayStatus();
 	B_DisplayStatus();
 	getchar();
@@ -56,6 +68,9 @@ int main()
 
 	// Loop through interactive tests
 	C_Test(h1);
+
+	dwRes = ResetControllerDPad(4);
+	getchar();
 	return (0);	
 }
 
@@ -67,7 +82,7 @@ void C_DisplayStatus()
 	getchar();
 
 	// Test if vXbox bus exists
-	if (isVBusExists())
+	if (STATUS_SUCCESS == isVBusExists())
 		printf("Virtual Xbox bus exists\n");
 	else
 		printf("Virtual Xbox bus does NOT exist\n");
@@ -211,7 +226,6 @@ void C_TestAxis(HDEVICE hDev)
 		FLOAT f_val;
 		sscanf(s_val, "%f", &f_val);
 
-
 		BOOL ok = SetDevAxis(hDev, Axis, f_val);
 	}
 
@@ -222,7 +236,7 @@ void C_Test(HDEVICE hDev)
 	printf("Testing [A]xes, [B]uttons or [P]OVs\n");
 
 	char Test;
-	scanf("%c%*s", &Test);
+	scanf("%c", &Test);
 
 	if (tolower(Test) == 'a')
 		C_TestAxis(hDev);
@@ -269,7 +283,7 @@ void B_DisplayStatus()
 	getchar();
 
 	// Test if vXbox bus exists
-	if (isVBusExists())
+	if (STATUS_SUCCESS == isVBusExists())
 		printf("Virtual Xbox bus exists\n");
 	else
 		printf("Virtual Xbox bus does NOT exist\n");

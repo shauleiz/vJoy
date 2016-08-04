@@ -60,26 +60,28 @@ WORD g_xButtons[10] = {
 				//////////// vXbox Internal Functions ////////////
 
 /// Status
-BOOL	IX_isVBusExists(void);
-BOOL	IX_GetNumEmptyBusSlots(UCHAR * nSlots);
-BOOL	IX_isControllerPluggedIn(UINT UserIndex);
+DWORD	IX_isVBusExists(void);
+DWORD	IX_GetNumEmptyBusSlots(UCHAR * nSlots);
+DWORD	IX_isControllerPluggedIn(UINT UserIndex, PBOOL Exist);
 BOOL	IX_isControllerPluggedIn(HDEVICE hDev);
-BOOL	IX_isControllerOwned(UINT UserIndex);
+DWORD	IX_isControllerOwned(UINT UserIndex, PBOOL Owned);
 BOOL	IX_isControllerOwned(HDEVICE hDev);
 // Virtual device Plug-In/Unplug
-BOOL	IX_PlugIn(UINT UserIndex);
-BOOL	IX_UnPlug(UINT UserIndex);
-BOOL	IX_UnPlugForce(UINT UserIndex);
+DWORD	IX_PlugIn(UINT UserIndex);
+DWORD	IX_PlugInNext(UINT * UserIndex);
+DWORD	IX_UnPlug(UINT UserIndex);
+DWORD	IX_UnPlugForce(UINT UserIndex);
 // Reset Devices
-BOOL	IX_ResetController(UINT UserIndex);
-BOOL	IX_ResetController(HDEVICE hDev);
-BOOL	IX_ResetAllControllers();
-BOOL	IX_ResetControllerBtns(UINT UserIndex);
-BOOL	IX_ResetControllerBtns(HDEVICE hDev);
-BOOL	IX_ResetControllerDPad(UINT UserIndex);
-BOOL	IX_ResetControllerDPad(HDEVICE hDev);
+DWORD	IX_ResetController(UINT UserIndex);
+DWORD	IX_ResetController(HDEVICE hDev);
+DWORD	IX_ResetAllControllers();
+DWORD	IX_ResetControllerBtns(UINT UserIndex);
+DWORD	IX_ResetControllerBtns(HDEVICE hDev);
+DWORD	IX_ResetControllerDPad(UINT UserIndex);
+DWORD	IX_ResetControllerDPad(HDEVICE hDev);
 // Data Transfer (Data to the device)
-BOOL	IX_SetBtn(UINT UserIndex, BOOL Press, WORD Button);
+DWORD	IX_SetBtn(UINT UserIndex, BOOL Press, WORD Button);
+#ifdef SPECIFICBUTTONS
 BOOL	IX_SetBtnA(UINT UserIndex, BOOL Press);
 BOOL	IX_SetBtnB(UINT UserIndex, BOOL Press);
 BOOL	IX_SetBtnX(UINT UserIndex, BOOL Press);
@@ -90,19 +92,23 @@ BOOL	IX_SetBtnLT(UINT UserIndex, BOOL Press); // Left Thumb/Stick
 BOOL	IX_SetBtnRT(UINT UserIndex, BOOL Press); // Right Thumb/Stick
 BOOL	IX_SetBtnLB(UINT UserIndex, BOOL Press); // Left Bumper
 BOOL	IX_SetBtnRB(UINT UserIndex, BOOL Press); // Right Bumper
-BOOL	IX_SetTriggerL(UINT UserIndex, BYTE Value); // Left Trigger
-BOOL	IX_SetTriggerR(UINT UserIndex, BYTE Value); // Right Trigger
-BOOL	IX_SetAxisX(UINT UserIndex, SHORT Value); // Left Stick X
-BOOL	IX_SetAxisY(UINT UserIndex, SHORT Value); // Left Stick Y
-BOOL	IX_SetAxisRx(UINT UserIndex, SHORT Value); // Right Stick X
-BOOL	IX_SetAxisRy(UINT UserIndex, SHORT Value); // Right Stick Y
-BOOL	IX_SetDpad(UINT UserIndex, INT Value);
+#endif
+DWORD	IX_SetTriggerL(UINT UserIndex, BYTE Value); // Left Trigger
+DWORD	IX_SetTriggerR(UINT UserIndex, BYTE Value); // Right Trigger
+DWORD	IX_SetAxisLx(UINT UserIndex, SHORT Value); // Left Stick X
+DWORD	IX_SetAxisLy(UINT UserIndex, SHORT Value); // Left Stick Y
+DWORD	IX_SetAxisRx(UINT UserIndex, SHORT Value); // Right Stick X
+DWORD	IX_SetAxisRy(UINT UserIndex, SHORT Value); // Right Stick Y
+DWORD	IX_SetDpad(UINT UserIndex, UCHAR Value);
+#ifdef SPECIFICBUTTONS
 BOOL	IX_SetDpadUp(UINT UserIndex);
 BOOL	IX_SetDpadRight(UINT UserIndex);
 BOOL	IX_SetDpadDown(UINT UserIndex);
 BOOL	IX_SetDpadLeft(UINT UserIndex);
 BOOL	IX_SetDpadOff(UINT UserIndex);
-BOOL	IX_SetBtn(HDEVICE hDev, BOOL Press, WORD Button);
+#endif // SPECIFICBUTTONS
+DWORD	IX_SetBtn(HDEVICE hDev, BOOL Press, WORD Button);
+#ifdef SPECIFICBUTTONS
 BOOL	IX_SetBtnA(HDEVICE hDev, BOOL Press);
 BOOL	IX_SetBtnB(HDEVICE hDev, BOOL Press);
 BOOL	IX_SetBtnX(HDEVICE hDev, BOOL Press);
@@ -112,22 +118,26 @@ BOOL	IX_SetBtnBack(HDEVICE hDev, BOOL Press);
 BOOL	IX_SetBtnLT(HDEVICE hDev, BOOL Press); // Left Thumb/Stick
 BOOL	IX_SetBtnRT(HDEVICE hDev, BOOL Press); // Right Thumb/Stick
 BOOL	IX_SetBtnLB(HDEVICE hDev, BOOL Press); // Left Bumper
-BOOL	IX_SetBtnRB(HDEVICE hDev, BOOL Press); // Right Bumper
-BOOL	IX_SetTriggerL(HDEVICE hDev, BYTE Value); // Left Trigger
-BOOL	IX_SetTriggerR(HDEVICE hDev, BYTE Value); // Right Trigger
-BOOL	IX_SetAxisX(HDEVICE hDev, SHORT Value); // Left Stick X
-BOOL	IX_SetAxisY(HDEVICE hDev, SHORT Value); // Left Stick Y
-BOOL	IX_SetAxisRx(HDEVICE hDev, SHORT Value); // Right Stick X
-BOOL	IX_SetAxisRy(HDEVICE hDev, SHORT Value); // Right Stick Y
-BOOL	IX_SetDpad(HDEVICE hDev, INT Value);
+BOOL	IX_SetBtnRB(HDEVICE hDev, BOOL Press); // Right Bumper  
+#endif // SPECIFICBUTTONS
+
+DWORD	IX_SetTriggerL(HDEVICE hDev, BYTE Value); // Left Trigger
+DWORD	IX_SetTriggerR(HDEVICE hDev, BYTE Value); // Right Trigger
+DWORD	IX_SetAxisLx(HDEVICE hDev, SHORT Value); // Left Stick X
+DWORD	IX_SetAxisLy(HDEVICE hDev, SHORT Value); // Left Stick Y
+DWORD	IX_SetAxisRx(HDEVICE hDev, SHORT Value); // Right Stick X
+DWORD	IX_SetAxisRy(HDEVICE hDev, SHORT Value); // Right Stick Y
+DWORD	IX_SetDpad(HDEVICE hDev, UCHAR Value);
+#ifdef SPECIFICBUTTONS
 BOOL	IX_SetDpadUp(HDEVICE hDev);
 BOOL	IX_SetDpadRight(HDEVICE hDev);
 BOOL	IX_SetDpadDown(HDEVICE hDev);
 BOOL	IX_SetDpadLeft(HDEVICE hDev);
 BOOL	IX_SetDpadOff(HDEVICE hDev);
+#endif // SPECIFICBUTTONS
 // Data Transfer (Feedback from the device)
-BOOL	IX_GetLedNumber(UINT UserIndex, PBYTE pLed);
-BOOL	IX_GetVibration(UINT UserIndex, PXINPUT_VIBRATION pVib);
+DWORD	IX_GetLedNumber(UINT UserIndex, PBYTE pLed);
+DWORD	IX_GetVibration(UINT UserIndex, PXINPUT_VIBRATION pVib);
 
 #pragma endregion // vXbox Internal Functions
 

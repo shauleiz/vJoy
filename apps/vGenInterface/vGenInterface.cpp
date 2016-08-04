@@ -7,6 +7,7 @@
 #define STATIC
 #define VJOYHEADERUSED
 
+//#include <ntstatus.h>
 #include <Xinput.h>
 #include "public.h"
 #include "vjoyinterface.h"
@@ -206,9 +207,9 @@ VGENINTERFACE_API BOOL SetAxis(LONG Value, UINT rID, UINT Axis)		// Write Value 
 		{
 			vx_Value = static_cast<SHORT>(2 * (Value - 1) - 32767);
 			if (Axis == 1)
-				return IX_SetAxisX(to_vXbox(rID), vx_Value);
+				return IX_SetAxisLx(to_vXbox(rID), vx_Value);
 			if (Axis == 2)
-				return IX_SetAxisY(to_vXbox(rID), vx_Value);
+				return IX_SetAxisLy(to_vXbox(rID), vx_Value);
 			if (Axis == 4)
 				return IX_SetAxisRx(to_vXbox(rID), vx_Value);
 			if (Axis == 5)
@@ -253,19 +254,19 @@ VGENINTERFACE_API BOOL SetDiscPov(int Value, UINT rID, UCHAR nPov)	// Write Valu
 		switch (Value)
 		{
 			case 0:
-				return IX_SetDpadUp(to_vXbox(rID));
+				return IX_SetDpad(to_vXbox(rID), XINPUT_GAMEPAD_DPAD_UP);
 
 			case 1:
-				return IX_SetDpadRight(to_vXbox(rID));
+				return IX_SetDpad(to_vXbox(rID), XINPUT_GAMEPAD_DPAD_RIGHT);
 
 			case 2:
-				return IX_SetDpadDown(to_vXbox(rID));
+				return IX_SetDpad(to_vXbox(rID), XINPUT_GAMEPAD_DPAD_DOWN);
 
 			case 3:
-				return IX_SetDpadLeft(to_vXbox(rID));
+				return IX_SetDpad(to_vXbox(rID), XINPUT_GAMEPAD_DPAD_LEFT);
 
 			default:
-				return IX_SetDpadOff(to_vXbox(rID));
+				return IX_SetDpad(to_vXbox(rID), 0);
 		}
 	}
 
@@ -281,7 +282,7 @@ VGENINTERFACE_API BOOL SetContPov(DWORD Value, UINT rID, UCHAR nPov)	// Write Va
 	if (Range_vXbox(rID) && (nPov == 1))
 	{
 		if (Value == -1)
-			return IX_SetDpadOff(to_vXbox(rID));
+			return IX_SetDpad(to_vXbox(rID), 0);
 
 		if (static_cast<LONG>(Value) < 100 || static_cast<LONG>(Value) > 35900)
 			return IX_SetDpad(to_vXbox(rID), DPAD_UP);
@@ -386,62 +387,73 @@ VGENINTERFACE_API DWORD Ffb_h_Eff_Constant(const FFB_DATA * Packet, FFB_EFF_CONS
 #pragma endregion Interface Functions (vJoy)
 
 #pragma region Interface Functions (vXbox)
-VGENINTERFACE_API BOOL isVBusExists(void)
+VGENINTERFACE_API DWORD isVBusExists(void)
 {
 	return IX_isVBusExists();
 }
 
-VGENINTERFACE_API BOOL GetNumEmptyBusSlots(UCHAR * nSlots)
+VGENINTERFACE_API DWORD GetNumEmptyBusSlots(UCHAR * nSlots)
 {
 	return IX_GetNumEmptyBusSlots(nSlots);
 }
 
-VGENINTERFACE_API BOOL isControllerPluggedIn(UINT UserIndex)
+VGENINTERFACE_API DWORD isControllerPluggedIn(UINT UserIndex, PBOOL Exist)
 {
-	return IX_isControllerPluggedIn(UserIndex);
+	return IX_isControllerPluggedIn(UserIndex, Exist);
 }
 
-VGENINTERFACE_API BOOL isControllerOwned(UINT UserIndex)
+VGENINTERFACE_API DWORD isControllerOwned(UINT UserIndex, PBOOL Owned)
 {
-	return IX_isControllerOwned(UserIndex);
+	return IX_isControllerOwned(UserIndex, Owned);
 }
 
-VGENINTERFACE_API BOOL PlugIn(UINT UserIndex)
+VGENINTERFACE_API DWORD PlugIn(UINT UserIndex)
 {
 	return IX_PlugIn( UserIndex);
 }
 
-VGENINTERFACE_API BOOL UnPlug(UINT UserIndex)
+VGENINTERFACE_API DWORD PlugInNext(UINT * UserIndex)
+{
+	return IX_PlugInNext( UserIndex);
+}
+
+VGENINTERFACE_API DWORD UnPlug(UINT UserIndex)
 {
 	return IX_UnPlug(UserIndex);
 }
 
-VGENINTERFACE_API BOOL UnPlugForce(UINT UserIndex)
+VGENINTERFACE_API DWORD UnPlugForce(UINT UserIndex)
 {
 	return IX_UnPlugForce(UserIndex);
 }
 
 // Reset Devices
-VGENINTERFACE_API BOOL ResetController(UINT UserIndex)
+VGENINTERFACE_API DWORD ResetController(UINT UserIndex)
 {
 	return IX_ResetController(UserIndex);
 }
 
-VGENINTERFACE_API BOOL ResetAllControllers()
+VGENINTERFACE_API DWORD ResetAllControllers()
 {
 	return IX_ResetAllControllers();
 }
 
-VGENINTERFACE_API BOOL ResetControllerBtns(UINT UserIndex)
+VGENINTERFACE_API DWORD ResetControllerBtns(UINT UserIndex)
 {
 	return IX_ResetControllerBtns(UserIndex);
 }
 
-VGENINTERFACE_API BOOL ResetControllerDPad(UINT UserIndex)
+VGENINTERFACE_API DWORD ResetControllerDPad(UINT UserIndex)
 {
 	return IX_ResetControllerDPad(UserIndex);
 }
 
+VGENINTERFACE_API DWORD SetBtn(UINT UserIndex, WORD Button, BOOL Press)
+{
+	return IX_SetBtn(UserIndex, Press,  Button);
+}
+
+#ifdef SPECIFICBUTTONS
 
 VGENINTERFACE_API BOOL SetBtnA(UINT UserIndex, BOOL Press)
 {
@@ -493,41 +505,44 @@ VGENINTERFACE_API BOOL SetBtnRB(UINT UserIndex, BOOL Press)
 	return IX_SetBtnRB(UserIndex, Press);
 }
 
-VGENINTERFACE_API BOOL SetTriggerR(UINT UserIndex, BYTE Value) // Right Trigger
+#endif // SPECIFICBUTTONS
+
+VGENINTERFACE_API DWORD SetTriggerR(UINT UserIndex, BYTE Value) // Right Trigger
 {
 	return IX_SetTriggerR(UserIndex, Value);
 }
 
-VGENINTERFACE_API BOOL SetTriggerL(UINT UserIndex, BYTE Value) // Left Trigger
+VGENINTERFACE_API DWORD SetTriggerL(UINT UserIndex, BYTE Value) // Left Trigger
 {
 	return IX_SetTriggerL(UserIndex, Value);
 }
 
-VGENINTERFACE_API BOOL SetAxisX(UINT UserIndex, SHORT Value) // Left Stick X
+VGENINTERFACE_API DWORD SetAxisLx(UINT UserIndex, SHORT Value) // Left Stick X
 {
-	return IX_SetAxisX(UserIndex, Value);
+	return IX_SetAxisLx(UserIndex, Value);
 }
 
-VGENINTERFACE_API BOOL SetAxisY(UINT UserIndex, SHORT Value) // Left Stick Y
+VGENINTERFACE_API DWORD SetAxisLy(UINT UserIndex, SHORT Value) // Left Stick Y
 {
-	return IX_SetAxisY(UserIndex, Value);
+	return IX_SetAxisLy(UserIndex, Value);
 }
 
-VGENINTERFACE_API BOOL SetAxisRx(UINT UserIndex, SHORT Value) // Right Stick X
+VGENINTERFACE_API DWORD SetAxisRx(UINT UserIndex, SHORT Value) // Right Stick X
 {
 	return IX_SetAxisRx(UserIndex, Value);
 }
 
-VGENINTERFACE_API BOOL SetAxisRy(UINT UserIndex, SHORT Value) // Right Stick Y
+VGENINTERFACE_API DWORD SetAxisRy(UINT UserIndex, SHORT Value) // Right Stick Y
 {
 	return IX_SetAxisRy(UserIndex, Value);
 }
 
-VGENINTERFACE_API BOOL SetDpad(UINT UserIndex, INT Value) // DPAD Set Value
+VGENINTERFACE_API DWORD SetDpad(UINT UserIndex, UCHAR Value) // DPAD Set Value
 {
 	return IX_SetDpad(UserIndex, Value);
 }
 
+#ifdef SPECIFICBUTTONS
 VGENINTERFACE_API BOOL SetDpadUp(UINT UserIndex) // DPAD Up
 {
 	return IX_SetDpadUp(UserIndex);
@@ -552,13 +567,13 @@ VGENINTERFACE_API BOOL SetDpadOff(UINT UserIndex) // DPAD Off
 {
 	return IX_SetDpadOff(UserIndex);
 }
-
-VGENINTERFACE_API BOOL GetLedNumber(UINT UserIndex, PBYTE pLed)
+#endif // SPECIFICBUTTONS
+VGENINTERFACE_API DWORD GetLedNumber(UINT UserIndex, PBYTE pLed)
 {
 	return IX_GetLedNumber(UserIndex, pLed);
 }
 
-VGENINTERFACE_API BOOL GetVibration(UINT UserIndex, PXINPUT_VIBRATION pVib)
+VGENINTERFACE_API DWORD GetVibration(UINT UserIndex, PXINPUT_VIBRATION pVib)
 {
 	return IX_GetVibration(UserIndex, pVib);
 }
@@ -575,7 +590,7 @@ VGENINTERFACE_API HDEVICE AcquireDev(UINT DevId, DevType dType)
 
 	if (dType == vXbox)
 	{
-		if (IX_PlugIn(DevId))
+		if (STATUS_SUCCESS == IX_PlugIn(DevId))
 			return GetDevHandle(DevId, vXbox);
 		else
 			return INVALID_DEV;
@@ -607,7 +622,24 @@ VGENINTERFACE_API BOOL isDevOwned(UINT DevId, DevType dType)
 		return (vJoyNS::GetVJDStatus(DevId) == VJD_STAT_OWN);
 
 	if (dType == vXbox)
-		return IX_isControllerPluggedIn(DevId);
+		return IX_isControllerOwned(DevId);
+
+	return FALSE;
+}
+
+VGENINTERFACE_API BOOL isDevExist(UINT DevId, DevType dType)
+{
+	if (dType == vJoy)
+	{
+		VjdStat stat = vJoyNS::GetVJDStatus(DevId);
+		if ((stat == VJD_STAT_OWN) || (stat == VJD_STAT_BUSY))
+			return TRUE;
+		else
+			return FALSE;
+	};
+
+	if (dType == vXbox)
+		return IX_isControllerOwned(DevId);
 
 	return FALSE;
 }
@@ -724,10 +756,10 @@ VGENINTERFACE_API BOOL SetDevAxis(HDEVICE hDev, UINT Axis, FLOAT Value)
 		switch (Axis)
 		{
 			case 1:
-				return IX_SetAxisX(hDev, vx_Value);
+				return IX_SetAxisLx(hDev, vx_Value);
 
 			case 2:
-				return IX_SetAxisY(hDev, vx_Value);
+				return IX_SetAxisLy(hDev, vx_Value);
 
 			case 3:
 				return IX_SetTriggerR(hDev, vx_TValue);
@@ -823,32 +855,37 @@ VGENINTERFACE_API BOOL  SetDevPov(HDEVICE hDev, UINT nPov, FLOAT Value)
 #pragma endregion
 
 #pragma region Internal vXbox
-BOOL	IX_isVBusExists(void)
+DWORD	IX_isVBusExists(void)
 {
 	DWORD Version;
 
 	DWORD res = XOutputGetBusVersion(&Version);
 	if (res == XOUTPUT_VBUS_NOT_CONNECTED)
-		return FALSE;
+		return STATUS_NO_SUCH_DEVICE;
 	else
-		return TRUE;
+		return STATUS_SUCCESS;
 }
 
-BOOL	IX_GetNumEmptyBusSlots(UCHAR * nSlots)
+DWORD	IX_GetNumEmptyBusSlots(UCHAR * nSlots)
 {
-	if (ERROR_SUCCESS == XOutputGetFreeSlots(1, nSlots))
-		return TRUE;
-	else
-		return FALSE;
+	DWORD res = XOutputGetFreeSlots(1, nSlots);
+
+	if (res == ERROR_SUCCESS) return STATUS_SUCCESS;
+	if (res == XOUTPUT_VBUS_NOT_CONNECTED) return STATUS_NO_SUCH_DEVICE;
+	if (res == XOUTPUT_VBUS_INDEX_OUT_OF_RANGE) return STATUS_INVALID_PARAMETER;
+	
+	else return STATUS_IO_DEVICE_ERROR;		
 }
 
-BOOL	IX_isControllerPluggedIn(UINT UserIndex)
+DWORD	IX_isControllerPluggedIn(UINT UserIndex, PBOOL Exist)
 {
-	BOOL Exist;
-	if (ERROR_SUCCESS == XOutputIsPluggedIn(UserIndex - 1, &Exist))
-		return Exist;
-	else
-		return FALSE;
+	DWORD res = XOutputIsPluggedIn(UserIndex - 1, Exist);
+
+	if (res == ERROR_SUCCESS) return STATUS_SUCCESS;
+	if (res == XOUTPUT_VBUS_NOT_CONNECTED) return STATUS_NO_SUCH_DEVICE;
+	if (res == XOUTPUT_VBUS_INDEX_OUT_OF_RANGE) return STATUS_INVALID_PARAMETER;
+
+	else return STATUS_IO_DEVICE_ERROR;
 }
 
 BOOL	IX_isControllerPluggedIn(HDEVICE hDev)
@@ -867,13 +904,15 @@ BOOL	IX_isControllerPluggedIn(HDEVICE hDev)
 		return FALSE;
 }
 
-BOOL	IX_isControllerOwned(UINT UserIndex)
+DWORD	IX_isControllerOwned(UINT UserIndex, PBOOL Owned)
 {
-	BOOL Owned;
-	if (ERROR_SUCCESS == XOutputIsOwned(UserIndex - 1, &Owned))
-		return Owned;
-	else
-		return FALSE;
+	DWORD res = XOutputIsOwned(UserIndex - 1, Owned);
+
+	if (res == ERROR_SUCCESS) return STATUS_SUCCESS;
+	if (res == XOUTPUT_VBUS_NOT_CONNECTED) return STATUS_NO_SUCH_DEVICE;
+	if (res == XOUTPUT_VBUS_INDEX_OUT_OF_RANGE) return STATUS_INVALID_PARAMETER;
+
+	else return STATUS_IO_DEVICE_ERROR;
 }
 
 BOOL	IX_isControllerOwned(HDEVICE hDev)
@@ -892,14 +931,33 @@ BOOL	IX_isControllerOwned(HDEVICE hDev)
 		return FALSE;
 }
 
-BOOL	IX_PlugIn(UINT UserIndex)
+DWORD	IX_PlugIn(UINT UserIndex)
 {
-	// Plug-in
-	if (ERROR_SUCCESS != XOutputPlugIn(UserIndex - 1))
-		return FALSE;
-
-	// Wait for device to start - try up to 1 second
+	// Test is it is possible to Plug-In
+	BOOL Exist;
 	DWORD res;
+
+	res = IX_isControllerPluggedIn(UserIndex, &Exist);
+	if (res != ERROR_SUCCESS)
+	{
+		if (res == XOUTPUT_VBUS_NOT_CONNECTED) return STATUS_NO_SUCH_DEVICE;
+		if (res == XOUTPUT_VBUS_INDEX_OUT_OF_RANGE) return STATUS_INVALID_PARAMETER;
+		else return STATUS_IO_DEVICE_ERROR;
+	}
+	if (Exist) return STATUS_DEVICE_ALREADY_ATTACHED;
+
+
+
+	// Plug-in
+	res = XOutputPlugIn(UserIndex - 1);
+	if (res != ERROR_SUCCESS)
+	{
+		if (res == XOUTPUT_VBUS_NOT_CONNECTED) return STATUS_NO_SUCH_DEVICE;
+		if (res == XOUTPUT_VBUS_INDEX_OUT_OF_RANGE) return STATUS_INVALID_PARAMETER;
+		else return STATUS_IO_DEVICE_ERROR;
+	}	
+		
+	// Wait for device to start - try up to 1 second
 	BYTE Led;
 	for (int i = 0; i < 1000; i++)
 	{
@@ -916,23 +974,70 @@ BOOL	IX_PlugIn(UINT UserIndex)
 		break;
 	}
 
+	// If still not ready
+	if (res == XOUTPUT_VBUS_DEVICE_NOT_READY) return STATUS_DEVICE_NOT_READY;
 
 	// Create the device data structure and insert it into the device-container
 	HDEVICE h = CreateDevice(vXbox, UserIndex);
 	if (h)
-		return TRUE;
+		return STATUS_SUCCESS;
 	
 	// Failed to create device
 	XOutputUnPlug(UserIndex - 1);
-	return FALSE;
+	return STATUS_INVALID_HANDLE;
 
 }
 
-BOOL	IX_UnPlug(UINT UserIndex)
+DWORD	IX_PlugInNext(UINT * UserIndex)
 {
+	// Look for an empty slot
+	BOOL Exist;
+	UINT i = 0;
+	DWORD res;
+	do {
+		res = IX_isControllerPluggedIn(++i, &Exist);
+		if (!Exist)
+		{
+			*UserIndex = i;
+			break;
+		}
+	} while (res == STATUS_SUCCESS);
+
+	// Slot not found?
+	if (res != STATUS_SUCCESS)
+		return res;
+
+	// Found, now plugin
+	return IX_PlugIn(i);
+}
+
+DWORD	IX_UnPlug(UINT UserIndex)
+{
+	BOOL Exist;
+	DWORD res;
+
+	// Exists?
+	res = IX_isControllerPluggedIn(UserIndex, &Exist);
+	if (res != STATUS_SUCCESS)
+		return res;
+	if (!Exist)
+		return STATUS_DEVICE_DOES_NOT_EXIST;
+
+	// Owned?
+	res = IX_isControllerOwned(UserIndex, &Exist);
+	if (res != STATUS_SUCCESS)
+		return res;
+	if (!Exist)
+		return STATUS_RESOURCE_NOT_OWNED;
+
 	// Unplug
-	if (ERROR_SUCCESS != XOutputUnPlug(UserIndex - 1))
-		return FALSE;
+	res = XOutputUnPlug(UserIndex - 1);
+	if (res != ERROR_SUCCESS)
+	{
+		if (res == XOUTPUT_VBUS_NOT_CONNECTED) return STATUS_NO_SUCH_DEVICE;
+		if (res == XOUTPUT_VBUS_INDEX_OUT_OF_RANGE) return STATUS_INVALID_PARAMETER;
+		else return STATUS_IO_DEVICE_ERROR;
+	}
 
 	// Wait for device to be unplugged
 	for (int i = 0; i < 1000; i++)
@@ -946,155 +1051,208 @@ BOOL	IX_UnPlug(UINT UserIndex)
 
 	// If still exists - error
 	if (IX_isControllerPluggedIn(UserIndex))
-		return FALSE;
+		return STATUS_TIMEOUT;
 	
 
 	// Get handle to device and destroy it
 	HDEVICE h = GetDevice(vXbox, UserIndex);
 	DestroyDevice(h);
-	if (h)
-		return TRUE;
-	else
-		return FALSE;
+	return STATUS_SUCCESS;
 }
 
-BOOL	IX_UnPlugForce(UINT UserIndex)
+DWORD	IX_UnPlugForce(UINT UserIndex)
 {
+	DWORD res;
+	BOOL Exist;
+
+	// Exists?
+	res = IX_isControllerPluggedIn(UserIndex, &Exist);
+	if (res != STATUS_SUCCESS)
+		return res;
+	if (!Exist)
+		return STATUS_DEVICE_DOES_NOT_EXIST;
+
 	// Unplug
-	if (ERROR_SUCCESS != XOutputUnPlugForce(UserIndex - 1))
-		return FALSE;
+	res = XOutputUnPlugForce(UserIndex - 1);
+	if (res != ERROR_SUCCESS)
+	{
+		if (res == XOUTPUT_VBUS_NOT_CONNECTED) return STATUS_NO_SUCH_DEVICE;
+		if (res == XOUTPUT_VBUS_INDEX_OUT_OF_RANGE) return STATUS_INVALID_PARAMETER;
+		else return STATUS_IO_DEVICE_ERROR;
+	}
+
+	// Wait for device to be unplugged
+	for (int i = 0; i < 1000; i++)
+	{
+		if (!IX_isControllerPluggedIn(UserIndex))
+			break;
+		Sleep(1);
+	}
+
+	Sleep(1000); // Temporary - replace with detection code
+
+				 // If still exists - error
+	if (IX_isControllerPluggedIn(UserIndex))
+		return STATUS_TIMEOUT;
+
 
 	// Get handle to device and destroy it
 	HDEVICE h = GetDevice(vXbox, UserIndex);
 	DestroyDevice(h);
-	if (h)
-		return TRUE;
-	else
-		return FALSE;
-
+	return STATUS_SUCCESS;
 }
 
-BOOL	IX_ResetController(HDEVICE hDev)
+DWORD	IX_ResetController(HDEVICE hDev)
 {
+	DWORD res;
+
 	if (!hDev)
-		return FALSE;
+		return STATUS_INVALID_PARAMETER;
 
 	UINT UserIndex = GetDeviceId(hDev);
 	if (!UserIndex)
-		return FALSE;
+		return STATUS_INVALID_PARAMETER_1;
 
 	// Get  position
 	XINPUT_GAMEPAD * position = (XINPUT_GAMEPAD *)GetDevicePos(hDev);
 	if (!position)
-		return FALSE;
+		return STATUS_MEMORY_NOT_ALLOCATED;
 
 	// Change position value
-	memset(&position, 0, sizeof(XINPUT_GAMEPAD));
-	if (ERROR_SUCCESS != XOutputSetState(UserIndex - 1, position))
-		return FALSE;
+	memset(position, 0, sizeof(XINPUT_GAMEPAD));
+	res = XOutputSetState(UserIndex - 1, position);
+	if (res != ERROR_SUCCESS)
+	{
+		if (res == XOUTPUT_VBUS_NOT_CONNECTED) return STATUS_NO_SUCH_DEVICE;
+		if (XOUTPUT_VBUS_DEVICE_NOT_READY) return STATUS_DEVICE_NOT_READY;
+		if (res == XOUTPUT_VBUS_INDEX_OUT_OF_RANGE) return STATUS_INVALID_PARAMETER;
+		else return STATUS_IO_DEVICE_ERROR;
+	}
 	else
-		return TRUE;
+		return STATUS_SUCCESS;
 }
 
-BOOL	IX_ResetController(UINT UserIndex)
+DWORD	IX_ResetController(UINT UserIndex)
 {
 	return IX_ResetController(GetDevice(vXbox, UserIndex));
 }
 
-BOOL	IX_ResetAllControllers()
+DWORD	IX_ResetAllControllers()
 {
-	int c = 0;
-	c += IX_ResetController(1);
-	c += IX_ResetController(2);
-	c += IX_ResetController(3);
-	c += IX_ResetController(4);
+	DWORD res[4];
+	res[0] = IX_ResetController(1);
+	res[1] = IX_ResetController(2);
+	res[2] = IX_ResetController(3);
+	res[3] = IX_ResetController(4);
 
-	return (c == 0 ? FALSE : TRUE);
+	for (int i = 0; i < 4; i++)
+		if (res[i] != STATUS_SUCCESS)
+			return res[i];
+	return STATUS_SUCCESS;
 }
 
-BOOL	IX_ResetControllerBtns(HDEVICE hDev)
+DWORD	IX_ResetControllerBtns(HDEVICE hDev)
 {
-	if (!hDev)
-		return FALSE;
+	DWORD res;
 
 	UINT UserIndex = GetDeviceId(hDev);
 	if (!UserIndex)
-		return FALSE;
+		return STATUS_INVALID_PARAMETER_1;
+
 
 	// Get  position
 	XINPUT_GAMEPAD * position = (XINPUT_GAMEPAD *)GetDevicePos(hDev);
 	if (!position)
-		return FALSE;
+		return STATUS_MEMORY_NOT_ALLOCATED;
 
 	// Change position value
 	position->wButtons &= 0x000F;
-	if (ERROR_SUCCESS != XOutputSetState(UserIndex - 1, position))
-		return FALSE;
+	res = XOutputSetState(UserIndex - 1, position);
+	if (res != ERROR_SUCCESS)
+	{
+		if (res == XOUTPUT_VBUS_NOT_CONNECTED) return STATUS_NO_SUCH_DEVICE;
+		if (XOUTPUT_VBUS_DEVICE_NOT_READY) return STATUS_DEVICE_NOT_READY;
+		if (res == XOUTPUT_VBUS_INDEX_OUT_OF_RANGE) return STATUS_INVALID_PARAMETER;
+		else return STATUS_IO_DEVICE_ERROR;
+	}
 	else
-		return TRUE;
+		return STATUS_SUCCESS;
 }
 
-BOOL	IX_ResetControllerBtns(UINT UserIndex)
+DWORD	IX_ResetControllerBtns(UINT UserIndex)
 {
 	return IX_ResetControllerBtns(GetDevice(vXbox, UserIndex));
 }
 
-BOOL	IX_ResetControllerDPad(HDEVICE hDev)
+DWORD	IX_ResetControllerDPad(HDEVICE hDev)
 {
-	if (!hDev)
-		return FALSE;
+	DWORD res;
 
 	UINT UserIndex = GetDeviceId(hDev);
 	if (!UserIndex)
-		return FALSE;
+		return STATUS_INVALID_PARAMETER_1;
+
 
 	// Get  position
 	XINPUT_GAMEPAD * position = (XINPUT_GAMEPAD *)GetDevicePos(hDev);
 	if (!position)
-		return FALSE;
+		return STATUS_MEMORY_NOT_ALLOCATED;
 
 	// Change position value
 	position->wButtons &= 0xFFF0;
-	if (ERROR_SUCCESS != XOutputSetState(UserIndex - 1, position))
-		return FALSE;
+	res = XOutputSetState(UserIndex - 1, position);
+	if (res != ERROR_SUCCESS)
+	{
+		if (res == XOUTPUT_VBUS_NOT_CONNECTED) return STATUS_NO_SUCH_DEVICE;
+		if (XOUTPUT_VBUS_DEVICE_NOT_READY) return STATUS_DEVICE_NOT_READY;
+		if (res == XOUTPUT_VBUS_INDEX_OUT_OF_RANGE) return STATUS_INVALID_PARAMETER;
+		else return STATUS_IO_DEVICE_ERROR;
+	}
 	else
-		return TRUE;
+		return STATUS_SUCCESS;
 }
 
-BOOL	IX_ResetControllerDPad(UINT UserIndex)
+DWORD	IX_ResetControllerDPad(UINT UserIndex)
 {
 	return IX_ResetControllerDPad(GetDevice(vXbox, UserIndex));
 }
 
-BOOL	IX_SetBtn(HDEVICE hDev, BOOL Press, WORD Button)
+DWORD	IX_SetBtn(HDEVICE hDev, BOOL Press, WORD Button)
 {
-	if (!hDev)
-		return FALSE;
+	DWORD res;
 
 	UINT UserIndex = GetDeviceId(hDev);
 	if (!UserIndex)
-		return FALSE;
+		return STATUS_INVALID_PARAMETER_1;
+
 
 	// Get  position
 	XINPUT_GAMEPAD * position = (XINPUT_GAMEPAD *)GetDevicePos(hDev);
 	if (!position)
-		return FALSE;
+		return STATUS_MEMORY_NOT_ALLOCATED;
 
 	WORD Mask = g_xButtons[Button - 1];
 	// Change position value
 	position->wButtons &= ~Mask;
 	position->wButtons |= Mask*Press;
-	if (ERROR_SUCCESS != XOutputSetState(UserIndex - 1, position))
-		return FALSE;
+	res = XOutputSetState(UserIndex - 1, position);
+	if (res != ERROR_SUCCESS)
+	{
+		if (res == XOUTPUT_VBUS_NOT_CONNECTED) return STATUS_NO_SUCH_DEVICE;
+		if (XOUTPUT_VBUS_DEVICE_NOT_READY) return STATUS_DEVICE_NOT_READY;
+		if (res == XOUTPUT_VBUS_INDEX_OUT_OF_RANGE) return STATUS_INVALID_PARAMETER;
+		else return STATUS_IO_DEVICE_ERROR;
+	}
 	else
-		return TRUE;
+		return STATUS_SUCCESS;
 }
 
-BOOL	IX_SetBtn(UINT UserIndex, BOOL Press, WORD Button)
+DWORD	IX_SetBtn(UINT UserIndex, BOOL Press, WORD Button)
 {
 	return IX_SetBtn(GetDevice(vXbox, UserIndex), Press, Button);
 }
 
+#ifdef SPECIFICBUTTONS
 BOOL	IX_SetBtnA(HDEVICE hDev, BOOL Press)
 {
 	return IX_SetBtn(hDev, Press, XINPUT_GAMEPAD_A);
@@ -1195,194 +1353,229 @@ BOOL	IX_SetBtnRB(UINT UserIndex, BOOL Press) // Right Bumper
 	return IX_SetBtn(UserIndex, Press, XINPUT_GAMEPAD_RIGHT_SHOULDER);
 }
 
-BOOL	IX_SetTriggerL(HDEVICE hDev, BYTE Value) // Left Trigger
+#endif // SPECIFICBUTTONS
+
+DWORD	IX_SetTriggerL(HDEVICE hDev, BYTE Value) // Left Trigger
 {
-	if (!hDev)
-		return FALSE;
+	DWORD res;
 
 	UINT UserIndex = GetDeviceId(hDev);
 	if (!UserIndex)
-		return FALSE;
+		return STATUS_INVALID_PARAMETER_1;
 
 	// Get  position
 	XINPUT_GAMEPAD * position = (XINPUT_GAMEPAD *)GetDevicePos(hDev);
 	if (!position)
-		return FALSE;
+		return STATUS_MEMORY_NOT_ALLOCATED;
 
 	// Change position value
 	position->bLeftTrigger = Value;
-	if (ERROR_SUCCESS != XOutputSetState(UserIndex - 1, position))
-		return FALSE;
+	res = XOutputSetState(UserIndex - 1, position);
+	if (res != ERROR_SUCCESS)
+	{
+		if (res == XOUTPUT_VBUS_NOT_CONNECTED) return STATUS_NO_SUCH_DEVICE;
+		if (XOUTPUT_VBUS_DEVICE_NOT_READY) return STATUS_DEVICE_NOT_READY;
+		if (res == XOUTPUT_VBUS_INDEX_OUT_OF_RANGE) return STATUS_INVALID_PARAMETER;
+		else return STATUS_IO_DEVICE_ERROR;
+	}
 	else
-		return TRUE;
+		return STATUS_SUCCESS;
 }
 
-BOOL	IX_SetTriggerL(UINT UserIndex, BYTE Value) // Left Trigger
+DWORD	IX_SetTriggerL(UINT UserIndex, BYTE Value) // Left Trigger
 {
 	return IX_SetTriggerL(GetDevice(vXbox, UserIndex), Value);
 }
 
-BOOL	IX_SetTriggerR(HDEVICE hDev, BYTE Value) // Right Trigger
+DWORD	IX_SetTriggerR(HDEVICE hDev, BYTE Value) // Right Trigger -- position->bRightTrigger = Value;
 {
-	if (!hDev)
-		return FALSE;
+	DWORD res;
 
 	UINT UserIndex = GetDeviceId(hDev);
 	if (!UserIndex)
-		return FALSE;
+		return STATUS_INVALID_PARAMETER_1;
 
 	// Get  position
 	XINPUT_GAMEPAD * position = (XINPUT_GAMEPAD *)GetDevicePos(hDev);
 	if (!position)
-		return FALSE;
+		return STATUS_MEMORY_NOT_ALLOCATED;
 
 	// Change position value
 	position->bRightTrigger = Value;
-	if (ERROR_SUCCESS != XOutputSetState(UserIndex - 1, position))
-		return FALSE;
+	res = XOutputSetState(UserIndex - 1, position);
+	if (res != ERROR_SUCCESS)
+	{
+		if (res == XOUTPUT_VBUS_NOT_CONNECTED) return STATUS_NO_SUCH_DEVICE;
+		if (XOUTPUT_VBUS_DEVICE_NOT_READY) return STATUS_DEVICE_NOT_READY;
+		if (res == XOUTPUT_VBUS_INDEX_OUT_OF_RANGE) return STATUS_INVALID_PARAMETER;
+		else return STATUS_IO_DEVICE_ERROR;
+	}
 	else
-		return TRUE;
+		return STATUS_SUCCESS;
 }
 
-BOOL	IX_SetTriggerR(UINT UserIndex, BYTE Value) // Left Trigger
+DWORD	IX_SetTriggerR(UINT UserIndex, BYTE Value) // Left Trigger
 {
 	return IX_SetTriggerR(GetDevice(vXbox, UserIndex), Value);
 }
 
-BOOL	IX_SetAxisX(HDEVICE hDev, SHORT Value) // Left Stick X
+DWORD	IX_SetAxisLx(HDEVICE hDev, SHORT Value) // Left Stick X
 {
-	if (!hDev)
-		return FALSE;
+	DWORD res;
 
 	UINT UserIndex = GetDeviceId(hDev);
 	if (!UserIndex)
-		return FALSE;
+		return STATUS_INVALID_PARAMETER_1;
 
 	// Get  position
 	XINPUT_GAMEPAD * position = (XINPUT_GAMEPAD *)GetDevicePos(hDev);
 	if (!position)
-		return FALSE;
+		return STATUS_MEMORY_NOT_ALLOCATED;
 
 	// Change position value
 	position->sThumbLX = Value;
-	if (ERROR_SUCCESS != XOutputSetState(UserIndex - 1, position))
-		return FALSE;
+	res = XOutputSetState(UserIndex - 1, position);
+	if (res != ERROR_SUCCESS)
+	{
+		if (res == XOUTPUT_VBUS_NOT_CONNECTED) return STATUS_NO_SUCH_DEVICE;
+		if (XOUTPUT_VBUS_DEVICE_NOT_READY) return STATUS_DEVICE_NOT_READY;
+		if (res == XOUTPUT_VBUS_INDEX_OUT_OF_RANGE) return STATUS_INVALID_PARAMETER;
+		else return STATUS_IO_DEVICE_ERROR;
+	}
 	else
-		return TRUE;
+		return STATUS_SUCCESS;
 }
 
-BOOL	IX_SetAxisX(UINT UserIndex, SHORT Value) // Left Stick X
+DWORD	IX_SetAxisLx(UINT UserIndex, SHORT Value) // Left Stick X
 {
-	return IX_SetAxisX(GetDevice(vXbox, UserIndex), Value);
+	return IX_SetAxisLx(GetDevice(vXbox, UserIndex), Value);
 }
 
-BOOL	IX_SetAxisY(HDEVICE hDev, SHORT Value) // Left Stick Y
+DWORD	IX_SetAxisLy(HDEVICE hDev, SHORT Value) // Left Stick Y
 {
-	if (!hDev)
-		return FALSE;
+	DWORD res;
 
 	UINT UserIndex = GetDeviceId(hDev);
 	if (!UserIndex)
-		return FALSE;
+		return STATUS_INVALID_PARAMETER_1;
 
 	// Get  position
 	XINPUT_GAMEPAD * position = (XINPUT_GAMEPAD *)GetDevicePos(hDev);
 	if (!position)
-		return FALSE;
+		return STATUS_MEMORY_NOT_ALLOCATED;
 
 	// Change position value
 	position->sThumbLY = Value;
-	if (ERROR_SUCCESS != XOutputSetState(UserIndex - 1, position))
-		return FALSE;
+	res = XOutputSetState(UserIndex - 1, position);
+	if (res != ERROR_SUCCESS)
+	{
+		if (res == XOUTPUT_VBUS_NOT_CONNECTED) return STATUS_NO_SUCH_DEVICE;
+		if (XOUTPUT_VBUS_DEVICE_NOT_READY) return STATUS_DEVICE_NOT_READY;
+		if (res == XOUTPUT_VBUS_INDEX_OUT_OF_RANGE) return STATUS_INVALID_PARAMETER;
+		else return STATUS_IO_DEVICE_ERROR;
+	}
 	else
-		return TRUE;
+		return STATUS_SUCCESS;
 }
 
-BOOL	IX_SetAxisY(UINT UserIndex, SHORT Value) // Left Stick Y
+DWORD	IX_SetAxisLy(UINT UserIndex, SHORT Value) // Left Stick Y
 {
-	return IX_SetAxisY(GetDevice(vXbox, UserIndex), Value);
+	return IX_SetAxisLy(GetDevice(vXbox, UserIndex), Value);
 }
 
-BOOL	IX_SetAxisRx(HDEVICE hDev, SHORT Value) // Right Stick X
+DWORD	IX_SetAxisRx(HDEVICE hDev, SHORT Value) // Right Stick X
 {
-	if (!hDev)
-		return FALSE;
+	DWORD res;
 
 	UINT UserIndex = GetDeviceId(hDev);
 	if (!UserIndex)
-		return FALSE;
+		return STATUS_INVALID_PARAMETER_1;
 
 	// Get  position
 	XINPUT_GAMEPAD * position = (XINPUT_GAMEPAD *)GetDevicePos(hDev);
 	if (!position)
-		return FALSE;
+		return STATUS_MEMORY_NOT_ALLOCATED;
 
 	// Change position value
 	position->sThumbRX = Value;
-	if (ERROR_SUCCESS != XOutputSetState(UserIndex - 1, position))
-		return FALSE;
+	res = XOutputSetState(UserIndex - 1, position);
+	if (res != ERROR_SUCCESS)
+	{
+		if (res == XOUTPUT_VBUS_NOT_CONNECTED) return STATUS_NO_SUCH_DEVICE;
+		if (XOUTPUT_VBUS_DEVICE_NOT_READY) return STATUS_DEVICE_NOT_READY;
+		if (res == XOUTPUT_VBUS_INDEX_OUT_OF_RANGE) return STATUS_INVALID_PARAMETER;
+		else return STATUS_IO_DEVICE_ERROR;
+	}
 	else
-		return TRUE;
+		return STATUS_SUCCESS;
 }
 
-BOOL	IX_SetAxisRx(UINT UserIndex, SHORT Value) // Right Stick X
+DWORD	IX_SetAxisRx(UINT UserIndex, SHORT Value) // Right Stick X
 {
 	return IX_SetAxisRx(GetDevice(vXbox, UserIndex), Value);
 }
 
-BOOL	IX_SetAxisRy(HDEVICE hDev, SHORT Value) // Right Stick Y
+DWORD	IX_SetAxisRy(HDEVICE hDev, SHORT Value) // Right Stick Y
 {
-	if (!hDev)
-		return FALSE;
+	DWORD res;
 
 	UINT UserIndex = GetDeviceId(hDev);
 	if (!UserIndex)
-		return FALSE;
+		return STATUS_INVALID_PARAMETER_1;
 
 	// Get  position
 	XINPUT_GAMEPAD * position = (XINPUT_GAMEPAD *)GetDevicePos(hDev);
 	if (!position)
-		return FALSE;
+		return STATUS_MEMORY_NOT_ALLOCATED;
 
 	// Change position value
 	position->sThumbRY = Value;
-	if (ERROR_SUCCESS != XOutputSetState(UserIndex - 1, position))
-		return FALSE;
+	res = XOutputSetState(UserIndex - 1, position);
+	if (res != ERROR_SUCCESS)
+	{
+		if (res == XOUTPUT_VBUS_NOT_CONNECTED) return STATUS_NO_SUCH_DEVICE;
+		if (XOUTPUT_VBUS_DEVICE_NOT_READY) return STATUS_DEVICE_NOT_READY;
+		if (res == XOUTPUT_VBUS_INDEX_OUT_OF_RANGE) return STATUS_INVALID_PARAMETER;
+		else return STATUS_IO_DEVICE_ERROR;
+	}
 	else
-		return TRUE;
+		return STATUS_SUCCESS;
 }
 
-BOOL	IX_SetAxisRy(UINT UserIndex, SHORT Value) // Right Stick Y
+DWORD	IX_SetAxisRy(UINT UserIndex, SHORT Value) // Right Stick Y
 {
 	return IX_SetAxisRy(GetDevice(vXbox, UserIndex), Value);
 }
 
-BOOL	IX_SetDpad(HDEVICE hDev, INT Value) // DPAD Set Value
+DWORD	IX_SetDpad(HDEVICE hDev, UCHAR Value) // DPAD Set Value
 {
-	if (!hDev)
-		return FALSE;
+	DWORD res;
 
 	UINT UserIndex = GetDeviceId(hDev);
 	if (!UserIndex)
-		return FALSE;
+		return STATUS_INVALID_PARAMETER_1;
 
 	// Get  position
 	XINPUT_GAMEPAD * position = (XINPUT_GAMEPAD *)GetDevicePos(hDev);
 	if (!position)
-		return FALSE;
+		return STATUS_MEMORY_NOT_ALLOCATED;
 
 	// Change position value
 	position->wButtons &= 0xFFF0;
 	position->wButtons |= Value;
-	if (ERROR_SUCCESS != XOutputSetState(UserIndex - 1, position))
-		return FALSE;
+	res = XOutputSetState(UserIndex - 1, position);
+	if (res != ERROR_SUCCESS)
+	{
+		if (res == XOUTPUT_VBUS_NOT_CONNECTED) return STATUS_NO_SUCH_DEVICE;
+		if (XOUTPUT_VBUS_DEVICE_NOT_READY) return STATUS_DEVICE_NOT_READY;
+		if (res == XOUTPUT_VBUS_INDEX_OUT_OF_RANGE) return STATUS_INVALID_PARAMETER;
+		else return STATUS_IO_DEVICE_ERROR;
+	}
 	else
-		return TRUE;
-
-	return IX_SetBtn(UserIndex, TRUE, Value);
+		return STATUS_SUCCESS;
 }
 
-BOOL	IX_SetDpad(UINT UserIndex, INT Value) // DPAD Set Value
+DWORD	IX_SetDpad(UINT UserIndex, UCHAR Value) // DPAD Set Value
 {
 	return IX_SetDpad(GetDevice(vXbox, UserIndex), Value);
 }
@@ -1437,34 +1630,56 @@ BOOL	IX_SetDpadOff(UINT UserIndex)
 	return IX_SetDpad(UserIndex, DPAD_OFF);
 }
 
-BOOL	IX_GetLedNumber(UINT UserIndex, PBYTE pLed)
+DWORD	IX_GetLedNumber(UINT UserIndex, PBYTE pLed)
 {
+	DWORD res;
+	BOOL Exist;
+
+	// Test if device is plugged-in
+	res = IX_isControllerPluggedIn(UserIndex, &Exist);
+	if (res != STATUS_SUCCESS)
+		return res;
+	if (!Exist)
+		return STATUS_DEVICE_DOES_NOT_EXIST;
+
 	HDEVICE h = GetDevice(vXbox, UserIndex);
 	if (!h)
-		return FALSE;
+		return STATUS_INVALID_HANDLE;
 
 	if (!pLed)
-		return FALSE;
+		return STATUS_INVALID_PARAMETER_2;
 
-	if (ERROR_SUCCESS != XoutputGetLedNumber(UserIndex - 1, pLed))
-		return FALSE;
+	res = XoutputGetLedNumber(UserIndex - 1, pLed);
+	if (res != ERROR_SUCCESS)
+	{
+		if (res == XOUTPUT_VBUS_NOT_CONNECTED) return STATUS_NO_SUCH_DEVICE;
+		if (res == XOUTPUT_VBUS_INDEX_OUT_OF_RANGE) return STATUS_INVALID_PARAMETER;
+		else return STATUS_IO_DEVICE_ERROR;
+	}
 	else
-		return TRUE;
+		return STATUS_SUCCESS;
 }
 
-BOOL	IX_GetVibration(UINT UserIndex, PXINPUT_VIBRATION pVib)
+DWORD	IX_GetVibration(UINT UserIndex, PXINPUT_VIBRATION pVib)
 {
+	DWORD res;
+
 	HDEVICE h = GetDevice(vXbox, UserIndex);
 	if (!h)
-		return FALSE;
+		return STATUS_INVALID_HANDLE;
 
 	if (!pVib)
-		return FALSE;
+		return STATUS_INVALID_PARAMETER_2;
 
-	if (ERROR_SUCCESS != XoutputGetVibration(UserIndex - 1, pVib))
-		return FALSE;
+	res = XoutputGetVibration(UserIndex - 1, pVib);
+	if (res != ERROR_SUCCESS)
+	{
+		if (res == XOUTPUT_VBUS_NOT_CONNECTED) return STATUS_NO_SUCH_DEVICE;
+		if (res == XOUTPUT_VBUS_INDEX_OUT_OF_RANGE) return STATUS_INVALID_PARAMETER;
+		else return STATUS_IO_DEVICE_ERROR;
+	}
 	else
-		return TRUE;
+		return STATUS_SUCCESS;
 }
 
 

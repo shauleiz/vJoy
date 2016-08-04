@@ -322,23 +322,26 @@ VGENINTERFACE_API DWORD		__cdecl Ffb_h_Eff_Constant(const FFB_DATA * Packet, FFB
 	//////////////////////////////////////////////////////////////////////////////////////
 
 	// Virtual vXbox bus information
-	VGENINTERFACE_API	BOOL		__cdecl isVBusExists(void);
-	VGENINTERFACE_API	BOOL		__cdecl GetNumEmptyBusSlots(UCHAR * nSlots);
+	VGENINTERFACE_API	DWORD		__cdecl isVBusExists(void);
+	VGENINTERFACE_API	DWORD		__cdecl GetNumEmptyBusSlots(UCHAR * nSlots);
 
 	// Device Status (Plugin/Unplug and check ownership)
-	VGENINTERFACE_API	BOOL		__cdecl isControllerPluggedIn(UINT UserIndex);
-	VGENINTERFACE_API	BOOL		__cdecl isControllerOwned(UINT UserIndex);
-	VGENINTERFACE_API	BOOL		__cdecl PlugIn(UINT UserIndex);
-	VGENINTERFACE_API	BOOL		__cdecl UnPlug(UINT UserIndex);
-	VGENINTERFACE_API	BOOL		__cdecl UnPlugForce(UINT UserIndex);
+	VGENINTERFACE_API	DWORD		__cdecl isControllerPluggedIn(UINT UserIndex, PBOOL Exist);
+	VGENINTERFACE_API	DWORD		__cdecl isControllerOwned(UINT UserIndex, PBOOL Exist);
+	VGENINTERFACE_API	DWORD		__cdecl PlugIn(UINT UserIndex);
+	VGENINTERFACE_API	DWORD		__cdecl PlugInNext(UINT * UserIndex);
+	VGENINTERFACE_API	DWORD		__cdecl UnPlug(UINT UserIndex);
+	VGENINTERFACE_API	DWORD		__cdecl UnPlugForce(UINT UserIndex);
 
 	// Reset Devices
-	VGENINTERFACE_API	BOOL		__cdecl ResetController(UINT UserIndex);
-	VGENINTERFACE_API	BOOL		__cdecl ResetAllControllers();
-	VGENINTERFACE_API	BOOL		__cdecl ResetControllerBtns(UINT UserIndex);
-	VGENINTERFACE_API	BOOL		__cdecl ResetControllerDPad(UINT UserIndex);
+	VGENINTERFACE_API	DWORD		__cdecl ResetController(UINT UserIndex);
+	VGENINTERFACE_API	DWORD		__cdecl ResetAllControllers();
+	VGENINTERFACE_API	DWORD		__cdecl ResetControllerBtns(UINT UserIndex);
+	VGENINTERFACE_API	DWORD		__cdecl ResetControllerDPad(UINT UserIndex);
 
 	// Button functions: Per-button Press/Release
+	VGENINTERFACE_API	DWORD		__cdecl SetBtn(UINT UserIndex, WORD Button, BOOL Press);
+#ifdef SPECIFICBUTTONS
 	VGENINTERFACE_API	BOOL		__cdecl SetBtnA(UINT UserIndex, BOOL Press);
 	VGENINTERFACE_API	BOOL		__cdecl SetBtnB(UINT UserIndex, BOOL Press);
 	VGENINTERFACE_API	BOOL		__cdecl SetBtnX(UINT UserIndex, BOOL Press);
@@ -350,25 +353,29 @@ VGENINTERFACE_API DWORD		__cdecl Ffb_h_Eff_Constant(const FFB_DATA * Packet, FFB
 	VGENINTERFACE_API	BOOL		__cdecl SetBtnStart(UINT UserIndex, BOOL Press);
 	VGENINTERFACE_API	BOOL		__cdecl SetBtnBack(UINT UserIndex, BOOL Press);
 
+#endif // SPECIFICBUTTONS
+
 	// Trigger/Axis functions: Set value in the range
-	VGENINTERFACE_API	BOOL		__cdecl SetTriggerL(UINT UserIndex, BYTE Value);
-	VGENINTERFACE_API	BOOL		__cdecl SetTriggerR(UINT UserIndex, BYTE Value);
-	VGENINTERFACE_API	BOOL		__cdecl	SetAxisX(UINT UserIndex, SHORT Value); // Left Stick X
-	VGENINTERFACE_API	BOOL		__cdecl	SetAxisY(UINT UserIndex, SHORT Value); // Left Stick Y
-	VGENINTERFACE_API	BOOL		__cdecl	SetAxisRx(UINT UserIndex, SHORT Value); // Right Stick X
-	VGENINTERFACE_API	BOOL		__cdecl	SetAxisRy(UINT UserIndex, SHORT Value); // Right Stick Y
+	VGENINTERFACE_API	DWORD		__cdecl SetTriggerL(UINT UserIndex, BYTE Value);
+	VGENINTERFACE_API	DWORD		__cdecl SetTriggerR(UINT UserIndex, BYTE Value);
+	VGENINTERFACE_API	DWORD		__cdecl	SetAxisLx(UINT UserIndex, SHORT Value); // Left Stick X
+	VGENINTERFACE_API	DWORD		__cdecl	SetAxisLy(UINT UserIndex, SHORT Value); // Left Stick Y
+	VGENINTERFACE_API	DWORD		__cdecl	SetAxisRx(UINT UserIndex, SHORT Value); // Right Stick X
+	VGENINTERFACE_API	DWORD		__cdecl	SetAxisRy(UINT UserIndex, SHORT Value); // Right Stick Y
 
 	// DPAD Functions
-	VGENINTERFACE_API	BOOL		__cdecl	SetDpad(UINT UserIndex, INT Value); // DPAD Set Value
+	VGENINTERFACE_API	DWORD		__cdecl	SetDpad(UINT UserIndex, UCHAR Value); // DPAD Set Value
+#ifdef SPECIFICBUTTONS
 	VGENINTERFACE_API	BOOL		__cdecl	SetDpadUp(UINT UserIndex); // DPAD Up
 	VGENINTERFACE_API	BOOL		__cdecl	SetDpadRight(UINT UserIndex); // DPAD Right
 	VGENINTERFACE_API	BOOL		__cdecl	SetDpadDown(UINT UserIndex); // DPAD Down
 	VGENINTERFACE_API	BOOL		__cdecl	SetDpadLeft(UINT UserIndex); // DPAD Left
 	VGENINTERFACE_API	BOOL		__cdecl	SetDpadOff(UINT UserIndex); // DPAD Off
+#endif // SPECIFICBUTTONS
 
-	// Feadback Polling: Assigned Led number / Vibration values
-	VGENINTERFACE_API	BOOL		__cdecl	GetLedNumber(UINT UserIndex, PBYTE pLed);
-	VGENINTERFACE_API	BOOL		__cdecl	GetVibration(UINT UserIndex, PXINPUT_VIBRATION pVib);
+	// Feedback Polling: Assigned Led number / Vibration values
+	VGENINTERFACE_API	DWORD		__cdecl	GetLedNumber(UINT UserIndex, PBYTE pLed);
+	VGENINTERFACE_API	DWORD		__cdecl	GetVibration(UINT UserIndex, PXINPUT_VIBRATION pVib);
 #pragma endregion
 
 #pragma region Common API
@@ -378,7 +385,8 @@ VGENINTERFACE_API DWORD		__cdecl Ffb_h_Eff_Constant(const FFB_DATA * Packet, FFB
 	VGENINTERFACE_API DevType		__cdecl GetDevType(HDEVICE hDev);				// Get device type (vJoy/vXbox)
 	VGENINTERFACE_API UINT			__cdecl GetDevNumber(HDEVICE hDev);				// If vJoy: Number=Id; If vXbox: Number=Led#
 	VGENINTERFACE_API UINT			__cdecl GetDevId(HDEVICE hDev);					// Return Device ID to be used with vXbox API and Backward compatibility API
-	VGENINTERFACE_API BOOL			__cdecl isDevOwned(UINT DevId, DevType dType);	// Is device plugged-in/Configured
+	VGENINTERFACE_API BOOL			__cdecl isDevOwned(UINT DevId, DevType dType);	// Is device plugged-in/Configured by this feeder
+	VGENINTERFACE_API BOOL			__cdecl isDevExist(UINT DevId, DevType dType);	// Is device plugged-in/Configured
 	VGENINTERFACE_API HDEVICE		__cdecl	GetDevHandle(UINT DevId, DevType dType);// Return device handle from Device ID and Device type
 	VGENINTERFACE_API BOOL			__cdecl isAxisExists(HDEVICE hDev, UINT nAxis);	// Does Axis exist. See above table
 	VGENINTERFACE_API UINT			__cdecl GetDevButtonN(HDEVICE hDev);			// Get number of buttons in device
