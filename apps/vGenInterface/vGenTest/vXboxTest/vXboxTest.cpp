@@ -5,11 +5,13 @@
 #include "../../../../inc/public.h"
 #include "../../vGenInterface.h"
 
+void TopLoop(UINT iDev);
 void PressButton(UINT iDev);
 void PressDpad(UINT iDev);
 void SetTrigger(UINT iDev);
 void SetAxis(UINT iDev);
 void PollVibration(UINT iDev);
+void GetVXboxStat(void);
 
 int main()
 {
@@ -18,13 +20,28 @@ int main()
 	UINT iDefDev;
 
 	// Clean-up vXbox devices
+#if 0
 	dwRes = UnPlugForce(1);
 	dwRes = UnPlugForce(2);
 	dwRes = UnPlugForce(3);
 	dwRes = UnPlugForce(4);
 
+#endif // 0
+
+	// Get Status on start
+	GetVXboxStat();
+
 	// Install device
+	dwRes = PlugIn(4);
 	dwRes = PlugInNext(&iDefDev);
+
+	// Get Status after plug-in
+	GetVXboxStat();
+
+	TopLoop(iDefDev);
+
+	scanf("%*c");
+	return 0;
 
 	// Poll Vibration
 	PollVibration(iDefDev);
@@ -35,8 +52,6 @@ int main()
 	// Test Buttons
 	PressButton(iDefDev);
 
-	scanf("%*c");
-	return 0;
 
 	// Test Axes
 	SetAxis(iDefDev);
@@ -49,6 +64,100 @@ int main()
 	return 0;
 }
 
+void TopLoop(UINT iDev)
+{
+	DWORD res;
+
+	do
+	{
+		printf("What would you like to do? [Q]uit / [R]eset / [T]est\n");
+		CHAR Opt[2];
+		scanf("%s", &Opt);
+		if (tolower(Opt[0] == 'q'))
+			return;
+		if (tolower(Opt[0] == 'r'))
+			res = ResetController(iDev);
+
+		printf("What would you like to test? [B]uttons / [A]xes / [D]-Pad / [V]ibration\n");
+		scanf("%s", &Opt);
+		if (tolower(Opt[0] == 'q'))
+			return;
+
+		if (tolower(Opt[0] == 'b'))
+		{
+			PressButton(iDev);
+			continue;
+		};
+
+		if (tolower(Opt[0] == 'a'))
+		{
+			SetAxis(iDev);
+			continue;
+		};
+
+		if (tolower(Opt[0] == 'd'))
+		{
+			PressDpad(iDev);
+			continue;
+		};
+
+		if (tolower(Opt[0] == 'v'))
+		{
+			PollVibration(iDev);
+			continue;
+		};
+
+
+	} while (true);
+
+}
+void GetVXboxStat(void)
+{
+	DWORD res;
+	const UCHAR nSlots = 4;
+	UCHAR nEmptySlots;
+	BOOL Exist, Owned;
+	BYTE Led;
+
+	// Get Number of slots
+	res = GetNumEmptyBusSlots(&nEmptySlots);
+	if (res == STATUS_SUCCESS)
+		printf("Number of empty vXbox slots: %d\n", nEmptySlots);
+
+	// For every slot - get status
+	for (int iSlot = 1; iSlot <= 4; iSlot++)
+	{
+		printf("vXbox Device %d: ", iSlot);
+		// Exists?
+		res = isControllerOwned(iSlot, &Exist);
+		if (res != STATUS_SUCCESS)
+			continue;
+
+		// Free?
+		if (!Exist)
+		{
+			printf("Free\n");
+			continue;
+		}
+
+		// Owned?
+		res = isControllerOwned(iSlot, &Owned);
+		if (res != STATUS_SUCCESS)
+			continue;
+
+		// Owned or just exists?
+		if (Owned)
+			printf("Owned");
+		else
+			printf("Exists");
+
+		res = GetLedNumber(iSlot, &Led);
+		if (res != STATUS_SUCCESS)
+			continue;
+
+		printf(" - Led:%d\n", Led);
+	}
+}
 void PressButton(UINT iDev)
 {
 	printf("Testing Buttons - Press/Release\n");
@@ -205,8 +314,9 @@ void PollVibration(UINT iDev)
 	DWORD res;
 	UINT Loop = 0;
 	CHAR Quit[5];
-	WORD Left, Right;
+	WORD Left=0, Right=0;
 
+	printf("Set Vibration Values\n");
 
 	do {
 		res = GetVibration(iDev, &Vib);
