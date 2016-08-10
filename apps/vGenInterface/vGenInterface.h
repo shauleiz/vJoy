@@ -336,8 +336,11 @@ VGENINTERFACE_API DWORD		__cdecl Ffb_h_Eff_Constant(const FFB_DATA * Packet, FFB
 	// Reset Devices
 	VGENINTERFACE_API	DWORD		__cdecl ResetController(UINT UserIndex);
 	VGENINTERFACE_API	DWORD		__cdecl ResetAllControllers();
+#ifdef SPECIFICRESET
 	VGENINTERFACE_API	DWORD		__cdecl ResetControllerBtns(UINT UserIndex);
 	VGENINTERFACE_API	DWORD		__cdecl ResetControllerDPad(UINT UserIndex);
+
+#endif // SPECIFICRESET
 
 	// Button functions: Per-button Press/Release
 	VGENINTERFACE_API	DWORD		__cdecl SetBtn(UINT UserIndex, WORD Button, BOOL Press);

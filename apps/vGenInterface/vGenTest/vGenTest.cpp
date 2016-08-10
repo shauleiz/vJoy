@@ -69,7 +69,7 @@ int main()
 	// Loop through interactive tests
 	C_Test(h1);
 
-	dwRes = ResetControllerDPad(4);
+	//dwRes = ResetControllerDPad(4);
 	getchar();
 	return (0);	
 }

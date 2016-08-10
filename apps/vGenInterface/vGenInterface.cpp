@@ -438,6 +438,8 @@ VGENINTERFACE_API DWORD ResetAllControllers()
 	return IX_ResetAllControllers();
 }
 
+#ifdef SPECIFICRESET
+
 VGENINTERFACE_API DWORD ResetControllerBtns(UINT UserIndex)
 {
 	return IX_ResetControllerBtns(UserIndex);
@@ -447,6 +449,9 @@ VGENINTERFACE_API DWORD ResetControllerDPad(UINT UserIndex)
 {
 	return IX_ResetControllerDPad(UserIndex);
 }
+
+#endif // SPECIFICRESET
+
 
 VGENINTERFACE_API DWORD SetBtn(UINT UserIndex, WORD Button, BOOL Press)
 {
