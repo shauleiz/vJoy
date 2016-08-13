@@ -143,7 +143,7 @@ DWORD	IX_GetVibration(UINT UserIndex, PXINPUT_VIBRATION pVib);
 
 #pragma region vJoy Internal Functions
 HDEVICE	IJ_AcquireVJD(UINT rID);				// Acquire the specified vJoy Device.
-VOID IJ_RelinquishVJD(HDEVICE hDev);			// Relinquise the specified vJoy Device.
+DWORD IJ_RelinquishVJD(HDEVICE hDev);			// Relinquise the specified vJoy Device.
 BOOL IJ_isVJDExists(HDEVICE hDev);
 enum VjdStat IJ_GetVJDStatus(HDEVICE hDev);			// Get the status of the specified vJoy Device.
 BOOL IJ_GetVJDAxisExist(HDEVICE hDev, UINT Axis); // Test if given axis defined in the specified VDJ
@@ -159,11 +159,11 @@ BOOL IJ_SetContPov(DWORD Value, HDEVICE hDev, UCHAR nPov);	// Write Value to a g
 
 //// Device Container and Device Handle functions
 HDEVICE CreateDevice(DevType Type, UINT i);
-void DestroyDevice(HDEVICE dev);
+void DestroyDevice(HDEVICE & dev);
 HDEVICE GetDevice(DevType Type, UINT i);
 UINT GetDeviceId(HDEVICE h);
-BOOL isDevice_vJoy(HDEVICE h);
-BOOL isDevice_vXbox(HDEVICE h);
+DWORD isDevice_vJoy(HDEVICE h);
+DWORD isDevice_vXbox(HDEVICE h);
 void * GetDevicePos(HDEVICE h);
 
 // Other helper functions

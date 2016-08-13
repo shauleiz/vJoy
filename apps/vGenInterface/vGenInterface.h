@@ -383,20 +383,21 @@ VGENINTERFACE_API DWORD		__cdecl Ffb_h_Eff_Constant(const FFB_DATA * Packet, FFB
 
 #pragma region Common API
 	// Device Administration, Manipulation and Information
-	VGENINTERFACE_API HDEVICE		__cdecl	AcquireDev(UINT DevId, DevType dType);	// Acquire a Device.
-	VGENINTERFACE_API VOID			__cdecl	RelinquishDev(HDEVICE hDev);			// Relinquish a Device.
-	VGENINTERFACE_API DevType		__cdecl GetDevType(HDEVICE hDev);				// Get device type (vJoy/vXbox)
-	VGENINTERFACE_API UINT			__cdecl GetDevNumber(HDEVICE hDev);				// If vJoy: Number=Id; If vXbox: Number=Led#
-	VGENINTERFACE_API UINT			__cdecl GetDevId(HDEVICE hDev);					// Return Device ID to be used with vXbox API and Backward compatibility API
-	VGENINTERFACE_API BOOL			__cdecl isDevOwned(UINT DevId, DevType dType);	// Is device plugged-in/Configured by this feeder
-	VGENINTERFACE_API BOOL			__cdecl isDevExist(UINT DevId, DevType dType);	// Is device plugged-in/Configured
-	VGENINTERFACE_API HDEVICE		__cdecl	GetDevHandle(UINT DevId, DevType dType);// Return device handle from Device ID and Device type
-	VGENINTERFACE_API BOOL			__cdecl isAxisExists(HDEVICE hDev, UINT nAxis);	// Does Axis exist. See above table
-	VGENINTERFACE_API UINT			__cdecl GetDevButtonN(HDEVICE hDev);			// Get number of buttons in device
-	VGENINTERFACE_API UINT			__cdecl GetDevHatN(HDEVICE hDev);				// Get number of Hat Switches in device
+	VGENINTERFACE_API DWORD 		__cdecl	AcquireDev(UINT DevId, DevType dType, HDEVICE * hDev);	// Acquire a Device.
+	VGENINTERFACE_API DWORD			__cdecl	RelinquishDev(HDEVICE hDev);			// Relinquish a Device.
+	VGENINTERFACE_API DWORD			__cdecl GetDevType(HDEVICE hDev, DevType * dType);	// Get device type (vJoy/vXbox)
+	VGENINTERFACE_API DWORD			__cdecl GetDevNumber(HDEVICE hDev, UINT * dNumber);	// If vJoy: Number=Id; If vXbox: Number=Led#
+	VGENINTERFACE_API DWORD			__cdecl GetDevId(HDEVICE hDev, UINT * dID);					// Return Device ID to be used with vXbox API and Backward compatibility API
+	VGENINTERFACE_API DWORD			__cdecl isDevOwned(UINT DevId, DevType dType, BOOL * Owned);	// Is device plugged-in/Configured by this feeder
+	VGENINTERFACE_API DWORD			__cdecl isDevExist(UINT DevId, DevType dType, BOOL * Exist);	// Is device plugged-in/Configured
+	VGENINTERFACE_API DWORD			__cdecl isDevFree(UINT DevId, DevType dType, BOOL * Free);	// Is device unplugged/Free
+	VGENINTERFACE_API DWORD			__cdecl	GetDevHandle(UINT DevId, DevType dType, HDEVICE * hDev);// Return device handle from Device ID and Device type
+	VGENINTERFACE_API DWORD			__cdecl isAxisExists(HDEVICE hDev, UINT nAxis, BOOL * Exist);	// Does Axis exist. See above table
+	VGENINTERFACE_API DWORD			__cdecl GetDevButtonN(HDEVICE hDev, UINT * nBtn);			// Get number of buttons in device
+	VGENINTERFACE_API DWORD			__cdecl GetDevHatN(HDEVICE hDev, UINT * nHat);				// Get number of Hat Switches in device
 
 	// Position Setting
-	VGENINTERFACE_API BOOL			__cdecl SetDevButton(HDEVICE hDev, UINT Button, BOOL Press);
-	VGENINTERFACE_API BOOL			__cdecl SetDevAxis(HDEVICE hDev, UINT Axis, FLOAT Value);
-	VGENINTERFACE_API BOOL			__cdecl SetDevPov(HDEVICE hDev, UINT nPov, FLOAT Value);
+	VGENINTERFACE_API DWORD			__cdecl SetDevButton(HDEVICE hDev, UINT Button, BOOL Press);
+	VGENINTERFACE_API DWORD			__cdecl SetDevAxis(HDEVICE hDev, UINT Axis, FLOAT Value);
+	VGENINTERFACE_API DWORD			__cdecl SetDevPov(HDEVICE hDev, UINT nPov, FLOAT Value);
 #pragma endregion
