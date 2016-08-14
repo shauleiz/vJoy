@@ -12,6 +12,7 @@
 #include "FfbMon.h"
 #include "Math.h"
 
+using namespace vJoy;
 
 int ffb_direction = 0;
 int ffb_strenght = 0;

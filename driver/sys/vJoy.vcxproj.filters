@@ -24,11 +24,6 @@
     </MessageCompile>
   </ItemGroup>
   <ItemGroup>
-    <Inf Include="vjoy.inx">
-      <Filter>Driver Files</Filter>
-    </Inf>
-  </ItemGroup>
-  <ItemGroup>
     <ClInclude Include="hidReportDesc.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -41,17 +36,12 @@
     <ClInclude Include="trace.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="vjoy.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="errcodes.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-  </ItemGroup>
-  <ItemGroup>
-    <ResourceCompile Include="vjoy.rc">
-      <Filter>Resource Files</Filter>
-    </ResourceCompile>
+    <ClInclude Include="vJoy.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="driver.c">
@@ -66,5 +56,15 @@
     <ClCompile Include="usb.c">
       <Filter>Source Files</Filter>
     </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Inf Include="vJoy.inx">
+      <Filter>Driver Files</Filter>
+    </Inf>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="vJoy.rc">
+      <Filter>Resource Files</Filter>
+    </ResourceCompile>
   </ItemGroup>
 </Project>

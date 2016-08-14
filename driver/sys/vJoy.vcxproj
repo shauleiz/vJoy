@@ -1,9 +1,41 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug-Xbox|ARM">
+      <Configuration>Debug-Xbox</Configuration>
+      <Platform>ARM</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug-Xbox|ARM64">
+      <Configuration>Debug-Xbox</Configuration>
+      <Platform>ARM64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug-Xbox|Win32">
+      <Configuration>Debug-Xbox</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug-Xbox|x64">
+      <Configuration>Debug-Xbox</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
     <ProjectConfiguration Include="Debug|Win32">
       <Configuration>Debug</Configuration>
       <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release-Xbox|ARM">
+      <Configuration>Release-Xbox</Configuration>
+      <Platform>ARM</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release-Xbox|ARM64">
+      <Configuration>Release-Xbox</Configuration>
+      <Platform>ARM64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release-Xbox|Win32">
+      <Configuration>Release-Xbox</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release-Xbox|x64">
+      <Configuration>Release-Xbox</Configuration>
+      <Platform>x64</Platform>
     </ProjectConfiguration>
     <ProjectConfiguration Include="Release|Win32">
       <Configuration>Release</Configuration>
@@ -42,10 +74,19 @@
     <Configuration>Debug</Configuration>
     <Platform Condition="'$(Platform)' == ''">Win32</Platform>
     <RootNamespace>vJoy</RootNamespace>
-    <WindowsTargetPlatformVersion>10.0.10586.0</WindowsTargetPlatformVersion>
+    <WindowsTargetPlatformVersion>10.0.14393.0</WindowsTargetPlatformVersion>
+    <ProjectName>vJoy</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <TargetVersion>Windows7</TargetVersion>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>WindowsKernelModeDriver10.0</PlatformToolset>
+    <ConfigurationType>Driver</ConfigurationType>
+    <DriverType>KMDF</DriverType>
+    <DriverTargetPlatform>Desktop</DriverTargetPlatform>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug-Xbox|Win32'" Label="Configuration">
     <TargetVersion>Windows7</TargetVersion>
     <UseDebugLibraries>true</UseDebugLibraries>
     <PlatformToolset>WindowsKernelModeDriver10.0</PlatformToolset>
@@ -61,7 +102,23 @@
     <DriverType>KMDF</DriverType>
     <DriverTargetPlatform>Desktop</DriverTargetPlatform>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release-Xbox|Win32'" Label="Configuration">
+    <TargetVersion>Windows7</TargetVersion>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>WindowsKernelModeDriver10.0</PlatformToolset>
+    <ConfigurationType>Driver</ConfigurationType>
+    <DriverType>KMDF</DriverType>
+    <DriverTargetPlatform>Desktop</DriverTargetPlatform>
+  </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <TargetVersion>Windows7</TargetVersion>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>WindowsKernelModeDriver10.0</PlatformToolset>
+    <ConfigurationType>Driver</ConfigurationType>
+    <DriverType>KMDF</DriverType>
+    <DriverTargetPlatform>Desktop</DriverTargetPlatform>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug-Xbox|x64'" Label="Configuration">
     <TargetVersion>Windows7</TargetVersion>
     <UseDebugLibraries>true</UseDebugLibraries>
     <PlatformToolset>WindowsKernelModeDriver10.0</PlatformToolset>
@@ -80,7 +137,27 @@
     <KMDF_VERSION_MINOR>9</KMDF_VERSION_MINOR>
     <ALLOW_DATE_TIME>1</ALLOW_DATE_TIME>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release-Xbox|x64'" Label="Configuration">
+    <TargetVersion>
+    </TargetVersion>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>WindowsKernelModeDriver10.0</PlatformToolset>
+    <ConfigurationType>Driver</ConfigurationType>
+    <DriverType>KMDF</DriverType>
+    <DriverTargetPlatform>Desktop</DriverTargetPlatform>
+    <KMDF_VERSION_MAJOR>1</KMDF_VERSION_MAJOR>
+    <KMDF_VERSION_MINOR>9</KMDF_VERSION_MINOR>
+    <ALLOW_DATE_TIME>1</ALLOW_DATE_TIME>
+  </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'" Label="Configuration">
+    <TargetVersion>Windows7</TargetVersion>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>WindowsKernelModeDriver10.0</PlatformToolset>
+    <ConfigurationType>Driver</ConfigurationType>
+    <DriverType>KMDF</DriverType>
+    <DriverTargetPlatform>Desktop</DriverTargetPlatform>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug-Xbox|ARM'" Label="Configuration">
     <TargetVersion>Windows7</TargetVersion>
     <UseDebugLibraries>true</UseDebugLibraries>
     <PlatformToolset>WindowsKernelModeDriver10.0</PlatformToolset>
@@ -96,6 +173,14 @@
     <DriverType>KMDF</DriverType>
     <DriverTargetPlatform>Desktop</DriverTargetPlatform>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release-Xbox|ARM'" Label="Configuration">
+    <TargetVersion>Windows7</TargetVersion>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>WindowsKernelModeDriver10.0</PlatformToolset>
+    <ConfigurationType>Driver</ConfigurationType>
+    <DriverType>KMDF</DriverType>
+    <DriverTargetPlatform>Desktop</DriverTargetPlatform>
+  </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM64'" Label="Configuration">
     <TargetVersion>Windows7</TargetVersion>
     <UseDebugLibraries>true</UseDebugLibraries>
@@ -104,7 +189,23 @@
     <DriverType>KMDF</DriverType>
     <DriverTargetPlatform>Desktop</DriverTargetPlatform>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug-Xbox|ARM64'" Label="Configuration">
+    <TargetVersion>Windows7</TargetVersion>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>WindowsKernelModeDriver10.0</PlatformToolset>
+    <ConfigurationType>Driver</ConfigurationType>
+    <DriverType>KMDF</DriverType>
+    <DriverTargetPlatform>Desktop</DriverTargetPlatform>
+  </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|ARM64'" Label="Configuration">
+    <TargetVersion>Windows7</TargetVersion>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>WindowsKernelModeDriver10.0</PlatformToolset>
+    <ConfigurationType>Driver</ConfigurationType>
+    <DriverType>KMDF</DriverType>
+    <DriverTargetPlatform>Desktop</DriverTargetPlatform>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release-Xbox|ARM64'" Label="Configuration">
     <TargetVersion>Windows7</TargetVersion>
     <UseDebugLibraries>false</UseDebugLibraries>
     <PlatformToolset>WindowsKernelModeDriver10.0</PlatformToolset>
@@ -128,7 +229,25 @@
     <EnableInf2cat>false</EnableInf2cat>
     <ExecutablePath>$(ExecutablePath);$(WDKContentRoot)bin\x86;$(WDKContentRoot)tools\tracing\x86;$(LOCALAPPDATA)\Atlassian\SourceTree\git_local\bin</ExecutablePath>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug-Xbox|Win32'">
+    <DebuggerFlavor>DbgengKernelDebugger</DebuggerFlavor>
+    <OutDir>$(SolutionDir)$(Platform)\$(Configuration)\</OutDir>
+    <IntDir>$(Platform)\$(Configuration)\</IntDir>
+    <IncludePath>$(KM_IncludePath);$(KMDF_INC_PATH)$(KMDF_VER_PATH);$(SolutionDir)Inc;$(IncludePath)</IncludePath>
+    <EnableInf2cat>false</EnableInf2cat>
+    <ExecutablePath>$(ExecutablePath);$(WDKContentRoot)bin\x86;$(WDKContentRoot)tools\tracing\x86;$(LOCALAPPDATA)\Atlassian\SourceTree\git_local\bin</ExecutablePath>
+  </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <DebuggerFlavor>DbgengKernelDebugger</DebuggerFlavor>
+    <OutDir>$(SolutionDir)$(Platform)\$(Configuration)\</OutDir>
+    <IntDir>$(Platform)\$(Configuration)\</IntDir>
+    <IncludePath>$(KM_IncludePath);$(KMDF_INC_PATH)$(KMDF_VER_PATH);$(SolutionDir)Inc;$(VC_IncludePath);$(IncludePath)</IncludePath>
+    <EnableInf2cat>false</EnableInf2cat>
+    <CodeAnalysisRuleSet>..\..\..\..\..\..\..\..\..\Program Files (x86)\Windows Kits\10\CodeAnalysis\DriverMinimumRules.ruleset</CodeAnalysisRuleSet>
+    <RunCodeAnalysis>false</RunCodeAnalysis>
+    <ExecutablePath>$(ExecutablePath);$(WDKContentRoot)bin\x86;$(WDKContentRoot)tools\tracing\x86;$(LOCALAPPDATA)\Atlassian\SourceTree\git_local\bin</ExecutablePath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release-Xbox|Win32'">
     <DebuggerFlavor>DbgengKernelDebugger</DebuggerFlavor>
     <OutDir>$(SolutionDir)$(Platform)\$(Configuration)\</OutDir>
     <IntDir>$(Platform)\$(Configuration)\</IntDir>
@@ -147,7 +266,25 @@
     <Inf2CatWindowsVersionList>7_x64;$(Inf2CatWindowsVersionList)</Inf2CatWindowsVersionList>
     <ExecutablePath>$(ExecutablePath);$(WDKContentRoot)bin\x86;$(WDKContentRoot)tools\tracing\x64;$(LOCALAPPDATA)\Atlassian\SourceTree\git_local\bin</ExecutablePath>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug-Xbox|x64'">
+    <DebuggerFlavor>DbgengKernelDebugger</DebuggerFlavor>
+    <OutDir>$(SolutionDir)$(Platform)\$(Configuration)\</OutDir>
+    <IntDir>$(Platform)\$(Configuration)\</IntDir>
+    <IncludePath>$(KM_IncludePath);$(KMDF_INC_PATH)$(KMDF_VER_PATH);$(SolutionDir)Inc;$(IncludePath)</IncludePath>
+    <EnableInf2cat>false</EnableInf2cat>
+    <Inf2CatWindowsVersionList>7_x64;$(Inf2CatWindowsVersionList)</Inf2CatWindowsVersionList>
+    <ExecutablePath>$(ExecutablePath);$(WDKContentRoot)bin\x86;$(WDKContentRoot)tools\tracing\x64;$(LOCALAPPDATA)\Atlassian\SourceTree\git_local\bin</ExecutablePath>
+  </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <DebuggerFlavor>DbgengKernelDebugger</DebuggerFlavor>
+    <OutDir>$(SolutionDir)$(Platform)\$(Configuration)\</OutDir>
+    <IntDir>$(Platform)\$(Configuration)\</IntDir>
+    <EnableInf2cat>false</EnableInf2cat>
+    <Inf2CatWindowsVersionList>10_$(DDKPlatform);7_$(DDKPlatform)</Inf2CatWindowsVersionList>
+    <IncludePath>$(KM_IncludePath);$(KMDF_INC_PATH)$(KMDF_VER_PATH);$(SolutionDir)Inc;$(IncludePath)</IncludePath>
+    <ExecutablePath>$(ExecutablePath);$(WDKContentRoot)bin\x86;$(WDKContentRoot)tools\tracing\x64;$(LOCALAPPDATA)\Atlassian\SourceTree\git_local\bin</ExecutablePath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release-Xbox|x64'">
     <DebuggerFlavor>DbgengKernelDebugger</DebuggerFlavor>
     <OutDir>$(SolutionDir)$(Platform)\$(Configuration)\</OutDir>
     <IntDir>$(Platform)\$(Configuration)\</IntDir>
@@ -163,6 +300,13 @@
     <IncludePath>$(KM_IncludePath);$(KMDF_INC_PATH)$(KMDF_VER_PATH);$(SolutionDir)Inc;$(IncludePath)</IncludePath>
     <ExecutablePath>$(VC_ExecutablePath_ARM);$(WindowsSDK_ExecutablePath);$(VS_ExecutablePath);$(MSBuild_ExecutablePath);$(FxCopDir);$(PATH);$(LOCALAPPDATA)\Atlassian\SourceTree\git_local\bin</ExecutablePath>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug-Xbox|ARM'">
+    <DebuggerFlavor>DbgengKernelDebugger</DebuggerFlavor>
+    <OutDir>$(SolutionDir)$(Platform)\$(Configuration)\</OutDir>
+    <IntDir>$(Platform)\$(Configuration)\</IntDir>
+    <IncludePath>$(KM_IncludePath);$(KMDF_INC_PATH)$(KMDF_VER_PATH);$(SolutionDir)Inc;$(IncludePath)</IncludePath>
+    <ExecutablePath>$(VC_ExecutablePath_ARM);$(WindowsSDK_ExecutablePath);$(VS_ExecutablePath);$(MSBuild_ExecutablePath);$(FxCopDir);$(PATH);$(LOCALAPPDATA)\Atlassian\SourceTree\git_local\bin</ExecutablePath>
+  </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">
     <DebuggerFlavor>DbgengKernelDebugger</DebuggerFlavor>
     <OutDir>$(SolutionDir)$(Platform)\$(Configuration)\</OutDir>
@@ -170,7 +314,22 @@
     <IncludePath>$(KM_IncludePath);$(KMDF_INC_PATH)$(KMDF_VER_PATH);$(SolutionDir)Inc;$(IncludePath)</IncludePath>
     <ExecutablePath>$(VC_ExecutablePath_ARM);$(WindowsSDK_ExecutablePath);$(VS_ExecutablePath);$(MSBuild_ExecutablePath);$(FxCopDir);$(PATH);$(LOCALAPPDATA)\Atlassian\SourceTree\git_local\bin</ExecutablePath>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release-Xbox|ARM'">
+    <DebuggerFlavor>DbgengKernelDebugger</DebuggerFlavor>
+    <OutDir>$(SolutionDir)$(Platform)\$(Configuration)\</OutDir>
+    <IntDir>$(Platform)\$(Configuration)\</IntDir>
+    <IncludePath>$(KM_IncludePath);$(KMDF_INC_PATH)$(KMDF_VER_PATH);$(SolutionDir)Inc;$(IncludePath)</IncludePath>
+    <ExecutablePath>$(VC_ExecutablePath_ARM);$(WindowsSDK_ExecutablePath);$(VS_ExecutablePath);$(MSBuild_ExecutablePath);$(FxCopDir);$(PATH);$(LOCALAPPDATA)\Atlassian\SourceTree\git_local\bin</ExecutablePath>
+  </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM64'">
+    <DebuggerFlavor>DbgengKernelDebugger</DebuggerFlavor>
+    <OutDir>$(SolutionDir)$(Platform)\$(Configuration)\</OutDir>
+    <IntDir>$(Platform)\$(Configuration)\</IntDir>
+    <IncludePath>$(KM_IncludePath);$(KMDF_INC_PATH)$(KMDF_VER_PATH);$(SolutionDir)Inc;$(IncludePath)</IncludePath>
+    <EnableInf2cat>false</EnableInf2cat>
+    <ExecutablePath>$(VCInstallDir)bin\x86_ARM64;$(VCInstallDir)bin;$(WindowsSDK_ExecutablePath_x86);$(VSInstallDir)Common7\Tools\bin;$(VSInstallDir)Common7\tools;$(VSInstallDir)Common7\ide;$(ProgramFiles)\HTML Help Workshop;$(MSBuildToolsPath32);$(FxCopDir);$(PATH);$(LOCALAPPDATA)\Atlassian\SourceTree\git_local\bin</ExecutablePath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug-Xbox|ARM64'">
     <DebuggerFlavor>DbgengKernelDebugger</DebuggerFlavor>
     <OutDir>$(SolutionDir)$(Platform)\$(Configuration)\</OutDir>
     <IntDir>$(Platform)\$(Configuration)\</IntDir>
@@ -186,7 +345,31 @@
     <EnableInf2cat>false</EnableInf2cat>
     <ExecutablePath>$(VCInstallDir)bin\x86_ARM64;$(VCInstallDir)bin;$(WindowsSDK_ExecutablePath_x86);$(VSInstallDir)Common7\Tools\bin;$(VSInstallDir)Common7\tools;$(VSInstallDir)Common7\ide;$(ProgramFiles)\HTML Help Workshop;$(MSBuildToolsPath32);$(FxCopDir);$(PATH);$(LOCALAPPDATA)\Atlassian\SourceTree\git_local\bin</ExecutablePath>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release-Xbox|ARM64'">
+    <DebuggerFlavor>DbgengKernelDebugger</DebuggerFlavor>
+    <OutDir>$(SolutionDir)$(Platform)\$(Configuration)\</OutDir>
+    <IntDir>$(Platform)\$(Configuration)\</IntDir>
+    <IncludePath>$(KM_IncludePath);$(KMDF_INC_PATH)$(KMDF_VER_PATH);$(SolutionDir)Inc;$(IncludePath)</IncludePath>
+    <EnableInf2cat>false</EnableInf2cat>
+    <ExecutablePath>$(VCInstallDir)bin\x86_ARM64;$(VCInstallDir)bin;$(WindowsSDK_ExecutablePath_x86);$(VSInstallDir)Common7\Tools\bin;$(VSInstallDir)Common7\tools;$(VSInstallDir)Common7\ide;$(ProgramFiles)\HTML Help Workshop;$(MSBuildToolsPath32);$(FxCopDir);$(PATH);$(LOCALAPPDATA)\Atlassian\SourceTree\git_local\bin</ExecutablePath>
+  </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM64'">
+    <ClCompile>
+      <TreatWarningAsError>false</TreatWarningAsError>
+      <PreprocessorDefinitions>_ARM64_;ARM64;_USE_DECLSPECS_FOR_SAL=1;STD_CALL;%(PreprocessorDefinitions);POOL_NX_OPTIN=1</PreprocessorDefinitions>
+    </ClCompile>
+    <Link>
+      <AdditionalDependencies>Ntstrsafe.lib;%(AdditionalDependencies);$(KernelBufferOverflowLib);$(DDK_LIB_PATH)ntoskrnl.lib;$(DDK_LIB_PATH)hal.lib;$(DDK_LIB_PATH)wmilib.lib;$(KMDF_LIB_PATH)$(KMDF_VER_PATH)\WdfLdr.lib;$(KMDF_LIB_PATH)$(KMDF_VER_PATH)\WdfDriverEntry.lib</AdditionalDependencies>
+    </Link>
+    <PreBuildEvent>
+      <Command>$(OutDir)CreateVersion.exe $(ProjectDir)gen-versioninfo.h</Command>
+      <Message>Generating Version File</Message>
+    </PreBuildEvent>
+    <PostBuildEvent>
+      <Command>DEL $(ProjectDir)gen-versioninfo.h</Command>
+    </PostBuildEvent>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug-Xbox|ARM64'">
     <ClCompile>
       <TreatWarningAsError>false</TreatWarningAsError>
       <PreprocessorDefinitions>_ARM64_;ARM64;_USE_DECLSPECS_FOR_SAL=1;STD_CALL;%(PreprocessorDefinitions);POOL_NX_OPTIN=1</PreprocessorDefinitions>
@@ -218,7 +401,41 @@
       <Command>DEL $(ProjectDir)gen-versioninfo.h</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release-Xbox|ARM64'">
+    <ClCompile>
+      <TreatWarningAsError>false</TreatWarningAsError>
+      <PreprocessorDefinitions>_ARM64_;ARM64;_USE_DECLSPECS_FOR_SAL=1;STD_CALL;%(PreprocessorDefinitions);POOL_NX_OPTIN=1</PreprocessorDefinitions>
+    </ClCompile>
+    <Link>
+      <AdditionalDependencies>Ntstrsafe.lib;%(AdditionalDependencies);$(KernelBufferOverflowLib);$(DDK_LIB_PATH)ntoskrnl.lib;$(DDK_LIB_PATH)hal.lib;$(DDK_LIB_PATH)wmilib.lib;$(KMDF_LIB_PATH)$(KMDF_VER_PATH)\WdfLdr.lib;$(KMDF_LIB_PATH)$(KMDF_VER_PATH)\WdfDriverEntry.lib</AdditionalDependencies>
+    </Link>
+    <PreBuildEvent>
+      <Command>$(OutDir)CreateVersion.exe $(ProjectDir)gen-versioninfo.h</Command>
+      <Message>Generating Version File</Message>
+    </PreBuildEvent>
+    <PostBuildEvent>
+      <Command>DEL $(ProjectDir)gen-versioninfo.h</Command>
+    </PostBuildEvent>
+  </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <TreatWarningAsError>false</TreatWarningAsError>
+      <AdditionalIncludeDirectories>.;$(IntDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>_X86_=1;i386=1;STD_CALL;%(PreprocessorDefinitions);POOL_NX_OPTIN=1</PreprocessorDefinitions>
+    </ClCompile>
+    <Link>
+      <AdditionalDependencies>Ntstrsafe.lib;%(AdditionalDependencies);$(KernelBufferOverflowLib);$(DDK_LIB_PATH)ntoskrnl.lib;$(DDK_LIB_PATH)hal.lib;$(DDK_LIB_PATH)wmilib.lib;$(KMDF_LIB_PATH)$(KMDF_VER_PATH)\WdfLdr.lib;$(KMDF_LIB_PATH)$(KMDF_VER_PATH)\WdfDriverEntry.lib</AdditionalDependencies>
+    </Link>
+    <PreBuildEvent>
+      <Command>$(OutDir)CreateVersion.exe $(ProjectDir)gen-versioninfo.h</Command>
+      <Message>Generating Version File</Message>
+    </PreBuildEvent>
+    <PostBuildEvent>
+      <Command>DEL $(ProjectDir)gen-versioninfo.h</Command>
+      <Message>Deleting Version file</Message>
+    </PostBuildEvent>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug-Xbox|Win32'">
     <ClCompile>
       <TreatWarningAsError>false</TreatWarningAsError>
       <AdditionalIncludeDirectories>.;$(IntDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
@@ -255,7 +472,42 @@
       <Message>Deleting Version file</Message>
     </PostBuildEvent>
   </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release-Xbox|Win32'">
+    <ClCompile>
+      <TreatWarningAsError>false</TreatWarningAsError>
+      <EnablePREfast>false</EnablePREfast>
+      <AdditionalIncludeDirectories>.;$(IntDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>_X86_=1;i386=1;STD_CALL;%(PreprocessorDefinitions);POOL_NX_OPTIN=1</PreprocessorDefinitions>
+    </ClCompile>
+    <Link>
+      <AdditionalDependencies>Ntstrsafe.lib;%(AdditionalDependencies);$(KernelBufferOverflowLib);$(DDK_LIB_PATH)ntoskrnl.lib;$(DDK_LIB_PATH)hal.lib;$(DDK_LIB_PATH)wmilib.lib;$(KMDF_LIB_PATH)$(KMDF_VER_PATH)\WdfLdr.lib;$(KMDF_LIB_PATH)$(KMDF_VER_PATH)\WdfDriverEntry.lib</AdditionalDependencies>
+    </Link>
+    <PreBuildEvent>
+      <Command>$(OutDir)CreateVersion.exe $(ProjectDir)gen-versioninfo.h</Command>
+      <Message>Generating Version File</Message>
+    </PreBuildEvent>
+    <PostBuildEvent>
+      <Command>DEL $(ProjectDir)gen-versioninfo.h</Command>
+      <Message>Deleting Version file</Message>
+    </PostBuildEvent>
+  </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">
+    <ClCompile>
+      <TreatWarningAsError>false</TreatWarningAsError>
+      <PreprocessorDefinitions>_ARM_;ARM;_USE_DECLSPECS_FOR_SAL=1;STD_CALL;%(PreprocessorDefinitions);POOL_NX_OPTIN=1</PreprocessorDefinitions>
+    </ClCompile>
+    <Link>
+      <AdditionalDependencies>Ntstrsafe.lib;%(AdditionalDependencies);$(KernelBufferOverflowLib);$(DDK_LIB_PATH)ntoskrnl.lib;$(DDK_LIB_PATH)hal.lib;$(DDK_LIB_PATH)wmilib.lib;$(KMDF_LIB_PATH)$(KMDF_VER_PATH)\WdfLdr.lib;$(KMDF_LIB_PATH)$(KMDF_VER_PATH)\WdfDriverEntry.lib</AdditionalDependencies>
+    </Link>
+    <PreBuildEvent>
+      <Command>$(OutDir)CreateVersion.exe $(ProjectDir)gen-versioninfo.h</Command>
+      <Message>Generating Version File</Message>
+    </PreBuildEvent>
+    <PostBuildEvent>
+      <Command>DEL $(ProjectDir)gen-versioninfo.h</Command>
+    </PostBuildEvent>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug-Xbox|ARM'">
     <ClCompile>
       <TreatWarningAsError>false</TreatWarningAsError>
       <PreprocessorDefinitions>_ARM_;ARM;_USE_DECLSPECS_FOR_SAL=1;STD_CALL;%(PreprocessorDefinitions);POOL_NX_OPTIN=1</PreprocessorDefinitions>
@@ -287,7 +539,41 @@
       <Command>DEL $(ProjectDir)gen-versioninfo.h</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release-Xbox|ARM'">
+    <ClCompile>
+      <TreatWarningAsError>false</TreatWarningAsError>
+      <PreprocessorDefinitions>_ARM_;ARM;_USE_DECLSPECS_FOR_SAL=1;STD_CALL;%(PreprocessorDefinitions);POOL_NX_OPTIN=1</PreprocessorDefinitions>
+    </ClCompile>
+    <Link>
+      <AdditionalDependencies>Ntstrsafe.lib;%(AdditionalDependencies);$(KernelBufferOverflowLib);$(DDK_LIB_PATH)ntoskrnl.lib;$(DDK_LIB_PATH)hal.lib;$(DDK_LIB_PATH)wmilib.lib;$(KMDF_LIB_PATH)$(KMDF_VER_PATH)\WdfLdr.lib;$(KMDF_LIB_PATH)$(KMDF_VER_PATH)\WdfDriverEntry.lib</AdditionalDependencies>
+    </Link>
+    <PreBuildEvent>
+      <Command>$(OutDir)CreateVersion.exe $(ProjectDir)gen-versioninfo.h</Command>
+      <Message>Generating Version File</Message>
+    </PreBuildEvent>
+    <PostBuildEvent>
+      <Command>DEL $(ProjectDir)gen-versioninfo.h</Command>
+    </PostBuildEvent>
+  </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <TreatWarningAsError>false</TreatWarningAsError>
+      <AdditionalIncludeDirectories>.;$(IntDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>_WIN64;_AMD64_;AMD64;%(PreprocessorDefinitions);POOL_NX_OPTIN=1</PreprocessorDefinitions>
+    </ClCompile>
+    <Link>
+      <AdditionalDependencies>Ntstrsafe.lib;%(AdditionalDependencies);$(KernelBufferOverflowLib);$(DDK_LIB_PATH)ntoskrnl.lib;$(DDK_LIB_PATH)hal.lib;$(DDK_LIB_PATH)wmilib.lib;$(KMDF_LIB_PATH)$(KMDF_VER_PATH)\WdfLdr.lib;$(KMDF_LIB_PATH)$(KMDF_VER_PATH)\WdfDriverEntry.lib</AdditionalDependencies>
+    </Link>
+    <PreBuildEvent>
+      <Command>$(OutDir)CreateVersion.exe $(ProjectDir)gen-versioninfo.h</Command>
+      <Message>Generating Version File</Message>
+    </PreBuildEvent>
+    <PostBuildEvent>
+      <Command>DEL $(ProjectDir)gen-versioninfo.h</Command>
+      <Message>Deleting Version file</Message>
+    </PostBuildEvent>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug-Xbox|x64'">
     <ClCompile>
       <TreatWarningAsError>false</TreatWarningAsError>
       <AdditionalIncludeDirectories>.;$(IntDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
@@ -323,6 +609,24 @@
       <Message>Deleting Version file</Message>
     </PostBuildEvent>
   </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release-Xbox|x64'">
+    <ClCompile>
+      <TreatWarningAsError>false</TreatWarningAsError>
+      <AdditionalIncludeDirectories>.;$(IntDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>_WIN64;_AMD64_;AMD64;%(PreprocessorDefinitions);POOL_NX_OPTIN=1</PreprocessorDefinitions>
+    </ClCompile>
+    <Link>
+      <AdditionalDependencies>Ntstrsafe.lib;%(AdditionalDependencies);$(KernelBufferOverflowLib);$(DDK_LIB_PATH)ntoskrnl.lib;$(DDK_LIB_PATH)hal.lib;$(DDK_LIB_PATH)wmilib.lib;$(KMDF_LIB_PATH)$(KMDF_VER_PATH)\WdfLdr.lib;$(KMDF_LIB_PATH)$(KMDF_VER_PATH)\WdfDriverEntry.lib</AdditionalDependencies>
+    </Link>
+    <PreBuildEvent>
+      <Command>$(OutDir)CreateVersion.exe $(ProjectDir)gen-versioninfo.h</Command>
+      <Message>Generating Version File</Message>
+    </PreBuildEvent>
+    <PostBuildEvent>
+      <Command>DEL $(ProjectDir)gen-versioninfo.h</Command>
+      <Message>Deleting Version file</Message>
+    </PostBuildEvent>
+  </ItemDefinitionGroup>
   <ItemGroup>
     <FilesToPackage Include="$(TargetPath)" />
   </ItemGroup>
@@ -330,24 +634,24 @@
     <MessageCompile Include="errcodes.mc" />
   </ItemGroup>
   <ItemGroup>
-    <Inf Include="vjoy.inx" />
-  </ItemGroup>
-  <ItemGroup>
     <ClInclude Include="errcodes.h" />
     <ClInclude Include="hidReportDesc.h" />
     <ClInclude Include="hidReportDescSingle.h" />
     <ClInclude Include="rawpdo.h" />
     <ClInclude Include="trace.h" />
-    <ClInclude Include="vjoy.h" />
-  </ItemGroup>
-  <ItemGroup>
-    <ResourceCompile Include="vjoy.rc" />
+    <ClInclude Include="vJoy.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="driver.c" />
     <ClCompile Include="hid.c" />
     <ClCompile Include="rawpdo.c" />
     <ClCompile Include="usb.c" />
+  </ItemGroup>
+  <ItemGroup>
+    <Inf Include="vJoy.inx" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="vJoy.rc" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

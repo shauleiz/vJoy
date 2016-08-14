@@ -1,0 +1,352 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug-Xbox|Win32">
+      <Configuration>Debug-Xbox</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release-Xbox|Win32">
+      <Configuration>Release-Xbox</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug-Xbox|x64">
+      <Configuration>Debug-Xbox</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release-Xbox|x64">
+      <Configuration>Release-Xbox</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{A2977561-932D-48D1-BDFC-30346B745478}</ProjectGuid>
+    <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
+    <Keyword>ManagedCProj</Keyword>
+    <RootNamespace>vXboxInterfaceCLR</RootNamespace>
+    <WindowsTargetPlatformVersion>10.0.14393.0</WindowsTargetPlatformVersion>
+    <ProjectName>VboxWrap</ProjectName>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug-Xbox|Win32'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v140</PlatformToolset>
+    <CLRSupport>true</CLRSupport>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release-Xbox|Win32'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v140</PlatformToolset>
+    <CLRSupport>true</CLRSupport>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v140</PlatformToolset>
+    <CLRSupport>true</CLRSupport>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug-Xbox|x64'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v140</PlatformToolset>
+    <CLRSupport>true</CLRSupport>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release-Xbox|x64'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v140</PlatformToolset>
+    <CLRSupport>true</CLRSupport>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v140</PlatformToolset>
+    <CLRSupport>true</CLRSupport>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="Shared">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug-Xbox|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release-Xbox|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug-Xbox|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release-Xbox|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug-Xbox|Win32'">
+    <LinkIncremental>true</LinkIncremental>
+    <ExecutablePath>$(VC_ExecutablePath_x86);$(WindowsSDK_ExecutablePath);$(VS_ExecutablePath);$(MSBuild_ExecutablePath);$(SystemRoot)\SysWow64;$(FxCopDir);$(PATH);$(LOCALAPPDATA)\Atlassian\SourceTree\git_local\bin\;$(ExecutablePath)</ExecutablePath>
+    <IncludePath>.;$(SolutionDir)\inc;$(IncludePath);$(VC_IncludePath)</IncludePath>
+    <OutDir>$(SolutionDir)$(Platform)\$(Configuration)\</OutDir>
+    <IntDir>$(Platform)\$(Configuration)\</IntDir>
+    <TargetExt>.dll</TargetExt>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug-Xbox|x64'">
+    <LinkIncremental>true</LinkIncremental>
+    <IncludePath>.;$(SolutionDir)\inc;$(IncludePath);</IncludePath>
+    <ExecutablePath>$(VC_ExecutablePath_x64);$(WindowsSDK_ExecutablePath);$(VS_ExecutablePath);$(MSBuild_ExecutablePath);$(FxCopDir);$(PATH);$(LOCALAPPDATA)\Atlassian\SourceTree\git_local\bin\</ExecutablePath>
+    <LibraryPath>$(SolutionDir)$(Platform)\$(Configuration);$(VC_LibraryPath_x64);$(WindowsSDK_LibraryPath_x64);$(NETFXKitsDir)Lib\um\x64</LibraryPath>
+    <TargetExt>.dll</TargetExt>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release-Xbox|Win32'">
+    <LinkIncremental>false</LinkIncremental>
+    <ExecutablePath>$(VC_ExecutablePath_x86);$(WindowsSDK_ExecutablePath);$(VS_ExecutablePath);$(MSBuild_ExecutablePath);$(SystemRoot)\SysWow64;$(FxCopDir);$(PATH);$(LOCALAPPDATA)\Atlassian\SourceTree\git_local\bin\;$(ExecutablePath)</ExecutablePath>
+    <IncludePath>.;$(SolutionDir)\inc;$(IncludePath);$(VC_IncludePath)</IncludePath>
+    <OutDir>$(SolutionDir)$(Platform)\$(Configuration)\</OutDir>
+    <IntDir>$(Platform)\$(Configuration)\</IntDir>
+    <TargetExt>.dll</TargetExt>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <LinkIncremental>false</LinkIncremental>
+    <ExecutablePath>$(VC_ExecutablePath_x86);$(WindowsSDK_ExecutablePath);$(VS_ExecutablePath);$(MSBuild_ExecutablePath);$(SystemRoot)\SysWow64;$(FxCopDir);$(PATH);$(LOCALAPPDATA)\Atlassian\SourceTree\git_local\bin\;$(ExecutablePath)</ExecutablePath>
+    <IncludePath>.;$(SolutionDir)\inc;$(IncludePath);$(VC_IncludePath)</IncludePath>
+    <OutDir>$(SolutionDir)$(Platform)\$(Configuration)\</OutDir>
+    <IntDir>$(Platform)\$(Configuration)\</IntDir>
+    <TargetExt>.dll</TargetExt>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release-Xbox|x64'">
+    <LinkIncremental>false</LinkIncremental>
+    <ExecutablePath>$(VC_ExecutablePath_x64);$(WindowsSDK_ExecutablePath);$(VS_ExecutablePath);$(MSBuild_ExecutablePath);$(FxCopDir);$(PATH);$(LOCALAPPDATA)\Atlassian\SourceTree\git_local\bin\</ExecutablePath>
+    <IncludePath>.;$(SolutionDir)\inc;$(IncludePath);</IncludePath>
+    <LibraryPath>$(SolutionDir)$(Platform)\$(Configuration);$(VC_LibraryPath_x64);$(WindowsSDK_LibraryPath_x64);$(NETFXKitsDir)Lib\um\x64</LibraryPath>
+    <TargetExt>.dll</TargetExt>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <LinkIncremental>false</LinkIncremental>
+    <ExecutablePath>$(VC_ExecutablePath_x64);$(WindowsSDK_ExecutablePath);$(VS_ExecutablePath);$(MSBuild_ExecutablePath);$(FxCopDir);$(PATH);$(LOCALAPPDATA)\Atlassian\SourceTree\git_local\bin\</ExecutablePath>
+    <IncludePath>.;$(SolutionDir)\inc;$(IncludePath);</IncludePath>
+    <LibraryPath>$(SolutionDir)$(Platform)\$(Configuration);$(VC_LibraryPath_x64);$(WindowsSDK_LibraryPath_x64);$(NETFXKitsDir)Lib\um\x64</LibraryPath>
+    <TargetExt>.dll</TargetExt>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug-Xbox|Win32'">
+    <ClCompile>
+      <WarningLevel>Level1</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <PreprocessorDefinitions>VXBOX_EXPORTS;%(PreprocessorDefinitions);XBOX</PreprocessorDefinitions>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <MultiProcessorCompilation>false</MultiProcessorCompilation>
+      <CompileAsManaged>true</CompileAsManaged>
+    </ClCompile>
+    <Link>
+      <AdditionalDependencies>vJoyInterface.lib;setupapi.lib;hid.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(WindowsSdkDir)lib\$(DDKSpec)\km\$(DDKPlatform);$(WindowsSdkLibraryPath);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <CLRImageType>Default</CLRImageType>
+      <DelayLoadDLLs>vJoyInterface.dll</DelayLoadDLLs>
+    </Link>
+    <ResourceCompile>
+      <PreprocessorDefinitions>_UNICODE;UNICODE;%(PreprocessorDefinitions);XBOX;_DEBUG;_DEBUG</PreprocessorDefinitions>
+    </ResourceCompile>
+    <PreBuildEvent>
+      <Command>$(OutDir)CreateVersion.exe $(ProjectDir)gen-versioninfo.h</Command>
+    </PreBuildEvent>
+    <PreBuildEvent>
+      <Message>Generating version file</Message>
+    </PreBuildEvent>
+    <PostBuildEvent>
+      <Command>DEL $(ProjectDir)gen-versioninfo.h</Command>
+    </PostBuildEvent>
+    <PostBuildEvent>
+      <Message>Deleting version file</Message>
+    </PostBuildEvent>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug-Xbox|x64'">
+    <ClCompile>
+      <WarningLevel>Level1</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <PreprocessorDefinitions>VXBOX_EXPORTS;_WIN64;_AMD64_;AMD64;%(PreprocessorDefinitions);XBOX</PreprocessorDefinitions>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <CompileAsManaged>true</CompileAsManaged>
+    </ClCompile>
+    <Link>
+      <AdditionalDependencies>vJoyInterface.lib;setupapi.lib;hid.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(SolutionDir)$(Platform)\$(Configuration)\;$(WindowsSdkDir)lib\$(DDKSpec)\km\$(DDKPlatform);$(WindowsSdkLibraryPath);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <CLRImageType>Default</CLRImageType>
+      <DelayLoadDLLs>vJoyInterface.dll</DelayLoadDLLs>
+    </Link>
+    <PreLinkEvent>
+      <Command>REM copy $(ProjectDir)..\..\..\..\vJoy\x64\Release-Xbox\*.dll $(TargetDir)\.</Command>
+    </PreLinkEvent>
+    <ResourceCompile>
+      <PreprocessorDefinitions>_UNICODE;UNICODE;%(PreprocessorDefinitions);XBOX;_DEBUG;X64</PreprocessorDefinitions>
+    </ResourceCompile>
+    <PreBuildEvent>
+      <Command>$(OutDir)CreateVersion.exe $(ProjectDir)gen-versioninfo.h</Command>
+    </PreBuildEvent>
+    <PreBuildEvent>
+      <Message>Generating version file</Message>
+    </PreBuildEvent>
+    <PostBuildEvent>
+      <Command>DEL $(ProjectDir)gen-versioninfo.h</Command>
+    </PostBuildEvent>
+    <PostBuildEvent>
+      <Message>Deleting version file</Message>
+    </PostBuildEvent>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release-Xbox|Win32'">
+    <ClCompile>
+      <WarningLevel>Level1</WarningLevel>
+      <PreprocessorDefinitions>VXBOX_EXPORTS;XBOX;WIN32;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <MultiProcessorCompilation>false</MultiProcessorCompilation>
+      <CompileAsManaged>true</CompileAsManaged>
+    </ClCompile>
+    <Link>
+      <AdditionalDependencies>vJoyInterface.lib;setupapi.lib;hid.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <CLRImageType>Default</CLRImageType>
+      <DelayLoadDLLs>vJoyInterface.dll</DelayLoadDLLs>
+    </Link>
+    <PreBuildEvent>
+      <Command>$(OutDir)CreateVersion.exe $(ProjectDir)gen-versioninfo.h</Command>
+      <Message>Generating version file</Message>
+    </PreBuildEvent>
+    <PostBuildEvent>
+      <Command>DEL $(ProjectDir)gen-versioninfo.h</Command>
+    </PostBuildEvent>
+    <PostBuildEvent>
+      <Message>Deleting version file</Message>
+    </PostBuildEvent>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <WarningLevel>Level1</WarningLevel>
+      <PreprocessorDefinitions>VXBOX_EXPORTS;XBOX;WIN32;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <MultiProcessorCompilation>false</MultiProcessorCompilation>
+      <CompileAsManaged>true</CompileAsManaged>
+    </ClCompile>
+    <Link>
+      <AdditionalDependencies>vJoyInterface.lib;setupapi.lib;hid.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <CLRImageType>Default</CLRImageType>
+      <DelayLoadDLLs>vJoyInterface.dll</DelayLoadDLLs>
+    </Link>
+    <PreBuildEvent>
+      <Command>$(OutDir)CreateVersion.exe $(ProjectDir)gen-versioninfo.h</Command>
+      <Message>Generating version file</Message>
+    </PreBuildEvent>
+    <PostBuildEvent>
+      <Command>DEL $(ProjectDir)gen-versioninfo.h</Command>
+    </PostBuildEvent>
+    <PostBuildEvent>
+      <Message>Deleting version file</Message>
+    </PostBuildEvent>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release-Xbox|x64'">
+    <ClCompile>
+      <WarningLevel>Level1</WarningLevel>
+      <PreprocessorDefinitions>VXBOX_EXPORTS;NDEBUG;_WIN64;_AMD64_;AMD64;%(PreprocessorDefinitions);XBOX</PreprocessorDefinitions>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <CompileAsManaged>true</CompileAsManaged>
+    </ClCompile>
+    <Link>
+      <AdditionalDependencies>vJoyInterface.lib;setupapi.lib;hid.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(SolutionDir)$(Platform)\$(Configuration)\;$(WindowsSdkDir)lib\$(DDKSpec)\km\$(DDKPlatform);$(WindowsSdkLibraryPath);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <CLRImageType>Default</CLRImageType>
+      <DelayLoadDLLs>vJoyInterface.dll</DelayLoadDLLs>
+    </Link>
+    <PreBuildEvent>
+      <Command>$(OutDir)CreateVersion.exe $(ProjectDir)gen-versioninfo.h</Command>
+      <Message>Generating version file</Message>
+    </PreBuildEvent>
+    <PostBuildEvent>
+      <Command>DEL $(ProjectDir)gen-versioninfo.h</Command>
+    </PostBuildEvent>
+    <PostBuildEvent>
+      <Message>Deleting version file</Message>
+    </PostBuildEvent>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <WarningLevel>Level1</WarningLevel>
+      <PreprocessorDefinitions>VXBOX_EXPORTS;NDEBUG;_WIN64;_AMD64_;AMD64;%(PreprocessorDefinitions);XBOX</PreprocessorDefinitions>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <CompileAsManaged>true</CompileAsManaged>
+    </ClCompile>
+    <Link>
+      <AdditionalDependencies>vJoyInterface.lib;setupapi.lib;hid.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(SolutionDir)$(Platform)\$(Configuration)\;$(WindowsSdkDir)lib\$(DDKSpec)\km\$(DDKPlatform);$(WindowsSdkLibraryPath);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <CLRImageType>Default</CLRImageType>
+      <DelayLoadDLLs>vJoyInterface.dll</DelayLoadDLLs>
+    </Link>
+    <PreBuildEvent>
+      <Command>$(OutDir)CreateVersion.exe $(ProjectDir)gen-versioninfo.h</Command>
+      <Message>Generating version file</Message>
+    </PreBuildEvent>
+    <PostBuildEvent>
+      <Command>DEL $(ProjectDir)gen-versioninfo.h</Command>
+    </PostBuildEvent>
+    <PostBuildEvent>
+      <Message>Deleting version file</Message>
+    </PostBuildEvent>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Stdafx.h" />
+    <ClInclude Include="targetver.h" />
+    <ClInclude Include="resource.h" />
+    <ClInclude Include="IWrapper.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="AssemblyInfo.cpp" />
+    <ClCompile Include="Stdafx.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug-Xbox|Win32'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug-Xbox|x64'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release-Xbox|Win32'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release-Xbox|x64'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="IWrapper.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="ReadMe.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="app.rc" />
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="app.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\vJoyInterface\vJoyInterface2012.vcxproj">
+      <Project>{9e1fc894-f587-4fba-8599-2f8c544e061a}</Project>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

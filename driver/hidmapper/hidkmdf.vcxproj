@@ -1,9 +1,25 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="12.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug-Xbox|Win32">
+      <Configuration>Debug-Xbox</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug-Xbox|x64">
+      <Configuration>Debug-Xbox</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
     <ProjectConfiguration Include="Debug|Win32">
       <Configuration>Debug</Configuration>
       <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release-Xbox|Win32">
+      <Configuration>Release-Xbox</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release-Xbox|x64">
+      <Configuration>Release-Xbox</Configuration>
+      <Platform>x64</Platform>
     </ProjectConfiguration>
     <ProjectConfiguration Include="Release|Win32">
       <Configuration>Release</Configuration>
@@ -37,9 +53,14 @@
   <PropertyGroup Label="Globals">
     <ProjectGuid>{7A0BD5DC-5ACA-4AB9-B395-C16E078C11E9}</ProjectGuid>
     <RootNamespace>$(MSBuildProjectName)</RootNamespace>
-    <WindowsTargetPlatformVersion>10.0.10586.0</WindowsTargetPlatformVersion>
+    <WindowsTargetPlatformVersion>10.0.14393.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <PropertyGroup Label="Configuration" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <TargetVersion>Windows7</TargetVersion>
+    <UseDebugLibraries>True</UseDebugLibraries>
+    <DriverTargetPlatform>Desktop</DriverTargetPlatform>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug-Xbox|Win32'" Label="Configuration">
     <TargetVersion>Windows7</TargetVersion>
     <UseDebugLibraries>True</UseDebugLibraries>
     <DriverTargetPlatform>Desktop</DriverTargetPlatform>
@@ -49,12 +70,27 @@
     <UseDebugLibraries>False</UseDebugLibraries>
     <DriverTargetPlatform>Desktop</DriverTargetPlatform>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release-Xbox|Win32'" Label="Configuration">
+    <TargetVersion>Windows7</TargetVersion>
+    <UseDebugLibraries>False</UseDebugLibraries>
+    <DriverTargetPlatform>Desktop</DriverTargetPlatform>
+  </PropertyGroup>
   <PropertyGroup Label="Configuration" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <TargetVersion>Windows7</TargetVersion>
     <UseDebugLibraries>True</UseDebugLibraries>
     <DriverTargetPlatform>Desktop</DriverTargetPlatform>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug-Xbox|x64'" Label="Configuration">
+    <TargetVersion>Windows7</TargetVersion>
+    <UseDebugLibraries>True</UseDebugLibraries>
+    <DriverTargetPlatform>Desktop</DriverTargetPlatform>
+  </PropertyGroup>
   <PropertyGroup Label="Configuration" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <TargetVersion>Windows7</TargetVersion>
+    <UseDebugLibraries>False</UseDebugLibraries>
+    <DriverTargetPlatform>Desktop</DriverTargetPlatform>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release-Xbox|x64'" Label="Configuration">
     <TargetVersion>Windows7</TargetVersion>
     <UseDebugLibraries>False</UseDebugLibraries>
     <DriverTargetPlatform>Desktop</DriverTargetPlatform>
@@ -66,17 +102,36 @@
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" />
   </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release-Xbox|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" />
+  </ImportGroup>
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug-Xbox|x64'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" />
   </ImportGroup>
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" />
   </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release-Xbox|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" />
+  </ImportGroup>
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug-Xbox|Win32'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" />
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <TimeStampServer>http://timestamp.verisign.com/scripts/timstamp.dll</TimeStampServer>
+    <IncludePath>$(KM_IncludePath);$(KMDF_INC_PATH)$(KMDF_VER_PATH);$(SolutionDir)Inc;$(IncludePath)</IncludePath>
+    <ExecutablePath>$(ExecutablePath);$(WDKContentRoot)bin\x86;$(WDKContentRoot)tools\tracing\x86;$(LOCALAPPDATA)\Atlassian\SourceTree\git_local\bin</ExecutablePath>
+    <PostBuildEventUseInBuild>false</PostBuildEventUseInBuild>
+    <PreBuildEventUseInBuild>false</PreBuildEventUseInBuild>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release-Xbox|Win32'">
     <TimeStampServer>http://timestamp.verisign.com/scripts/timstamp.dll</TimeStampServer>
     <IncludePath>$(KM_IncludePath);$(KMDF_INC_PATH)$(KMDF_VER_PATH);$(SolutionDir)Inc;$(IncludePath)</IncludePath>
     <ExecutablePath>$(ExecutablePath);$(WDKContentRoot)bin\x86;$(WDKContentRoot)tools\tracing\x86;$(LOCALAPPDATA)\Atlassian\SourceTree\git_local\bin</ExecutablePath>
@@ -90,7 +145,20 @@
     <PostBuildEventUseInBuild>false</PostBuildEventUseInBuild>
     <PreBuildEventUseInBuild>false</PreBuildEventUseInBuild>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release-Xbox|x64'">
+    <TimeStampServer>http://timestamp.verisign.com/scripts/timstamp.dll</TimeStampServer>
+    <IncludePath>$(KM_IncludePath);$(KMDF_INC_PATH)$(KMDF_VER_PATH);$(SolutionDir)Inc;$(IncludePath)</IncludePath>
+    <ExecutablePath>$(ExecutablePath);$(WDKContentRoot)bin\x86;$(WDKContentRoot)tools\tracing\x64;$(LOCALAPPDATA)\Atlassian\SourceTree\git_local\bin</ExecutablePath>
+    <PostBuildEventUseInBuild>false</PostBuildEventUseInBuild>
+    <PreBuildEventUseInBuild>false</PreBuildEventUseInBuild>
+  </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <IncludePath>$(KM_IncludePath);$(KMDF_INC_PATH)$(KMDF_VER_PATH);$(SolutionDir)Inc;$(IncludePath)</IncludePath>
+    <ExecutablePath>$(ExecutablePath);$(WDKContentRoot)bin\x86;$(WDKContentRoot)tools\tracing\x86;$(LOCALAPPDATA)\Atlassian\SourceTree\git_local\bin</ExecutablePath>
+    <PreBuildEventUseInBuild>false</PreBuildEventUseInBuild>
+    <PostBuildEventUseInBuild>false</PostBuildEventUseInBuild>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug-Xbox|Win32'">
     <IncludePath>$(KM_IncludePath);$(KMDF_INC_PATH)$(KMDF_VER_PATH);$(SolutionDir)Inc;$(IncludePath)</IncludePath>
     <ExecutablePath>$(ExecutablePath);$(WDKContentRoot)bin\x86;$(WDKContentRoot)tools\tracing\x86;$(LOCALAPPDATA)\Atlassian\SourceTree\git_local\bin</ExecutablePath>
     <PreBuildEventUseInBuild>false</PreBuildEventUseInBuild>
@@ -102,7 +170,23 @@
     <PostBuildEventUseInBuild>false</PostBuildEventUseInBuild>
     <PreBuildEventUseInBuild>false</PreBuildEventUseInBuild>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug-Xbox|x64'">
+    <IncludePath>$(KM_IncludePath);$(KMDF_INC_PATH)$(KMDF_VER_PATH);$(SolutionDir)Inc;$(IncludePath)</IncludePath>
+    <ExecutablePath>$(ExecutablePath);$(WDKContentRoot)bin\x86;$(WDKContentRoot)tools\tracing\x64;$(LOCALAPPDATA)\Atlassian\SourceTree\git_local\bin</ExecutablePath>
+    <PostBuildEventUseInBuild>false</PostBuildEventUseInBuild>
+    <PreBuildEventUseInBuild>false</PreBuildEventUseInBuild>
+  </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <PreBuildEvent>
+      <Command>$(OutDir)CreateVersion.exe $(ProjectDir)gen-versioninfo.h</Command>
+      <Message>Generating Version File</Message>
+    </PreBuildEvent>
+    <PostBuildEvent>
+      <Command>DEL $(ProjectDir)gen-versioninfo.h</Command>
+      <Message>Deleting Version file</Message>
+    </PostBuildEvent>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug-Xbox|Win32'">
     <PreBuildEvent>
       <Command>$(OutDir)CreateVersion.exe $(ProjectDir)gen-versioninfo.h</Command>
       <Message>Generating Version File</Message>
@@ -122,6 +206,16 @@
       <Message>Deleting Version file</Message>
     </PostBuildEvent>
   </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release-Xbox|Win32'">
+    <PreBuildEvent>
+      <Command>$(OutDir)CreateVersion.exe $(ProjectDir)gen-versioninfo.h</Command>
+      <Message>Generating Version File</Message>
+    </PreBuildEvent>
+    <PostBuildEvent>
+      <Command>DEL $(ProjectDir)gen-versioninfo.h</Command>
+      <Message>Deleting Version file</Message>
+    </PostBuildEvent>
+  </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <PreBuildEvent>
       <Command>$(OutDir)CreateVersion.exe $(ProjectDir)gen-versioninfo.h</Command>
@@ -132,7 +226,27 @@
       <Message>Deleting Version file</Message>
     </PostBuildEvent>
   </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug-Xbox|x64'">
+    <PreBuildEvent>
+      <Command>$(OutDir)CreateVersion.exe $(ProjectDir)gen-versioninfo.h</Command>
+      <Message>Generating Version File</Message>
+    </PreBuildEvent>
+    <PostBuildEvent>
+      <Command>DEL $(ProjectDir)gen-versioninfo.h</Command>
+      <Message>Deleting Version file</Message>
+    </PostBuildEvent>
+  </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <PreBuildEvent>
+      <Command>$(OutDir)CreateVersion.exe $(ProjectDir)gen-versioninfo.h</Command>
+      <Message>Generating Version File</Message>
+    </PreBuildEvent>
+    <PostBuildEvent>
+      <Command>DEL $(ProjectDir)gen-versioninfo.h</Command>
+      <Message>Deleting Version file</Message>
+    </PostBuildEvent>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release-Xbox|x64'">
     <PreBuildEvent>
       <Command>$(OutDir)CreateVersion.exe $(ProjectDir)gen-versioninfo.h</Command>
       <Message>Generating Version File</Message>

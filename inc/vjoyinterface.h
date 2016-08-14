@@ -10,19 +10,19 @@
 #define VJOYINTERFACE_API __declspec(dllimport)
 #endif
 
-
 ///////////////////////////// vJoy device (collection) status ////////////////////////////////////////////
 #ifndef VJDSTAT
 #define VJDSTAT
-enum VjdStat  /* Declares an enumeration data type */
-{
-	VJD_STAT_OWN,	// The  vJoy Device is owned by this application.
-	VJD_STAT_FREE,	// The  vJoy Device is NOT owned by any application (including this one).
-	VJD_STAT_BUSY,	// The  vJoy Device is owned by another application. It cannot be acquired by this application.
-	VJD_STAT_MISS,	// The  vJoy Device is missing. It either does not exist or the driver is down.
-	VJD_STAT_UNKN	// Unknown
-}; 
-
+namespace vJoy {
+	enum VjdStat  /* Declares an enumeration data type */
+	{
+		VJD_STAT_OWN,	// The  vJoy Device is owned by this application.
+		VJD_STAT_FREE,	// The  vJoy Device is NOT owned by any application (including this one).
+		VJD_STAT_BUSY,	// The  vJoy Device is owned by another application. It cannot be acquired by this application.
+		VJD_STAT_MISS,	// The  vJoy Device is missing. It either does not exist or the driver is down.
+		VJD_STAT_UNKN	// Unknown
+	};
+}
 /* Error codes for some of the functions */
 #define NO_HANDLE_BY_INDEX				 -1
 #define BAD_PREPARSED_DATA				 -2
@@ -73,7 +73,7 @@ struct DEVCTRLS {
 
 struct DeviceStat {
 	HANDLE h;								// Handle to the PDO interface that represents the virtual device
-	VjdStat stat;							// Status of the device
+	vJoy::VjdStat stat;							// Status of the device
 	JOYSTICK_POSITION_V2 position;			// Current Position of the device
 	HDEVNOTIFY hDeviceNotifyHandle;			// Device Notification Handle
 	DEVCTRLS	DeviceControls;				// Structure Holding the data about the device's controls
@@ -276,7 +276,7 @@ VJOYINTERFACE_API int	__cdecl  GetVJDContPovNumber(UINT rID);	// Get the number 
 VJOYINTERFACE_API BOOL	__cdecl  GetVJDAxisExist(UINT rID, UINT Axis); // Test if given axis defined in the specified VDJ
 VJOYINTERFACE_API BOOL	__cdecl  GetVJDAxisMax(UINT rID, UINT Axis, LONG * Max); // Get logical Maximum value for a given axis defined in the specified VDJ
 VJOYINTERFACE_API BOOL	__cdecl  GetVJDAxisMin(UINT rID, UINT Axis, LONG * Min); // Get logical Minimum value for a given axis defined in the specified VDJ
-VJOYINTERFACE_API enum VjdStat	__cdecl	GetVJDStatus(UINT rID);			// Get the status of the specified vJoy Device.
+VJOYINTERFACE_API enum vJoy::VjdStat	__cdecl	GetVJDStatus(UINT rID);			// Get the status of the specified vJoy Device.
 // Added in 2.1.6
 VJOYINTERFACE_API BOOL	__cdecl	isVJDExists(UINT rID);					// TRUE if the specified vJoy Device exists
 

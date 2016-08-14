@@ -1,0 +1,652 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>HidSharp</name>
+    </assembly>
+    <members>
+        <member name="T:HidSharp.ReportDescriptors.Units.TemperatureUnit">
+            <summary>
+            Defines the possible units of temperature.
+            </summary>
+        </member>
+        <member name="F:HidSharp.ReportDescriptors.Units.TemperatureUnit.None">
+            <summary>
+            The unit system has no unit of temperature.
+            </summary>
+        </member>
+        <member name="F:HidSharp.ReportDescriptors.Units.TemperatureUnit.Kelvin">
+            <summary>
+            The unit of temperature is Kelvin (occurs in SI Linear and Rotation unit systems).
+            </summary>
+        </member>
+        <member name="F:HidSharp.ReportDescriptors.Units.TemperatureUnit.Fahrenheit">
+            <summary>
+            The unit of temperature is Fahrenheit (occurs in English Linear and Rotation unit systems).
+            </summary>
+        </member>
+        <member name="T:HidSharp.HidDeviceLoader">
+            <summary>
+            Detects USB HID class devices connected to the system.
+            </summary>
+        </member>
+        <member name="M:HidSharp.HidDeviceLoader.#ctor">
+            <summary>
+            Initializes a new instance of the <see cref="T:HidSharp.HidDeviceLoader"/> class.
+            </summary>
+        </member>
+        <member name="M:HidSharp.HidDeviceLoader.GetDevicesVB">
+            <summary>
+            Gets a list of connected USB devices.
+            This overload is meant for Visual Basic 6 and COM clients.
+            </summary>
+            <returns>The device list.</returns>
+        </member>
+        <member name="M:HidSharp.HidDeviceLoader.GetDevices">
+            <summary>
+            Gets a list of connected USB devices.
+            </summary>
+            <returns>The device list.</returns>
+        </member>
+        <member name="M:HidSharp.HidDeviceLoader.GetDevices(System.Nullable{System.Int32},System.Nullable{System.Int32},System.Nullable{System.Int32},System.String)">
+            <summary>
+            Gets a list of connected USB devices, filtered by some criteria.
+            </summary>
+            <param name="vendorID">The vendor ID, or null to not filter by vendor ID.</param>
+            <param name="productID">The product ID, or null to not filter by product ID.</param>
+            <param name="productVersion">The product version, or null to not filter by product version.</param>
+            <param name="serialNumber">The serial number, or null to not filter by serial number.</param>
+            <returns>The filtered device list.</returns>
+        </member>
+        <member name="M:HidSharp.HidDeviceLoader.GetDeviceOrDefault(System.Nullable{System.Int32},System.Nullable{System.Int32},System.Nullable{System.Int32},System.String)">
+            <summary>
+            Gets the first connected USB device that matches specified criteria.
+            </summary>
+            <param name="vendorID">The vendor ID, or null to not filter by vendor ID.</param>
+            <param name="productID">The product ID, or null to not filter by product ID.</param>
+            <param name="productVersion">The product version, or null to not filter by product version.</param>
+            <param name="serialNumber">The serial number, or null to not filter by serial number.</param>
+            <returns>The device, or null if none was found.</returns>
+        </member>
+        <member name="T:HidSharp.HidStream">
+            <summary>
+            Communicates with a USB HID class device.
+            </summary>
+        </member>
+        <member name="M:HidSharp.HidStream.Flush">
+            <exclude />
+        </member>
+        <member name="M:HidSharp.HidStream.GetFeature(System.Byte[])">
+            <summary>
+            Sends a Get Feature setup request.
+            </summary>
+            <param name="buffer">The buffer to fill. Place the Report ID in the first byte.</param>
+        </member>
+        <member name="M:HidSharp.HidStream.GetFeature(System.Byte[],System.Int32,System.Int32)">
+            <summary>
+            Sends a Get Feature setup request.
+            </summary>
+            <param name="buffer">The buffer to fill. Place the Report ID in the byte at index <paramref name="offset"/>.</param>
+            <param name="offset">The index in the buffer to begin filling with data.</param>
+            <param name="count">The number of bytes in the feature request.</param>
+        </member>
+        <member name="M:HidSharp.HidStream.Read">
+            <summary>
+            Reads HID Input Reports.
+            </summary>
+            <returns>The data read.</returns>
+        </member>
+        <member name="M:HidSharp.HidStream.Read(System.Byte[])">
+            <summary>
+            Reads HID Input Reports.
+            </summary>
+            <param name="buffer">The buffer to place the reports into.</param>
+            <returns>The number of bytes read.</returns>
+        </member>
+        <member name="M:HidSharp.HidStream.EndRead(System.IAsyncResult)">
+            <inheritdoc />
+        </member>
+        <member name="M:HidSharp.HidStream.Seek(System.Int64,System.IO.SeekOrigin)">
+            <exclude />
+        </member>
+        <member name="M:HidSharp.HidStream.SetFeature(System.Byte[])">
+            <summary>
+            Sends a Set Feature setup request.
+            </summary>
+            <param name="buffer">The buffer of data to send. Place the Report ID in the first byte.</param>
+        </member>
+        <member name="M:HidSharp.HidStream.SetFeature(System.Byte[],System.Int32,System.Int32)">
+            <summary>
+            Sends a Set Feature setup request.
+            </summary>
+            <param name="buffer">The buffer of data to send. Place the Report ID in the byte at index <paramref name="offset"/>.</param>
+            <param name="offset">The index in the buffer to start the write from.</param>
+            <param name="count">The number of bytes in the feature request.</param>
+        </member>
+        <member name="M:HidSharp.HidStream.SetLength(System.Int64)">
+            <exclude />
+        </member>
+        <member name="M:HidSharp.HidStream.Write(System.Byte[])">
+            <summary>
+            Writes an HID Output Report to the device.
+            </summary>
+            <param name="buffer">The buffer containing the report. Place the Report ID in the first byte.</param>
+        </member>
+        <member name="M:HidSharp.HidStream.EndWrite(System.IAsyncResult)">
+            <inheritdoc />
+        </member>
+        <member name="P:HidSharp.HidStream.CanRead">
+            <exclude />
+        </member>
+        <member name="P:HidSharp.HidStream.CanSeek">
+            <exclude />
+        </member>
+        <member name="P:HidSharp.HidStream.CanWrite">
+            <exclude />
+        </member>
+        <member name="P:HidSharp.HidStream.CanTimeout">
+            <exclude />
+        </member>
+        <member name="P:HidSharp.HidStream.Device">
+            <summary>
+            Gets the <see cref="T:HidSharp.HidDevice"/> associated with this stream.
+            </summary>
+        </member>
+        <member name="P:HidSharp.HidStream.Length">
+            <exclude />
+        </member>
+        <member name="P:HidSharp.HidStream.Position">
+            <exclude />
+        </member>
+        <member name="P:HidSharp.HidStream.ReadTimeout">
+            <summary>
+            The maximum amount of time, in milliseconds, to wait for to receive a HID report.
+            
+            The default is 3000 milliseconds.
+            To disable the timeout, set this to <see cref="F:System.Threading.Timeout.Infinite"/>.
+            </summary>
+        </member>
+        <member name="P:HidSharp.HidStream.WriteTimeout">
+            <summary>
+            The maximum amount of time, in milliseconds, to wait for the device to acknowledge a HID report.
+            
+            The default is 3000 milliseconds.
+            To disable the timeout, set this to <see cref="F:System.Threading.Timeout.Infinite"/>.
+            </summary>
+        </member>
+        <member name="T:HidSharp.ReportDescriptors.Units.MassUnit">
+            <summary>
+            Defines the possible units of mass.
+            </summary>
+        </member>
+        <member name="F:HidSharp.ReportDescriptors.Units.MassUnit.None">
+            <summary>
+            The unit system has no unit of mass.
+            </summary>
+        </member>
+        <member name="F:HidSharp.ReportDescriptors.Units.MassUnit.Gram">
+            <summary>
+            The unit of mass is the gram (occurs in the SI Linear and Rotation unit systems).
+            </summary>
+        </member>
+        <member name="F:HidSharp.ReportDescriptors.Units.MassUnit.Slug">
+            <summary>
+            The unit of mass is the slug (occurs in the English Linear and Rotation unit systems).
+            </summary>
+        </member>
+        <member name="T:HidSharp.ReportDescriptors.ItemType">
+            <summary>
+            Describes the manner in which an item affects the descriptor.
+            </summary>
+        </member>
+        <member name="F:HidSharp.ReportDescriptors.ItemType.Main">
+            <summary>
+            Main items determine the report being described.
+            For example, a main item switches between Input and Output reports.
+            </summary>
+        </member>
+        <member name="F:HidSharp.ReportDescriptors.ItemType.Global">
+            <summary>
+            Global items affect all reports later in the descriptor.
+            </summary>
+        </member>
+        <member name="F:HidSharp.ReportDescriptors.ItemType.Local">
+            <summary>
+            Local items only affect the current report.
+            </summary>
+        </member>
+        <member name="F:HidSharp.ReportDescriptors.ItemType.Reserved">
+            <summary>
+            Long items use this type.
+            </summary>
+        </member>
+        <member name="T:HidSharp.HidDevice">
+            <summary>
+            Represents a USB HID class device.
+            </summary>
+        </member>
+        <member name="M:HidSharp.HidDevice.Open">
+            <summary>
+            Makes a connection to the USB HID class device, or throws an exception if the connection cannot be made.
+            </summary>
+            <returns>The stream to use to communicate with the device.</returns>
+        </member>
+        <member name="M:HidSharp.HidDevice.GetReportDescriptor">
+            <summary>
+            Returns the raw report descriptor of the USB device.
+            Currently this is only supported on Linux.
+            </summary>
+            <returns>The report descriptor.</returns>
+        </member>
+        <member name="M:HidSharp.HidDevice.TryOpen(HidSharp.HidStream@)">
+            <summary>
+            Tries to make a connection to the USB HID class device.
+            </summary>
+            <param name="stream">The stream to use to communicate with the device.</param>
+            <returns>True if the connetion was successful.</returns>
+        </member>
+        <member name="M:HidSharp.HidDevice.ToString">
+            <inheritdoc />
+        </member>
+        <member name="P:HidSharp.HidDevice.DevicePath">
+            <summary>
+            The operating system's name for the device.
+            
+            If you have multiple devices with the same Vendor ID, Product ID, Serial Number. etc.,
+            this may be useful for differentiating them.
+            </summary>
+        </member>
+        <member name="P:HidSharp.HidDevice.MaxInputReportLength">
+            <summary>
+            The maximum input report length, including the Report ID byte.
+            If the device does not use Report IDs, the first byte will always be 0.
+            </summary>
+        </member>
+        <member name="P:HidSharp.HidDevice.MaxOutputReportLength">
+            <summary>
+            The maximum output report length, including the Report ID byte.
+            If the device does not use Report IDs, use 0 for the first byte.
+            </summary>
+        </member>
+        <member name="P:HidSharp.HidDevice.MaxFeatureReportLength">
+            <summary>
+            The maximum feature report length, including the Report ID byte.
+            If the device does not use Report IDs, use 0 for the first byte.
+            </summary>
+        </member>
+        <member name="P:HidSharp.HidDevice.Manufacturer">
+            <summary>
+            The manufacturer name.
+            </summary>
+        </member>
+        <member name="P:HidSharp.HidDevice.ProductID">
+            <summary>
+            The USB product ID. These are listed at: http://usb-ids.gowdy.us
+            </summary>
+        </member>
+        <member name="P:HidSharp.HidDevice.ProductName">
+            <summary>
+            The product name.
+            </summary>
+        </member>
+        <member name="P:HidSharp.HidDevice.ProductVersion">
+            <summary>
+            The product version.
+            This is a 16-bit number encoding the major and minor versions in the upper and lower 8 bits, respectively.
+            </summary>
+        </member>
+        <member name="P:HidSharp.HidDevice.SerialNumber">
+            <summary>
+            The device serial number.
+            </summary>
+        </member>
+        <member name="P:HidSharp.HidDevice.VendorID">
+            <summary>
+            The USB vendor ID. These are listed at: http://usb-ids.gowdy.us
+            </summary>
+        </member>
+        <member name="T:HidSharp.ReportDescriptors.Units.UnitSystem">
+            <summary>
+            Defines the possible unit systems.
+            </summary>
+        </member>
+        <member name="F:HidSharp.ReportDescriptors.Units.UnitSystem.None">
+            <summary>
+            No units are used.
+            </summary>
+        </member>
+        <member name="F:HidSharp.ReportDescriptors.Units.UnitSystem.SILinear">
+            <summary>
+            The SI Linear unit system uses centimeters for length, grams for mass, seconds for time,
+            Kelvin for temperature, Amperes for current, and candelas for luminous intensity.
+            </summary>
+        </member>
+        <member name="F:HidSharp.ReportDescriptors.Units.UnitSystem.SIRotation">
+            <summary>
+            The SI Rotation unit system uses radians for length, grams for mass, seconds for time,
+            Kelvin for temperature, Amperes for current, and candelas for luminous intensity.
+            </summary>
+        </member>
+        <member name="F:HidSharp.ReportDescriptors.Units.UnitSystem.EnglishLinear">
+            <summary>
+            The English Linear unit system uses inches for length, slugs for mass, seconds for time,
+            Fahrenheit for temperature, Amperes for current, and candelas for luminous intensity.
+            </summary>
+        </member>
+        <member name="F:HidSharp.ReportDescriptors.Units.UnitSystem.EnglishRotation">
+            <summary>
+            The English Rotation unit system uses degrees for length, slugs for mass, seconds for time,
+            Fahrenheit for temperature, Amperes for current, and candelas for luminous intensity.
+            </summary>
+        </member>
+        <member name="T:HidSharp.ReportDescriptors.Units.LengthUnit">
+            <summary>
+            Defines the possible units of length.
+            </summary>
+        </member>
+        <member name="F:HidSharp.ReportDescriptors.Units.LengthUnit.None">
+            <summary>
+            The unit system has no unit of length.
+            </summary>
+        </member>
+        <member name="F:HidSharp.ReportDescriptors.Units.LengthUnit.Centimeter">
+            <summary>
+            The unit of length is the centimeter (occurs in the SI Linear unit system).
+            </summary>
+        </member>
+        <member name="F:HidSharp.ReportDescriptors.Units.LengthUnit.Radians">
+            <summary>
+            The unit of length is the radian (occurs in the SI Rotation unit system).
+            </summary>
+        </member>
+        <member name="F:HidSharp.ReportDescriptors.Units.LengthUnit.Inch">
+            <summary>
+            The unit of length is the inch (occurs in the English Linear unit system).
+            </summary>
+        </member>
+        <member name="F:HidSharp.ReportDescriptors.Units.LengthUnit.Degrees">
+            <summary>
+            The unit of length is the degree (occurs in the English Rotation unit system).
+            </summary>
+        </member>
+        <member name="T:HidSharp.ReportDescriptors.Units.Unit">
+            <summary>
+            Describes the units of a report value.
+            </summary>
+        </member>
+        <member name="M:HidSharp.ReportDescriptors.Units.Unit.#ctor(System.UInt32)">
+            <summary>
+            Initializes a new instance of the <see cref="T:HidSharp.ReportDescriptors.Units.Unit"/> class.
+            </summary>
+            <param name="value">The raw HID value describing the units.</param>
+        </member>
+        <member name="M:HidSharp.ReportDescriptors.Units.Unit.DecodeExponent(System.UInt32)">
+            <summary>
+            Decodes an encoded HID unit exponent.
+            </summary>
+            <param name="value">The encoded exponent.</param>
+            <returns>The exponent.</returns>
+        </member>
+        <member name="M:HidSharp.ReportDescriptors.Units.Unit.EncodeExponent(System.Int32)">
+            <summary>
+            Encodes an exponent in HID unit form.
+            </summary>
+            <param name="value">The exponent.</param>
+            <returns>The encoded exponent.</returns>
+        </member>
+        <member name="P:HidSharp.ReportDescriptors.Units.Unit.System">
+            <summary>
+            Gets or sets the unit system.
+            </summary>
+        </member>
+        <member name="P:HidSharp.ReportDescriptors.Units.Unit.LengthExponent">
+            <summary>
+            Gets or sets the exponent of the report value's units of length.
+            </summary>
+        </member>
+        <member name="P:HidSharp.ReportDescriptors.Units.Unit.LengthUnit">
+            <summary>
+            Gets the units of length corresponding to <see cref="P:HidSharp.ReportDescriptors.Units.Unit.System"/>.
+            </summary>
+        </member>
+        <member name="P:HidSharp.ReportDescriptors.Units.Unit.MassExponent">
+            <summary>
+            Gets or sets the exponent of the report value's units of mass.
+            </summary>
+        </member>
+        <member name="P:HidSharp.ReportDescriptors.Units.Unit.MassUnit">
+            <summary>
+            Gets the units of mass corresponding to <see cref="P:HidSharp.ReportDescriptors.Units.Unit.System"/>.
+            </summary>
+        </member>
+        <member name="P:HidSharp.ReportDescriptors.Units.Unit.TimeExponent">
+            <summary>
+            Gets or sets the exponent of the report value's units of time.
+            </summary>
+        </member>
+        <member name="P:HidSharp.ReportDescriptors.Units.Unit.TimeUnit">
+            <summary>
+            Gets the units of time corresponding to <see cref="P:HidSharp.ReportDescriptors.Units.Unit.System"/>.
+            </summary>
+        </member>
+        <member name="P:HidSharp.ReportDescriptors.Units.Unit.TemperatureExponent">
+            <summary>
+            Gets or sets the exponent of the report value's units of temperature.
+            </summary>
+        </member>
+        <member name="P:HidSharp.ReportDescriptors.Units.Unit.TemperatureUnit">
+            <summary>
+            Gets the units of temperature corresponding to <see cref="P:HidSharp.ReportDescriptors.Units.Unit.System"/>.
+            </summary>
+        </member>
+        <member name="P:HidSharp.ReportDescriptors.Units.Unit.CurrentExponent">
+            <summary>
+            Gets or sets the exponent of the report value's units of current.
+            </summary>
+        </member>
+        <member name="P:HidSharp.ReportDescriptors.Units.Unit.CurrentUnit">
+            <summary>
+            Gets the units of current corresponding to <see cref="P:HidSharp.ReportDescriptors.Units.Unit.System"/>.
+            </summary>
+        </member>
+        <member name="P:HidSharp.ReportDescriptors.Units.Unit.LuminousIntensityExponent">
+            <summary>
+            Gets or sets the exponent of the report value's units of luminous intensity.
+            </summary>
+        </member>
+        <member name="P:HidSharp.ReportDescriptors.Units.Unit.LuminousIntensityUnit">
+            <summary>
+            Gets the units of luminous intensity corresponding to <see cref="P:HidSharp.ReportDescriptors.Units.Unit.System"/>.
+            </summary>
+        </member>
+        <member name="P:HidSharp.ReportDescriptors.Units.Unit.Value">
+            <summary>
+            Gets or sets the raw HID value describing the units.
+            </summary>
+        </member>
+        <member name="T:HidSharp.ReportDescriptors.Units.TimeUnit">
+            <summary>
+            Defines the possible units of time.
+            </summary>
+        </member>
+        <member name="F:HidSharp.ReportDescriptors.Units.TimeUnit.None">
+            <summary>
+            The unit system has no unit of time.
+            </summary>
+        </member>
+        <member name="F:HidSharp.ReportDescriptors.Units.TimeUnit.Seconds">
+            <summary>
+            The unit of time is seconds.
+            </summary>
+        </member>
+        <member name="F:HidSharp.ReportDescriptors.DataMainItemFlags.None">
+            <summary>
+            No flags are set.
+            </summary>
+        </member>
+        <member name="F:HidSharp.ReportDescriptors.DataMainItemFlags.Constant">
+            <summary>
+            Constant values cannot be changed.
+            </summary>
+        </member>
+        <member name="F:HidSharp.ReportDescriptors.DataMainItemFlags.Variable">
+            <summary>
+            Each variable field corresponds to a particular value.
+            The alternative is an array, where each field specifies an index.
+            For example, with eight buttons, a variable field would have eight bits.
+            An array would have an index of which button is pressed.
+            </summary>
+        </member>
+        <member name="F:HidSharp.ReportDescriptors.DataMainItemFlags.Relative">
+            <summary>
+            Mouse motion is in relative coordinates.
+            Most sensors -- joysticks, accelerometers, etc. -- output absolute coordinates.
+            </summary>
+        </member>
+        <member name="F:HidSharp.ReportDescriptors.DataMainItemFlags.Wrap">
+            <summary>
+            The value wraps around in a continuous manner.
+            </summary>
+        </member>
+        <member name="T:HidSharp.ReportDescriptors.Units.LuminousIntensityUnit">
+            <summary>
+            Defines the possible units of luminous intensity.
+            </summary>
+        </member>
+        <member name="F:HidSharp.ReportDescriptors.Units.LuminousIntensityUnit.None">
+            <summary>
+            The unit system has no unit of luminous intensity.
+            </summary>
+        </member>
+        <member name="F:HidSharp.ReportDescriptors.Units.LuminousIntensityUnit.Candela">
+            <summary>
+            The unit of luminous intensity is the candela.
+            </summary>
+        </member>
+        <member name="T:HidSharp.ReportDescriptors.Units.CurrentUnit">
+            <summary>
+            Defines the possible units of current.
+            </summary>
+        </member>
+        <member name="F:HidSharp.ReportDescriptors.Units.CurrentUnit.None">
+            <summary>
+            The unit system has no unit of current.
+            </summary>
+        </member>
+        <member name="F:HidSharp.ReportDescriptors.Units.CurrentUnit.Ampere">
+            <summary>
+            The unit of current is the Ampere.
+            </summary>
+        </member>
+        <member name="T:HidSharp.ReportDescriptors.Parser.Report">
+            <summary>
+            Reads and writes HID reports.
+            </summary>
+        </member>
+        <member name="M:HidSharp.ReportDescriptors.Parser.Report.#ctor">
+            <summary>
+            Initializes a new instance of the <see cref="T:HidSharp.ReportDescriptors.Parser.Report"/> class.
+            </summary>
+        </member>
+        <member name="M:HidSharp.ReportDescriptors.Parser.Report.Clear">
+            <summary>
+            Resets the instance to its initial state.
+            </summary>
+        </member>
+        <member name="M:HidSharp.ReportDescriptors.Parser.Report.Scan(System.Byte[],System.Int32,HidSharp.ReportDescriptors.Parser.ReportScanCallback)">
+            <summary>
+            Reads a HID report, calling back a provided function for each segment.
+            </summary>
+            <param name="buffer">The buffer containing the report.</param>
+            <param name="offset">The offset to begin reading the report at.</param>
+            <param name="callback">
+                This callback will be called for each report segment.
+                Use this to read every value you need.
+            </param>
+        </member>
+        <member name="M:HidSharp.ReportDescriptors.Parser.Report.Write(HidSharp.ReportDescriptors.Parser.ReportScanCallback)">
+            <summary>
+            Writes a HID report, calling back a provided function for each segment.
+            </summary>
+            <param name="callback">
+                This callback will be called for each report segment.
+                Write to each segment to write a complete HID report.
+            </param>
+        </member>
+        <member name="P:HidSharp.ReportDescriptors.Parser.Report.ID">
+            <summary>
+            The Report ID.
+            </summary>
+        </member>
+        <member name="P:HidSharp.ReportDescriptors.Parser.Report.Length">
+            <summary>
+            The length of this particular report.
+            The Report ID is not included in this length.
+            </summary>
+        </member>
+        <member name="T:HidSharp.ReportDescriptors.Parser.ReportDescriptorParser">
+            <summary>
+            Parses HID report descriptors.
+            </summary>
+        </member>
+        <member name="M:HidSharp.ReportDescriptors.Parser.ReportDescriptorParser.#ctor">
+            <summary>
+            Initializes a new instance of the <see cref="T:HidSharp.ReportDescriptors.Parser.ReportDescriptorParser"/> class.
+            </summary>
+        </member>
+        <member name="M:HidSharp.ReportDescriptors.Parser.ReportDescriptorParser.Clear">
+            <summary>
+            Resets the parser to its initial state.
+            </summary>
+        </member>
+        <member name="M:HidSharp.ReportDescriptors.Parser.ReportDescriptorParser.Parse(System.Byte[])">
+            <summary>
+            Parses a raw HID report descriptor.
+            </summary>
+            <param name="buffer">The buffer containing the report descriptor.</param>
+        </member>
+        <member name="M:HidSharp.ReportDescriptors.Parser.ReportDescriptorParser.Parse(System.Byte[],System.Int32,System.Int32)">
+            <summary>
+            Parses a raw HID report descriptor.
+            </summary>
+            <param name="buffer">The buffer containing the report descriptor.</param>
+            <param name="offset">The offset into the buffer to begin parsing from.</param>
+            <param name="count">The number of bytes to parse.</param>
+        </member>
+        <member name="M:HidSharp.ReportDescriptors.Parser.ReportDescriptorParser.Parse(System.Collections.Generic.IEnumerable{HidSharp.ReportDescriptors.EncodedItem})">
+            <summary>
+            Parses all of the <see cref="T:HidSharp.ReportDescriptors.EncodedItem"/> elements in a report descriptor.
+            </summary>
+            <param name="items">The items to parse.</param>
+        </member>
+        <member name="M:HidSharp.ReportDescriptors.Parser.ReportDescriptorParser.Parse(HidSharp.ReportDescriptors.EncodedItem)">
+            <summary>
+            Parses a single <see cref="T:HidSharp.ReportDescriptors.EncodedItem"/>.
+            Call this repeatedly for every item to completely decode a report descriptor.
+            </summary>
+            <param name="item">The item to parse.</param>
+        </member>
+        <member name="P:HidSharp.ReportDescriptors.Parser.ReportDescriptorParser.InputReportMaxLength">
+            <summary>
+            The maximum input report length.
+            The Report ID is not included in this length.
+            </summary>
+        </member>
+        <member name="P:HidSharp.ReportDescriptors.Parser.ReportDescriptorParser.OutputReportMaxLength">
+            <summary>
+            The maximum output report length.
+            The Report ID is not included in this length.
+            </summary>
+        </member>
+        <member name="P:HidSharp.ReportDescriptors.Parser.ReportDescriptorParser.FeatureReportMaxLength">
+            <summary>
+            The maximum feature report length.
+            The Report ID is not included in this length.
+            </summary>
+        </member>
+        <member name="P:HidSharp.ReportDescriptors.Parser.ReportDescriptorParser.ReportsUseID">
+            <summary>
+            True if the device sends Report IDs.
+            </summary>
+        </member>
+    </members>
+</doc>

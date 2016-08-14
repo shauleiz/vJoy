@@ -30,6 +30,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="vJoyInterface.def" />
+    <None Include="ClassDiagram.cd" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Header Files">
