@@ -29,10 +29,11 @@ VGENINTERFACE_API int GetVJDButtonNumber(UINT rID)	// Get the number of buttons 
 {
 	if (Range_vXbox(rID))
 	{
-		if (!IX_isControllerPluggedIn(to_vXbox(rID)))
-			return 0;
-		else
+		BOOL Exist;
+		if (SUCCEEDED(IX_isControllerPluggedIn(to_vXbox(rID), &Exist)) && Exist)
 			return 10;
+		else
+			return 0;
 	}
 	else
 		return vJoyNS::GetVJDButtonNumber(rID);
@@ -42,10 +43,11 @@ VGENINTERFACE_API int GetVJDDiscPovNumber(UINT rID)	// Get the number of POVs de
 {
 	if (Range_vXbox(rID))
 	{
-		if (!IX_isControllerPluggedIn(to_vXbox(rID)))
-			return 0;
-		else
+		BOOL Exist;
+		if (SUCCEEDED(IX_isControllerPluggedIn(to_vXbox(rID), &Exist)) && Exist)
 			return 1;
+		else
+			return 0;
 	}
 	else
 		return vJoyNS::GetVJDDiscPovNumber(rID);
@@ -63,16 +65,19 @@ VGENINTERFACE_API BOOL GetVJDAxisExist(UINT rID, UINT Axis) // Test if given axi
 {
 	if (Range_vXbox(rID))
 	{
-		if (!IX_isControllerPluggedIn(to_vXbox(rID)))
-			return FALSE;
-			
-		if ((Axis == HID_USAGE_X) || (Axis == HID_USAGE_Y) || (Axis == HID_USAGE_Z) || (Axis == HID_USAGE_RX) || (Axis == HID_USAGE_RY) || (Axis == HID_USAGE_RZ))
-			return TRUE;
+		BOOL Exist;
+		if (SUCCEEDED(IX_isControllerPluggedIn(to_vXbox(rID), &Exist)) && Exist)
+		{
+			if ((Axis == HID_USAGE_X) || (Axis == HID_USAGE_Y) || (Axis == HID_USAGE_Z) || (Axis == HID_USAGE_RX) || (Axis == HID_USAGE_RY) || (Axis == HID_USAGE_RZ))
+				return TRUE;
+			else
+				return FALSE;
+		}
 		else
 			return FALSE;
 	}
 	else
-		return vJoyNS::GetVJDAxisExist(rID, Axis);
+		return (vJoyNS::GetVJDAxisExist(rID, Axis) == TRUE);
 }
 
 VGENINTERFACE_API BOOL GetVJDAxisMax(UINT rID, UINT Axis, LONG * Max) // Get logical Maximum value for a given axis defined in the specified VDJ
@@ -129,10 +134,19 @@ VGENINTERFACE_API enum VjdStat GetVJDStatus(UINT rID)			// Get the status of the
 {
 	if (Range_vXbox(rID))
 	{
-		if (IX_isControllerPluggedIn(to_vXbox(rID)))
-			return VJD_STAT_OWN;
-		else
-			return VJD_STAT_UNKN;
+		BOOL Exist, Owned;
+		if SUCCEEDED(IX_isControllerOwned(to_vXbox(rID), &Owned))
+		{
+			if (Owned)
+				return VJD_STAT_OWN;
+		}
+
+		if SUCCEEDED(IX_isControllerPluggedIn(to_vXbox(rID), &Exist))
+		{
+			if (Exist)
+				return VJD_STAT_BUSY;
+		}
+			return VJD_STAT_FREE;
 	}
 	else
 		return vJoyNS::GetVJDStatus(rID);
@@ -141,7 +155,13 @@ VGENINTERFACE_API enum VjdStat GetVJDStatus(UINT rID)			// Get the status of the
 VGENINTERFACE_API BOOL isVJDExists(UINT rID)					// TRUE if the specified vJoy Device exists
 {
 	if (Range_vXbox(rID))
-		return (IX_isControllerPluggedIn(to_vXbox(rID)));
+	{
+
+		BOOL Exist;
+		if SUCCEEDED(IX_isControllerPluggedIn(to_vXbox(rID), &Exist))
+					 return Exist;
+		return FALSE;
+	}
 	else
 		return vJoyNS::isVJDExists(rID);
 }
@@ -193,27 +213,32 @@ VGENINTERFACE_API BOOL UpdateVJD(UINT rID, PVOID pData)	// Update the position d
 VGENINTERFACE_API BOOL SetAxis(LONG Value, UINT rID, UINT Axis)		// Write Value to a given axis defined in the specified VDJ 
 {
 	if (Range_vJoy(rID))
-		return vJoyNS::SetAxis(Value, rID, Axis);
+		return (vJoyNS::SetAxis(Value, rID, Axis) == TRUE);
 
 	if (Range_vXbox(rID))
 	{
-		if (!IX_isControllerPluggedIn(to_vXbox(rID)))
+		if (!SUCCEEDED(IX_isControllerPluggedIn(to_vXbox(rID))))
 			return FALSE;
+
+		// Remap Axes
+		Axis = Axis - HID_USAGE_X + 1;
 
 		// If Axis is X,Y,RX,RY (1,2,4,5) then remap range:
 		// 0 - 32768  ==> -32768 - 32767
 		SHORT vx_Value;
 		if (Axis == 1 || Axis == 2 || Axis == 4 || Axis == 5)
 		{
-			vx_Value = static_cast<SHORT>(2 * (Value - 1) - 32767);
+			if (Value > 32767)
+				Value = 32767;
+			vx_Value = (Value- 16384)*2;
 			if (Axis == 1)
-				return IX_SetAxisLx(to_vXbox(rID), vx_Value);
+				return SUCCEEDED(IX_SetAxisLx(to_vXbox(rID), vx_Value));
 			if (Axis == 2)
-				return IX_SetAxisLy(to_vXbox(rID), vx_Value);
+				return SUCCEEDED(IX_SetAxisLy(to_vXbox(rID), vx_Value));
 			if (Axis == 4)
-				return IX_SetAxisRx(to_vXbox(rID), vx_Value);
+				return SUCCEEDED(IX_SetAxisRx(to_vXbox(rID), vx_Value));
 			if (Axis == 5)
-				return IX_SetAxisRy(to_vXbox(rID), vx_Value);
+				return SUCCEEDED(IX_SetAxisRy(to_vXbox(rID), vx_Value));
 		}
 
 		// If Triggers (3,6) then remap range:
@@ -222,9 +247,9 @@ VGENINTERFACE_API BOOL SetAxis(LONG Value, UINT rID, UINT Axis)		// Write Value 
 		{
 			vx_Value = static_cast<SHORT>((Value - 1) /128);
 			if (Axis == 3)
-				return IX_SetTriggerR(to_vXbox(rID), static_cast<BYTE>(vx_Value));
+				return SUCCEEDED(IX_SetTriggerR(to_vXbox(rID), static_cast<BYTE>(vx_Value)));
 			if (Axis == 6)
-				return IX_SetTriggerL(to_vXbox(rID), static_cast<BYTE>(vx_Value));
+				return SUCCEEDED(IX_SetTriggerL(to_vXbox(rID), static_cast<BYTE>(vx_Value)));
 		}
 		else 
 			return FALSE;
@@ -239,7 +264,7 @@ VGENINTERFACE_API BOOL SetBtn(BOOL Value, UINT rID, UCHAR nBtn)		// Write Value 
 		return vJoyNS::SetBtn(Value, rID, nBtn);
 
 	if (Range_vXbox(rID))
-		return IX_SetBtn(to_vXbox(rID), Value, nBtn);
+		return SUCCEEDED(IX_SetBtn(to_vXbox(rID), Value, nBtn));
 
 	return FALSE;
 }

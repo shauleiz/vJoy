@@ -74,6 +74,7 @@ int main()
 	getchar();
 	getchar();
 	C_DisplayStatus();
+	C_DisplayAllDeviceCtrls();
 
 	// Loop through interactive tests
 	C_Test(h1);
@@ -259,16 +260,16 @@ void C_TestAxis(HDEVICE hDev)
 	{
 		printf("Enter Axis number\n");
 		UINT Axis;
-		scanf("%u%c", &Axis);
+		scanf("%d%*c", &Axis);
 
 		printf("0-100 (Q to quit)?\n");
 		char s_val[20];
-		scanf("%s", s_val);
+		scanf("%19s%*c", s_val);
 		if (tolower(s_val[0]) == 'q')
 			break;
 
 		FLOAT f_val;
-		sscanf(s_val, "%f", &f_val);
+		sscanf(s_val, "%f%*c", &f_val);
 
 		BOOL ok = SetDevAxis(hDev, Axis, f_val);
 	}
