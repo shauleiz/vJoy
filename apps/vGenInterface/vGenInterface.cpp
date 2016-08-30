@@ -230,7 +230,7 @@ VGENINTERFACE_API BOOL SetAxis(LONG Value, UINT rID, UINT Axis)		// Write Value 
 		{
 			if (Value > 32767)
 				Value = 32767;
-			vx_Value = (Value- 16384)*2;
+			vx_Value = static_cast<SHORT>((Value- 16384)*2);
 			if (Axis == 1)
 				return SUCCEEDED(IX_SetAxisLx(to_vXbox(rID), vx_Value));
 			if (Axis == 2)

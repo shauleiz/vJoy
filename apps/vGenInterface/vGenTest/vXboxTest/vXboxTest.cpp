@@ -290,7 +290,7 @@ void PressDpad(UINT iDev)
 			continue;
 		}
 
-		for (int i = 0; i < len; i++)
+		for (size_t i = 0; i < len; i++)
 		{
 			if (tolower(Side[i]) == 'u')
 				Flags |= XINPUT_GAMEPAD_DPAD_UP;

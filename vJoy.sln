@@ -104,6 +104,9 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Testing", "Testing", "{906CDBED-CB4F-4560-ACEB-04CCDFB2116C}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ForceFree", "apps\vGenInterface\vGenTest\FreeDev\FreeDev.vcxproj", "{CE7EF748-2FCE-4ECC-8E51-7F43A893BE62}"
+	ProjectSection(ProjectDependencies) = postProject
+		{B9272D99-836B-4201-A168-4AD780550D1E} = {B9272D99-836B-4201-A168-4AD780550D1E}
+	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "CompatTest", "apps\vGenInterface\vGenTest\CompatTest\CompatTest.vcxproj", "{293C477A-8B77-419D-B8A9-0CA5212934CC}"
 	ProjectSection(ProjectDependencies) = postProject
