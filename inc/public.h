@@ -148,7 +148,7 @@ typedef struct _HID_DEVICE_ATTRIBUTES {
 #endif
 
 // Device Type
-enum DevType { vJoy, vXbox };
+//enum DevType { vJoy, vXbox };
 
 // Error levels for status report
 enum ERRLEVEL {INFO, WARN, ERR, FATAL, APP};

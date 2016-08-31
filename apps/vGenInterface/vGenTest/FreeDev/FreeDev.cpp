@@ -1,8 +1,7 @@
 // FreeDev.cpp : Free vXbox & vJoy devices
 //
-#include "../../stdafx.h"
+#include "stdafx.h"
 #include <Xinput.h>
-#include "../../../../inc/public.h"
 #include "../../vGenInterface.h"
 
 

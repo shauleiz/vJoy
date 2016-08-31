@@ -1,8 +1,7 @@
 #define _CRT_SECURE_NO_WARNINGS
 
-#include "../../stdafx.h"
+#include "stdafx.h"
 #include <Xinput.h>
-#include "../../../../inc/public.h"
 #include "../../vGenInterface.h"
 
 void TopLoop(UINT iDev);

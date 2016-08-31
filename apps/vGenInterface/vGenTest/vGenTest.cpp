@@ -1,7 +1,6 @@
 // Test vGenInterface - Unified API for vJoy and vXbox
 #include "../stdafx.h"
 #include <Xinput.h>
-#include "../../../inc/public.h"
 #include "../vGenInterface.h"
 
 // General Functions

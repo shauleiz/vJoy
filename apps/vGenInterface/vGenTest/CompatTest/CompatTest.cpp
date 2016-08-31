@@ -1,9 +1,9 @@
 // CompatTest.cpp : Defines the entry point for the console application.
 //
 
-#include "../../stdafx.h"
+#include "stdafx.h"
 #include <Xinput.h>
-#include "../../../../inc/public.h"
+//#include "../../../../inc/public.h"
 #include "../../vGenInterface.h"
 
 void CM_DisplayStatus();
