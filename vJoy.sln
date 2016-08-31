@@ -85,8 +85,14 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "vGenInterface", "apps\vGenI
 	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "vJoyInterface", "apps\common\vJoyInterface\vJoyInterface2012.vcxproj", "{9E1FC894-F587-4FBA-8599-2F8C544E061A}"
+	ProjectSection(ProjectDependencies) = postProject
+		{9EB6193B-FCC1-450F-9B1F-B64E8B380940} = {9EB6193B-FCC1-450F-9B1F-B64E8B380940}
+	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "vJoyInterfaceStat", "apps\common\vJoyInterfaceStat\vJoyInterfaceStat2012.vcxproj", "{F7AB57BB-BA05-44F7-BD41-C39290DFE829}"
+	ProjectSection(ProjectDependencies) = postProject
+		{9EB6193B-FCC1-450F-9B1F-B64E8B380940} = {9EB6193B-FCC1-450F-9B1F-B64E8B380940}
+	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "vGenInterface", "vGenInterface", "{7A79C6D2-E447-478D-84C8-307A91F6E533}"
 EndProject
