@@ -68,3 +68,4 @@ apps/common/vJoyInterface/RCa11704
 apps/vGenInterface/vGenTest/vXboxTest/ReadMe.txt
 apps/vGenInterface/vGenTest/FreeDev/FreeDev.vcxproj.filters
 apps/vGenInterface/vGenTest/FreeDev/ReadMe.txt
+*.odt#

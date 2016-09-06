@@ -279,74 +279,75 @@ typedef void (CALLBACK *FfbGenCB)(PVOID, PVOID);
 ///  8	| Slider1	|	-
 ///  
 
-///
+extern "C" {
+	///
 #pragma region Backward compatibility API
 //////////////////////////////////////////////////////////////////////////////////////
 // Version
-VGENINTERFACE_API	SHORT		__cdecl GetvJoyVersion(void);
+	VGENINTERFACE_API	SHORT		__cdecl GetvJoyVersion(void);
 
-/////	vJoy/vXbox Device properties
-VGENINTERFACE_API int	__cdecl  GetVJDButtonNumber(UINT rID);	// Get the number of buttons defined in the specified VDJ
-VGENINTERFACE_API int	__cdecl  GetVJDDiscPovNumber(UINT rID);	// Get the number of descrete-type POV hats defined in the specified VDJ
-VGENINTERFACE_API int	__cdecl  GetVJDContPovNumber(UINT rID);	// Get the number of descrete-type POV hats defined in the specified VDJ
-VGENINTERFACE_API BOOL	__cdecl  GetVJDAxisExist(UINT rID, UINT Axis); // Test if given axis defined in the specified VDJ
-VGENINTERFACE_API BOOL	__cdecl  GetVJDAxisMax(UINT rID, UINT Axis, LONG * Max); // Get logical Maximum value for a given axis defined in the specified VDJ
-VGENINTERFACE_API BOOL	__cdecl  GetVJDAxisMin(UINT rID, UINT Axis, LONG * Min); // Get logical Minimum value for a given axis defined in the specified VDJ
-VGENINTERFACE_API enum VjdStat	__cdecl	GetVJDStatus(UINT rID);			// Get the status of the specified vJoy Device.
-VGENINTERFACE_API BOOL	__cdecl	isVJDExists(UINT rID);					// TRUE if the specified vJoy Device exists
+	/////	vJoy/vXbox Device properties
+	VGENINTERFACE_API int	__cdecl  GetVJDButtonNumber(UINT rID);	// Get the number of buttons defined in the specified VDJ
+	VGENINTERFACE_API int	__cdecl  GetVJDDiscPovNumber(UINT rID);	// Get the number of descrete-type POV hats defined in the specified VDJ
+	VGENINTERFACE_API int	__cdecl  GetVJDContPovNumber(UINT rID);	// Get the number of descrete-type POV hats defined in the specified VDJ
+	VGENINTERFACE_API BOOL	__cdecl  GetVJDAxisExist(UINT rID, UINT Axis); // Test if given axis defined in the specified VDJ
+	VGENINTERFACE_API BOOL	__cdecl  GetVJDAxisMax(UINT rID, UINT Axis, LONG * Max); // Get logical Maximum value for a given axis defined in the specified VDJ
+	VGENINTERFACE_API BOOL	__cdecl  GetVJDAxisMin(UINT rID, UINT Axis, LONG * Min); // Get logical Minimum value for a given axis defined in the specified VDJ
+	VGENINTERFACE_API enum VjdStat	__cdecl	GetVJDStatus(UINT rID);			// Get the status of the specified vJoy Device.
+	VGENINTERFACE_API BOOL	__cdecl	isVJDExists(UINT rID);					// TRUE if the specified vJoy Device exists
 
-/////	Write access to vJoy Device - Basic
-VGENINTERFACE_API BOOL		__cdecl	AcquireVJD(UINT rID);				// Acquire the specified vJoy Device.
-VGENINTERFACE_API VOID		__cdecl	RelinquishVJD(UINT rID);			// Relinquish the specified vJoy Device.
-VGENINTERFACE_API BOOL		__cdecl	UpdateVJD(UINT rID, PVOID pData);	// Update the position data of the specified vJoy Device.
+	/////	Write access to vJoy Device - Basic
+	VGENINTERFACE_API BOOL		__cdecl	AcquireVJD(UINT rID);				// Acquire the specified vJoy Device.
+	VGENINTERFACE_API VOID		__cdecl	RelinquishVJD(UINT rID);			// Relinquish the specified vJoy Device.
+	VGENINTERFACE_API BOOL		__cdecl	UpdateVJD(UINT rID, PVOID pData);	// Update the position data of the specified vJoy Device.
 
-/////	Write access to vJoy Device - Modifyiers
-// This group of functions modify the current value of the position data
-// They replace the need to create a structure of position data then call UpdateVJD
+	/////	Write access to vJoy Device - Modifyiers
+	// This group of functions modify the current value of the position data
+	// They replace the need to create a structure of position data then call UpdateVJD
 
-//// Device-Reset functions
-VGENINTERFACE_API BOOL		__cdecl	ResetVJD(UINT rID);			// Reset all controls to predefined values in the specified VDJ
-VGENINTERFACE_API VOID		__cdecl	ResetAll(void);				// Reset all controls to predefined values in all VDJ
-VGENINTERFACE_API BOOL		__cdecl	ResetButtons(UINT rID);		// Reset all buttons (To 0) in the specified VDJ
-VGENINTERFACE_API BOOL		__cdecl	ResetPovs(UINT rID);		// Reset all POV Switches (To -1) in the specified VDJ
+	//// Device-Reset functions
+	VGENINTERFACE_API BOOL		__cdecl	ResetVJD(UINT rID);			// Reset all controls to predefined values in the specified VDJ
+	VGENINTERFACE_API VOID		__cdecl	ResetAll(void);				// Reset all controls to predefined values in all VDJ
+	VGENINTERFACE_API BOOL		__cdecl	ResetButtons(UINT rID);		// Reset all buttons (To 0) in the specified VDJ
+	VGENINTERFACE_API BOOL		__cdecl	ResetPovs(UINT rID);		// Reset all POV Switches (To -1) in the specified VDJ
 
-// Write data
-VGENINTERFACE_API BOOL		__cdecl	SetAxis(LONG Value, UINT rID, UINT Axis);		// Write Value to a given axis defined in the specified VDJ 
-VGENINTERFACE_API BOOL		__cdecl	SetBtn(BOOL Value, UINT rID, UCHAR nBtn);		// Write Value to a given button defined in the specified VDJ 
-VGENINTERFACE_API BOOL		__cdecl	SetDiscPov(int Value, UINT rID, UCHAR nPov);	// Write Value to a given descrete POV defined in the specified VDJ 
-VGENINTERFACE_API BOOL		__cdecl	SetContPov(DWORD Value, UINT rID, UCHAR nPov);	// Write Value to a given continuous POV defined in the specified VDJ 
+	// Write data
+	VGENINTERFACE_API BOOL		__cdecl	SetAxis(LONG Value, UINT rID, UINT Axis);		// Write Value to a given axis defined in the specified VDJ 
+	VGENINTERFACE_API BOOL		__cdecl	SetBtn(BOOL Value, UINT rID, UCHAR nBtn);		// Write Value to a given button defined in the specified VDJ 
+	VGENINTERFACE_API BOOL		__cdecl	SetDiscPov(int Value, UINT rID, UCHAR nPov);	// Write Value to a given descrete POV defined in the specified VDJ 
+	VGENINTERFACE_API BOOL		__cdecl	SetContPov(DWORD Value, UINT rID, UCHAR nPov);	// Write Value to a given continuous POV defined in the specified VDJ 
 
-// FFB function
-VGENINTERFACE_API FFBEType	__cdecl	FfbGetEffect();	// Returns effect serial number if active, 0 if inactive
-VGENINTERFACE_API VOID		__cdecl	FfbRegisterGenCB(FfbGenCB cb, PVOID data);
-__declspec(deprecated("** FfbStart function was deprecated - you can remove it from your code **")) \
-VGENINTERFACE_API BOOL		__cdecl	FfbStart(UINT rID);				  // Start the FFB queues of the specified vJoy Device.
-__declspec(deprecated("** FfbStop function was deprecated - you can remove it from your code **")) \
-VGENINTERFACE_API VOID		__cdecl	FfbStop(UINT rID);				  // Stop the FFB queues of the specified vJoy Device.
+	// FFB function
+	VGENINTERFACE_API FFBEType	__cdecl	FfbGetEffect();	// Returns effect serial number if active, 0 if inactive
+	VGENINTERFACE_API VOID		__cdecl	FfbRegisterGenCB(FfbGenCB cb, PVOID data);
+	__declspec(deprecated("** FfbStart function was deprecated - you can remove it from your code **")) \
+		VGENINTERFACE_API BOOL		__cdecl	FfbStart(UINT rID);				  // Start the FFB queues of the specified vJoy Device.
+	__declspec(deprecated("** FfbStop function was deprecated - you can remove it from your code **")) \
+		VGENINTERFACE_API VOID		__cdecl	FfbStop(UINT rID);				  // Stop the FFB queues of the specified vJoy Device.
 
-																	  // Added in 2.1.6
-VGENINTERFACE_API BOOL		__cdecl	IsDeviceFfb(UINT rID);
-VGENINTERFACE_API BOOL		__cdecl	IsDeviceFfbEffect(UINT rID, UINT Effect);
+																			  // Added in 2.1.6
+	VGENINTERFACE_API BOOL		__cdecl	IsDeviceFfb(UINT rID);
+	VGENINTERFACE_API BOOL		__cdecl	IsDeviceFfbEffect(UINT rID, UINT Effect);
 
-//  Force Feedback (FFB) helper functions
-VGENINTERFACE_API DWORD 	__cdecl	Ffb_h_DeviceID(const FFB_DATA * Packet, int *DeviceID);
-VGENINTERFACE_API DWORD 	__cdecl Ffb_h_Type(const FFB_DATA * Packet, FFBPType *Type);
-VGENINTERFACE_API DWORD 	__cdecl Ffb_h_Packet(const FFB_DATA * Packet, WORD *Type, int *DataSize, BYTE *Data[]);
-VGENINTERFACE_API DWORD 	__cdecl Ffb_h_EBI(const FFB_DATA * Packet, int *Index);
-VGENINTERFACE_API DWORD 	__cdecl Ffb_h_Eff_Report(const FFB_DATA * Packet, FFB_EFF_REPORT*  Effect);
-//__declspec(deprecated("** Ffb_h_Eff_Const function was deprecated - Use function Ffb_h_Eff_Report **")) \
-//VGENINTERFACE_API DWORD 	__cdecl Ffb_h_Eff_Const(const FFB_DATA * Packet, FFB_EFF_REPORT*  Effect);
-VGENINTERFACE_API DWORD		__cdecl Ffb_h_Eff_Ramp(const FFB_DATA * Packet, FFB_EFF_RAMP*  RampEffect);
-VGENINTERFACE_API DWORD 	__cdecl Ffb_h_EffOp(const FFB_DATA * Packet, FFB_EFF_OP*  Operation);
-VGENINTERFACE_API DWORD 	__cdecl Ffb_h_DevCtrl(const FFB_DATA * Packet, FFB_CTRL *  Control);
-VGENINTERFACE_API DWORD 	__cdecl Ffb_h_Eff_Period(const FFB_DATA * Packet, FFB_EFF_PERIOD*  Effect);
-VGENINTERFACE_API DWORD 	__cdecl Ffb_h_Eff_Cond(const FFB_DATA * Packet, FFB_EFF_COND*  Condition);
-VGENINTERFACE_API DWORD 	__cdecl Ffb_h_DevGain(const FFB_DATA * Packet, BYTE * Gain);
-VGENINTERFACE_API DWORD		__cdecl Ffb_h_Eff_Envlp(const FFB_DATA * Packet, FFB_EFF_ENVLP*  Envelope);
-VGENINTERFACE_API DWORD		__cdecl Ffb_h_EffNew(const FFB_DATA * Packet, FFBEType * Effect);
+	//  Force Feedback (FFB) helper functions
+	VGENINTERFACE_API DWORD 	__cdecl	Ffb_h_DeviceID(const FFB_DATA * Packet, int *DeviceID);
+	VGENINTERFACE_API DWORD 	__cdecl Ffb_h_Type(const FFB_DATA * Packet, FFBPType *Type);
+	VGENINTERFACE_API DWORD 	__cdecl Ffb_h_Packet(const FFB_DATA * Packet, WORD *Type, int *DataSize, BYTE *Data[]);
+	VGENINTERFACE_API DWORD 	__cdecl Ffb_h_EBI(const FFB_DATA * Packet, int *Index);
+	VGENINTERFACE_API DWORD 	__cdecl Ffb_h_Eff_Report(const FFB_DATA * Packet, FFB_EFF_REPORT*  Effect);
+	//__declspec(deprecated("** Ffb_h_Eff_Const function was deprecated - Use function Ffb_h_Eff_Report **")) \
+	//VGENINTERFACE_API DWORD 	__cdecl Ffb_h_Eff_Const(const FFB_DATA * Packet, FFB_EFF_REPORT*  Effect);
+	VGENINTERFACE_API DWORD		__cdecl Ffb_h_Eff_Ramp(const FFB_DATA * Packet, FFB_EFF_RAMP*  RampEffect);
+	VGENINTERFACE_API DWORD 	__cdecl Ffb_h_EffOp(const FFB_DATA * Packet, FFB_EFF_OP*  Operation);
+	VGENINTERFACE_API DWORD 	__cdecl Ffb_h_DevCtrl(const FFB_DATA * Packet, FFB_CTRL *  Control);
+	VGENINTERFACE_API DWORD 	__cdecl Ffb_h_Eff_Period(const FFB_DATA * Packet, FFB_EFF_PERIOD*  Effect);
+	VGENINTERFACE_API DWORD 	__cdecl Ffb_h_Eff_Cond(const FFB_DATA * Packet, FFB_EFF_COND*  Condition);
+	VGENINTERFACE_API DWORD 	__cdecl Ffb_h_DevGain(const FFB_DATA * Packet, BYTE * Gain);
+	VGENINTERFACE_API DWORD		__cdecl Ffb_h_Eff_Envlp(const FFB_DATA * Packet, FFB_EFF_ENVLP*  Envelope);
+	VGENINTERFACE_API DWORD		__cdecl Ffb_h_EffNew(const FFB_DATA * Packet, FFBEType * Effect);
 
-// Added in 2.1.6
-VGENINTERFACE_API DWORD		__cdecl Ffb_h_Eff_Constant(const FFB_DATA * Packet, FFB_EFF_CONSTANT *  ConstantEffect);
+	// Added in 2.1.6
+	VGENINTERFACE_API DWORD		__cdecl Ffb_h_Eff_Constant(const FFB_DATA * Packet, FFB_EFF_CONSTANT *  ConstantEffect);
 #pragma endregion
 
 #pragma region vXbox API
@@ -381,7 +382,7 @@ VGENINTERFACE_API DWORD		__cdecl Ffb_h_Eff_Constant(const FFB_DATA * Packet, FFB
 #endif // SPECIFICRESET
 
 	// Button functions: Per-button Press/Release
-	VGENINTERFACE_API	DWORD		__cdecl SetBtn(UINT UserIndex, WORD Button, BOOL Press);
+	VGENINTERFACE_API	DWORD		__cdecl SetButton(UINT UserIndex, WORD Button, BOOL Press);
 #ifdef SPECIFICBUTTONS
 	VGENINTERFACE_API	BOOL		__cdecl SetBtnA(UINT UserIndex, BOOL Press);
 	VGENINTERFACE_API	BOOL		__cdecl SetBtnB(UINT UserIndex, BOOL Press);
@@ -439,3 +440,4 @@ VGENINTERFACE_API DWORD		__cdecl Ffb_h_Eff_Constant(const FFB_DATA * Packet, FFB
 	VGENINTERFACE_API DWORD			__cdecl SetDevAxis(HDEVICE hDev, UINT Axis, FLOAT Value);
 	VGENINTERFACE_API DWORD			__cdecl SetDevPov(HDEVICE hDev, UINT nPov, FLOAT Value);
 #pragma endregion
+} // extern "C"

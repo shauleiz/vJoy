@@ -18,6 +18,7 @@
 #pragma comment(lib, "vJoyInterfaceStat.lib")
 #pragma comment(lib, "XOutputStatic_1_2.lib")
 
+extern "C" {
 
 #pragma region Interface Functions (vJoy)
 VGENINTERFACE_API SHORT GetvJoyVersion(void)
@@ -478,7 +479,7 @@ VGENINTERFACE_API DWORD ResetControllerDPad(UINT UserIndex)
 #endif // SPECIFICRESET
 
 
-VGENINTERFACE_API DWORD SetBtn(UINT UserIndex, WORD Button, BOOL Press)
+VGENINTERFACE_API DWORD SetButton(UINT UserIndex, WORD Button, BOOL Press)
 {
 	return IX_SetBtn(UserIndex, Press,  Button);
 }
@@ -1153,6 +1154,8 @@ VGENINTERFACE_API DWORD  SetDevPov(HDEVICE hDev, UINT nPov, FLOAT Value)
 }
 
 #pragma endregion
+
+} //extern "C"
 
 #pragma region Internal vXbox
 DWORD	IX_isVBusExists(void)
