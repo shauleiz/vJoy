@@ -361,7 +361,7 @@ extern "C" {
 	//////////////////////////////////////////////////////////////////////////////////////
 
 	// Virtual vXbox bus information
-	VGENINTERFACE_API	DWORD		__cdecl isVBusExists(void);
+	VGENINTERFACE_API	DWORD		__cdecl isVBusExist(void);
 	VGENINTERFACE_API	DWORD		__cdecl GetNumEmptyBusSlots(UCHAR * nSlots);
 
 	// Device Status (Plugin/Unplug and check ownership)
@@ -431,7 +431,7 @@ extern "C" {
 	VGENINTERFACE_API DWORD			__cdecl isDevExist(UINT DevId, DevType dType, BOOL * Exist);	// Is device plugged-in/Configured
 	VGENINTERFACE_API DWORD			__cdecl isDevFree(UINT DevId, DevType dType, BOOL * Free);	// Is device unplugged/Free
 	VGENINTERFACE_API DWORD			__cdecl	GetDevHandle(UINT DevId, DevType dType, HDEVICE * hDev);// Return device handle from Device ID and Device type
-	VGENINTERFACE_API DWORD			__cdecl isAxisExists(HDEVICE hDev, UINT nAxis, BOOL * Exist);	// Does Axis exist. See above table
+	VGENINTERFACE_API DWORD			__cdecl isAxisExist(HDEVICE hDev, UINT nAxis, BOOL * Exist);	// Does Axis exist. See above table
 	VGENINTERFACE_API DWORD			__cdecl GetDevButtonN(HDEVICE hDev, UINT * nBtn);			// Get number of buttons in device
 	VGENINTERFACE_API DWORD			__cdecl GetDevHatN(HDEVICE hDev, UINT * nHat);				// Get number of Hat Switches in device
 

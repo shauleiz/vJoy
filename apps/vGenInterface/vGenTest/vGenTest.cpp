@@ -43,7 +43,7 @@ int main()
 	DisplayError(dwRes);
 
 	SHORT vJoyVer = GetvJoyVersion();
-	BOOL exist = (STATUS_SUCCESS == isVBusExists());
+	BOOL exist = (STATUS_SUCCESS == isVBusExist());
 	BYTE Led[4];
 	XINPUT_VIBRATION Vib;
 	LONG MaxX;
@@ -114,7 +114,7 @@ void C_DisplayStatus()
 	getchar();
 
 	// Test if vXbox bus exists
-	if (STATUS_SUCCESS == isVBusExists())
+	if (STATUS_SUCCESS == isVBusExist())
 		printf("Virtual Xbox bus exists\n");
 	else
 		printf("Virtual Xbox bus does NOT exist\n");
@@ -354,7 +354,7 @@ void C_DisplayDeviceCtrls(HDEVICE hDev)
 	for (size_t i = 1; i <= 8; i++)
 	{
 		
-		dwRes = isAxisExists(hDev, i, &Exist);
+		dwRes = isAxisExist(hDev, i, &Exist);
 		if SUCCEEDED(dwRes)
 		{
 			if (Exist)
@@ -416,7 +416,7 @@ void B_DisplayStatus()
 	getchar();
 
 	// Test if vXbox bus exists
-	if (STATUS_SUCCESS == isVBusExists())
+	if (STATUS_SUCCESS == isVBusExist())
 		printf("Virtual Xbox bus exists\n");
 	else
 		printf("Virtual Xbox bus does NOT exist\n");

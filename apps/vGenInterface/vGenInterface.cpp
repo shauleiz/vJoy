@@ -413,7 +413,7 @@ VGENINTERFACE_API DWORD Ffb_h_Eff_Constant(const FFB_DATA * Packet, FFB_EFF_CONS
 #pragma endregion Interface Functions (vJoy)
 
 #pragma region Interface Functions (vXbox)
-VGENINTERFACE_API DWORD isVBusExists(void)
+VGENINTERFACE_API DWORD isVBusExist(void)
 {
 	return IX_isVBusExists();
 }
@@ -882,7 +882,7 @@ VGENINTERFACE_API DWORD GetDevHandle(UINT DevId, DevType dType, HDEVICE * hDev) 
 		return STATUS_UNSUCCESSFUL;
 }
 
-VGENINTERFACE_API DWORD isAxisExists(HDEVICE hDev, UINT nAxis, BOOL * Exist)	// Does Axis exist.
+VGENINTERFACE_API DWORD isAxisExist(HDEVICE hDev, UINT nAxis, BOOL * Exist)	// Does Axis exist.
 {
 	BOOL Owned;
 	DWORD res;
