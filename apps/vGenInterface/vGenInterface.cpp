@@ -1084,10 +1084,10 @@ VGENINTERFACE_API DWORD  SetDevPov(HDEVICE hDev, UINT nPov, FLOAT Value)
 	{
 		// Don't test for type - just try
 
-		// Continuous: Convert Value from range 0-100 to range 0-35999 (-1 means Reset)
+		// Continuous: Convert Value from range 0-359.99 to range 0-35999 (-1 means Reset)
 		LONG vj_Value = -1;
 		if (Value >= 0)
-			vj_Value = static_cast <LONG>(35999 * Value / 100);
+			vj_Value = static_cast <LONG>(Value * 100);
 		BOOL res = IJ_SetContPov(vj_Value, hDev, nPov);
 		if (res == TRUE)
 			return STATUS_SUCCESS;
@@ -1097,19 +1097,19 @@ VGENINTERFACE_API DWORD  SetDevPov(HDEVICE hDev, UINT nPov, FLOAT Value)
 		switch (static_cast <int>(Value))
 		{
 			case 0:
-			case 100:
+			case 360:
 				vjd_Value = 0;
 				break;
 
-			case 25:
+			case 90:
 				vjd_Value = 1;
 				break;
 
-			case 50:
+			case 180:
 				vjd_Value = 2;
 				break;
 
-			case 75:
+			case 270:
 				vjd_Value = 3;
 				break;
 
@@ -1131,19 +1131,19 @@ VGENINTERFACE_API DWORD  SetDevPov(HDEVICE hDev, UINT nPov, FLOAT Value)
 
 		if (Value == 0)
 			return IX_SetDpad(hDev, DPAD_UP);
-		if (Value == 12.5)
+		if (Value == 45)
 			return IX_SetDpad(hDev, DPAD_UP | DPAD_RIGHT);
-		if (Value == 25)
+		if (Value == 90)
 			return IX_SetDpad(hDev, DPAD_RIGHT);
-		if (Value == 37.5)
+		if (Value == 135)
 			return IX_SetDpad(hDev, DPAD_DOWN | DPAD_RIGHT);
-		if (Value == 50)
+		if (Value == 180)
 			return IX_SetDpad(hDev, DPAD_DOWN);
-		if (Value == 62.5)
+		if (Value == 225)
 			return IX_SetDpad(hDev, DPAD_DOWN | DPAD_LEFT);
-		if (Value == 75)
+		if (Value == 270)
 			return IX_SetDpad(hDev, DPAD_LEFT);
-		if (Value == 87.5)
+		if (Value == 315)
 			return IX_SetDpad(hDev, DPAD_UP | DPAD_LEFT);
 
 		return IX_SetDpad(hDev, DPAD_OFF);
