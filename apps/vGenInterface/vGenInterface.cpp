@@ -725,7 +725,7 @@ VGENINTERFACE_API DWORD isDevExist(UINT DevId, DevType dType, BOOL * Exist)
 	if (dType == vJoy)
 	{
 		VjdStat stat = vJoyNS::GetVJDStatus(DevId);
-		if ((stat == VJD_STAT_OWN) || (stat == VJD_STAT_BUSY))
+		if ((stat == VJD_STAT_OWN) || (stat == VJD_STAT_BUSY) || (stat == VJD_STAT_FREE))
 			*Exist = TRUE;
 		else
 			*Exist = FALSE;
