@@ -26,6 +26,11 @@ VGENINTERFACE_API SHORT GetvJoyVersion(void)
 	return vJoyNS::GetvJoyVersion();
 }
 
+VGENINTERFACE_API	BOOL		vJoyEnabled(void) 
+{
+	return vJoyNS::vJoyEnabled();
+}
+
 VGENINTERFACE_API int GetVJDButtonNumber(UINT rID)	// Get the number of buttons defined in the specified device
 {
 	if (Range_vXbox(rID))

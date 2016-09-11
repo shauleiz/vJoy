@@ -285,6 +285,7 @@ extern "C" {
 //////////////////////////////////////////////////////////////////////////////////////
 // Version
 	VGENINTERFACE_API	SHORT		__cdecl GetvJoyVersion(void);
+	VGENINTERFACE_API	BOOL		__cdecl vJoyEnabled(void);
 
 	/////	vJoy/vXbox Device properties
 	VGENINTERFACE_API int	__cdecl  GetVJDButtonNumber(UINT rID);	// Get the number of buttons defined in the specified VDJ
