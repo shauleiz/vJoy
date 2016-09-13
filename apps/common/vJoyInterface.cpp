@@ -3239,6 +3239,10 @@ void	InitDll(void)
     // Start Logging if logging requested
     StartLogging();
 
+	// Reset all devices
+	for (int Index = 1; Index <= 16; Index++)
+		InitPosition(Index);
+
     // Create window process on another thread
     DWORD dwThreadId;
     hEvent =  CreateEvent(NULL, TRUE, FALSE, NULL);
