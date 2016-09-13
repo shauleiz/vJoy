@@ -39,6 +39,13 @@ enum VjdStat  /* Declares an enumeration data type */
 #define BAD_ID_RANGE				 	 -9
 #define NO_SUCH_AXIS				 	 -10
 
+/* Registry Constants */
+#define REG_PARAM		L"SYSTEM\\CurrentControlSet\\services\\vjoy\\Parameters"
+#define REG_PARAM_DEV0	L"SYSTEM\\CurrentControlSet\\services\\vjoy\\Parameters\\Device0"
+#define REG_PARAM_DEV	L"SYSTEM\\CurrentControlSet\\services\\vjoy\\Parameters\\Device"
+#define REG_DEVICE		L"Device"
+#define REG_INIT		L"Init"
+#define BTN_INIT		L"BTNS"
 
 /* Environment Variables */
 #define INTERFACE_LOG_LEVEL "VJOYINTERFACELOGLEVEL"
@@ -92,6 +99,15 @@ struct DEV_INFO {
 	BYTE	DriverFFB;		// Does this driver support FFB (False)
 	BYTE	DeviceFFB;		// Does this device support FFB (False)
 } ;
+
+// Structure that holds initial values of device controls
+typedef struct _DEVICE_INIT_VALS {
+	UCHAR cb;				// Size in bytes of this structure
+	USHORT id;				// Device ID
+	UCHAR InitValAxis[8];	// Initial Value of axes (X, Y, Z, RX, RY, RZ, SL1, SL2)  in %
+	UCHAR InitValPov[4];	// Initial Value of POVs in % (0xFF means neutral point)
+	UCHAR ButtonMask[16];	// Each bit represents a button
+} DEVICE_INIT_VALS, *PDEVICE_INIT_VALS;
 
 
 typedef void (CALLBACK *RemovalCB)(BOOL, BOOL, PVOID);

@@ -3328,6 +3328,7 @@ HDEVNOTIFY RegisterHandleNotification(HWND Win, HANDLE hDev)
 }
 
 
+
 BOOL	InitPosition(int Index)
 {
     /*
@@ -3419,6 +3420,95 @@ BOOL	Update(UINT rID)
     }
     CloseHandle(OverLapped.hEvent);
     return res;
+}
+
+/*++
+Routine Description:
+
+GetInitValueFromRegistry helper function reads the initialization values for the controls of a device.
+
+Returns:
+Bit-Mask where every bit refers to an entry in the output buffer.
+If a bit is set the the entry (Axis, POV or the button mask) is valid.
+If none is valid (or the key is missing) returns 0.
+
+Parameters:
+id [in]:			The id of the device to initialize
+data_buf[in/out]:	In:		Size of buffer in memger cb
+Out:	Initialization data
+
+--*/
+unsigned int GetInitValueFromRegistry(USHORT		id, PDEVICE_INIT_VALS data_buf)
+{
+	NTSTATUS				status = STATUS_SUCCESS;
+	WDFKEY					KeyDevice, KeyParameters;
+	WCHAR					DeviceKeyName[512] = { 0 };
+	UNICODE_STRING			strDev, strControl;
+	PCWSTR					Axes[] = { L"X", L"Y", L"Z", L"RX", L"RY", L"RZ", L"SL1", L"SL2", L"POV1", L"POV2", L"POV3", L"POV4" };
+	UCHAR					nAxes = 0;
+	int						iAxis;
+	unsigned int			Mask = 0;
+	const int				nButtons = 128;
+
+	PAGED_CODE();
+
+	// Check that buffer size is sufficient
+	nAxes = sizeof(Axes) / sizeof(PCWSTR);
+	if (data_buf->cb < (2 + nAxes + sizeof(nButtons) / 8))
+	{
+		LogEventWithStatus(ERRLOG_REP_REG_FAILED, L"GetInitValueFromRegistry: Buffer size too small", WdfDriverWdmGetDriverObject(WdfGetDriver()), status);
+		return 0;
+	};
+	data_buf->id = id;
+
+	// Get the key of the Parameters key under "SYSTEM\\CurrentControlSet\\services\\vjoy"
+	status = WdfDriverOpenParametersRegistryKey(WdfGetDriver(), WRITE_DAC, WDF_NO_OBJECT_ATTRIBUTES, &KeyParameters);
+	if (!NT_SUCCESS(status))
+	{
+		LogEventWithStatus(ERRLOG_REP_REG_FAILED, L"WdfDriverOpenParametersRegistryKey", WdfDriverWdmGetDriverObject(WdfGetDriver()), status);
+		return 0;
+	};
+	status = STATUS_SUCCESS;
+
+	// Calculate the string of the registry key
+	status = RtlStringCchPrintfExW(DeviceKeyName, sizeof(DeviceKeyName) / sizeof(WCHAR), NULL, NULL, STRSAFE_NO_TRUNCATION, REG_DEVICE L"%02d\\" REG_INIT, id);
+	if (!NT_SUCCESS(status))
+	{
+		LogEventWithStatus(ERRLOG_REP_REG_FAILED, L"RtlStringCchPrintfExW", WdfDriverWdmGetDriverObject(WdfGetDriver()), status);
+		return 0;
+	};
+	RtlUnicodeStringInit(&strDev, DeviceKeyName);
+
+
+	// Open a handle to the key
+	status = WdfRegistryOpenKey(KeyParameters, &strDev, GENERIC_READ, WDF_NO_OBJECT_ATTRIBUTES, &KeyDevice);
+	if (!NT_SUCCESS(status))
+	{
+		LogEventWithStatus(ERRLOG_REP_REG_FAILED, L"WdfRegistryOpenKey", WdfDriverWdmGetDriverObject(WdfGetDriver()), status);
+		WdfRegistryClose(KeyParameters);
+		return 0;
+	};
+
+	// Analyze axes	& POVs
+	for (iAxis = 0; iAxis < nAxes; iAxis++)
+	{
+		RtlUnicodeStringInit(&strControl, Axes[iAxis]);
+		status = WdfRegistryQueryValue(KeyDevice, &strControl, 1, &(data_buf->InitValAxis[iAxis]), NULL, NULL); //val
+		if (status == STATUS_SUCCESS)
+			Mask |= 0x01;
+		Mask = Mask << 1;
+	};
+
+	// Analyze buttons BTN_INIT
+	RtlUnicodeStringInit(&strControl, BTN_INIT);
+	status = WdfRegistryQueryValue(KeyDevice, &strControl, 16, &(data_buf->ButtonMask), NULL, NULL);
+	if (status == STATUS_SUCCESS)
+		Mask |= 0x01;
+
+	WdfRegistryClose(KeyParameters);
+	WdfRegistryClose(KeyDevice);
+
+	return Mask;
 }
 
 
