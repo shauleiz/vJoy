@@ -275,13 +275,13 @@ extern "C" {
 			if (bytes && Stat)
 			{
 				if (LogStream)
-					_ftprintf_s(LogStream, _T("\n[%05d]Info: FfbIsStarted() - Returns (Immediatly) TRUE"), ProcessId);
+					_ftprintf_s(LogStream, _T("\n[%05u]Info: FfbIsStarted() - Returns (Immediatly) TRUE"), ProcessId);
 				return true;
 			}
 			else
 			{
 				if (LogStream)
-					_ftprintf_s(LogStream, _T("\n[%05d]Error: FfbIsStarted() - Returns (Immediatly) FALSE (bytes=%d stat=%d)"), ProcessId, bytes, Stat);
+					_ftprintf_s(LogStream, _T("\n[%05u]Error: FfbIsStarted() - Returns (Immediatly) FALSE (bytes=%u stat=%u)"), ProcessId, bytes, Stat);
 				return false;
 			}
 		}
@@ -294,7 +294,7 @@ extern "C" {
 			if (err != ERROR_IO_PENDING)
 			{
 				if (LogStream)
-					_ftprintf_s(LogStream, _T("\n[%05d]Error: FfbIsStarted() - error (0x%X) Returns FALSE"), ProcessId, err);
+					_ftprintf_s(LogStream, _T("\n[%05u]Error: FfbIsStarted() - error (0x%X) Returns FALSE"), ProcessId, err);
 				CloseHandle(OverLapped.hEvent);
 				return false;
 			}
@@ -306,13 +306,13 @@ extern "C" {
 			if (gotdata && nBytesTranss)
 			{
 				if (LogStream)
-					_ftprintf_s(LogStream, _T("\n[%05d]Info: FfbIsStarted() - gotdata=%d nBytesTranss=%d  Returns TRUE"), ProcessId, gotdata, nBytesTranss);
+					_ftprintf_s(LogStream, _T("\n[%05u]Info: FfbIsStarted() - gotdata=%d nBytesTranss=%d  Returns TRUE"), ProcessId, gotdata, nBytesTranss);
 				return true;
 			}
 			else
 			{
 				if (LogStream)
-					_ftprintf_s(LogStream, _T("\n[%05d]Info: FfbIsStarted() - gotdata=%d nBytesTranss=%d  Returns FALSE"), ProcessId, gotdata, nBytesTranss);
+					_ftprintf_s(LogStream, _T("\n[%05u]Info: FfbIsStarted() - gotdata=%d nBytesTranss=%d  Returns FALSE"), ProcessId, gotdata, nBytesTranss);
 				return false;
 			}
 		}
@@ -494,7 +494,7 @@ namespace vJoyNS {
 		if (!ok)
 		{
 			if (LogStream)
-				_ftprintf_s(LogStream, _T("\n[%05d]Info: GetVJDStatus(%d) - return VJD_STAT_UNKN"), ProcessId, rID);
+				_ftprintf_s(LogStream, _T("\n[%05u]Info: GetVJDStatus(%d) - return VJD_STAT_UNKN"), ProcessId, rID);
 			return VJD_STAT_UNKN;
 		}
 
@@ -508,7 +508,7 @@ namespace vJoyNS {
 		DWORD e;
 
 		if (LogStream)
-			_ftprintf_s(LogStream, _T("\n[%05d]Info: isVJDExists(%d) - Started"), ProcessId, rID);
+			_ftprintf_s(LogStream, _T("\n[%05u]Info: isVJDExists(%d) - Started"), ProcessId, rID);
 
 		int nbytes = 10;
 		BYTE buffer[10] = { 0 };
@@ -519,7 +519,7 @@ namespace vJoyNS {
 			return false;
 
 		if (LogStream)
-			_ftprintf_s(LogStream, _T("\n[%05d]Info: isVJDExists(%d) - buf[0]=%02d; buf[1]=%02d; buf[2]=%02d; buf[3]=%02d; buf[4]=%02d "), ProcessId, rID, buf[0], buf[1], buf[2], buf[3], buf[4]);
+			_ftprintf_s(LogStream, _T("\n[%05u]Info: isVJDExists(%d) - buf[0]=%02d; buf[1]=%02d; buf[2]=%02d; buf[3]=%02d; buf[4]=%02d "), ProcessId, rID, buf[0], buf[1], buf[2], buf[3], buf[4]);
 
 		if (buf[0] & 0x01)
 			return true;
@@ -531,7 +531,7 @@ namespace vJoyNS {
 		if (h != INVALID_HANDLE_VALUE)
 		{
 			if (LogStream)
-				_ftprintf_s(LogStream, _T("\n[%05d]Info: isVJDExists(%d) - Exit OK"), ProcessId, rID);
+				_ftprintf_s(LogStream, _T("\n[%05u]Info: isVJDExists(%d) - Exit OK"), ProcessId, rID);
 			CloseHandle(h);
 			return TRUE;
 		}
@@ -539,11 +539,11 @@ namespace vJoyNS {
 		if (e == ERROR_ACCESS_DENIED)
 		{
 			if (LogStream)
-				_ftprintf_s(LogStream, _T("\n[%05d]Info: isVJDExists(%d) - Exit OK (Access denied - probably busy)"), ProcessId, rID);
+				_ftprintf_s(LogStream, _T("\n[%05u]Info: isVJDExists(%d) - Exit OK (Access denied - probably busy)"), ProcessId, rID);
 			return TRUE;
 		}
 		if (LogStream)
-			_ftprintf_s(LogStream, _T("\n[%05d]Info: isVJDExists(%d) - Exit (Could not access this device)"), ProcessId, rID);
+			_ftprintf_s(LogStream, _T("\n[%05u]Info: isVJDExists(%d) - Exit (Could not access this device)"), ProcessId, rID);
 		return FALSE;
 #endif // VERSION205
 	}
@@ -580,7 +580,7 @@ namespace vJoyNS {
 		if (!ok)
 		{
 			if (LogStream)
-				_ftprintf_s(LogStream, _T("\n[%05d]Info: GetVJDStatus(%d) - return VJD_STAT_UNKN"), ProcessId, rID);
+				_ftprintf_s(LogStream, _T("\n[%05u]Info: GetVJDStatus(%d) - return VJD_STAT_UNKN"), ProcessId, rID);
 			return VJD_STAT_UNKN;
 		}
 
@@ -589,7 +589,7 @@ namespace vJoyNS {
 		{
 			Set_stat(rID, VJD_STAT_MISS);
 			if (LogStream)
-				_ftprintf_s(LogStream, _T("\n[%05d]Info: GetVJDStatus(%d) - return VJD_STAT_MISS"), ProcessId, rID);
+				_ftprintf_s(LogStream, _T("\n[%05u]Info: GetVJDStatus(%d) - return VJD_STAT_MISS"), ProcessId, rID);
 			return Get_stat(rID);
 		}
 
@@ -597,7 +597,7 @@ namespace vJoyNS {
 		if (!(buf[0] & 0x04))
 		{
 			if (LogStream)
-				_ftprintf_s(LogStream, _T("\n[%05d]Info: GetVJDStatus(%d) - return VJD_STAT_FREE"), ProcessId, rID);
+				_ftprintf_s(LogStream, _T("\n[%05u]Info: GetVJDStatus(%u) - return VJD_STAT_FREE"), ProcessId, rID);
 			Set_stat(rID, VJD_STAT_FREE);
 			return Get_stat(rID);
 		}
@@ -612,7 +612,7 @@ namespace vJoyNS {
 			Set_stat(rID, VJD_STAT_BUSY);
 
 		if (LogStream)
-			_ftprintf_s(LogStream, _T("\n[%05d]Info: GetVJDStatus(%d) - return %d"), ProcessId, rID, Get_stat(rID));
+			_ftprintf_s(LogStream, _T("\n[%05u]Info: GetVJDStatus(%d) - return %d"), ProcessId, rID, Get_stat(rID));
 
 		return Get_stat(rID);
 
@@ -812,7 +812,7 @@ namespace vJoyNS {
 		HIDP_CAPS Capabilities;
 
 		if (LogStream)
-			_ftprintf_s(LogStream, _T("\n[%05d]Info: GetVJDButtonNumber(rID=%d) - Starting"), ProcessId, rID);
+			_ftprintf_s(LogStream, _T("\n[%05u]Info: GetVJDButtonNumber(rID=%d) - Starting"), ProcessId, rID);
 
 		if (!AreControlsInit(rID))
 			GetControls(rID);
@@ -825,7 +825,7 @@ namespace vJoyNS {
 			return NO_HANDLE_BY_INDEX;
 
 		if (LogStream)
-			_ftprintf_s(LogStream, _T("\n[%05d]Info: GetVJDButtonNumber(rID=%d) - Using Index=%d"), ProcessId, rID, Index);
+			_ftprintf_s(LogStream, _T("\n[%05u]Info: GetVJDButtonNumber(rID=%d) - Using Index=%d"), ProcessId, rID, Index);
 
 		BOOL ok = HidD_GetPreparsedData(h, &PreparsedData);
 #else
@@ -836,7 +836,7 @@ namespace vJoyNS {
 		if (!ok)
 		{
 			if (LogStream)
-				_ftprintf_s(LogStream, _T("\n[%05d]Error: GetVJDButtonNumber(rID=%d) - HidD_GetPreparsedData() failed"), ProcessId, rID);
+				_ftprintf_s(LogStream, _T("\n[%05u]Error: GetVJDButtonNumber(rID=%d) - HidD_GetPreparsedData() failed"), ProcessId, rID);
 			CloseHandle(h);
 			return BAD_PREPARSED_DATA;
 		}
@@ -845,14 +845,14 @@ namespace vJoyNS {
 		if (stat != HIDP_STATUS_SUCCESS)
 		{
 			if (LogStream)
-				_ftprintf_s(LogStream, _T("\n[%05d]Error: GetVJDButtonNumber(rID=%d) - HidP_GetCaps() failed"), ProcessId, rID);
+				_ftprintf_s(LogStream, _T("\n[%05u]Error: GetVJDButtonNumber(rID=%d) - HidP_GetCaps() failed"), ProcessId, rID);
 			CloseHandle(h);
 			return NO_CAPS;
 		}
 
 		if (LogStream)
 		{
-			_ftprintf_s(LogStream, _T("\n[%05d]Info: GetVJDButtonNumber(rID=%d) - Capabilities: "), ProcessId, rID);
+			_ftprintf_s(LogStream, _T("\n[%05u]Info: GetVJDButtonNumber(rID=%d) - Capabilities: "), ProcessId, rID);
 			_ftprintf_s(LogStream, _T("\t Usage=0x%x;"), Capabilities.Usage);
 			_ftprintf_s(LogStream, _T("\t UsagePage=0x%x;"), Capabilities.UsagePage);
 			_ftprintf_s(LogStream, _T("\t InputReportByteLength=%d;"), Capabilities.InputReportByteLength);
@@ -868,7 +868,7 @@ namespace vJoyNS {
 		if (n < 1)
 		{
 			if (LogStream)
-				_ftprintf_s(LogStream, _T("\n[%05d]Error: GetVJDButtonNumber(rID=%d) - Number of button Caps is %d"), ProcessId, rID, n);
+				_ftprintf_s(LogStream, _T("\n[%05u]Error: GetVJDButtonNumber(rID=%d) - Number of button Caps is %d"), ProcessId, rID, n);
 			CloseHandle(h);
 			return BAD_N_BTN_CAPS;
 		}
@@ -878,7 +878,7 @@ namespace vJoyNS {
 		if (stat != HIDP_STATUS_SUCCESS)
 		{
 			if (LogStream)
-				_ftprintf_s(LogStream, _T("\n[%05d]Error: GetVJDButtonNumber(rID=%d) - HidP_GetButtonCaps() failed"), ProcessId, rID);
+				_ftprintf_s(LogStream, _T("\n[%05u]Error: GetVJDButtonNumber(rID=%d) - HidP_GetButtonCaps() failed"), ProcessId, rID);
 			CloseHandle(h);
 			delete[] 	bCaps;
 			return BAD_BTN_CAPS;
@@ -886,7 +886,7 @@ namespace vJoyNS {
 
 		if (LogStream)
 		{
-			_ftprintf_s(LogStream, _T("\n[%05d]Info: GetVJDButtonNumber(rID=%d) - Button Capabilities: "), ProcessId, rID);
+			_ftprintf_s(LogStream, _T("\n[%05u]Info: GetVJDButtonNumber(rID=%d) - Button Capabilities: "), ProcessId, rID);
 			_ftprintf_s(LogStream, _T("\t UsagePage=0x%x;"), bCaps[0].UsagePage);
 			_ftprintf_s(LogStream, _T("\t ReportID=%d;"), bCaps[0].ReportID);
 			_ftprintf_s(LogStream, _T("\t UsageMax=%d;"), (bCaps[0].Range).UsageMax);
@@ -903,7 +903,7 @@ namespace vJoyNS {
 		else
 		{
 			if (LogStream)
-				_ftprintf_s(LogStream, _T("\n[%05d]Error: GetVJDButtonNumber(rID=%d) - Bad Range"), ProcessId, rID);
+				_ftprintf_s(LogStream, _T("\n[%05u]Error: GetVJDButtonNumber(rID=%d) - Bad Range"), ProcessId, rID);
 			CloseHandle(h);
 			delete[] 	bCaps;
 			return BAD_BTN_RANGE;
@@ -914,7 +914,7 @@ namespace vJoyNS {
 		CloseHandle(h);
 
 		if (LogStream)
-			_ftprintf_s(LogStream, _T("\n[%05d]Info: GetVJDButtonNumber(rID=%d) - Return(nButtons=%d)"), ProcessId, rID, nButtons);
+			_ftprintf_s(LogStream, _T("\n[%05u]Info: GetVJDButtonNumber(rID=%d) - Return(nButtons=%d)"), ProcessId, rID, nButtons);
 		return nButtons;
 	}
 
@@ -1097,13 +1097,13 @@ namespace vJoyNS {
 			// The transaction was not completed.
 			// If it is just because it is pending then wait otherwise it is an error
 			if (LogStream)
-				_ftprintf_s(LogStream, _T("\n[%05d]Info: UpdateVJD() - DeviceIoControl was not completed"), ProcessId);
+				_ftprintf_s(LogStream, _T("\n[%05u]Info: UpdateVJD() - DeviceIoControl was not completed"), ProcessId);
 			DWORD err = GetLastError();
 			if (err != ERROR_IO_PENDING)
 			{
 				CloseHandle(OverLapped.hEvent);
 				if (LogStream)
-					_ftprintf_s(LogStream, _T("\n[%05d]Error: UpdateVJD() - DeviceIoControl failed with error 0x%X"), ProcessId, err);
+					_ftprintf_s(LogStream, _T("\n[%05u]Error: UpdateVJD() - DeviceIoControl failed with error 0x%X"), ProcessId, err);
 				return FALSE;
 			}
 			else
@@ -1113,14 +1113,14 @@ namespace vJoyNS {
 				{
 					CloseHandle(OverLapped.hEvent);
 					if (LogStream)
-						_ftprintf_s(LogStream, _T("\n[%05d]Error: UpdateVJD() - WaitForSingleObject returned 0x%X"), ProcessId, WaitRet);
+						_ftprintf_s(LogStream, _T("\n[%05u]Error: UpdateVJD() - WaitForSingleObject returned 0x%X"), ProcessId, WaitRet);
 					return FALSE;
 				}
 			}
 		}
 		CloseHandle(OverLapped.hEvent);
 		if (LogStream)
-			_ftprintf_s(LogStream, _T("\n[%05d]Info: UpdateVJD() - DeviceIoControl successful"), ProcessId);
+			_ftprintf_s(LogStream, _T("\n[%05u]Info: UpdateVJD() - DeviceIoControl successful"), ProcessId);
 		return TRUE;
 #endif // 0
 	}
@@ -1999,7 +1999,7 @@ HANDLE	GetHandleByIndex(int index)
 */
 
     if (LogStream)
-        _ftprintf_s(LogStream, _T("\n[%05d]Info: GetHandleByIndex(index=%d) - Starting"), ProcessId, index);
+        _ftprintf_s(LogStream, _T("\n[%05u]Info: GetHandleByIndex(index=%d) - Starting"), ProcessId, index);
 
     // Get  the device interfaceGUID for HIDClass devices.
     GUID HidGuid;
@@ -2016,7 +2016,7 @@ HANDLE	GetHandleByIndex(int index)
     if (INVALID_HANDLE_VALUE == hardwareDeviceInfo)
     {
     if (LogStream)
-        _ftprintf_s(LogStream, _T("\n[%05d]Error: GetHandleByIndex(index=%d) - Failed SetupDiGetClassDevs()"), ProcessId, index);
+        _ftprintf_s(LogStream, _T("\n[%05u]Error: GetHandleByIndex(index=%d) - Failed SetupDiGetClassDevs()"), ProcessId, index);
         return NULL;
     }
 
@@ -2063,7 +2063,7 @@ HANDLE	GetHandleByIndex(int index)
 	if ((err != ERROR_INSUFFICIENT_BUFFER) || !requiredLength)
 	{
 		if (LogStream)
-			_ftprintf_s(LogStream, _T("\n[%05d]Error: GetHandleByIndex(index=%d) - Failed SetupDiGetDeviceInterfaceDetail() with requiredLength=0"), ProcessId, index);
+			_ftprintf_s(LogStream, _T("\n[%05u]Error: GetHandleByIndex(index=%d) - Failed SetupDiGetDeviceInterfaceDetail() with requiredLength=0"), ProcessId, index);
 		return INVALID_HANDLE_VALUE;
 	}
 
@@ -2082,7 +2082,7 @@ HANDLE	GetHandleByIndex(int index)
         else
         {
             if (LogStream)
-                _ftprintf_s(LogStream, _T("\n[%05d]Error: GetHandleByIndex(index=%d) - Failed to allocate functionClassDeviceData"), ProcessId, index);
+                _ftprintf_s(LogStream, _T("\n[%05u]Error: GetHandleByIndex(index=%d) - Failed to allocate functionClassDeviceData"), ProcessId, index);
             LocalFree(functionClassDeviceData);
             SetupDiDestroyDeviceInfoList (hardwareDeviceInfo);
             return NULL;
@@ -2098,7 +2098,7 @@ HANDLE	GetHandleByIndex(int index)
             NULL))
         {
             if (LogStream)
-                _ftprintf_s(LogStream, _T("\n[%05d]Error: GetHandleByIndex(index=%d) - Failed SetupDiGetDeviceInterfaceDetail() [2]"), ProcessId, index);
+                _ftprintf_s(LogStream, _T("\n[%05u]Error: GetHandleByIndex(index=%d) - Failed SetupDiGetDeviceInterfaceDetail() [2]"), ProcessId, index);
             LocalFree(functionClassDeviceData);
             SetupDiDestroyDeviceInfoList (hardwareDeviceInfo);
             return NULL;
@@ -2115,7 +2115,7 @@ HANDLE	GetHandleByIndex(int index)
         if (INVALID_HANDLE_VALUE == HidDevice)
         {
             if (LogStream)
-                _ftprintf_s(LogStream, _T("\n[%05d]Error: GetHandleByIndex(index=%d) - Failed to CreateFile(%s)"), ProcessId, index, functionClassDeviceData->DevicePath);
+                _ftprintf_s(LogStream, _T("\n[%05u]Error: GetHandleByIndex(index=%d) - Failed to CreateFile(%s)"), ProcessId, index, functionClassDeviceData->DevicePath);
             LocalFree(functionClassDeviceData);
             SetupDiDestroyDeviceInfoList (hardwareDeviceInfo);
             CloseHandle(HidDevice);
@@ -2125,7 +2125,7 @@ HANDLE	GetHandleByIndex(int index)
 
         // Cleanup
             if (LogStream)
-                _ftprintf_s(LogStream, _T("\n[%05d]Info: GetHandleByIndex(index=%d) - Exit OK (Handle to %s)"), ProcessId, index, functionClassDeviceData->DevicePath);
+                _ftprintf_s(LogStream, _T("\n[%05u]Info: GetHandleByIndex(index=%d) - Exit OK (Handle to %s)"), ProcessId, index, functionClassDeviceData->DevicePath);
         LocalFree(functionClassDeviceData);
         SetupDiDestroyDeviceInfoList (hardwareDeviceInfo);
 
@@ -2171,7 +2171,7 @@ int		GetDeviceIndexById(USHORT VendorId, USHORT ProductId, int BaseIndex)
 	Attributes.Size = sizeof(HIDD_ATTRIBUTES);
 
     if (LogStream)
-		_ftprintf_s(LogStream, _T("\n[%05d]Info: GetDeviceIndexById(BaseIndex=%d) - Starting"), ProcessId, BaseIndex);
+		_ftprintf_s(LogStream, _T("\n[%05u]Info: GetDeviceIndexById(BaseIndex=%d) - Starting"), ProcessId, BaseIndex);
 
 	while (h = GetHandleByIndex(i++))
 	{
@@ -2183,12 +2183,12 @@ int		GetDeviceIndexById(USHORT VendorId, USHORT ProductId, int BaseIndex)
 			if ((Attributes.VendorID == VendorId) && (Attributes.ProductID == ProductId) && (iFound == -1))
 			iFound = i - 1;
 		if (LogStream && (gotit == TRUE))
-			_ftprintf_s(LogStream, _T("\n[%05d]Info: GetDeviceIndexById(BaseIndex=%d) - index=%d; VendorId=%x; ProductId=%x; VersionNumber=%x"), ProcessId, BaseIndex, i, Attributes.VendorID, Attributes.ProductID, Attributes.VersionNumber);
+			_ftprintf_s(LogStream, _T("\n[%05u]Info: GetDeviceIndexById(BaseIndex=%d) - index=%d; VendorId=%x; ProductId=%x; VersionNumber=%x"), ProcessId, BaseIndex, i, Attributes.VendorID, Attributes.ProductID, Attributes.VersionNumber);
 	}
 
 	//CloseHandle(h);
 	if (LogStream)
-		_ftprintf_s(LogStream, _T("\n[%05d]Info: GetDeviceIndexById(BaseIndex=%d) - Returning %d"), ProcessId, BaseIndex, iFound);
+		_ftprintf_s(LogStream, _T("\n[%05u]Info: GetDeviceIndexById(BaseIndex=%d) - Returning %d"), ProcessId, BaseIndex, iFound);
 	return iFound;
 }
 
@@ -2204,18 +2204,18 @@ int		GetDeviceIndexByReportId(USHORT VendorId, USHORT ProductId, BYTE ReportId)
     int id;
 
     if (LogStream)
-        _ftprintf_s(LogStream, _T("\n[%05d]Info: GetDeviceIndexByReportId(%d) - Starting"), ProcessId, ReportId );
+        _ftprintf_s(LogStream, _T("\n[%05u]Info: GetDeviceIndexByReportId(%d) - Starting"), ProcessId, ReportId );
 
     // Get the index of the next vJoy device
     while ((DevIndex = GetDeviceIndexById(VendorId, ProductId, i++)) >= 0)
     {
         if (LogStream)
-            _ftprintf_s(LogStream, _T("\n[%05d]Info: GetDeviceIndexByReportId(%d) - GetDeviceIndexById(i=%d) => %d"), ProcessId, ReportId, i, DevIndex);
+            _ftprintf_s(LogStream, _T("\n[%05u]Info: GetDeviceIndexByReportId(%d) - GetDeviceIndexById(i=%d) => %d"), ProcessId, ReportId, i, DevIndex);
 
         // Get the id of this vJoy device
         id = GetvJoyReportId(DevIndex);
         if (LogStream)
-            _ftprintf_s(LogStream, _T("\n[%05d]Info: GetDeviceIndexByReportId(%d) - GetvJoyReportId(DevIndex=%d) => %d"), ProcessId, ReportId, DevIndex, id);
+            _ftprintf_s(LogStream, _T("\n[%05u]Info: GetDeviceIndexByReportId(%d) - GetvJoyReportId(DevIndex=%d) => %d"), ProcessId, ReportId, DevIndex, id);
 
 
         // If this is the correct id then return the index
@@ -2225,7 +2225,7 @@ int		GetDeviceIndexByReportId(USHORT VendorId, USHORT ProductId, BYTE ReportId)
 
     // No match
     if (LogStream)
-            _ftprintf_s(LogStream, _T("\n[%05d]Error: GetDeviceIndexByReportId(%d) - No match"), ProcessId, ReportId);
+            _ftprintf_s(LogStream, _T("\n[%05u]Error: GetDeviceIndexByReportId(%d) - No match"), ProcessId, ReportId);
     return -1;
 }
 
@@ -2493,7 +2493,7 @@ BOOL	GetDeviceNameSpace(char ** NameSpace, int * Size, BOOL Refresh, DWORD *erro
         if (error)
             *error = GetLastError();
         if (LogStream)
-            _ftprintf_s(LogStream, _T("\n[%05d]Error: GetDeviceNameSpace() - Failed SetupDiGetClassDevs() with %x"), ProcessId, *error);
+            _ftprintf_s(LogStream, _T("\n[%05u]Error: GetDeviceNameSpace() - Failed SetupDiGetClassDevs() with %x"), ProcessId, *error);
         return FALSE; // INVALID_HANDLE_VALUE;
     }
 
@@ -2528,7 +2528,7 @@ BOOL	GetDeviceNameSpace(char ** NameSpace, int * Size, BOOL Refresh, DWORD *erro
 				if (error)
 					*error = GetLastError();
 				if (LogStream)
-					_ftprintf_s(LogStream, _T("\n[%05d]Error: GetDeviceNameSpace() - Failed SetupDiGetDeviceInterfaceDetail() with error %x"), ProcessId, *error);
+					_ftprintf_s(LogStream, _T("\n[%05u]Error: GetDeviceNameSpace() - Failed SetupDiGetDeviceInterfaceDetail() with error %x"), ProcessId, *error);
 				SetupDiDestroyDeviceInfoList(hardwareDeviceInfo);
 				return FALSE; // INVALID_HANDLE_VALUE;
 			}
@@ -2548,7 +2548,7 @@ BOOL	GetDeviceNameSpace(char ** NameSpace, int * Size, BOOL Refresh, DWORD *erro
             if (error)
                 *error = GetLastError();
             if (LogStream)
-                _ftprintf_s(LogStream, _T("\n[%05d]Error: GetDeviceNameSpace() - Failed to allocate memory for PSP_DEVICE_INTERFACE_DETAIL_DATA"), ProcessId);
+                _ftprintf_s(LogStream, _T("\n[%05u]Error: GetDeviceNameSpace() - Failed to allocate memory for PSP_DEVICE_INTERFACE_DETAIL_DATA"), ProcessId);
             LocalFree(deviceInterfaceDetailData);
             SetupDiDestroyDeviceInfoList(hardwareDeviceInfo);
             return FALSE; // INVALID_HANDLE_VALUE;
@@ -2566,7 +2566,7 @@ BOOL	GetDeviceNameSpace(char ** NameSpace, int * Size, BOOL Refresh, DWORD *erro
 			{
 				*error = GetLastError();
 				if (LogStream)
-					_ftprintf_s(LogStream, _T("\n[%05d]Error: GetDeviceNameSpace() - Failed SetupDiGetDeviceInterfaceDetail() with error %x"), ProcessId, *error);
+					_ftprintf_s(LogStream, _T("\n[%05u]Error: GetDeviceNameSpace() - Failed SetupDiGetDeviceInterfaceDetail() with error %x"), ProcessId, *error);
 			}
 
 			SetupDiDestroyDeviceInfoList(hardwareDeviceInfo);
@@ -2575,7 +2575,7 @@ BOOL	GetDeviceNameSpace(char ** NameSpace, int * Size, BOOL Refresh, DWORD *erro
 		}
 
 		if (LogStream)
-            _ftprintf_s(LogStream, _T("\n[%05d]Info: GetDeviceNameSpace() - DevicePath=%s"), ProcessId, deviceInterfaceDetailData->DevicePath);
+            _ftprintf_s(LogStream, _T("\n[%05u]Info: GetDeviceNameSpace() - DevicePath=%s"), ProcessId, deviceInterfaceDetailData->DevicePath);
 
         // Now we have the device path of one interface
 
@@ -2583,7 +2583,7 @@ BOOL	GetDeviceNameSpace(char ** NameSpace, int * Size, BOOL Refresh, DWORD *erro
         int DestSize=0;
         bool ok = ExtractNamespace(deviceInterfaceDetailData->DevicePath, NULL,  &DestSize);
         if (LogStream)
-            _ftprintf_s(LogStream, _T("\n[%05d]Info: GetDeviceNameSpace() - Required size for namespace=%d"), ProcessId, DestSize);
+            _ftprintf_s(LogStream, _T("\n[%05u]Info: GetDeviceNameSpace() - Required size for namespace=%d"), ProcessId, DestSize);
 
         // Allocate string
         StatNS = new char[DestSize];
@@ -2607,7 +2607,7 @@ BOOL	GetDeviceNameSpace(char ** NameSpace, int * Size, BOOL Refresh, DWORD *erro
         if (error)
             *error = GetLastError();
         if (LogStream)
-            _ftprintf_s(LogStream, _T("\n[%05d]Info: GetDeviceNameSpace() - SetupDiEnumDeviceInterfaces() interface is not a vJoy interface"), ProcessId);
+            _ftprintf_s(LogStream, _T("\n[%05u]Info: GetDeviceNameSpace() - SetupDiEnumDeviceInterfaces() interface is not a vJoy interface"), ProcessId);
         LocalFree(deviceInterfaceDetailData);
         deviceInterfaceDetailData = NULL;
         return FALSE; //
@@ -2658,7 +2658,7 @@ HANDLE	OpenDeviceInterface(UINT iInterFace, DWORD *error)
         if (error)
             *error = GetLastError();
         if (LogStream)
-            _ftprintf_s(LogStream, _T("\n[%05d]Error: OpenDeviceInterface(%d) - Failed CreateFile() with error %x"), ProcessId, iInterFace, *error);
+            _ftprintf_s(LogStream, _T("\n[%05u]Error: OpenDeviceInterface(%d) - Failed CreateFile() with error %x"), ProcessId, iInterFace, *error);
         return INVALID_HANDLE_VALUE;
     }
 
@@ -2675,15 +2675,15 @@ HANDLE	OpenDeviceInterface(UINT iInterFace, DWORD *error)
         if (error)
             *error = GetLastError();
         if (LogStream)
-            _ftprintf_s(LogStream, _T("\n[%05d]Error: OpenDeviceInterface(%d) - Failed GetDevInfo()"), ProcessId, iInterFace);
+            _ftprintf_s(LogStream, _T("\n[%05u]Error: OpenDeviceInterface(%d) - Failed GetDevInfo()"), ProcessId, iInterFace);
         return INVALID_HANDLE_VALUE;
     }
     if (LogStream)
-        _ftprintf_s(LogStream, _T("\n[%05d]Info: OpenDeviceInterface(%d) - GetDevInfo() returned successfully for device %d"), ProcessId, iInterFace, info.DeviceID);
+        _ftprintf_s(LogStream, _T("\n[%05u]Info: OpenDeviceInterface(%d) - GetDevInfo() returned successfully for device %d"), ProcessId, iInterFace, info.DeviceID);
 
 
         if (LogStream)
-            _ftprintf_s(LogStream, _T("\n[%05d]Info: OpenDeviceInterface(%d) - Exit OK"), ProcessId, iInterFace);
+            _ftprintf_s(LogStream, _T("\n[%05u]Info: OpenDeviceInterface(%d) - Exit OK"), ProcessId, iInterFace);
     return file;
 }
 
@@ -2749,13 +2749,13 @@ bool	GetDevInfo(HANDLE h, PVOID data)
         if (bytes)
         {
             if (LogStream)
-                _ftprintf_s(LogStream, _T("\n[%05d]Info: GetDevInfo() - Returns (Immediatly) TRUE: ID=%d Implemented=%d isImplemented=%x %x %x %x"), ProcessId, info->DeviceID, info->nImplemented, info->isImplemented, info->MaxDevices, info->DriverFFB, info->DeviceFFB);
+                _ftprintf_s(LogStream, _T("\n[%05u]Info: GetDevInfo() - Returns (Immediatly) TRUE: ID=%d Implemented=%d isImplemented=%x %x %x %x"), ProcessId, info->DeviceID, info->nImplemented, info->isImplemented, info->MaxDevices, info->DriverFFB, info->DeviceFFB);
             return true;
         }
         else
         {
             if (LogStream)
-                _ftprintf_s(LogStream, _T("\n[%05d]Error: GetDevInfo() - Returns (Immediatly) FALSE"), ProcessId);
+                _ftprintf_s(LogStream, _T("\n[%05u]Error: GetDevInfo() - Returns (Immediatly) FALSE"), ProcessId);
             return false;
         }
     }
@@ -2768,7 +2768,7 @@ bool	GetDevInfo(HANDLE h, PVOID data)
         if (err != ERROR_IO_PENDING)
         {
             if (LogStream)
-                _ftprintf_s(LogStream, _T("\n[%05d]Error: GetDevInfo() - error (0x%X) Returns FALSE"), ProcessId, err);
+                _ftprintf_s(LogStream, _T("\n[%05u]Error: GetDevInfo() - error (0x%X) Returns FALSE"), ProcessId, err);
             CloseHandle(OverLapped.hEvent);
             return false;
         }
@@ -2780,13 +2780,13 @@ bool	GetDevInfo(HANDLE h, PVOID data)
         if (gotdata && nBytesTranss)
         {
             if (LogStream)
-                _ftprintf_s(LogStream, _T("\n[%05d]Info: GetDevInfo() - gotdata=%d nBytesTranss=%d  Returns TRUE"), ProcessId, gotdata, nBytesTranss);
+                _ftprintf_s(LogStream, _T("\n[%05u]Info: GetDevInfo() - gotdata=%d nBytesTranss=%d  Returns TRUE"), ProcessId, gotdata, nBytesTranss);
             return true;
         }
         else
         {
             if (LogStream)
-                _ftprintf_s(LogStream, _T("\n[%05d]Info: GetDevInfo() - gotdata=%d nBytesTranss=%d  Returns FALSE"), ProcessId, gotdata, nBytesTranss);
+                _ftprintf_s(LogStream, _T("\n[%05u]Info: GetDevInfo() - gotdata=%d nBytesTranss=%d  Returns FALSE"), ProcessId, gotdata, nBytesTranss);
             return false;
         }
     }
@@ -2831,13 +2831,13 @@ bool	GetDevStat(BYTE id, int * nbytes, BYTE * buffer)
         {
             *nbytes = bytes;
             if (LogStream)
-                _ftprintf_s(LogStream, _T("\n[%05d]Info: GetDevStat() - Returns (Immediatly) TRUE: ID=%d ; output bytes=%d ; data = %x"), ProcessId, id, bytes, *(UINT *)buffer);
+                _ftprintf_s(LogStream, _T("\n[%05u]Info: GetDevStat() - Returns (Immediatly) TRUE: ID=%d ; output bytes=%d ; data = %x"), ProcessId, id, bytes, *(UINT *)buffer);
             return true;
         }
         else
         {
             if (LogStream)
-                _ftprintf_s(LogStream, _T("\n[%05d]Error: GetDevStat() - Returns (Immediatly) FALSE"), ProcessId);
+                _ftprintf_s(LogStream, _T("\n[%05u]Error: GetDevStat() - Returns (Immediatly) FALSE"), ProcessId);
             return false;
         }
     }
@@ -2850,7 +2850,7 @@ bool	GetDevStat(BYTE id, int * nbytes, BYTE * buffer)
         if (err != ERROR_IO_PENDING)
         {
             if (LogStream)
-                _ftprintf_s(LogStream, _T("\n[%05d]Error: GetDevStat() - error (0x%X) Returns FALSE"), ProcessId, err);
+                _ftprintf_s(LogStream, _T("\n[%05u]Error: GetDevStat() - error (0x%X) Returns FALSE"), ProcessId, err);
             CloseHandle(OverLapped.hEvent);
             return false;
         }
@@ -2863,13 +2863,13 @@ bool	GetDevStat(BYTE id, int * nbytes, BYTE * buffer)
         {
             *nbytes = bytes;
             if (LogStream)
-                _ftprintf_s(LogStream, _T("\n[%05d]Info: GetDevStat() - gotdata=%d nBytesTranss=%d  Returns TRUE"), ProcessId, gotdata, nBytesTranss);
+                _ftprintf_s(LogStream, _T("\n[%05u]Info: GetDevStat() - gotdata=%d nBytesTranss=%d  Returns TRUE"), ProcessId, gotdata, nBytesTranss);
             return true;
         }
         else
         {
             if (LogStream)
-                _ftprintf_s(LogStream, _T("\n[%05d]Info: GetDevStat() - gotdata=%d nBytesTranss=%d  Returns FALSE"), ProcessId, gotdata, nBytesTranss);
+                _ftprintf_s(LogStream, _T("\n[%05u]Info: GetDevStat() - gotdata=%d nBytesTranss=%d  Returns FALSE"), ProcessId, gotdata, nBytesTranss);
             return false;
         }
     }
@@ -2911,13 +2911,13 @@ bool	GetDrvStat(int * nbytes, BYTE * buffer)
         {
             *nbytes = bytes;
             if (LogStream)
-                _ftprintf_s(LogStream, _T("\n[%05d]Info: GetDrvStat() - Returns (Immediatly) TRUE; output bytes=%d ; data = %x"), ProcessId, bytes, *(UINT *)buffer);
+                _ftprintf_s(LogStream, _T("\n[%05u]Info: GetDrvStat() - Returns (Immediatly) TRUE; output bytes=%d ; data = %x"), ProcessId, bytes, *(UINT *)buffer);
             return true;
         }
         else
         {
             if (LogStream)
-                _ftprintf_s(LogStream, _T("\n[%05d]Error: GetDrvStat() - Returns (Immediatly) FALSE"), ProcessId);
+                _ftprintf_s(LogStream, _T("\n[%05u]Error: GetDrvStat() - Returns (Immediatly) FALSE"), ProcessId);
             return false;
         }
     }
@@ -2930,7 +2930,7 @@ bool	GetDrvStat(int * nbytes, BYTE * buffer)
         if (err != ERROR_IO_PENDING)
         {
             if (LogStream)
-                _ftprintf_s(LogStream, _T("\n[%05d]Error: GetDrvStat() - error (0x%X) Returns FALSE"), ProcessId, err);
+                _ftprintf_s(LogStream, _T("\n[%05u]Error: GetDrvStat() - error (0x%X) Returns FALSE"), ProcessId, err);
             CloseHandle(OverLapped.hEvent);
             return false;
         }
@@ -2943,13 +2943,13 @@ bool	GetDrvStat(int * nbytes, BYTE * buffer)
         {
             *nbytes = bytes;
             if (LogStream)
-                _ftprintf_s(LogStream, _T("\n[%05d]Info: GetDrvStat() - gotdata=%d nBytesTranss=%d  Returns TRUE"), ProcessId, gotdata, nBytesTranss);
+                _ftprintf_s(LogStream, _T("\n[%05u]Info: GetDrvStat() - gotdata=%d nBytesTranss=%d  Returns TRUE"), ProcessId, gotdata, nBytesTranss);
             return true;
         }
         else
         {
             if (LogStream)
-                _ftprintf_s(LogStream, _T("\n[%05d]Info: GetDrvStat() - gotdata=%d nBytesTranss=%d  Returns FALSE"), ProcessId, gotdata, nBytesTranss);
+                _ftprintf_s(LogStream, _T("\n[%05u]Info: GetDrvStat() - gotdata=%d nBytesTranss=%d  Returns FALSE"), ProcessId, gotdata, nBytesTranss);
             return false;
         }
     }
@@ -3061,7 +3061,7 @@ bool isRawDevice(const char *DevicePath, int Index)
     int d=0;
     sscanf_s(interfacename,"%03d",&d);
     if (LogStream)
-        _ftprintf_s(LogStream, _T("\n[%05d]Info: isRawDevice(%d) - Compare %s with %s(d=%d)"), ProcessId, Index, DevicePath, interfacename, d);
+        _ftprintf_s(LogStream, _T("\n[%05u]Info: isRawDevice(%d) - Compare %s with %s(d=%d)"), ProcessId, Index, DevicePath, interfacename, d);
     free(backslash_lower);
 
     if (d == Index)
@@ -3147,7 +3147,7 @@ int WINAPI CreateDummyWindow(void)
 }
 
 
-LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
+LRESULT CALLBACK WndProc(HWND hWind, UINT message, WPARAM wParam, LPARAM lParam)
 //
 //  FUNCTION: WndProc(HWND, UINT, WPARAM, LPARAM)
 //
@@ -3164,8 +3164,8 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
     switch (message)
     {
     case WM_PAINT:
-        hdc = BeginPaint(hWnd, &ps);
-        EndPaint(hWnd, &ps);
+        hdc = BeginPaint(hWind, &ps);
+        EndPaint(hWind, &ps);
         break;
     case WM_DESTROY:
         PostQuitMessage(0);
@@ -3177,7 +3177,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         FfbProcessData(wParam, lParam);
         break;
     default:
-        return DefWindowProc(hWnd, message, wParam, lParam);
+        return DefWindowProc(hWind, message, wParam, lParam);
         break;
     }
 
@@ -3493,18 +3493,18 @@ int	DbgGetCaps(void)
         // Link is the current Link Collection
         HIDP_LINK_COLLECTION_NODE Link = vLinks[cnt];
 
-        ULONG   UsageLength = Capabilities.NumberOutputValueCaps;
+        ULONG   UsageLengthLocal = Capabilities.NumberOutputValueCaps;
         UsageList = new USAGE[Capabilities.NumberOutputValueCaps + 1];
         CHAR Report[10000];
-        PHIDP_VALUE_CAPS val_caps = new HIDP_VALUE_CAPS[100];
-        USHORT n_val_caps = 100;
+        PHIDP_VALUE_CAPS val_caps_local = new HIDP_VALUE_CAPS[100];
+        USHORT n_val_caps_local = 100;
 
         stat = HidP_GetUsageValue(
             HidP_Output,
             Link.LinkUsagePage,
             0/*cnt*/,
             0x25/*Link.LinkUsage*/,
-            &UsageLength,
+            &UsageLengthLocal,
             PreparsedData,
             Report,
             Capabilities.OutputReportByteLength);
@@ -3516,8 +3516,8 @@ int	DbgGetCaps(void)
             Link.LinkUsagePage,
             0,
             0x25,
-            val_caps,
-            &n_val_caps,
+			val_caps_local,
+            &n_val_caps_local,
             PreparsedData
             );
         if (HIDP_STATUS_USAGE_NOT_FOUND != stat)
@@ -4133,13 +4133,13 @@ bool  FfbStart(HANDLE h) // Obsolete
 		// The transaction was not completed.
 		// If it is just because it is pending then wait otherwise it is an error
 		if (LogStream)
-			_ftprintf_s(LogStream, _T("\n[%05d]Info: FfbStart() - DeviceIoControl was not completed"), ProcessId);
+			_ftprintf_s(LogStream, _T("\n[%05u]Info: FfbStart() - DeviceIoControl was not completed"), ProcessId);
 		DWORD err = GetLastError();
 		if (err != ERROR_IO_PENDING)
 		{
 			CloseHandle(OverLapped.hEvent);
 			if (LogStream)
-				_ftprintf_s(LogStream, _T("\n[%05d]Error: FfbStart() - DeviceIoControl failed with error 0x%X"), ProcessId, err);
+				_ftprintf_s(LogStream, _T("\n[%05u]Error: FfbStart() - DeviceIoControl failed with error 0x%X"), ProcessId, err);
 			return FALSE;
 		}
 		else
@@ -4149,14 +4149,14 @@ bool  FfbStart(HANDLE h) // Obsolete
 			{
 				CloseHandle(OverLapped.hEvent);
 				if (LogStream)
-					_ftprintf_s(LogStream, _T("\n[%05d]Error: FfbStart() - WaitForSingleObject returned 0x%X"), ProcessId, WaitRet);
+					_ftprintf_s(LogStream, _T("\n[%05u]Error: FfbStart() - WaitForSingleObject returned 0x%X"), ProcessId, WaitRet);
 				return FALSE;
 			}
 		}
 	}
 	CloseHandle(OverLapped.hEvent);
 	if (LogStream)
-		_ftprintf_s(LogStream, _T("\n[%05d]Info: FfbStart() - DeviceIoControl successful"), ProcessId);
+		_ftprintf_s(LogStream, _T("\n[%05u]Info: FfbStart() - DeviceIoControl successful"), ProcessId);
 
 
 	// Start a thread that waits for FFB data
@@ -4201,13 +4201,13 @@ bool	FfbStop(HANDLE h)	// Obsolete
 		// The transaction was not completed.
 		// If it is just because it is pending then wait otherwise it is an error
 		if (LogStream)
-			_ftprintf_s(LogStream, _T("\n[%05d]Info: FfbStop() - DeviceIoControl was not completed"), ProcessId);
+			_ftprintf_s(LogStream, _T("\n[%05u]Info: FfbStop() - DeviceIoControl was not completed"), ProcessId);
 		DWORD err = GetLastError();
 		if (err != ERROR_IO_PENDING)
 		{
 			CloseHandle(OverLapped.hEvent);
 			if (LogStream)
-				_ftprintf_s(LogStream, _T("\n[%05d]Error: FfbStop() - DeviceIoControl failed with error 0x%X"), ProcessId, err);
+				_ftprintf_s(LogStream, _T("\n[%05u]Error: FfbStop() - DeviceIoControl failed with error 0x%X"), ProcessId, err);
 			return FALSE;
 		}
 		else
@@ -4217,14 +4217,14 @@ bool	FfbStop(HANDLE h)	// Obsolete
 			{
 				CloseHandle(OverLapped.hEvent);
 				if (LogStream)
-					_ftprintf_s(LogStream, _T("\n[%05d]Error: FfbStop() - WaitForSingleObject returned 0x%X"), ProcessId, WaitRet);
+					_ftprintf_s(LogStream, _T("\n[%05u]Error: FfbStop() - WaitForSingleObject returned 0x%X"), ProcessId, WaitRet);
 				return FALSE;
 			}
 		}
 	}
 	CloseHandle(OverLapped.hEvent);
 	if (LogStream)
-		_ftprintf_s(LogStream, _T("\n[%05d]Info: FfbStop() - DeviceIoControl successful"), ProcessId);
+		_ftprintf_s(LogStream, _T("\n[%05u]Info: FfbStop() - DeviceIoControl successful"), ProcessId);
 	return TRUE;
 }
 
@@ -4252,13 +4252,13 @@ bool	FfbIsStarted(HANDLE h)
 		if (bytes && Stat)
 		{
 			if (LogStream)
-				_ftprintf_s(LogStream, _T("\n[%05d]Info: FfbIsStarted() - Returns (Immediatly) TRUE"), ProcessId);
+				_ftprintf_s(LogStream, _T("\n[%05u]Info: FfbIsStarted() - Returns (Immediatly) TRUE"), ProcessId);
 			return true;
 		}
 		else
 		{
 			if (LogStream)
-				_ftprintf_s(LogStream, _T("\n[%05d]Error: FfbIsStarted() - Returns (Immediatly) FALSE (bytes=%d stat=%d)"), ProcessId, bytes, Stat);
+				_ftprintf_s(LogStream, _T("\n[%05u]Error: FfbIsStarted() - Returns (Immediatly) FALSE (bytes=%d stat=%d)"), ProcessId, bytes, Stat);
 			return false;
 		}
 	}
@@ -4271,7 +4271,7 @@ bool	FfbIsStarted(HANDLE h)
 		if (err != ERROR_IO_PENDING)
 		{
 			if (LogStream)
-				_ftprintf_s(LogStream, _T("\n[%05d]Error: FfbIsStarted() - error (0x%X) Returns FALSE"), ProcessId, err);
+				_ftprintf_s(LogStream, _T("\n[%05u]Error: FfbIsStarted() - error (0x%X) Returns FALSE"), ProcessId, err);
 			CloseHandle(OverLapped.hEvent);
 			return false;
 		}
@@ -4283,13 +4283,13 @@ bool	FfbIsStarted(HANDLE h)
 		if (gotdata && nBytesTranss)
 		{
 			if (LogStream)
-				_ftprintf_s(LogStream, _T("\n[%05d]Info: FfbIsStarted() - gotdata=%d nBytesTranss=%d  Returns TRUE"), ProcessId, gotdata, nBytesTranss);
+				_ftprintf_s(LogStream, _T("\n[%05u]Info: FfbIsStarted() - gotdata=%d nBytesTranss=%d  Returns TRUE"), ProcessId, gotdata, nBytesTranss);
 			return true;
 		}
 		else
 		{
 			if (LogStream)
-				_ftprintf_s(LogStream, _T("\n[%05d]Info: FfbIsStarted() - gotdata=%d nBytesTranss=%d  Returns FALSE"), ProcessId, gotdata, nBytesTranss);
+				_ftprintf_s(LogStream, _T("\n[%05u]Info: FfbIsStarted() - gotdata=%d nBytesTranss=%d  Returns FALSE"), ProcessId, gotdata, nBytesTranss);
 			return false;
 		}
 	}
