@@ -79,28 +79,28 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <IncludePath>.;$(SolutionDir)inc;$(IncludePath);$(SolutionDir)\Inc;</IncludePath>
+    <IncludePath>.;$(SolutionDir)apps\common\vJoyInterface;$(IncludePath);$(VC_IncludePath)</IncludePath>
     <PreBuildEventUseInBuild>true</PreBuildEventUseInBuild>
     <OutDir>$(SolutionDir)$(Platform)\$(Configuration)\</OutDir>
     <ExecutablePath>$(VC_ExecutablePath_x64);$(WindowsSDK_ExecutablePath);$(VS_ExecutablePath);$(MSBuild_ExecutablePath);$(FxCopDir);$(PATH);$(LOCALAPPDATA)\Atlassian\SourceTree\git_local\bin\</ExecutablePath>
     <IntDir>$(Platform)\$(Configuration)_stat\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <IncludePath>.;$(SolutionDir)inc;$(IncludePath);$(SolutionDir)\Inc;</IncludePath>
+    <IncludePath>.;$(SolutionDir)apps\common\vJoyInterface;$(IncludePath);$(VC_IncludePath)</IncludePath>
     <PreBuildEventUseInBuild>true</PreBuildEventUseInBuild>
     <OutDir>$(SolutionDir)$(Platform)\$(Configuration)\</OutDir>
     <ExecutablePath>$(VC_ExecutablePath_x64);$(WindowsSDK_ExecutablePath);$(VS_ExecutablePath);$(MSBuild_ExecutablePath);$(FxCopDir);$(PATH);$(LOCALAPPDATA)\Atlassian\SourceTree\git_local\bin\</ExecutablePath>
     <IntDir>$(Platform)\$(Configuration)_stat\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <IncludePath>.;$(SolutionDir)inc;$(IncludePath);udePath);$(SolutionDir)\Inc;$(SolutionDir)\Inc;$(SolutionDir)\Inc</IncludePath>
+    <IncludePath>.;$(SolutionDir)apps\common\vJoyInterface;$(IncludePath);$(VC_IncludePath)</IncludePath>
     <IntDir>$(Platform)\$(Configuration)_stat\</IntDir>
     <PreBuildEventUseInBuild>true</PreBuildEventUseInBuild>
     <OutDir>$(SolutionDir)$(Platform)\$(Configuration)\</OutDir>
     <ExecutablePath>$(VC_ExecutablePath_x86);$(WindowsSDK_ExecutablePath);$(VS_ExecutablePath);$(MSBuild_ExecutablePath);$(SystemRoot)\SysWow64;$(FxCopDir);$(PATH);$(LOCALAPPDATA)\Atlassian\SourceTree\git_local\bin\</ExecutablePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <IncludePath>.;$(SolutionDir)inc;$(IncludePath);udePath);$(SolutionDir)\Inc;$(SolutionDir)\Inc;$(SolutionDir)\Inc</IncludePath>
+    <IncludePath>.;$(SolutionDir)apps\common\vJoyInterface;$(IncludePath);$(VC_IncludePath)</IncludePath>
     <PreBuildEventUseInBuild>true</PreBuildEventUseInBuild>
     <IntDir>$(Platform)\$(Configuration)_stat\</IntDir>
     <OutDir>$(SolutionDir)$(Platform)\$(Configuration)\</OutDir>
@@ -141,6 +141,7 @@
       <PrecompiledHeader>Create</PrecompiledHeader>
       <PreprocessorDefinitions>STATIC;VJOYINTERFACE_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <ShowIncludes>false</ShowIncludes>
     </ClCompile>
     <Link>
       <AdditionalDependencies>setupapi.lib;hid.lib;%(AdditionalDependencies)</AdditionalDependencies>

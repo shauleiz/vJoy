@@ -100,14 +100,6 @@ struct DEV_INFO {
 	BYTE	DeviceFFB;		// Does this device support FFB (False)
 } ;
 
-// Structure that holds initial values of device controls
-typedef struct _DEVICE_INIT_VALS {
-	UCHAR cb;				// Size in bytes of this structure
-	USHORT id;				// Device ID
-	UCHAR InitValAxis[8];	// Initial Value of axes (X, Y, Z, RX, RY, RZ, SL1, SL2)  in %
-	UCHAR InitValPov[4];	// Initial Value of POVs in % (0xFF means neutral point)
-	UCHAR ButtonMask[16];	// Each bit represents a button
-} DEVICE_INIT_VALS, *PDEVICE_INIT_VALS;
 
 
 typedef void (CALLBACK *RemovalCB)(BOOL, BOOL, PVOID);

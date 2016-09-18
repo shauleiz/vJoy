@@ -23,6 +23,16 @@ extern "C"
 #pragma comment(lib,"Hid.lib")
 #pragma comment (lib, "Setupapi.lib")
 
+// Structure that holds initial values of device controls
+struct DEVICE_INIT_VALS {
+	UCHAR cb;				// Size in bytes of this structure
+	USHORT id;				// Device ID
+	UCHAR InitValAxis[8];	// Initial Value of axes (X, Y, Z, RX, RY, RZ, SL1, SL2)  in %
+	UCHAR InitValPov[4];	// Initial Value of POVs in % (0xFF means neutral point)
+	UCHAR ButtonMask[16];	// Each bit represents a button
+} ;
+
+
 typedef std::map<int, DeviceStat> vJoyDeviceMap;
 
 // Prototypes (Helper Functions)
@@ -49,6 +59,8 @@ void	InitDll(void);
 HDEVNOTIFY RegistervJoyNotification(HWND hWin);
 HDEVNOTIFY RegisterHandleNotification(HWND hWin, HANDLE hDev);
 BOOL	InitPosition(int Index);
+void	CalcInitValue(USHORT id,  DEVICE_INIT_VALS *data_buf);
+UINT	GetInitValueFromRegistry(USHORT id,   DEVICE_INIT_VALS *data_buf);
 void	SavePosition(UINT rID, PVOID pData);
 BOOL	Update(UINT rID);
 BOOL	GetAxisCaps(UINT rID, UINT Axis, HIDP_VALUE_CAPS * ValCaps);
@@ -1144,31 +1156,71 @@ namespace vJoyNS {
 
 	VJOYINTERFACE_API BOOL	__cdecl	ResetButtons(UINT rID)
 	{
-		// Reset all buttons (To 0) in the specified VDJ
-		if (rID > 0 && rID <= 16)
-		{
-			vJoyDevices[rID].position.lButtons = 0;
-			vJoyDevices[rID].position.lButtonsEx1 = 0;
-			vJoyDevices[rID].position.lButtonsEx2 = 0;
-			vJoyDevices[rID].position.lButtonsEx3 = 0;
-			UpdateVJD(rID, &(vJoyDevices[rID].position));
-			return TRUE;
-		}
-		else
+		// Reset all buttons (To Default values) in the specified VDJ
+		if (rID < 1 || rID > 16)
 			return FALSE;
+
+		// Initialize
+		DEVICE_INIT_VALS data_buf;
+		size_t s = sizeof(DEVICE_INIT_VALS);
+		data_buf.cb = s;
+		data_buf.id = rID;
+
+
+		// Calculate default position
+		CalcInitValue(rID, &data_buf);
+
+		// Reset only buttons
+		vJoyDevices[rID].position.lButtons = ((DWORD *)(data_buf.ButtonMask))[0];
+		vJoyDevices[rID].position.lButtonsEx1 = ((DWORD *)(data_buf.ButtonMask))[1];
+		vJoyDevices[rID].position.lButtonsEx2 = ((DWORD *)(data_buf.ButtonMask))[2];
+		vJoyDevices[rID].position.lButtonsEx3 = ((DWORD *)(data_buf.ButtonMask))[3];
+		
+		// Send data to the device
+		UpdateVJD(rID, &(vJoyDevices[rID].position));
+			
+		return TRUE;
 	}
 
 	VJOYINTERFACE_API BOOL	__cdecl	ResetPovs(UINT rID)
 	{
 		// Reset all POV Switches (To -1) in the specified VDJ
-		if (rID > 0 && rID <= 16)
-		{
-			vJoyDevices[rID].position.bHats = vJoyDevices[rID].position.bHatsEx1 = vJoyDevices[rID].position.bHatsEx2 = vJoyDevices[rID].position.bHatsEx3 = (DWORD)-1;
-			UpdateVJD(rID, &(vJoyDevices[rID].position));
-			return TRUE;
-		}
-		else
+		if (rID < 1 || rID > 16)
 			return FALSE;
+
+		// Initialize
+		DEVICE_INIT_VALS data_buf;
+		size_t s = sizeof(DEVICE_INIT_VALS);
+		data_buf.cb = s;
+		data_buf.id = rID;
+
+
+		// Calculate default position
+		CalcInitValue(rID, &data_buf);
+
+		if (data_buf.InitValPov[0] == 0xFF)
+			vJoyDevices[rID].position.bHats = (DWORD)-1;
+		else
+			vJoyDevices[rID].position.bHats = data_buf.InitValPov[0] * 0x8C9F / 100 + 1;
+
+		if (data_buf.InitValPov[1] == 0xFF)
+			vJoyDevices[rID].position.bHatsEx1 = (DWORD)-1;
+		else
+			vJoyDevices[rID].position.bHatsEx1 = data_buf.InitValPov[1] * 0x8C9F / 100 + 1;
+
+		if (data_buf.InitValPov[2] == 0xFF)
+			vJoyDevices[rID].position.bHatsEx2 = (DWORD)-1;
+		else
+			vJoyDevices[rID].position.bHatsEx2 = data_buf.InitValPov[2] * 0x8C9F / 100 + 1;
+
+		if (data_buf.InitValPov[3] == 0xFF)
+			vJoyDevices[rID].position.bHatsEx3 = (DWORD)-1;
+		else
+			vJoyDevices[rID].position.bHatsEx3 = data_buf.InitValPov[3] * 0x8C9F / 100 + 1;
+
+		
+		UpdateVJD(rID, &(vJoyDevices[rID].position));
+			return TRUE;
 	}
 
 	VJOYINTERFACE_API BOOL	__cdecl	SetAxis(LONG Value, UINT rID, UINT Axis)
@@ -3240,10 +3292,6 @@ void	InitDll(void)
     // Start Logging if logging requested
     StartLogging();
 
-	// Reset all devices
-	for (int Index = 1; Index <= 16; Index++)
-		InitPosition(Index);
-
     // Create window process on another thread
     DWORD dwThreadId;
     hEvent =  CreateEvent(NULL, TRUE, FALSE, NULL);
@@ -3328,8 +3376,6 @@ HDEVNOTIFY RegisterHandleNotification(HWND Win, HANDLE hDev)
     return hDeviceNotify;
 }
 
-
-
 BOOL	InitPosition(int Index)
 {
     /*
@@ -3344,21 +3390,183 @@ BOOL	InitPosition(int Index)
     if (Index<1 || Index>16)
         return FALSE;
 
-    vJoyDevices[Index].position.wAxisX = GetAxisLogMid(Index, HID_USAGE_X);
-    vJoyDevices[Index].position.wAxisY = GetAxisLogMid(Index, HID_USAGE_Y);
-    vJoyDevices[Index].position.wAxisZ = GetAxisLogMid(Index, HID_USAGE_Z);
+	// Initialize
+	DEVICE_INIT_VALS data_buf;
+	size_t s = sizeof( DEVICE_INIT_VALS);
+	data_buf.cb = s;
+	data_buf.id = Index;
+
+
+	// Calculate default position
+	CalcInitValue(Index, &data_buf);
+
+	//  Copy default position to position structure
+    vJoyDevices[Index].position.wAxisX = data_buf.InitValAxis[0] * 0x7FFF / 100 + 1 ;
+    vJoyDevices[Index].position.wAxisY = data_buf.InitValAxis[1] * 0x7FFF / 100 + 1;
+    vJoyDevices[Index].position.wAxisZ = data_buf.InitValAxis[2] * 0x7FFF / 100 + 1;
     vJoyDevices[Index].position.wThrottle = vJoyDevices[Index].position.wRudder = vJoyDevices[Index].position.wAileron = 0;
-    vJoyDevices[Index].position.wAxisXRot = vJoyDevices[Index].position.wAxisYRot = vJoyDevices[Index].position.wAxisZRot = 0;
-    vJoyDevices[Index].position.wSlider = vJoyDevices[Index].position.wDial = vJoyDevices[Index].position.wWheel = 0;
+    vJoyDevices[Index].position.wAxisXRot = data_buf.InitValAxis[3] * 0x7FFF / 100 + 1;
+	vJoyDevices[Index].position.wAxisYRot = data_buf.InitValAxis[4] * 0x7FFF / 100 + 1;
+	vJoyDevices[Index].position.wAxisZRot = data_buf.InitValAxis[5] * 0x7FFF / 100 + 1;
+    vJoyDevices[Index].position.wSlider = data_buf.InitValAxis[6] * 0x7FFF / 100 + 1;
+	vJoyDevices[Index].position.wDial = data_buf.InitValAxis[7] * 0x7FFF / 100 + 1;
     vJoyDevices[Index].position.wAxisVX = vJoyDevices[Index].position.wAxisVY = vJoyDevices[Index].position.wAxisVZ = 0;
     vJoyDevices[Index].position.wAxisVBRX = vJoyDevices[Index].position.wAxisVBRY = vJoyDevices[Index].position.wAxisVBRZ = 0;
-    vJoyDevices[Index].position.lButtons = 0;
-    vJoyDevices[Index].position.lButtonsEx1 = 0;
-    vJoyDevices[Index].position.lButtonsEx2 = 0;
-    vJoyDevices[Index].position.lButtonsEx3 = 0;
-    vJoyDevices[Index].position.bHats = vJoyDevices[Index].position.bHatsEx1 = vJoyDevices[Index].position.bHatsEx2 = vJoyDevices[Index].position.bHatsEx3 = (DWORD)-1;
+
+	if (data_buf.InitValPov[0] == 0xFF)
+		vJoyDevices[Index].position.bHats = (DWORD)-1;
+	else
+		vJoyDevices[Index].position.bHats = data_buf.InitValPov[0] * 0x8C9F / 100 + 1;
+
+	if (data_buf.InitValPov[1] == 0xFF)
+		vJoyDevices[Index].position.bHatsEx1 = (DWORD)-1;
+	else
+		vJoyDevices[Index].position.bHatsEx1 = data_buf.InitValPov[1] * 0x8C9F / 100 + 1;
+
+	if (data_buf.InitValPov[2] == 0xFF)
+		vJoyDevices[Index].position.bHatsEx2 = (DWORD)-1;
+	else
+		vJoyDevices[Index].position.bHatsEx2 = data_buf.InitValPov[2] * 0x8C9F / 100 + 1;
+
+	if (data_buf.InitValPov[3] == 0xFF)
+		vJoyDevices[Index].position.bHatsEx3 = (DWORD)-1;
+	else
+		vJoyDevices[Index].position.bHatsEx3 = data_buf.InitValPov[3] * 0x8C9F / 100 + 1;
+
+    vJoyDevices[Index].position.lButtons = ((DWORD *)(data_buf.ButtonMask))[0];
+    vJoyDevices[Index].position.lButtonsEx1 = ((DWORD *)(data_buf.ButtonMask))[1];
+    vJoyDevices[Index].position.lButtonsEx2 = ((DWORD *)(data_buf.ButtonMask))[2];
+    vJoyDevices[Index].position.lButtonsEx3 = ((DWORD *)(data_buf.ButtonMask))[3];
 
     return TRUE;
+}
+
+void	CalcInitValue(USHORT id, struct DEVICE_INIT_VALS * data_buf)
+{
+	UINT mask_device=0, mask_master=0;
+	DEVICE_INIT_VALS  init_master;
+	UCHAR InitValAxis[8] = { 50, 50, 50, 0, 0, 0, 0, 0 };
+	UCHAR InitValPov[4] = { (UCHAR)-1, (UCHAR)-1, (UCHAR)-1, (UCHAR)-1 };
+	UCHAR ButtonMask[16] = { 0 };
+	int i, j, k;
+
+	// If ID is NOT 0 then call GetInitValueFromRegistry() and save output buffer in data_buf
+	if (id != 0)
+	{
+		// Get the data from the registry - if it covers all controls the return
+		mask_device = GetInitValueFromRegistry(id, data_buf);
+		if (mask_device == 0x1FFF) // all data taken from registry?
+			return;
+	}
+
+	// Getting the missing data from the master device
+	init_master.cb = sizeof(DEVICE_INIT_VALS);
+	init_master.id = id;
+	mask_master = GetInitValueFromRegistry(0, &init_master);
+	int nAxes, nPovs, offset;
+
+	// Merge Axes
+	nAxes = (sizeof(data_buf->InitValAxis) / sizeof(data_buf->InitValAxis[0]));
+	nPovs = (sizeof(data_buf->InitValPov) / sizeof(data_buf->InitValPov[0]));
+	for ( i = 0; i <nAxes; i++)
+	{
+		offset = nAxes + nPovs - i;
+		if (!(mask_device & (1 << offset)))
+		{
+			if (mask_master & (1 << offset))
+				data_buf->InitValAxis[i] = init_master.InitValAxis[i];
+			else
+				data_buf->InitValAxis[i] = InitValAxis[i];
+		};
+	};
+
+	// Merge POVs
+	for ( j = 0; j < nPovs; i++, j++)
+	{
+		offset = nPovs - i;
+		if (!(mask_device & (1 << offset)))
+		{
+			if (mask_master & (1 << offset))
+				data_buf->InitValPov[j] = init_master.InitValPov[j];
+			else
+				data_buf->InitValPov[j] = InitValPov[j];
+		};
+	};
+
+	// Buttons
+	if (!(mask_device & 1))
+	{
+		if (mask_master & 1)
+			for (int k = 0; k < (sizeof(data_buf->ButtonMask) / sizeof(data_buf->ButtonMask[0])); k++)
+				data_buf->ButtonMask[k] = init_master.ButtonMask[k];
+		else
+			for (int k = 0; k < (sizeof(data_buf->ButtonMask) / sizeof(data_buf->ButtonMask[0])); k++)
+				data_buf->ButtonMask[k] = ButtonMask[k];
+	};
+
+
+}
+
+UINT	GetInitValueFromRegistry(USHORT id, struct DEVICE_INIT_VALS * data_buf)
+{
+	PCWSTR	Axes[] = { L"X", L"Y", L"Z", L"RX", L"RY", L"RZ", L"SL1", L"SL2" };
+	UCHAR	nAxes = 0;
+	PCWSTR	Povs[] = { L"POV1", L"POV2", L"POV3", L"POV4" };
+	UCHAR	nPovs = 0;
+	INT		nButtons = 128;
+	UINT	Mask = 0;
+
+
+	/* Check that buffer size is sufficient */
+	nAxes = sizeof(Axes) / sizeof(PCWSTR);
+	nPovs = sizeof(Povs) / sizeof(PCWSTR);
+	if (data_buf->cb < (2 + nAxes + nPovs + sizeof(nButtons) / 8))
+		return 0;
+
+
+	/* Calculate the registry name: "SYSTEM\\CurrentControlSet\\services\\vjoy\\Parameters\\Device**\\Init" */
+	size_t size_dev = wcslen(REG_PARAM_DEV); // Size of "SYSTEM\\CurrentControlSet\\services\\vjoy\\Parameters\\Device"
+	size_t size_ini = wcslen(REG_INIT); // Size of "Init"
+	size_t s = size_ini + size_dev + 10; // Size of entire buffer including slashes, ID etc
+	WCHAR * strInit = new WCHAR[s];
+	int actual_size = swprintf_s(strInit, s,L"%s%02d\\%s\0",REG_PARAM_DEV, id, REG_INIT);
+	if (actual_size < 0 || actual_size >= s)
+		return 0; // Error: Creation of registry string failed
+
+	/* Open registry - Most of the path should exist */
+	HKEY hParams, hDevDef;
+	LONG RegRes = RegOpenKeyExW(HKEY_LOCAL_MACHINE, strInit, 0, KEY_READ, &hParams);
+	if (RegRes != ERROR_SUCCESS)
+		return 0;	// Error: Could not open 
+
+					/* Analyze axes */
+	DWORD OutSize = sizeof(UCHAR);
+	for (int iAxis = 0; iAxis < nAxes; iAxis++)
+	{
+		RegRes = RegGetValueW(hParams, NULL, Axes[iAxis], RRF_RT_REG_BINARY, NULL, &(data_buf->InitValAxis[iAxis]), &OutSize);
+		if (RegRes == ERROR_SUCCESS)
+			Mask |= 0x01;
+		Mask = Mask << 1;
+	};
+
+	/* Analyze POVs */
+	for (int iPov = 0; iPov < nPovs; iPov++)
+	{
+		RegRes = RegGetValueW(hParams, NULL, Povs[iPov], RRF_RT_REG_BINARY, NULL, &(data_buf->InitValPov[iPov]), &OutSize);
+		if (RegRes == ERROR_SUCCESS)
+			Mask |= 0x01;
+		Mask = Mask << 1;
+	};
+
+	/* Analyze buttons */
+	OutSize = 16*sizeof(UCHAR);
+	RegRes = RegGetValueW(hParams, NULL, BTN_INIT, RRF_RT_REG_BINARY, NULL, &(data_buf->ButtonMask), &OutSize);
+	if (RegRes == ERROR_SUCCESS)
+			Mask |= 0x01;
+
+	RegCloseKey(hParams);
+
+	return Mask;
 }
 
 void	SavePosition(UINT rID, PVOID pData)
@@ -3836,6 +4044,7 @@ LONG	GetAxisLogMid(UINT rID, UINT Axis)
     return (Max+Min+1)/2;
 }
 
+
 #pragma region vJoy Device Map manipulation functions
 
 // Create a new map entry with default values
@@ -3853,7 +4062,9 @@ BOOL vJoyDeviceEntry(int rID)
     if (!out.second)
         return FALSE;
     else
-        return TRUE;
+		InitPosition(rID);
+        
+	return TRUE;
 }
 
 // Remove an existing map entry

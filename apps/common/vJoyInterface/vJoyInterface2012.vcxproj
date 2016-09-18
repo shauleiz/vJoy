@@ -260,7 +260,7 @@
     <ExecutablePath>$(VC_ExecutablePath_x86);$(WindowsSDK_ExecutablePath);$(VS_ExecutablePath);$(MSBuild_ExecutablePath);$(SystemRoot)\SysWow64;$(FxCopDir);$(PATH);$(LOCALAPPDATA)\Atlassian\SourceTree\git_local\bin\</ExecutablePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <IncludePath>.;$(SolutionDir)..\..\..\inc;$(IncludePath);$(VC_IncludePath)</IncludePath>
+    <IncludePath>.;$(IncludePath);$(VC_IncludePath)</IncludePath>
     <IntDir>$(Platform)\$(Configuration)\</IntDir>
     <PreBuildEventUseInBuild>true</PreBuildEventUseInBuild>
     <OutDir>$(SolutionDir)$(Platform)\$(Configuration)\</OutDir>

@@ -70,3 +70,4 @@ apps/vGenInterface/vGenTest/FreeDev/FreeDev.vcxproj.filters
 apps/vGenInterface/vGenTest/FreeDev/ReadMe.txt
 *.odt#
 apps/common/vJoyInterfaceCS/WrapperTest/WrapperTest.ruleset
+apps/common/vJoyInterfaceStat/gen-versioninfo.h
