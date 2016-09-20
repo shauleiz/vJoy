@@ -64,7 +64,7 @@ DEFINE_GUID(GUID_DEVINTERFACE_VJOY, 0x781EF630, 0x72B2, 0x11d2, 0xB8, 0x52, 0x00
 #define VER_X_	0
 #define VER_H_	2
 #define VER_M_	1
-#define VER_L_	6
+#define VER_L_	7
 
 #define STRINGIFY_1(x)   #x
 #define STRINGIFY(x)     STRINGIFY_1(x)

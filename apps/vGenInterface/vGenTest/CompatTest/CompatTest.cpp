@@ -261,7 +261,7 @@ void CM_TestPov(UINT id)
 {
 	printf("Testing POVs\n");
 	int nDisc=0, nCont=0;
-	UCHAR pov;
+	UINT pov;
 	char s_val[20], s_pov[20];
 
 	while (1)
@@ -286,8 +286,7 @@ void CM_TestPov(UINT id)
 			else
 			{ 
 				printf("Enter Continuous Pov number in the range 1-%d\n",nCont);
-				scanf_s("%s", s_pov, (unsigned)_countof(s_pov));
-				sscanf_s(s_pov, "%d", &pov, sizeof(UCHAR));
+				scanf_s("%u%*c", &pov);
 			}
 			printf("Value -1, 0-35999 (Q to quit / R to reset)?\n");
 		}
@@ -298,14 +297,13 @@ void CM_TestPov(UINT id)
 			else
 			{
 				printf("Enter Discrete Pov number in the range 1-%d\n", nDisc);
-				scanf_s("%s", s_pov, (unsigned)_countof(s_pov));
-				sscanf_s(s_pov, "%d", &pov, sizeof(UCHAR));
-			}			
+				scanf_s("%u%*c", &pov);
+			}
 			printf("Value -1, 0-3 (Q to quit)?\n");
 		}
 		
 
-		scanf_s("%s", s_val, (unsigned)_countof(s_val));
+		scanf_s("%19s", s_val, (unsigned)_countof(s_val));
 		if (tolower(s_val[0]) == 'q')
 			break;
 
@@ -320,9 +318,9 @@ void CM_TestPov(UINT id)
 		sscanf_s(s_val, "%d", &i_val, sizeof(INT));
 
 		if (nDisc)
-			SetDiscPov(i_val, id, pov);
+			SetDiscPov(i_val, id, (UCHAR)pov);
 		else
-			SetContPov(i_val, id, pov);
+			SetContPov(i_val, id, (UCHAR)pov);
 
 	}
 
