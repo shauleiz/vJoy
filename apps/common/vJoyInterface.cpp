@@ -3448,7 +3448,7 @@ void	CalcInitValue(USHORT id, struct DEVICE_INIT_VALS * data_buf)
 	UCHAR InitValAxis[8] = { 50, 50, 50, 0, 0, 0, 0, 0 };
 	UCHAR InitValPov[4] = { (UCHAR)-1, (UCHAR)-1, (UCHAR)-1, (UCHAR)-1 };
 	UCHAR ButtonMask[16] = { 0 };
-	int i, j, k;
+	int i, j;
 
 	// If ID is NOT 0 then call GetInitValueFromRegistry() and save output buffer in data_buf
 	if (id != 0)
