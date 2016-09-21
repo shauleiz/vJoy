@@ -2638,7 +2638,7 @@ BOOL	GetDeviceNameSpace(char ** NameSpace, int * Size, BOOL Refresh, DWORD *erro
             _ftprintf_s(LogStream, _T("\n[%05u]Info: GetDeviceNameSpace() - Required size for namespace=%d"), ProcessId, DestSize);
 
         // Allocate string
-        StatNS = new char[DestSize];
+        StatNS = new char[DestSize+1];
         ok = ExtractNamespace(deviceInterfaceDetailData->DevicePath, StatNS,  &DestSize);
         LocalFree(deviceInterfaceDetailData);
         deviceInterfaceDetailData = NULL;
