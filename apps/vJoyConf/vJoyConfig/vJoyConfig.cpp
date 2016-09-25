@@ -21,6 +21,8 @@
 #pragma comment(lib, "vJoyInterface.lib")
 #pragma comment(lib, "Version.lib")
 
+using namespace vJoy;
+
 //////////////// Globals ////////////////
 CMD		g_cmnd = HLP;
 

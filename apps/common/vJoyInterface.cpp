@@ -17,6 +17,8 @@ extern "C"
 #include <tchar.h>
 #include "vJoyInterface.h"
 
+using namespace vJoy;
+
 #define OLD_PREPARSED 0
 
 #pragma warning( disable : 4706)
@@ -3507,7 +3509,7 @@ void Set_stat(int rID, VjdStat status)
 //Else : Return VJD_STAT_UNKN
 VjdStat  Get_stat(int rID)
 {
-    VjdStat stat = VJD_STAT_UNKN;
+	VjdStat stat = VJD_STAT_UNKN;
 
     // If doesn't exist - Return VJD_STAT_UNKN
     if (vJoyDevices.find(rID) != vJoyDevices.end())

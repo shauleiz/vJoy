@@ -14,7 +14,7 @@ namespace vJoyDemo {
     using namespace LBSoft::IndustrialCtrls::Knobs;
 	using namespace LBSoft::IndustrialCtrls::Buttons;
 	using namespace System::Diagnostics;
-
+	using namespace vJoy;
 
     // from http://www.codeproject.com/KB/miscctrl/NextUIknob.aspx
     // Must add file FunkyLibrary.dll to exeutable folder

@@ -16,20 +16,22 @@ extern "C"
 #include <Dbt.h>
 #include <tchar.h>
 
-#include "..\..\..\..\inc\public.h"
-#include "..\vJoyInterface.h"
-#include "..\vXboxInterface.h"
+#include "..\..\vXboxInterfaceCppWrap\vXboxInterfaceCppWrap\IWrapper.h"
+#include "..\..\vXboxInterfaceCppWrap\vXboxInterfaceCppWrap\IWrapper.cpp"
 
-#ifndef XBOX
+
+using namespace std;
+using namespace vXbox;
+#ifdef XBOX
 #pragma comment(lib, "vJoyInterface")
 int main()
 {
 	BOOL res;
 	UCHAR nEmpty;
-
+	IWrapper w;
 
 	// Test if bus exists
-	BOOL bus =	 isVBusExists();
+	BOOL bus = isVBusExists();
 	if (bus)
 		printf("Virtual Xbox bus exists\n\n");
 	else
@@ -68,7 +70,7 @@ int main()
 	{
 		res = GetNumEmptyBusSlots(&nEmpty);
 		if (res)
-			printf("\n\nNumber of Empty Slots: %d\n",nEmpty);
+			printf("\n\nNumber of Empty Slots: %d\n", nEmpty);
 		else
 			printf("\n\nCannot determine Number of Empty Slots");
 
@@ -84,49 +86,46 @@ int main()
 		printf("\nisControllerOwned(%d): %X\n", i, res);
 	}
 	printf("\n");
-	SetTriggerL(2, 0);
-	SetTriggerR(2, 0);
+	SetTriggerL(2, 0, XINPUT_GAMEPAD_TRIGGER_THRESHOLD);
+	SetTriggerR(2, 0, XINPUT_GAMEPAD_TRIGGER_THRESHOLD);
 
 	for (int T = 0; T < 100; T++)
 	{
-		SetAxisX(1, T * 300);
-		SetAxisY(1, (T * 300)*-1);
-		SetAxisRx(1, T * 100);
-		SetAxisRy(1, (T * 100)*-1);
+		SetAxisXY(1, (BYTE)(T * 300), (BYTE)((T * 300)*-1), HID_USAGE_X, HID_USAGE_Y, XINPUT_GAMEPAD_LEFT_THUMB_DEADZONE);
+		SetAxisRxy(1, (BYTE)(T * 100), (BYTE)((T * 100)*-1), XINPUT_GAMEPAD_RIGHT_THUMB_DEADZONE);
 		switch (T)
 		{
-			case 0:
-				SetDpadUp(1);
-				SetBtnA(1, FALSE);
-				SetBtnB(1, TRUE);
-				break;
-			case 20:
-				SetDpadRight(1);
-				SetBtnB(1, FALSE);
-				break;
-			case 40:
-				SetDpadDown(1);
-				break;
-			case 60:
-				SetDpadLeft(1);
-				break;
-			case 80:
-				SetDpadOff(1);
-				SetBtnA(1, TRUE);
-				break;
+		case 0:
+			SetDpadUp(1);
+			SetBtnA(1, FALSE);
+			SetBtnB(1, TRUE);
+			break;
+		case 20:
+			SetDpadRight(1);
+			SetBtnB(1, FALSE);
+			break;
+		case 40:
+			SetDpadDown(1);
+			break;
+		case 60:
+			SetDpadLeft(1);
+			break;
+		case 80:
+			SetDpadOff(1);
+			SetBtnA(1, TRUE);
+			break;
 		}
-		
-		SetTriggerL(1, 2 * T);
-		SetTriggerR(1, 57 +(2 * T));
+
+		SetTriggerL(1, 2 * T, XINPUT_GAMEPAD_TRIGGER_THRESHOLD);
+		SetTriggerR(1, 57 + (2 * T), XINPUT_GAMEPAD_TRIGGER_THRESHOLD);
 		Sleep(100);
 	}
-	SetTriggerL(1, 255);
-	SetTriggerR(1, 255);
+	SetTriggerL(1, 255, XINPUT_GAMEPAD_TRIGGER_THRESHOLD);
+	SetTriggerR(1, 255, XINPUT_GAMEPAD_TRIGGER_THRESHOLD);
 
 	printf("Press any key to detect device feedback \n");
 	getchar();
 
-	WORD LeftMotor, RightMotor;
 	UCHAR Led;
 	BOOL Led_Ok, Vib_Ok;
 	XINPUT_VIBRATION Vib;
@@ -159,11 +158,11 @@ int main()
 	return 0;
 
 }
-#else // XBOX
+#else // !XBOX
 int main()
 {
 	printf("NOT Xbox mode\n");
 	return 0;
 }
 
-#endif // XBOX 
+#endif // !XBOX 

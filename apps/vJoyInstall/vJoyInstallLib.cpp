@@ -156,7 +156,7 @@ UINT Install(LPCTSTR inf, LPCTSTR hwid, TCHAR *InstanceId, BOOL quiet)
 	StatusMessage( NULL, prt,  INFO);
 
     //
-    // Use the INF File to extract the Class GUID.
+    // Use the INF File to extract the Class GUID. (#define UNICODE if necessary, see SetupDiGetINFClass source)
     //
     if (!SetupDiGetINFClass(InfPath,&ClassGUID,ClassName,sizeof(ClassName)/sizeof(ClassName[0]),0))
 	{

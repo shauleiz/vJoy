@@ -30,8 +30,24 @@ DEFINE_GUID(GUID_DEVINTERFACE_SCPVBUS, 0xf679f562, 0x3164, 0x42ce, 0xa4, 0xdb, 0
 #define DPAD_RIGHT XINPUT_GAMEPAD_DPAD_RIGHT
 #define DPAD_OFF 0
 
+/** As of Xinput definitions
+typedef struct _XINPUT_GAMEPAD
+{
+WORD                                wButtons;
+SHORT                               sThumbLX;
+SHORT                               sThumbLY;
+SHORT                               sThumbRX;
+SHORT                               sThumbRY;
+*/
 #define AXIS_MAX	32767
-#define AXIS_MIN	-32768
+#define AXIS_MIN	-32767
+/**
+BYTE                                bLeftTrigger;
+BYTE                                bRightTrigger;
+}
+*/
+#define AXIS_SL_MAX	255
+#define AXIS_SL_MIN	0
 
 
 #define FILE_DEVICE_BUSENUM		FILE_DEVICE_BUS_EXTENDER
@@ -82,6 +98,7 @@ extern "C"
 	VJOYINTERFACE_API BOOL	__cdecl	 UnPlugForce(UINT UserIndex);
 
 	// Data Transfer (Data to the device)
+	VJOYINTERFACE_API BOOL	__cdecl	 SetBtnAny(UINT UserIndex, BOOL Press, UINT xBtn);
 	VJOYINTERFACE_API BOOL	__cdecl	 SetBtnA(UINT UserIndex, BOOL Press);
 	VJOYINTERFACE_API BOOL	__cdecl	 SetBtnB(UINT UserIndex, BOOL Press);
 	VJOYINTERFACE_API BOOL	__cdecl	 SetBtnX(UINT UserIndex, BOOL Press);
@@ -92,22 +109,32 @@ extern "C"
 	VJOYINTERFACE_API BOOL	__cdecl	 SetBtnRT(UINT UserIndex, BOOL Press); // Right Thumb/Stick
 	VJOYINTERFACE_API BOOL	__cdecl	 SetBtnLB(UINT UserIndex, BOOL Press); // Left Bumper
 	VJOYINTERFACE_API BOOL	__cdecl	 SetBtnRB(UINT UserIndex, BOOL Press); // Right Bumper
- 	VJOYINTERFACE_API BOOL	__cdecl	 SetTriggerL(UINT UserIndex, BYTE Value); // Left Trigger
- 	VJOYINTERFACE_API BOOL	__cdecl	 SetTriggerR(UINT UserIndex, BYTE Value); // Right Trigger
-	VJOYINTERFACE_API BOOL	__cdecl	 SetAxisX(UINT UserIndex, SHORT Value); // Left Stick X
-	VJOYINTERFACE_API BOOL	__cdecl	 SetAxisY(UINT UserIndex, SHORT Value); // Left Stick Y
-	VJOYINTERFACE_API BOOL	__cdecl	 SetAxisRx(UINT UserIndex, SHORT Value); // Right Stick X
-	VJOYINTERFACE_API BOOL	__cdecl	 SetAxisRy(UINT UserIndex, SHORT Value); // Right Stick Y
+	VJOYINTERFACE_API BOOL	__cdecl	 SetTriggerL(UINT UserIndex, BYTE Value, UINT Threshold); // Left Trigger
+	VJOYINTERFACE_API BOOL	__cdecl	 SetTriggerR(UINT UserIndex, BYTE Value, UINT Threshold); // Right Trigger
+	VJOYINTERFACE_API BOOL	__cdecl	 SetDpad(UINT UserIndex, INT Value);
 	VJOYINTERFACE_API BOOL	__cdecl	 SetDpadUp(UINT UserIndex);
 	VJOYINTERFACE_API BOOL	__cdecl	 SetDpadRight(UINT UserIndex);
 	VJOYINTERFACE_API BOOL	__cdecl	 SetDpadDown(UINT UserIndex);
 	VJOYINTERFACE_API BOOL	__cdecl	 SetDpadLeft(UINT UserIndex);
+	VJOYINTERFACE_API BOOL	__cdecl	 SetDpadUpRight(UINT UserIndex);
+	VJOYINTERFACE_API BOOL	__cdecl	 SetDpadDownRight(UINT UserIndex);
+	VJOYINTERFACE_API BOOL	__cdecl	 SetDpadDownLeft(UINT UserIndex);
+	VJOYINTERFACE_API BOOL	__cdecl	 SetDpadUpLeft(UINT UserIndex);
 	VJOYINTERFACE_API BOOL	__cdecl	 SetDpadOff(UINT UserIndex);
 
 	// Data Transfer (Feedback from the device)
 	VJOYINTERFACE_API BOOL	__cdecl	 GetLedNumber(UINT UserIndex, PBYTE pLed);
 	VJOYINTERFACE_API BOOL	__cdecl	 GetVibration(UINT UserIndex, PXINPUT_VIBRATION pVib);
 
+	/**
+	Axis DeadZones and Trigger Thresholds function (Xinput recommends)
+	https://msdn.microsoft.com/en-us/library/windows/desktop/ee417001(v=vs.85).aspx
+	*/
+	VJOYINTERFACE_API BOOL	__cdecl	 SetAxisXY(UINT UserIndex, SHORT ValueX, SHORT ValueY, UINT AxisX, UINT AxisY, UINT DeadZone, SHORT Axis_Max);
+	VJOYINTERFACE_API BOOL __cdecl GetAxisXY(UINT UserIndex, PSHORT ValueX, PSHORT ValueY, UINT AxisX, UINT AxisY);
+	VJOYINTERFACE_API BOOL __cdecl GetTriggerLR(UINT UserIndex, PBYTE ValueL, PBYTE ValueR, UINT AxisL, UINT AxisR);
+
+	VJOYINTERFACE_API BOOL __cdecl	SetTriggerLR(UINT UserIndex, SHORT ValueL, SHORT ValueR, UINT Threshold);
 }  // extern "C"
 
 //////////// Helper Functions /////////////////////////
@@ -116,6 +143,6 @@ HANDLE GetVXbusHandle(void);
 BOOL GetCreateProcID(DWORD UserIndex, PULONG ProcID);
 BOOL XOutputSetState(DWORD UserIndex, XINPUT_GAMEPAD* pGamepad);
 BOOL XOutputSetGetState(DWORD UserIndex, XINPUT_GAMEPAD* pGamepad, PBYTE bVibrate, PBYTE bLargeMotor, PBYTE bSmallMotor, PBYTE bLed);
-BOOL SetDpad(UINT UserIndex, INT Value);
+BOOL SetBtn(UINT UserIndex, BOOL Press, UCHAR nBtn);
 WORD ConvertButton(LONG vBtns, WORD xBtns, UINT vBtn, UINT xBtn);
 BOOL UnPlug_Opt(UINT UserIndex, BOOL Force);

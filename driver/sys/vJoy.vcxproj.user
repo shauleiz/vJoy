@@ -4,7 +4,15 @@
     <SignMode>TestSign</SignMode>
     <ProductionCertificate>CN=Shaul Eizikovich, O=Shaul Eizikovich, L=Hod HaSharon, S=Tel Aviv, C=IL | 6D5471DF6BBFAFA5D5900C88C08DF0E9C513690A</ProductionCertificate>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug-Xbox|Win32'">
+    <SignMode>TestSign</SignMode>
+    <ProductionCertificate>CN=Shaul Eizikovich, O=Shaul Eizikovich, L=Hod HaSharon, S=Tel Aviv, C=IL | 6D5471DF6BBFAFA5D5900C88C08DF0E9C513690A</ProductionCertificate>
+  </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <SignMode>ProductionSign</SignMode>
+    <ProductionCertificate>CN=Shaul Eizikovich, O=Shaul Eizikovich, L=Hod HaSharon, S=Tel Aviv, C=IL | 6D5471DF6BBFAFA5D5900C88C08DF0E9C513690A</ProductionCertificate>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release-Xbox|Win32'">
     <SignMode>ProductionSign</SignMode>
     <ProductionCertificate>CN=Shaul Eizikovich, O=Shaul Eizikovich, L=Hod HaSharon, S=Tel Aviv, C=IL | 6D5471DF6BBFAFA5D5900C88C08DF0E9C513690A</ProductionCertificate>
   </PropertyGroup>
@@ -14,15 +22,34 @@
     <DebugDeployment>True</DebugDeployment>
     <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug-Xbox|x64'">
+    <SignMode>TestSign</SignMode>
+    <ProductionCertificate>CN=Shaul Eizikovich, O=Shaul Eizikovich, L=Hod HaSharon, S=Tel Aviv, C=IL | 6D5471DF6BBFAFA5D5900C88C08DF0E9C513690A</ProductionCertificate>
+    <DebugDeployment>True</DebugDeployment>
+    <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
+  </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <SignMode>ProductionSign</SignMode>
     <ProductionCertificate>CN=Shaul Eizikovich, O=Shaul Eizikovich, L=Hod HaSharon, S=Tel Aviv, C=IL | 6D5471DF6BBFAFA5D5900C88C08DF0E9C513690A</ProductionCertificate>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release-Xbox|x64'">
+    <SignMode>TestSign</SignMode>
+    <ProductionCertificate>CN=Shaul Eizikovich, O=Shaul Eizikovich, L=Hod HaSharon, S=Tel Aviv, C=IL | 6D5471DF6BBFAFA5D5900C88C08DF0E9C513690A</ProductionCertificate>
+    <TestCertificate>CN="WDKTestCert FORMATEUR,131156740020816892" | 3B9E7348F688D1D5013ABAD8E34C0F33B04DDDA7</TestCertificate>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|ARM64'">
     <SignMode>ProductionSign</SignMode>
     <ProductionCertificate>CN=Shaul Eizikovich, O=Shaul Eizikovich, L=Hod HaSharon, S=Tel Aviv, C=IL | 6D5471DF6BBFAFA5D5900C88C08DF0E9C513690A</ProductionCertificate>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release-Xbox|ARM64'">
+    <SignMode>ProductionSign</SignMode>
+    <ProductionCertificate>CN=Shaul Eizikovich, O=Shaul Eizikovich, L=Hod HaSharon, S=Tel Aviv, C=IL | 6D5471DF6BBFAFA5D5900C88C08DF0E9C513690A</ProductionCertificate>
+  </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">
+    <SignMode>ProductionSign</SignMode>
+    <ProductionCertificate>CN=Shaul Eizikovich, O=Shaul Eizikovich, L=Hod HaSharon, S=Tel Aviv, C=IL | 6D5471DF6BBFAFA5D5900C88C08DF0E9C513690A</ProductionCertificate>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release-Xbox|ARM'">
     <SignMode>ProductionSign</SignMode>
     <ProductionCertificate>CN=Shaul Eizikovich, O=Shaul Eizikovich, L=Hod HaSharon, S=Tel Aviv, C=IL | 6D5471DF6BBFAFA5D5900C88C08DF0E9C513690A</ProductionCertificate>
   </PropertyGroup>

@@ -1,4 +1,5 @@
 #pragma once
+using namespace vJoy;
 class CvJoyDevice
 {
 public:
