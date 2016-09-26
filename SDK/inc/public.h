@@ -55,16 +55,16 @@ DEFINE_GUID(GUID_DEVINTERFACE_VJOY, 0x781EF630, 0x72B2, 0x11d2, 0xB8, 0x52, 0x00
 #else
 #define DEVICENAME_STRING			"vJoy"
 #endif
-#define NTDEVICE_NAME_STRING		"\\Device\\" DEVICENAME_STRING
-#define SYMBOLIC_NAME_STRING		"\\DosDevices\\" DEVICENAME_STRING
-#define	DOS_FILE_NAME				"\\\\.\\" DEVICENAME_STRING
+#define NTDEVICE_NAME_STRING		"\\Device\\"DEVICENAME_STRING
+#define SYMBOLIC_NAME_STRING		"\\DosDevices\\"DEVICENAME_STRING
+#define	DOS_FILE_NAME				"\\\\.\\"DEVICENAME_STRING
 #define VJOY_INTERFACE				L"Device_"
 
 // Version parts
 #define VER_X_	0
 #define VER_H_	2
 #define VER_M_	1
-#define VER_L_	6
+#define VER_L_	7
 
 #define STRINGIFY_1(x)   #x
 #define STRINGIFY(x)     STRINGIFY_1(x)
@@ -146,6 +146,9 @@ typedef struct _HID_DEVICE_ATTRIBUTES {
 
 } HID_DEVICE_ATTRIBUTES, * PHID_DEVICE_ATTRIBUTES;
 #endif
+
+// Device Type
+//enum DevType { vJoy, vXbox };
 
 // Error levels for status report
 enum ERRLEVEL {INFO, WARN, ERR, FATAL, APP};

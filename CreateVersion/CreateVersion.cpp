@@ -22,27 +22,47 @@ static void find_delim(char *s, char **res, int *ix)
 
 int main(int argc, char **argv)
 {
+	unsigned int major = 0, mid = 0, minor = 0;
 	char vbuf[4096] = { 0 };
-	char *version, *ncommits, *sha;
+	char *version="0.0.0", *ncommits="0", *sha="0";
 	FILE *po;
 	int buflen;
+	int outval;
+
+	// Open output file
+	char * filename = argv[1];
+	if (!filename) {
+		fprintf(stderr, "Bad output file name\n");
+		return -5;
+	}
+
+	FILE * f;
+	errno_t err = fopen_s(&f, filename, "w+");
+	if (err || !f)
+	{
+		fprintf(stderr, "Could not oupen output file name (errno=%d)\n", err);
+		return -6;
+	}
 
 	fprintf(stderr, "Starting CreateVersion\n");
 	if (argc != 2) {
 		fprintf(stderr, "Usage: %s <Outputfile>\n", argv[0]);
-		exit(-1);
+		outval = -1;
+		goto FINAL;
 	}
 
 	/** Get the output */
 	po = popen("git describe --long --match  v*", "r");
 	if (!po) {
 		perror("git describe");
-		exit(-2);
+		outval = -2;
+		goto FINAL;
 	}
 
 	if (!fgets(vbuf, sizeof(vbuf), po)) {
 		fprintf(stderr, "git describe closed stream\n");
-		exit(-3);
+		outval = -3;
+		goto FINAL;
 	}
 	pclose(po);
 	buflen = (int)strlen(vbuf);
@@ -60,28 +80,16 @@ int main(int argc, char **argv)
 	version = vbuf;
 
 	// Break the version number into its components
-	unsigned int major=0, mid=0, minor=0;
 	int nFields = sscanf_s(version, "v%u.%u.%u",&major, &mid, &minor) ;
 	if (nFields != 3) {
 		fprintf(stderr, "Version string corrupt\n");
-		exit(-4);
+		outval = -4;
+		goto FINAL;
 	}
 
-	// Open output file
-	char * filename = argv[1];
-	if (!filename) {
-		fprintf(stderr, "Bad output file name\n");
-		exit(-5);
-	}
 
-	FILE * f;
-	errno_t err = fopen_s(&f, filename, "w+");
-	if (err || !f)
-	{
-		fprintf(stderr, "Could not oupen output file name (errno=%d)\n", err);
-		exit(-6);
-	}
 
+FINAL:
 	// Put data into file
 	fprintf(f, "#pragma once\n");
 	fprintf(f, "#define VER_H_ %u\n", major);
