@@ -2171,7 +2171,7 @@ HANDLE	GetHandleByIndex(int index)
             LocalFree(functionClassDeviceData);
             SetupDiDestroyDeviceInfoList (hardwareDeviceInfo);
             CloseHandle(HidDevice);
-            return NULL;
+            return INVALID_HANDLE_VALUE;
         }
 
 
