@@ -2137,7 +2137,7 @@ HANDLE	GetHandleByIndex(int index)
                 _ftprintf_s(LogStream, _T("\n[%05u]Error: GetHandleByIndex(index=%d) - Failed to allocate functionClassDeviceData"), ProcessId, index);
             LocalFree(functionClassDeviceData);
             SetupDiDestroyDeviceInfoList (hardwareDeviceInfo);
-            return NULL;
+            return INVALID_HANDLE_VALUE;
         }
 
         //  Now, get the data into 'functionClassDeviceData'
@@ -2153,7 +2153,7 @@ HANDLE	GetHandleByIndex(int index)
                 _ftprintf_s(LogStream, _T("\n[%05u]Error: GetHandleByIndex(index=%d) - Failed SetupDiGetDeviceInterfaceDetail() [2]"), ProcessId, index);
             LocalFree(functionClassDeviceData);
             SetupDiDestroyDeviceInfoList (hardwareDeviceInfo);
-            return NULL;
+            return INVALID_HANDLE_VALUE;
         }
 
         // Get a handle to the device
