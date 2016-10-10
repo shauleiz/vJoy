@@ -72,3 +72,5 @@ apps/vGenInterface/vGenTest/FreeDev/ReadMe.txt
 apps/common/vJoyInterfaceCS/WrapperTest/WrapperTest.ruleset
 apps/common/vJoyInterfaceStat/gen-versioninfo.h
 driver/sys/gen-versioninfo.h
+apps/vJoyInstall/CmdLine/gen-versioninfo.h
+driver/Package/gen-versioninfo.h
