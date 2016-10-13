@@ -362,6 +362,54 @@ Return Value:
 		status = vJoyCompleteReadReport(pdoData->hParentDevice, (BYTE)id);
 		break;   
 
+	case GET_POSITIONS:
+		/* Get position struct for the device */
+		TraceEvents(TRACE_LEVEL_INFORMATION, DBG_INIT, "vJoy_EvtIoDeviceControlForRawPdo: [GET_POSITIONS]\n");
+
+		// Get the context, id and the status
+		id = GetIdFromRawPdoRequest(Request, pExtension);
+
+		// Check for Illegal ID
+		if (id == 0xFFFF)
+		{
+			TraceEvents(TRACE_LEVEL_WARNING, DBG_INIT, "vJoy_EvtIoDeviceControlForRawPdo: Bad id=%d\n", id);
+
+			WdfRequestComplete(Request, STATUS_NO_SUCH_DEVICE);
+			return;
+		};
+
+		// Calculate the size of buffer needed
+		pDevContext = GetDeviceContext(pdoData->hParentDevice);
+		if (!pDevContext) break;
+		bytesToCopy = (ULONG)sizeof(pDevContext->positions[id-1]);
+		TraceEvents(TRACE_LEVEL_INFORMATION, DBG_INIT, "vJoy_EvtIoDeviceControlForRawPdo: bytesToCopy=%d\n", bytesToCopy);
+
+		// Retrieve the output buffer
+		status = WdfRequestRetrieveOutputBuffer(Request, bytesToCopy, &GenBuffer, &bytesReturned);
+
+		//// Interprete the results of calling WdfRequestRetrieveOutputBuffer()
+		// If returned STATUS_SUCCESS then the buffer is OK
+		// If returned STATUS_BUFFER_TOO_SMALL and bytesReturned>=4 then this is a request for buffer size
+		// If returned STATUS_BUFFER_TOO_SMALL and bytesReturned<4 then this is an error
+
+		if (status == STATUS_SUCCESS && bytesReturned >= bytesToCopy)
+		{
+			RtlCopyMemory(GenBuffer, pDevContext->positions[id - 1], bytesToCopy);
+			WdfRequestCompleteWithInformation(Request, status, bytesToCopy);
+			return;
+		}
+
+		if (status == STATUS_BUFFER_TOO_SMALL && bytesReturned >= sizeof(INT))
+		{
+			*(INT *)(GenBuffer) = bytesToCopy;
+			WdfRequestCompleteWithInformation(Request, status, sizeof(INT));
+			return;
+		}
+			
+		TraceEvents(TRACE_LEVEL_ERROR, DBG_INIT, "vJoy_EvtIoDeviceControlForRawPdo: GET_POSITION failed\n");
+		WdfRequestComplete(Request, status);						
+		break;
+
 	case GET_FFB_STAT:
 		/* Get the status of the FFB mechanism */
 
