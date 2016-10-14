@@ -381,11 +381,11 @@ Return Value:
 		// Calculate the size of buffer needed
 		pDevContext = GetDeviceContext(pdoData->hParentDevice);
 		if (!pDevContext) break;
-		bytesToCopy = (ULONG)sizeof(pDevContext->positions[id-1]);
+		bytesToCopy = sizeof(JOYSTICK_POSITION_V2);
 		TraceEvents(TRACE_LEVEL_INFORMATION, DBG_INIT, "vJoy_EvtIoDeviceControlForRawPdo: bytesToCopy=%d\n", bytesToCopy);
 
 		// Retrieve the output buffer
-		status = WdfRequestRetrieveOutputBuffer(Request, bytesToCopy, &GenBuffer, &bytesReturned);
+		status = WdfRequestRetrieveOutputBuffer(Request, 0, &GenBuffer, &bytesReturned);
 
 		//// Interprete the results of calling WdfRequestRetrieveOutputBuffer()
 		// If returned STATUS_SUCCESS then the buffer is OK
@@ -394,12 +394,14 @@ Return Value:
 
 		if (status == STATUS_SUCCESS && bytesReturned >= bytesToCopy)
 		{
-			RtlCopyMemory(GenBuffer, pDevContext->positions[id - 1], bytesToCopy);
+			//RtlCopyMemory(GenBuffer, pDevContext->positions[id - 1], bytesToCopy);
+			// Copy data to output buffer
+			GetPositions(GenBuffer, pDevContext, id, bytesToCopy);
 			WdfRequestCompleteWithInformation(Request, status, bytesToCopy);
 			return;
 		}
 
-		if (status == STATUS_BUFFER_TOO_SMALL && bytesReturned >= sizeof(INT))
+		if (status == STATUS_SUCCESS && bytesReturned >= sizeof(INT))
 		{
 			*(INT *)(GenBuffer) = bytesToCopy;
 			WdfRequestCompleteWithInformation(Request, status, sizeof(INT));
@@ -407,8 +409,8 @@ Return Value:
 		}
 			
 		TraceEvents(TRACE_LEVEL_ERROR, DBG_INIT, "vJoy_EvtIoDeviceControlForRawPdo: GET_POSITION failed\n");
-		WdfRequestComplete(Request, status);						
-		break;
+		WdfRequestComplete(Request, STATUS_BUFFER_TOO_SMALL);
+		return;
 
 	case GET_FFB_STAT:
 		/* Get the status of the FFB mechanism */

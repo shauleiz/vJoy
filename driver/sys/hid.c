@@ -1302,6 +1302,32 @@ LoadPositions(PJOYSTICK_POSITION_V2 pPosition, PDEVICE_EXTENSION pDevContext, si
     WdfWaitLockRelease(pDevContext->positionLock);
 }
 
+VOID GetPositions(PJOYSTICK_POSITION_V2 pPosition, PDEVICE_EXTENSION pDevContext, UCHAR id, size_t buffsize)
+{
+	int i;
+
+	i = id - 1; // Index is zero-based
+
+	WdfWaitLockAcquire(pDevContext->positionLock, NULL);
+	pPosition->wAxisX		= pDevContext->positions[i]->ValX;
+	pPosition->wAxisY		= pDevContext->positions[i]->ValY;
+	pPosition->wAxisZ		= pDevContext->positions[i]->ValZ;
+	pPosition->wAxisXRot	= pDevContext->positions[i]->ValRX;
+	pPosition->wAxisYRot	= pDevContext->positions[i]->ValRY;
+	pPosition->wAxisZRot	= pDevContext->positions[i]->ValRZ;
+	pPosition->wSlider		= pDevContext->positions[i]->ValSlider;
+	pPosition->wDial		= pDevContext->positions[i]->ValDial;
+	pPosition->lButtons		= pDevContext->positions[i]->ValButtons;
+	pPosition->bHats		= pDevContext->positions[i]->ValHats;
+	pPosition->bHatsEx1		= pDevContext->positions[i]->ValHatsEx1;
+	pPosition->bHatsEx2		= pDevContext->positions[i]->ValHatsEx2;
+	pPosition->bHatsEx3		= pDevContext->positions[i]->ValHatsEx3;
+	pPosition->lButtonsEx1	= pDevContext->positions[i]->ValButtonsEx1;
+	pPosition->lButtonsEx2	= pDevContext->positions[i]->ValButtonsEx2;
+	pPosition->lButtonsEx3	= pDevContext->positions[i]->ValButtonsEx3;
+	WdfWaitLockRelease(pDevContext->positionLock);
+}
+
 
 /*++
 

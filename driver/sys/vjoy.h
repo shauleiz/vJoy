@@ -1531,7 +1531,15 @@ LoadPositions(
 	PJOYSTICK_POSITION_V2 pReport,
 	PDEVICE_EXTENSION	pDevContext,
 	size_t				buffsize
-	);
+);
+
+VOID
+GetPositions(
+	PJOYSTICK_POSITION_V2 pPosition,
+	PDEVICE_EXTENSION	pDevContext,
+	UCHAR				id,
+	size_t				buffsize
+);
 
 #ifdef PPJOY_MODE
 VOID

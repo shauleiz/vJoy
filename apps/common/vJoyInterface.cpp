@@ -62,6 +62,7 @@ BOOL	InitPosition(int Index);
 void	CalcInitValue(USHORT id,  DEVICE_INIT_VALS *data_buf);
 UINT	GetInitValueFromRegistry(USHORT id,   DEVICE_INIT_VALS *data_buf);
 void	SavePosition(UINT rID, PVOID pData);
+BOOL GetDevPosition(BYTE id, PJOYSTICK_POSITION_V2 pPosition);
 BOOL	Update(UINT rID);
 BOOL	GetAxisCaps(UINT rID, UINT Axis, HIDP_VALUE_CAPS * ValCaps);
 LONG	GetAxisLogMin(UINT rID, UINT Axis);
@@ -84,6 +85,7 @@ void Set_stat(int rID, VjdStat status);
 VjdStat  Get_stat(int rID);
 void Set_hNotify(int rID, HDEVNOTIFY h);
 HDEVNOTIFY 	Get_hNotify(int rID);
+
 
 #if 0
 
@@ -441,6 +443,7 @@ namespace vJoyNS {
 			return FALSE;
 
 		InitDll();
+
 		if (Get_stat(rID) == VJD_STAT_OWN)
 			return TRUE;
 
@@ -452,6 +455,7 @@ namespace vJoyNS {
 			Set_hNotify(rID, RegisterHandleNotification(hWnd, hTmp));
 			if (IsDeviceFfb(rID))
 				FfbStartThread(hTmp);
+
 			return TRUE;
 		}
 		else
@@ -3400,6 +3404,10 @@ BOOL	InitPosition(int Index)
 	// Calculate default position
 	CalcInitValue(Index, &data_buf);
 
+	//BOOL GoodPos = GetDevPosition(Index, &vJoyDevices[Index].position);
+	//return TRUE;
+
+
 	//  Copy default position to position structure
     vJoyDevices[Index].position.wAxisX = data_buf.InitValAxis[0] * 0x7FFF / 100 + 1 ;
     vJoyDevices[Index].position.wAxisY = data_buf.InitValAxis[1] * 0x7FFF / 100 + 1;
@@ -3579,6 +3587,81 @@ void	SavePosition(UINT rID, PVOID pData)
         return;
 
     memcpy(&(vJoyDevices[rID].position), pData, sizeof(JOYSTICK_POSITION_V2));
+}
+
+BOOL GetDevPosition(BYTE id, PJOYSTICK_POSITION_V2 pPosition)
+/* 
+	This function gets the joystick position of a given device by device ID
+	Returns TRUE if pPosition points to a valid position data.
+	Otherwise returns FALSE
+	Function does not change values in structure vJoyDevices[id].position
+*/
+{
+	UINT	IoCode = GET_POSITIONS;
+	UINT	IoSize = sizeof(JOYSTICK_POSITION_V2);
+	ULONG	bytes;
+	HANDLE	hIoctlEvent;
+	OVERLAPPED OverLapped = { 0 };
+
+	// Preparing
+	hIoctlEvent = CreateEvent(NULL, TRUE, TRUE, NULL);
+	memset(&OverLapped, 0, sizeof(OVERLAPPED));
+	OverLapped.hEvent = hIoctlEvent;
+
+	// Get joystick position structure from vJoy device
+	BOOL res = DeviceIoControl(Get_h(id), IoCode, NULL, 0, (PVOID)pPosition, IoSize, &bytes, &OverLapped);
+	// immediate Return
+	if (res)
+	{
+		CloseHandle(OverLapped.hEvent);
+		if (bytes)
+		{
+			if (LogStream)
+				_ftprintf_s(LogStream, _T("\n[%05u]Info: GetDevPosition() - Returns (Immediatly) TRUE"), ProcessId);
+			return TRUE;
+		}
+		else
+		{
+			if (LogStream)
+				_ftprintf_s(LogStream, _T("\n[%05u]Error: GetDevPosition() - Returns (Immediatly) FALSE"), ProcessId);
+			return FALSE;
+		}
+	}
+
+	// Delayed/Error
+	else
+	{
+		// Error getting the data
+		DWORD err = GetLastError();
+		if (err != ERROR_IO_PENDING)
+		{
+			if (LogStream)
+				_ftprintf_s(LogStream, _T("\n[%05u]Error: GetDevPosition() - error (0x%X) Returns FALSE"), ProcessId, err);
+			CloseHandle(OverLapped.hEvent);
+			return FALSE;
+		}
+
+		// Wait until data ready
+		DWORD nBytesTranss = 0;
+		BOOL gotdata = GetOverlappedResult(Get_h(id), &OverLapped, &nBytesTranss, TRUE);
+		CloseHandle(OverLapped.hEvent);
+
+		// Data received and it is not empty
+		if (gotdata && nBytesTranss)
+		{
+			if (LogStream)
+				_ftprintf_s(LogStream, _T("\n[%05u]Info: GetDevPosition() - gotdata=%d nBytesTranss=%d  Returns TRUE"), ProcessId, gotdata, nBytesTranss);
+			return TRUE;
+		}
+		else
+		{
+			if (LogStream)
+				_ftprintf_s(LogStream, _T("\n[%05u]Info: GetDevPosition() - gotdata=%d nBytesTranss=%d  Returns FALSE"), ProcessId, gotdata, nBytesTranss);
+			return FALSE;
+		}
+	}
+
+	return FALSE;
 }
 
 
