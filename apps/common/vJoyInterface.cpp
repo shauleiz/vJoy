@@ -62,7 +62,7 @@ BOOL	InitPosition(int Index);
 void	CalcInitValue(USHORT id,  DEVICE_INIT_VALS *data_buf);
 UINT	GetInitValueFromRegistry(USHORT id,   DEVICE_INIT_VALS *data_buf);
 void	SavePosition(UINT rID, PVOID pData);
-BOOL GetDevPosition(BYTE id, PJOYSTICK_POSITION_V2 pPosition);
+BOOL	GetDevPosition(BYTE id, PJOYSTICK_POSITION_V2 pPosition);
 BOOL	Update(UINT rID);
 BOOL	GetAxisCaps(UINT rID, UINT Axis, HIDP_VALUE_CAPS * ValCaps);
 LONG	GetAxisLogMin(UINT rID, UINT Axis);
@@ -80,6 +80,7 @@ void vJoyDeviceClear(void);
 BOOL  Set_PreparsedData(int rID);
 BOOL Get_PreparsedData(int rID, PHIDP_PREPARSED_DATA * pPPData);
 void Set_h(int rID, HANDLE h);
+void Sync_Position(int rID);
 HANDLE 	Get_h(int rID);
 void Set_stat(int rID, VjdStat status);
 VjdStat  Get_stat(int rID);
@@ -455,7 +456,7 @@ namespace vJoyNS {
 			Set_hNotify(rID, RegisterHandleNotification(hWnd, hTmp));
 			if (IsDeviceFfb(rID))
 				FfbStartThread(hTmp);
-
+			Sync_Position(rID);
 			return TRUE;
 		}
 		else
@@ -3399,13 +3400,13 @@ BOOL	InitPosition(int Index)
 	size_t s = sizeof( DEVICE_INIT_VALS);
 	data_buf.cb = s;
 	data_buf.id = Index;
+	return TRUE;
 
 
 	// Calculate default position
 	CalcInitValue(Index, &data_buf);
 
-	//BOOL GoodPos = GetDevPosition(Index, &vJoyDevices[Index].position);
-	//return TRUE;
+	BOOL GoodPos = GetDevPosition(Index, &vJoyDevices[Index].position);
 
 
 	//  Copy default position to position structure
@@ -4144,8 +4145,6 @@ BOOL vJoyDeviceEntry(int rID)
     auto out = vJoyDevices.emplace(rID, DeviceStat{ INVALID_HANDLE_VALUE, VJD_STAT_UNKN, { 0 }, NULL, { FALSE }, NULL });
     if (!out.second)
         return FALSE;
-    else
-		InitPosition(rID);
         
 	return TRUE;
 }
@@ -4284,6 +4283,29 @@ void Set_h(int rID, HANDLE h)
     vJoyDevices[rID].h = h;
 }
 
+// Sync_Position(int rID)
+// Syncs the existing position entry in the container
+// Requires the h member to be valid -
+// Call only after Set_h
+void Sync_Position(int rID)
+{
+	// If doesn't exist - return
+	if (vJoyDevices.find(rID) == vJoyDevices.end())
+		return;
+
+	// if handle is invalid - return
+	if (vJoyDevices[rID].h == INVALID_HANDLE_VALUE)
+		return;
+
+	// Get the current device position from the device
+	JOYSTICK_POSITION_V2 Position;
+	BOOL bRes = GetDevPosition(rID, &Position);
+	if (!bRes)
+		return;
+
+	// Update the container
+	SavePosition(rID, PVOID(&Position));
+}
 //Get_h() :
 //If entry exists : Returns the  handle to the device
 //Else : Return INVALID_HANDLE_VALUE
