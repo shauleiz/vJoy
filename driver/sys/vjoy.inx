@@ -47,11 +47,11 @@ CopyFilesDLL = 11
 
 ; For XP and later
 [Vendor.NT$ARCH$]
-%vjoy%    = vjoy.Inst, root\VID_1234&PID_BEAD&REV_0217
+%vjoy%    = vjoy.Inst, root\VID_1234&PID_BEAD&REV_0218
 
 ; For Win7 and later so that we can use inbox HID-KMDF mapper
 [Vendor.NT$ARCH$.6.1]
-%vjoy%    = vjoy.Inst.Win7, root\VID_1234&PID_BEAD&REV_0217
+%vjoy%    = vjoy.Inst.Win7, root\VID_1234&PID_BEAD&REV_0218
 
 
 ;===============================================================
