@@ -199,7 +199,7 @@ Return Value:
 		if (FileObj)
 			*(DWORD *)(&((BYTE *)GenBuffer)[1]) = GetFileObjectContext(FileObj)->CallingProcessId;
 		else
-			*(DWORD *)(&((BYTE *)GenBuffer)[1]) = 0;
+			*(DWORD *)(&((BYTE *)GenBuffer)[1]) =  0;
 		TraceEvents(TRACE_LEVEL_INFORMATION, DBG_INIT, "vJoy_EvtIoDeviceControlForRawPdo[GET_DEV_STAT]: ProcessID=%x\n", *(DWORD *)(&((BYTE *)GenBuffer)[1]));
 
 		// Complete the transaction

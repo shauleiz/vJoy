@@ -565,6 +565,49 @@ namespace vJoyNS {
 #endif // VERSION205
 	}
 
+	// Get the Process ID of the process that ownes a vJoy Device indicated by rID
+	// Valid Process ID is a positive number
+	// Negative numbers indicate a problem
+	// Posible negative numbers:
+	//  [NO_FILE_EXIST]: Usually indicates a FREE device (No owner)
+	//  [NO_DEV_EXIST]: Usually indicates a MISSING device
+	//  [BAD_DEV_STAT]: Indicates some internal problem
+	VJOYINTERFACE_API int __cdecl	GetOwnerPid(UINT rID)
+	{
+		int nbytes = 10;
+		BYTE buffer[10] = { 0 };
+		BYTE * buf = buffer;
+
+		bool ok = GetDevStat(rID, &nbytes, buf);
+
+		// If output is undefined then this state is unknown
+		if (!ok)
+		{
+			if (LogStream)
+				_ftprintf_s(LogStream, _T("\n[%05u]Info: GetOwnerPid(%d) - GetDevStat Failed"), ProcessId, rID);
+			return BAD_DEV_STAT;
+		}
+
+		// Device  exists?
+		if (!(buf[0] & 0x01))
+		{
+			if (LogStream)
+				_ftprintf_s(LogStream, _T("\n[%05u]Info: GetOwnerPid(%d) - vJoy Device does not exist"), ProcessId, rID);
+			return NO_DEV_EXIST;
+		}
+
+		// Device File object is not ready
+		if (!(buf[0] & 0x04))
+		{
+			if (LogStream)
+				_ftprintf_s(LogStream, _T("\n[%05u]Info: GetOwnerPid(%d) - vJoy Device file object does not exist"), ProcessId, rID);
+			return NO_FILE_EXIST;
+		}
+
+		// Get the PID
+		return ((int)*(WORD *)&buf[1]);
+	}
+
 
 	VJOYINTERFACE_API enum VjdStat	__cdecl	GetVJDStatus(UINT rID)
 		/**

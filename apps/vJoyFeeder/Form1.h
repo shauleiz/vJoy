@@ -59,12 +59,33 @@ namespace vJoyDemo {
             /*2*/
             GetExistingDevices();
 
+
             /*3*/
             if (!AcquireVJD(GetCurrentReportId()))
             {
                 textBoxInfo->Text = L"Cannot open vJoy Device - Cannot continue\r\n";
                 //return;
             };
+
+			// Debug >>
+			int pid[6];
+			pid[0] = GetOwnerPid(1);
+			pid[1] = GetOwnerPid(2);
+			pid[2] = GetOwnerPid(3);
+			pid[3] = GetOwnerPid(4);
+			pid[4] = GetOwnerPid(5);
+			pid[5] = GetOwnerPid(6);
+			String^ message;
+			message = L"vJoy Device:1  PID:" + pid[0] + "\r\n"
+				+ L"vJoy Device:2  PID:" + pid[1] + "\r\n"
+				+ L"vJoy Device:3  PID:" + pid[2] + "\r\n"
+				+ L"vJoy Device:4  PID:" + pid[3] + "\r\n"
+				+ L"vJoy Device:5  PID:" + pid[4] + "\r\n"
+				+ L"vJoy Device:6  PID:" + pid[5] + "\r\n";
+			textBoxInfo->Text = message;
+			MessageBox::Show(this, textBoxInfo->Text, L"Debug", MessageBoxButtons::OK, MessageBoxIcon::Warning);
+
+				// Debug <<
 
             /*4*/
             ResetAll();
@@ -1629,20 +1650,21 @@ private: System::Boolean GetExistingDevices(void) {
 
     for (int i = 1; i <= 16; i++)
     {
-//		s = GetVJDStatus(i);
-//		if (s == VJD_STAT_FREE || s == VJD_STAT_OWN || s == VJD_STAT_BUSY)
-        if (isVJDExists(i))
-        {
-            exist = true;
-            listBoxTarget->Items->Add(i);
-            if (GetVJDStatus(i) == VJD_STAT_FREE && first_free < 0)
-                first_free = listBoxTarget->Items->Count - 1;
-        }
-    }
-    if (exist)
-        listBoxTarget->SelectedIndex = first_free;
+		//		s = GetVJDStatus(i);
+		//		if (s == VJD_STAT_FREE || s == VJD_STAT_OWN || s == VJD_STAT_BUSY)
+		if (isVJDExists(i))
+		{
+			exist = true;
+			listBoxTarget->Items->Add(i);
+			if (GetVJDStatus(i) == VJD_STAT_FREE && first_free < 0)
+				first_free = listBoxTarget->Items->Count - 1;
+		}
+	}
+	if (exist)
+		listBoxTarget->SelectedIndex = first_free;
 
-    return exist;
+
+	return exist;
 }
 
 private: System::Void Enable(bool driverOK) {
@@ -1817,7 +1839,8 @@ private: System::Void WatchDog_Tick(System::Object^  sender, System::EventArgs^ 
              if (ReportId>0)
              {
                  stat  = GetVJDStatus(ReportId);
-                 if (stat == VJD_STAT_OWN)
+				 
+				 if (stat == VJD_STAT_OWN)
                      return;
                  else
                  {
