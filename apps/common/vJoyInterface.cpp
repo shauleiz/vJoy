@@ -512,7 +512,7 @@ namespace vJoyNS {
 		{
 			if (LogStream)
 				_ftprintf_s(LogStream, _T("\n[%05u]Info: GetVJDStatus(%d) - return VJD_STAT_UNKN"), ProcessId, rID);
-			return VJD_STAT_UNKN;
+			return FALSE;
 		}
 
 		// Device  exists?
