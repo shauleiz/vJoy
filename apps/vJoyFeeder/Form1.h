@@ -67,26 +67,6 @@ namespace vJoyDemo {
                 //return;
             };
 
-			// Debug >>
-			int pid[6];
-			pid[0] = GetOwnerPid(1);
-			pid[1] = GetOwnerPid(2);
-			pid[2] = GetOwnerPid(3);
-			pid[3] = GetOwnerPid(4);
-			pid[4] = GetOwnerPid(5);
-			pid[5] = GetOwnerPid(6);
-			String^ message;
-			message = L"vJoy Device:1  PID:" + pid[0] + "\r\n"
-				+ L"vJoy Device:2  PID:" + pid[1] + "\r\n"
-				+ L"vJoy Device:3  PID:" + pid[2] + "\r\n"
-				+ L"vJoy Device:4  PID:" + pid[3] + "\r\n"
-				+ L"vJoy Device:5  PID:" + pid[4] + "\r\n"
-				+ L"vJoy Device:6  PID:" + pid[5] + "\r\n";
-			textBoxInfo->Text = message;
-			MessageBox::Show(this, textBoxInfo->Text, L"Debug", MessageBoxButtons::OK, MessageBoxIcon::Warning);
-
-				// Debug <<
-
             /*4*/
             ResetAll();
 
