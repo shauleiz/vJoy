@@ -36,6 +36,9 @@
     <ClInclude Include="MyMFCListCtrl.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\inc\public.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="vJoyList.cpp">
@@ -53,6 +56,9 @@
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="vJoyList.rc">
+      <Filter>Resource Files</Filter>
+    </ResourceCompile>
+    <ResourceCompile Include="res\version.rc">
       <Filter>Resource Files</Filter>
     </ResourceCompile>
   </ItemGroup>

@@ -75,3 +75,4 @@ driver/sys/gen-versioninfo.h
 apps/vJoyInstall/CmdLine/gen-versioninfo.h
 driver/Package/gen-versioninfo.h
 SDK/ReadMe-2.1.5.odt
+apps/vJoyList/gen-versioninfo.h
