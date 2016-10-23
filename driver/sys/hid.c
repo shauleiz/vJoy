@@ -1993,25 +1993,45 @@ void InitializeDev(PDEVICE_EXTENSION   devContext, USHORT Mask, BOOLEAN ResetOnl
         devContext->positions[index]->ValDial = data_buf.InitValAxis[7] * 0x7FFF / 100 + 1;
         devContext->positions[index]->ValWheel = 0;
 
-        if (data_buf.InitValPov[0] == -1)
-            devContext->positions[index]->ValHats = (DWORD)-1;
-        else
-            devContext->positions[index]->ValHats = data_buf.InitValPov[0] * 35999 / 100;
+		// Test if the initialization values refer to Discrete POVs
+		// The sign of Discrete POV initialization is value in the range 0x80-0x8F
+		// If one or more values are in the range it is adssumed the POVs are Discrete
+		if (
+			((data_buf.InitValPov[0] >> 4) == 8) ||
+			((data_buf.InitValPov[1] >> 4) == 8) ||
+			((data_buf.InitValPov[2] >> 4) == 8) ||
+			((data_buf.InitValPov[3] >> 4) == 8)
+			)
+			devContext->positions[index]->ValHats =
+			((data_buf.InitValPov[0] & 0xF) << 0) +
+			((data_buf.InitValPov[1] & 0xF) << 4) +
+			((data_buf.InitValPov[2] & 0xF) << 8) +
+			((data_buf.InitValPov[3] & 0xF) << 12);
 
-        if (data_buf.InitValPov[1] == -1)
-            devContext->positions[index]->ValHatsEx1 = (DWORD)-1;
-        else
-            devContext->positions[index]->ValHatsEx1 = data_buf.InitValPov[1] * 35999 / 100;
 
-        if (data_buf.InitValPov[2] == -1)
-            devContext->positions[index]->ValHatsEx2 = (DWORD)-1;
-        else
-            devContext->positions[index]->ValHatsEx2 = data_buf.InitValPov[2] * 35999 / 100;
+		// These are Continuous POVs
+		else
+		{
+			if (data_buf.InitValPov[0] == -1)
+				devContext->positions[index]->ValHats = (DWORD)-1;
+			else
+				devContext->positions[index]->ValHats = data_buf.InitValPov[0] * 35999 / 100;
 
-        if (data_buf.InitValPov[3] == -1)
-            devContext->positions[index]->ValHatsEx3 = (DWORD)-1;
-        else
-            devContext->positions[index]->ValHatsEx3 = data_buf.InitValPov[3] * 35999 / 100;
+			if (data_buf.InitValPov[1] == -1)
+				devContext->positions[index]->ValHatsEx1 = (DWORD)-1;
+			else
+				devContext->positions[index]->ValHatsEx1 = data_buf.InitValPov[1] * 35999 / 100;
+
+			if (data_buf.InitValPov[2] == -1)
+				devContext->positions[index]->ValHatsEx2 = (DWORD)-1;
+			else
+				devContext->positions[index]->ValHatsEx2 = data_buf.InitValPov[2] * 35999 / 100;
+
+			if (data_buf.InitValPov[3] == -1)
+				devContext->positions[index]->ValHatsEx3 = (DWORD)-1;
+			else
+				devContext->positions[index]->ValHatsEx3 = data_buf.InitValPov[3] * 35999 / 100;
+		};
 
         devContext->positions[index]->ValButtons = ((DWORD *)(data_buf.ButtonMask))[0];
         devContext->positions[index]->ValButtonsEx1 = ((DWORD *)(data_buf.ButtonMask))[1];
