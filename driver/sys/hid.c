@@ -1586,7 +1586,8 @@ unsigned int GetInitValueFromRegistry(USHORT		id, PDEVICE_INIT_VALS data_buf)
     status = WdfRegistryOpenKey(KeyParameters, &strDev, GENERIC_READ, WDF_NO_OBJECT_ATTRIBUTES, &KeyDevice);
     if (!NT_SUCCESS(status))
     {
-        LogEventWithStatus(ERRLOG_REP_REG_FAILED, L"WdfRegistryOpenKey", WdfDriverWdmGetDriverObject(WdfGetDriver()), status);
+		if (STATUS_OBJECT_NAME_NOT_FOUND != status)
+			LogEventWithStatus(ERRLOG_REP_REG_FAILED, L"WdfRegistryOpenKey", WdfDriverWdmGetDriverObject(WdfGetDriver()), status);
         WdfRegistryClose(KeyParameters);
         return 0;
     };
