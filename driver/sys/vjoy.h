@@ -1667,15 +1667,15 @@ BOOLEAN FfbActiveGet(
 	PDEVICE_EXTENSION    pDevContext
 	);
 
-VOID FfbNotifyWrite(
+EVT_WDF_IO_QUEUE_STATE   FfbNotifyWrite/*(
 	WDFQUEUE Queue,
 	WDFCONTEXT Context
-	);
+	)*/;
 
-VOID FfbNotifyRead(
+EVT_WDF_IO_QUEUE_STATE FfbNotifyRead/*(
 	WDFQUEUE Queue,
 	WDFCONTEXT Context
-	);
+	)*/;
 
 VOID FfbTransferData(
 	PDEVICE_EXTENSION devContext,

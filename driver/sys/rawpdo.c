@@ -396,7 +396,7 @@ Return Value:
 		{
 			//RtlCopyMemory(GenBuffer, pDevContext->positions[id - 1], bytesToCopy);
 			// Copy data to output buffer
-			GetPositions(GenBuffer, pDevContext, id, bytesToCopy);
+			GetPositions(GenBuffer, pDevContext, (UCHAR)id, bytesToCopy);
 			WdfRequestCompleteWithInformation(Request, status, bytesToCopy);
 			return;
 		}

@@ -277,10 +277,23 @@ Return Value:
 
 	// Child device's compatible ID is "hid_device_system_game"
 	// Additional ones may be added below
-	WdfPdoInitAddCompatibleID(DeviceInit, &CompatId);
+	status = WdfPdoInitAddCompatibleID(DeviceInit, &CompatId);
+	if (!NT_SUCCESS(status)) {
+		TraceEvents(TRACE_LEVEL_WARNING, DBG_PNP, "WdfPdoInitAddCompatibleID failed with status code 0x%x\n", status);
+		LogEventWithStatus(ERRLOG_DEVICE_FAILED, L"WdfPdoInitAddCompatibleID", NULL, status);
+	}
 
-	WdfPdoInitAssignDeviceID(DeviceInit, &DeviceId);
-	WdfPdoInitAssignInstanceID(DeviceInit, &InstanceId);
+	status = WdfPdoInitAssignDeviceID(DeviceInit, &DeviceId);
+	if (!NT_SUCCESS(status)) {
+		TraceEvents(TRACE_LEVEL_WARNING, DBG_PNP, "WdfPdoInitAssignDeviceID failed with status code 0x%x\n", status);
+		LogEventWithStatus(ERRLOG_DEVICE_FAILED, L"WdfPdoInitAssignDeviceID", NULL, status);
+	}
+
+	status = WdfPdoInitAssignInstanceID(DeviceInit, &InstanceId);
+	if (!NT_SUCCESS(status)) {
+		TraceEvents(TRACE_LEVEL_WARNING, DBG_PNP, "WdfPdoInitAssignInstanceID failed with status code 0x%x\n", status);
+		LogEventWithStatus(ERRLOG_DEVICE_FAILED, L"WdfPdoInitAssignInstanceID", NULL, status);
+	}
 
     //WdfDeviceInitAssignSDDLString(DeviceInit,
     //                                       &SDDL_DEVOBJ_SYS_ALL_ADM_RWX_WORLD_R_RES_R);
@@ -288,7 +301,7 @@ Return Value:
 
 
     WDF_OBJECT_ATTRIBUTES_INIT_CONTEXT_TYPE(&attributes, DEVICE_EXTENSION);
-	attributes.EvtCleanupCallback = vJoyEvtDeviceContextCleanup;
+	attributes.EvtCleanupCallback = (PFN_WDF_OBJECT_CONTEXT_CLEANUP)vJoyEvtDeviceContextCleanup; // See https://social.msdn.microsoft.com/Forums/en-US/ba0e4557-05a7-42a0-a960-cf2ded57ecfb/driver-analysis-undocumented-warning-c28118?forum=wdk
 
 #if 0
 	// Test with PNP requests

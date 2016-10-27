@@ -28,6 +28,7 @@ Revision History:
 
 #define USE_EXTERNAL_HARDCODED_HID_REPORT_DESCRIPTOR
 //#define USE_HARDCODED_HID_REPORT_DESCRIPTOR_5
+#define					NameSize 300
 
 #include <vjoy.h>
 
@@ -1304,6 +1305,8 @@ LoadPositions(PJOYSTICK_POSITION_V2 pPosition, PDEVICE_EXTENSION pDevContext, si
 
 VOID GetPositions(PJOYSTICK_POSITION_V2 pPosition, PDEVICE_EXTENSION pDevContext, UCHAR id, size_t buffsize)
 {
+	UNREFERENCED_PARAMETER(buffsize);
+
 	int i;
 
 	i = id - 1; // Index is zero-based
@@ -1358,7 +1361,7 @@ PVOID GetReportDescriptorFromRegistry(USHORT * Size, USHORT * IdMask)
     PKEY_BASIC_INFORMATION 	pDeviceBasicInfo=NULL;
     ULONG					ResultLength;
     ULONG					nameLength;
-    WCHAR					DeviceKeyName[512];
+    WCHAR					DeviceKeyName[NameSize];
     size_t					pcb=0;
     USHORT					id=0;
 
@@ -1410,8 +1413,8 @@ PVOID GetReportDescriptorFromRegistry(USHORT * Size, USHORT * IdMask)
 
         // Copy name of subkey to unicode buffer and release temporary buffer
         nameLength = pDeviceBasicInfo->NameLength;
-        RtlZeroMemory(DeviceKeyName, 512);
-        status = RtlStringCbCopyNW(DeviceKeyName, 512*sizeof(WCHAR), pDeviceBasicInfo->Name, nameLength);
+        RtlZeroMemory(DeviceKeyName, NameSize);
+        status = RtlStringCbCopyNW(DeviceKeyName, NameSize *sizeof(WCHAR), pDeviceBasicInfo->Name, nameLength);
         if (!NT_SUCCESS(status))
         {
             LogEventWithStatus(ERRLOG_REP_REG_FAILED, L"RtlStringCbCopyNW", WdfDriverWdmGetDriverObject(WdfGetDriver()), status);
@@ -1422,8 +1425,10 @@ PVOID GetReportDescriptorFromRegistry(USHORT * Size, USHORT * IdMask)
         ExFreePoolWithTag(pDeviceBasicInfo, 'fnIb');
 
         // The sub-key name should range from "Device01" to "Device16"
-        RtlStringCbLengthW(REG_DEVICE, 512, &pcb);
-        if (!RtlEqualMemory(DeviceKeyName, REG_DEVICE, pcb))
+        status =   RtlStringCbLengthW(REG_DEVICE, NameSize, &pcb);
+		if (!NT_SUCCESS(status))
+			continue;
+		if (!RtlEqualMemory(DeviceKeyName, REG_DEVICE, pcb))
             continue;
 
         // Get the Subkey holding the configuration data
@@ -1544,7 +1549,7 @@ unsigned int GetInitValueFromRegistry(USHORT		id, PDEVICE_INIT_VALS data_buf)
 {
     NTSTATUS				status = STATUS_SUCCESS;
     WDFKEY					KeyDevice, KeyParameters;
-    WCHAR					DeviceKeyName[512] = { 0 };
+    WCHAR					DeviceKeyName[NameSize] = { 0 };
     UNICODE_STRING			strDev, strControl;
     PCWSTR					Axes[] = { L"X", L"Y", L"Z", L"RX", L"RY", L"RZ", L"SL1", L"SL2", L"POV1", L"POV2", L"POV3", L"POV4" };
     UCHAR					nAxes = 0;
@@ -2145,7 +2150,7 @@ USHORT ParseIdInDescriptor(BYTE * desc, DWORD dDescSize)
     return id;
 }
 
-VOID FfbNotifyWrite(
+VOID  FfbNotifyWrite(
     WDFQUEUE Queue,
     WDFCONTEXT Context
     )
