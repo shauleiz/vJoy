@@ -1354,6 +1354,11 @@ Return Value:
 #if (KMDF_MINOR_VERSION != 005 &&  KMDF_MINOR_VERSION != 007)
 __drv_allocatesMem(object)
 #endif
+
+#if (_MSC_VER < 1900 )
+#pragma warning( push )
+#pragma warning( disable : 6102 )
+#endif
 LPTSTR * GetDevMultiSz(__in HDEVINFO Devs, __in PSP_DEVINFO_DATA DevInfo, __in DWORD Prop)
 /*++
 
@@ -1415,6 +1420,7 @@ Return Value:
     }
     return NULL;
 }
+#pragma warning( pop )
 
 #if (KMDF_MINOR_VERSION != 005 &&  KMDF_MINOR_VERSION != 007)
 void DelMultiSz(__in_opt __drv_freesMem(object) PZPWSTR Array)
