@@ -142,6 +142,14 @@ Return Value:
 
 		// Get the buffer
 		status = WdfRequestRetrieveOutputBuffer(Request, bytesToCopy, &GenBuffer, &bytesReturned);
+		if (!NT_SUCCESS(status))
+		{
+			TraceEvents(TRACE_LEVEL_ERROR, DBG_INIT, "vJoy_EvtIoDeviceControlForRawPdo[GET_DEV_STAT]: failed to retrieve output buffer\n");
+			WdfRequestComplete(Request, STATUS_NO_SUCH_DEVICE);
+			return;
+		};
+
+
 		if (bytesReturned<5)
 		{
 			TraceEvents(TRACE_LEVEL_ERROR, DBG_INIT, "vJoy_EvtIoDeviceControlForRawPdo[GET_DEV_STAT]: failed - bytesReturned=%d\n", bytesReturned);
@@ -228,6 +236,13 @@ Return Value:
 
 		// Output buffer must be at least one byte
 		status = WdfRequestRetrieveOutputBuffer(Request, bytesToCopy, &GenBuffer, &bytesReturned);
+		if (!NT_SUCCESS(status))
+		{
+			TraceEvents(TRACE_LEVEL_ERROR, DBG_INIT, "vJoy_EvtIoDeviceControlForRawPdo[GET_DRV_INFO]: failed to retrieve output buffer\n");
+			WdfRequestComplete(Request, STATUS_NO_SUCH_DEVICE);
+			return;
+		};
+
 		if (bytesReturned<1)
 		{
 			TraceEvents(TRACE_LEVEL_ERROR, DBG_INIT, "vJoy_EvtIoDeviceControlForRawPdo: [GET_DRV_INFO] - bytesReturned <1\n");
@@ -299,6 +314,13 @@ Return Value:
 		};
 
 		status = WdfRequestRetrieveOutputBuffer(Request, bytesToCopy, &GenBuffer, &bytesReturned);
+		if (!NT_SUCCESS(status))
+		{
+			TraceEvents(TRACE_LEVEL_ERROR, DBG_INIT, "vJoy_EvtIoDeviceControlForRawPdo[GET_DEV_INFO]: failed to retrieve output buffer\n");
+			WdfRequestComplete(Request, STATUS_NO_SUCH_DEVICE);
+			return;
+		};
+
 		if (bytesReturned<6)
 		{
 			WdfRequestComplete(Request, STATUS_NO_SUCH_DEVICE);
@@ -421,6 +443,12 @@ Return Value:
 		WdfRequestGetParameters(Request, &Params);
 		bytesToCopy = (ULONG)Params.Parameters.DeviceIoControl.OutputBufferLength;
 		status = WdfRequestRetrieveOutputBuffer(Request, bytesToCopy, &GenBuffer, &bytesReturned);
+		if (!NT_SUCCESS(status))
+		{
+			TraceEvents(TRACE_LEVEL_ERROR, DBG_INIT, "vJoy_EvtIoDeviceControlForRawPdo[GET_FFB_STAT]: failed to retrieve output buffer\n");
+			WdfRequestComplete(Request, STATUS_NO_SUCH_DEVICE);
+			return;
+		};
 		if (!bytesReturned)
 		{
 			WdfRequestComplete(Request, STATUS_NO_SUCH_DEVICE);
@@ -512,6 +540,12 @@ Return Value:
 
 		status = WdfRequestRetrieveOutputBuffer(Request, bytesToCopy, &GenBuffer, &bytesReturned);
 		TraceEvents(TRACE_LEVEL_INFORMATION, DBG_INIT, "vJoy_EvtIoDeviceControlForRawPdo: bytesReturned=%d\n", bytesReturned);
+		if (!NT_SUCCESS(status))
+		{
+			TraceEvents(TRACE_LEVEL_ERROR, DBG_INIT, "vJoy_EvtIoDeviceControlForRawPdo[GET_DRV_DEV_EN]: failed to retrieve output buffer\n");
+			WdfRequestComplete(Request, STATUS_NO_SUCH_DEVICE);
+			return;
+		};
 		if (bytesReturned<1)
 		{
 			WdfRequestComplete(Request, STATUS_NO_SUCH_DEVICE);
@@ -547,6 +581,12 @@ Return Value:
 
 		status = WdfRequestRetrieveOutputBuffer(Request, bytesToCopy, &GenBuffer, &bytesReturned);
 		TraceEvents(TRACE_LEVEL_INFORMATION, DBG_INIT, "vJoy_EvtIoDeviceControlForRawPdo: bytesReturned=%d\n", bytesReturned);
+		if (!NT_SUCCESS(status))
+		{
+			TraceEvents(TRACE_LEVEL_ERROR, DBG_INIT, "vJoy_EvtIoDeviceControlForRawPdo[GET_DRV_DEV_MAX]: failed to retrieve output buffer\n");
+			WdfRequestComplete(Request, STATUS_NO_SUCH_DEVICE);
+			return;
+		};
 		if (bytesReturned<1)
 		{
 			WdfRequestComplete(Request, STATUS_NO_SUCH_DEVICE);
@@ -581,6 +621,12 @@ Return Value:
 		// Get the buffer from the request
 		status = WdfRequestRetrieveOutputBuffer(Request, bytesToCopy, &GenBuffer, &bytesReturned);
 		TraceEvents(TRACE_LEVEL_INFORMATION, DBG_INIT, "vJoy_EvtIoDeviceControlForRawPdo: bytesReturned=%d\n", bytesReturned);
+		if (!NT_SUCCESS(status))
+		{
+			TraceEvents(TRACE_LEVEL_ERROR, DBG_INIT, "vJoy_EvtIoDeviceControlForRawPdo[IS_DRV_FFB_CAP]: failed to retrieve output buffer\n");
+			WdfRequestComplete(Request, STATUS_NO_SUCH_DEVICE);
+			return;
+		};
 		if (bytesReturned<1)
 		{
 			TraceEvents(TRACE_LEVEL_ERROR, DBG_INIT, "vJoy_EvtIoDeviceControlForRawPdo: bytesReturned=%d (Failed)\n", bytesReturned);
