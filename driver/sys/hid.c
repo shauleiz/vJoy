@@ -2099,8 +2099,16 @@ PVOID ReAllocatePoolWithTag(PVOID orig, SIZE_T prevSize, POOL_TYPE PoolType, SIZ
     PVOID tmpPool, out;
     ULONG tmpTag = 'pmeT'; // 'Temp'
 
+	if ((PoolType & NonPagedPoolMustSucceed) != 0)
+		return NULL;
+
     if (!orig || !prevSize)
-        return ExAllocatePoolWithTag(PoolType, NumberOfBytes, Tag);
+	{ 
+        out = ExAllocatePoolWithTag(PoolType, NumberOfBytes, Tag);
+		if (out)
+			return out;
+		return NULL;
+	}
 
     tmpPool = ExAllocatePoolWithTag(PoolType, prevSize, tmpTag);
     if (!tmpPool)
@@ -2112,10 +2120,7 @@ PVOID ReAllocatePoolWithTag(PVOID orig, SIZE_T prevSize, POOL_TYPE PoolType, SIZ
     ExFreePoolWithTag(orig, Tag);
     orig=NULL;
 
-#pragma warning (push)
-#pragma warning( disable:28160 )
     out = ExAllocatePoolWithTag(PoolType, NumberOfBytes, Tag);
-#pragma warning (pop)
     if (!out)
         return NULL;
     RtlZeroMemory(out, prevSize);
