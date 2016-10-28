@@ -1101,8 +1101,8 @@ VOID LogEvent(NTSTATUS code, PWSTR msg, PVOID pObj)
 	if (msg)
 	{
 		p->NumberOfStrings = 1;
-		wcscpy((PWSTR)((PUCHAR)p + p->StringOffset), msg);
-		// wcscpy_s((PWSTR) ((PUCHAR) p + p->StringOffset), sizeof(*msg)/sizeof(WCHAR),msg); // TODO: Fix this line and remove the line above
+		// wcscpy((PWSTR)((PUCHAR)p + p->StringOffset), msg);
+		wcscpy_s((PWSTR) ((PUCHAR) p + p->StringOffset), (ULONG)((wcslen(msg) + 1)),msg); // TODO: Fix this line and remove the line above
 	}
 	else
 		p->NumberOfStrings = 0;
@@ -1143,17 +1143,17 @@ VOID LogEventWithStatus(NTSTATUS code, PWSTR msg, PVOID pObj, NTSTATUS stat)
 	if (msg)
 	{
 		p->NumberOfStrings = 2;
-		wcscpy((PWSTR)((PUCHAR)p + p->StringOffset), msg);
-		//wcscpy_s((PWSTR)((PUCHAR)p + p->StringOffset), wcslen(msg) + 1, msg);	 // TODO: Fix this line and remove the line above
+		//wcscpy((PWSTR)((PUCHAR)p + p->StringOffset), msg);
+		wcscpy_s((PWSTR)((PUCHAR)p + p->StringOffset), (ULONG)(wcslen(msg) + 1), msg);	 // TODO: Fix this line and remove the line above
 
-		wcscpy((PWSTR)((PUCHAR)p + p->StringOffset + (wcslen(msg) + 1) * sizeof(WCHAR)), strStat);
-		//wcscpy_s((PWSTR)((PUCHAR)p + p->StringOffset + (wcslen(msg) + 1) * sizeof(WCHAR)), wcslen(strStat) + 1,strStat); // TODO: Fix this line and remove the line above
+		//wcscpy((PWSTR)((PUCHAR)p + p->StringOffset + (wcslen(msg) + 1) * sizeof(WCHAR)), strStat);
+		wcscpy_s((PWSTR)((PUCHAR)p + p->StringOffset + (wcslen(msg) + 1) * sizeof(WCHAR)), wcslen(strStat) + 1,strStat); // TODO: Fix this line and remove the line above
 	}
 	else
 	{
 		p->NumberOfStrings = 1;
-		wcscpy((PWSTR)((PUCHAR)p + p->StringOffset), strStat);
-		//wcscpy_s((PWSTR)((PUCHAR)p + p->StringOffset), wcslen(strStat) + 1, strStat);		// TODO: Fix this line and remove the line above
+		//wcscpy((PWSTR)((PUCHAR)p + p->StringOffset), strStat);
+		wcscpy_s((PWSTR)((PUCHAR)p + p->StringOffset), wcslen(strStat) + 1, strStat);		// TODO: Fix this line and remove the line above
 	};
 
 	IoWriteErrorLogEntry(p);
