@@ -321,13 +321,13 @@ extern "C" {
 			if (gotdata && nBytesTranss)
 			{
 				if (LogStream)
-					_ftprintf_s(LogStream, _T("\n[%05u]Info: FfbIsStarted() - gotdata=%d nBytesTranss=%d  Returns TRUE"), ProcessId, gotdata, nBytesTranss);
+					_ftprintf_s(LogStream, _T("\n[%05u]Info: FfbIsStarted() - gotdata=%d nBytesTranss=%u  Returns TRUE"), ProcessId, gotdata, nBytesTranss);
 				return true;
 			}
 			else
 			{
 				if (LogStream)
-					_ftprintf_s(LogStream, _T("\n[%05u]Info: FfbIsStarted() - gotdata=%d nBytesTranss=%d  Returns FALSE"), ProcessId, gotdata, nBytesTranss);
+					_ftprintf_s(LogStream, _T("\n[%05u]Info: FfbIsStarted() - gotdata=%d nBytesTranss=%u  Returns FALSE"), ProcessId, gotdata, nBytesTranss);
 				return false;
 			}
 		}
@@ -511,7 +511,7 @@ namespace vJoyNS {
 		if (!ok)
 		{
 			if (LogStream)
-				_ftprintf_s(LogStream, _T("\n[%05u]Info: GetVJDStatus(%d) - return VJD_STAT_UNKN"), ProcessId, rID);
+				_ftprintf_s(LogStream, _T("\n[%05u]Info: GetVJDStatus(%u) - return VJD_STAT_UNKN"), ProcessId, rID);
 			return FALSE;
 		}
 
@@ -584,7 +584,7 @@ namespace vJoyNS {
 		if (!ok)
 		{
 			if (LogStream)
-				_ftprintf_s(LogStream, _T("\n[%05u]Info: GetOwnerPid(%d) - GetDevStat Failed"), ProcessId, rID);
+				_ftprintf_s(LogStream, _T("\n[%05u]Info: GetOwnerPid(%u) - GetDevStat Failed"), ProcessId, rID);
 			return BAD_DEV_STAT;
 		}
 
@@ -592,7 +592,7 @@ namespace vJoyNS {
 		if (!(buf[0] & 0x01))
 		{
 			if (LogStream)
-				_ftprintf_s(LogStream, _T("\n[%05u]Info: GetOwnerPid(%d) - vJoy Device does not exist"), ProcessId, rID);
+				_ftprintf_s(LogStream, _T("\n[%05u]Info: GetOwnerPid(%u) - vJoy Device does not exist"), ProcessId, rID);
 			return NO_DEV_EXIST;
 		}
 
@@ -600,7 +600,7 @@ namespace vJoyNS {
 		if (!(buf[0] & 0x04))
 		{
 			if (LogStream)
-				_ftprintf_s(LogStream, _T("\n[%05u]Info: GetOwnerPid(%d) - vJoy Device file object does not exist"), ProcessId, rID);
+				_ftprintf_s(LogStream, _T("\n[%05u]Info: GetOwnerPid(%u) - vJoy Device file object does not exist"), ProcessId, rID);
 			return NO_FILE_EXIST;
 		}
 
@@ -640,7 +640,7 @@ namespace vJoyNS {
 		if (!ok)
 		{
 			if (LogStream)
-				_ftprintf_s(LogStream, _T("\n[%05u]Info: GetVJDStatus(%d) - return VJD_STAT_UNKN"), ProcessId, rID);
+				_ftprintf_s(LogStream, _T("\n[%05u]Info: GetVJDStatus(%u) - return VJD_STAT_UNKN"), ProcessId, rID);
 			return VJD_STAT_UNKN;
 		}
 
@@ -649,7 +649,7 @@ namespace vJoyNS {
 		{
 			Set_stat(rID, VJD_STAT_MISS);
 			if (LogStream)
-				_ftprintf_s(LogStream, _T("\n[%05u]Info: GetVJDStatus(%d) - return VJD_STAT_MISS"), ProcessId, rID);
+				_ftprintf_s(LogStream, _T("\n[%05u]Info: GetVJDStatus(%u) - return VJD_STAT_MISS"), ProcessId, rID);
 			return Get_stat(rID);
 		}
 
@@ -672,7 +672,7 @@ namespace vJoyNS {
 			Set_stat(rID, VJD_STAT_BUSY);
 
 		if (LogStream)
-			_ftprintf_s(LogStream, _T("\n[%05u]Info: GetVJDStatus(%d) - return %d"), ProcessId, rID, Get_stat(rID));
+			_ftprintf_s(LogStream, _T("\n[%05u]Info: GetVJDStatus(%u) - return %u"), ProcessId, rID, (UCHAR)Get_stat(rID));
 
 		return Get_stat(rID);
 
@@ -872,7 +872,7 @@ namespace vJoyNS {
 		HIDP_CAPS Capabilities;
 
 		if (LogStream)
-			_ftprintf_s(LogStream, _T("\n[%05u]Info: GetVJDButtonNumber(rID=%d) - Starting"), ProcessId, rID);
+			_ftprintf_s(LogStream, _T("\n[%05u]Info: GetVJDButtonNumber(rID=%u) - Starting"), ProcessId, rID);
 
 		if (!AreControlsInit(rID))
 			GetControls(rID);
@@ -885,7 +885,7 @@ namespace vJoyNS {
 			return NO_HANDLE_BY_INDEX;
 
 		if (LogStream)
-			_ftprintf_s(LogStream, _T("\n[%05u]Info: GetVJDButtonNumber(rID=%d) - Using Index=%d"), ProcessId, rID, Index);
+			_ftprintf_s(LogStream, _T("\n[%05u]Info: GetVJDButtonNumberfprintf_s - Using Index=%d"), ProcessId, rID, Index);
 
 		BOOL ok = HidD_GetPreparsedData(h, &PreparsedData);
 #else
@@ -896,7 +896,7 @@ namespace vJoyNS {
 		if (!ok)
 		{
 			if (LogStream)
-				_ftprintf_s(LogStream, _T("\n[%05u]Error: GetVJDButtonNumber(rID=%d) - HidD_GetPreparsedData() failed"), ProcessId, rID);
+				_ftprintf_s(LogStream, _T("\n[%05u]Error: GetVJDButtonNumber(rID=%u) - HidD_GetPreparsedData() failed"), ProcessId, rID);
 			CloseHandle(h);
 			return BAD_PREPARSED_DATA;
 		}
@@ -905,21 +905,21 @@ namespace vJoyNS {
 		if (stat != HIDP_STATUS_SUCCESS)
 		{
 			if (LogStream)
-				_ftprintf_s(LogStream, _T("\n[%05u]Error: GetVJDButtonNumber(rID=%d) - HidP_GetCaps() failed"), ProcessId, rID);
+				_ftprintf_s(LogStream, _T("\n[%05u]Error: GetVJDButtonNumber(rID=%u) - HidP_GetCaps() failed"), ProcessId, rID);
 			CloseHandle(h);
 			return NO_CAPS;
 		}
 
 		if (LogStream)
 		{
-			_ftprintf_s(LogStream, _T("\n[%05u]Info: GetVJDButtonNumber(rID=%d) - Capabilities: "), ProcessId, rID);
+			_ftprintf_s(LogStream, _T("\n[%05u]Info: GetVJDButtonNumber(rID=%u) - Capabilities: "), ProcessId, rID);
 			_ftprintf_s(LogStream, _T("\t Usage=0x%x;"), Capabilities.Usage);
 			_ftprintf_s(LogStream, _T("\t UsagePage=0x%x;"), Capabilities.UsagePage);
-			_ftprintf_s(LogStream, _T("\t InputReportByteLength=%d;"), Capabilities.InputReportByteLength);
-			_ftprintf_s(LogStream, _T("\t NumberLinkCollectionNodes=%d;"), Capabilities.NumberLinkCollectionNodes);
-			_ftprintf_s(LogStream, _T("\t NumberInputButtonCaps=%d;"), Capabilities.NumberInputButtonCaps);
-			_ftprintf_s(LogStream, _T("\t NumberInputValueCaps=%d;"), Capabilities.NumberInputValueCaps);
-			_ftprintf_s(LogStream, _T("\t NumberInputDataIndices=%d;"), Capabilities.NumberInputDataIndices);
+			_ftprintf_s(LogStream, _T("\t InputReportByteLength=%u;"), Capabilities.InputReportByteLength);
+			_ftprintf_s(LogStream, _T("\t NumberLinkCollectionNodes=%u;"), Capabilities.NumberLinkCollectionNodes);
+			_ftprintf_s(LogStream, _T("\t NumberInputButtonCaps=%u;"), Capabilities.NumberInputButtonCaps);
+			_ftprintf_s(LogStream, _T("\t NumberInputValueCaps=%u;"), Capabilities.NumberInputValueCaps);
+			_ftprintf_s(LogStream, _T("\t NumberInputDataIndices=%u;"), Capabilities.NumberInputDataIndices);
 		}
 
 		// Get Button data
@@ -928,7 +928,7 @@ namespace vJoyNS {
 		if (n < 1)
 		{
 			if (LogStream)
-				_ftprintf_s(LogStream, _T("\n[%05u]Error: GetVJDButtonNumber(rID=%d) - Number of button Caps is %d"), ProcessId, rID, n);
+				_ftprintf_s(LogStream, _T("\n[%05u]Error: GetVJDButtonNumber(rID=%u) - Number of button Caps is %u"), ProcessId, rID, n);
 			CloseHandle(h);
 			return BAD_N_BTN_CAPS;
 		}
@@ -938,7 +938,7 @@ namespace vJoyNS {
 		if (stat != HIDP_STATUS_SUCCESS)
 		{
 			if (LogStream)
-				_ftprintf_s(LogStream, _T("\n[%05u]Error: GetVJDButtonNumber(rID=%d) - HidP_GetButtonCaps() failed"), ProcessId, rID);
+				_ftprintf_s(LogStream, _T("\n[%05u]Error: GetVJDButtonNumber(rID=%u) - HidP_GetButtonCaps() failed"), ProcessId, rID);
 			CloseHandle(h);
 			delete[] 	bCaps;
 			return BAD_BTN_CAPS;
@@ -946,12 +946,12 @@ namespace vJoyNS {
 
 		if (LogStream)
 		{
-			_ftprintf_s(LogStream, _T("\n[%05u]Info: GetVJDButtonNumber(rID=%d) - Button Capabilities: "), ProcessId, rID);
+			_ftprintf_s(LogStream, _T("\n[%05u]Info: GetVJDButtonNumber(rID=%u) - Button Capabilities: "), ProcessId, rID);
 			_ftprintf_s(LogStream, _T("\t UsagePage=0x%x;"), bCaps[0].UsagePage);
-			_ftprintf_s(LogStream, _T("\t ReportID=%d;"), bCaps[0].ReportID);
-			_ftprintf_s(LogStream, _T("\t UsageMax=%d;"), (bCaps[0].Range).UsageMax);
-			_ftprintf_s(LogStream, _T("\t UsageMin=%d;"), (bCaps[0].Range).UsageMin);
-			_ftprintf_s(LogStream, _T("\t DataIndexMin=%d;"), (bCaps[0].Range).DataIndexMin);
+			_ftprintf_s(LogStream, _T("\t ReportID=%u;"), bCaps[0].ReportID);
+			_ftprintf_s(LogStream, _T("\t UsageMax=%u;"), (bCaps[0].Range).UsageMax);
+			_ftprintf_s(LogStream, _T("\t UsageMin=%u;"), (bCaps[0].Range).UsageMin);
+			_ftprintf_s(LogStream, _T("\t DataIndexMin=%u;"), (bCaps[0].Range).DataIndexMin);
 		}
 
 		// Assuming one button range, get the number of buttons
@@ -963,7 +963,7 @@ namespace vJoyNS {
 		else
 		{
 			if (LogStream)
-				_ftprintf_s(LogStream, _T("\n[%05u]Error: GetVJDButtonNumber(rID=%d) - Bad Range"), ProcessId, rID);
+				_ftprintf_s(LogStream, _T("\n[%05u]Error: GetVJDButtonNumber(rID=%u) - Bad Range"), ProcessId, rID);
 			CloseHandle(h);
 			delete[] 	bCaps;
 			return BAD_BTN_RANGE;
@@ -974,7 +974,7 @@ namespace vJoyNS {
 		CloseHandle(h);
 
 		if (LogStream)
-			_ftprintf_s(LogStream, _T("\n[%05u]Info: GetVJDButtonNumber(rID=%d) - Return(nButtons=%d)"), ProcessId, rID, nButtons);
+			_ftprintf_s(LogStream, _T("\n[%05u]Info: GetVJDButtonNumber(rID=%u) - Return(nButtons=%d)"), ProcessId, rID, nButtons);
 		return nButtons;
 	}
 
@@ -2139,7 +2139,7 @@ HANDLE	GetHandleByIndex(int index)
     {
         lasterror = GetLastError();
         if (LogStream)
-            _ftprintf_s(LogStream, _T("\n[%05d]Warning: GetHandleByIndex(index=%d) - Failed SetupDiEnumDeviceInterfaces() with error 0x%x"), ProcessId, index, lasterror);
+            _ftprintf_s(LogStream, _T("\n[%05u]Warning: GetHandleByIndex(index=%d) - Failed SetupDiEnumDeviceInterfaces() with error 0x%x"), ProcessId, index, lasterror);
         if (lasterror == ERROR_NO_MORE_ITEMS) // 0x103
             return NULL;
         else
@@ -2304,18 +2304,18 @@ int		GetDeviceIndexByReportId(USHORT VendorId, USHORT ProductId, BYTE ReportId)
     int id;
 
     if (LogStream)
-        _ftprintf_s(LogStream, _T("\n[%05u]Info: GetDeviceIndexByReportId(%d) - Starting"), ProcessId, ReportId );
+        _ftprintf_s(LogStream, _T("\n[%05u]Info: GetDeviceIndexByReportId(%u) - Starting"), ProcessId, ReportId );
 
     // Get the index of the next vJoy device
     while ((DevIndex = GetDeviceIndexById(VendorId, ProductId, i++)) >= 0)
     {
         if (LogStream)
-            _ftprintf_s(LogStream, _T("\n[%05u]Info: GetDeviceIndexByReportId(%d) - GetDeviceIndexById(i=%d) => %d"), ProcessId, ReportId, i, DevIndex);
+            _ftprintf_s(LogStream, _T("\n[%05u]Info: GetDeviceIndexByReportId(%u) - GetDeviceIndexById(i=%d) => %d"), ProcessId, ReportId, i, DevIndex);
 
         // Get the id of this vJoy device
         id = GetvJoyReportId(DevIndex);
         if (LogStream)
-            _ftprintf_s(LogStream, _T("\n[%05u]Info: GetDeviceIndexByReportId(%d) - GetvJoyReportId(DevIndex=%d) => %d"), ProcessId, ReportId, DevIndex, id);
+            _ftprintf_s(LogStream, _T("\n[%05u]Info: GetDeviceIndexByReportId(%u) - GetvJoyReportId(DevIndex=%d) => %d"), ProcessId, ReportId, DevIndex, id);
 
 
         // If this is the correct id then return the index
@@ -2325,7 +2325,7 @@ int		GetDeviceIndexByReportId(USHORT VendorId, USHORT ProductId, BYTE ReportId)
 
     // No match
     if (LogStream)
-            _ftprintf_s(LogStream, _T("\n[%05u]Error: GetDeviceIndexByReportId(%d) - No match"), ProcessId, ReportId);
+            _ftprintf_s(LogStream, _T("\n[%05u]Error: GetDeviceIndexByReportId(%u) - No match"), ProcessId, ReportId);
     return -1;
 }
 
@@ -2758,7 +2758,7 @@ HANDLE	OpenDeviceInterface(UINT iInterFace, DWORD *error)
         if (error)
             *error = GetLastError();
         if (LogStream)
-            _ftprintf_s(LogStream, _T("\n[%05u]Error: OpenDeviceInterface(%d) - Failed CreateFile() with error %x"), ProcessId, iInterFace, *error);
+            _ftprintf_s(LogStream, _T("\n[%05u]Error: OpenDeviceInterface(%u) - Failed CreateFile() with error %x"), ProcessId, iInterFace, *error);
         return INVALID_HANDLE_VALUE;
     }
 
@@ -2775,15 +2775,15 @@ HANDLE	OpenDeviceInterface(UINT iInterFace, DWORD *error)
         if (error)
             *error = GetLastError();
         if (LogStream)
-            _ftprintf_s(LogStream, _T("\n[%05u]Error: OpenDeviceInterface(%d) - Failed GetDevInfo()"), ProcessId, iInterFace);
+            _ftprintf_s(LogStream, _T("\n[%05u]Error: OpenDeviceInterface(%u) - Failed GetDevInfo()"), ProcessId, iInterFace);
         return INVALID_HANDLE_VALUE;
     }
     if (LogStream)
-        _ftprintf_s(LogStream, _T("\n[%05u]Info: OpenDeviceInterface(%d) - GetDevInfo() returned successfully for device %d"), ProcessId, iInterFace, info.DeviceID);
+        _ftprintf_s(LogStream, _T("\n[%05u]Info: OpenDeviceInterface(%u) - GetDevInfo() returned successfully for device %u"), ProcessId, iInterFace, info.DeviceID);
 
 
         if (LogStream)
-            _ftprintf_s(LogStream, _T("\n[%05u]Info: OpenDeviceInterface(%d) - Exit OK"), ProcessId, iInterFace);
+            _ftprintf_s(LogStream, _T("\n[%05u]Info: OpenDeviceInterface(%u) - Exit OK"), ProcessId, iInterFace);
     return file;
 }
 
@@ -2849,7 +2849,7 @@ bool	GetDevInfo(HANDLE h, PVOID data)
         if (bytes)
         {
             if (LogStream)
-                _ftprintf_s(LogStream, _T("\n[%05u]Info: GetDevInfo() - Returns (Immediatly) TRUE: ID=%d Implemented=%d isImplemented=%x %x %x %x"), ProcessId, info->DeviceID, info->nImplemented, info->isImplemented, info->MaxDevices, info->DriverFFB, info->DeviceFFB);
+                _ftprintf_s(LogStream, _T("\n[%05u]Info: GetDevInfo() - Returns (Immediatly) TRUE: ID=%u Implemented=%u isImplemented=%x %x %x %x"), ProcessId, info->DeviceID, info->nImplemented, info->isImplemented, info->MaxDevices, info->DriverFFB, info->DeviceFFB);
             return true;
         }
         else
@@ -2880,13 +2880,13 @@ bool	GetDevInfo(HANDLE h, PVOID data)
         if (gotdata && nBytesTranss)
         {
             if (LogStream)
-                _ftprintf_s(LogStream, _T("\n[%05u]Info: GetDevInfo() - gotdata=%d nBytesTranss=%d  Returns TRUE"), ProcessId, gotdata, nBytesTranss);
+                _ftprintf_s(LogStream, _T("\n[%05u]Info: GetDevInfo() - gotdata=%d nBytesTranss=%u  Returns TRUE"), ProcessId, gotdata, nBytesTranss);
             return true;
         }
         else
         {
             if (LogStream)
-                _ftprintf_s(LogStream, _T("\n[%05u]Info: GetDevInfo() - gotdata=%d nBytesTranss=%d  Returns FALSE"), ProcessId, gotdata, nBytesTranss);
+                _ftprintf_s(LogStream, _T("\n[%05u]Info: GetDevInfo() - gotdata=%d nBytesTranss=%u  Returns FALSE"), ProcessId, gotdata, nBytesTranss);
             return false;
         }
     }
@@ -2931,7 +2931,7 @@ bool	GetDevStat(BYTE id, int * nbytes, BYTE * buffer)
         {
             *nbytes = bytes;
             if (LogStream)
-                _ftprintf_s(LogStream, _T("\n[%05u]Info: GetDevStat() - Returns (Immediatly) TRUE: ID=%d ; output bytes=%d ; data = %x"), ProcessId, id, bytes, *(UINT *)buffer);
+                _ftprintf_s(LogStream, _T("\n[%05u]Info: GetDevStat() - Returns (Immediatly) TRUE: ID=%u ; output bytes=%u ; data = %x"), ProcessId, id, bytes, *(UINT *)buffer);
             return true;
         }
         else
@@ -2963,13 +2963,13 @@ bool	GetDevStat(BYTE id, int * nbytes, BYTE * buffer)
         {
             *nbytes = bytes;
             if (LogStream)
-                _ftprintf_s(LogStream, _T("\n[%05u]Info: GetDevStat() - gotdata=%d nBytesTranss=%d  Returns TRUE"), ProcessId, gotdata, nBytesTranss);
+                _ftprintf_s(LogStream, _T("\n[%05u]Info: GetDevStat() - gotdata=%d nBytesTranss=%u  Returns TRUE"), ProcessId, gotdata, nBytesTranss);
             return true;
         }
         else
         {
             if (LogStream)
-                _ftprintf_s(LogStream, _T("\n[%05u]Info: GetDevStat() - gotdata=%d nBytesTranss=%d  Returns FALSE"), ProcessId, gotdata, nBytesTranss);
+                _ftprintf_s(LogStream, _T("\n[%05u]Info: GetDevStat() - gotdata=%d nBytesTranss=%u  Returns FALSE"), ProcessId, gotdata, nBytesTranss);
             return false;
         }
     }
@@ -3011,7 +3011,7 @@ bool	GetDrvStat(int * nbytes, BYTE * buffer)
         {
             *nbytes = bytes;
             if (LogStream)
-                _ftprintf_s(LogStream, _T("\n[%05u]Info: GetDrvStat() - Returns (Immediatly) TRUE; output bytes=%d ; data = %x"), ProcessId, bytes, *(UINT *)buffer);
+                _ftprintf_s(LogStream, _T("\n[%05u]Info: GetDrvStat() - Returns (Immediatly) TRUE; output bytes=%u ; data = %x"), ProcessId, bytes, *(UINT *)buffer);
             return true;
         }
         else
@@ -3043,13 +3043,13 @@ bool	GetDrvStat(int * nbytes, BYTE * buffer)
         {
             *nbytes = bytes;
             if (LogStream)
-                _ftprintf_s(LogStream, _T("\n[%05u]Info: GetDrvStat() - gotdata=%d nBytesTranss=%d  Returns TRUE"), ProcessId, gotdata, nBytesTranss);
+                _ftprintf_s(LogStream, _T("\n[%05u]Info: GetDrvStat() - gotdata=%d nBytesTranss=%u  Returns TRUE"), ProcessId, gotdata, nBytesTranss);
             return true;
         }
         else
         {
             if (LogStream)
-                _ftprintf_s(LogStream, _T("\n[%05u]Info: GetDrvStat() - gotdata=%d nBytesTranss=%d  Returns FALSE"), ProcessId, gotdata, nBytesTranss);
+                _ftprintf_s(LogStream, _T("\n[%05u]Info: GetDrvStat() - gotdata=%d nBytesTranss=%u  Returns FALSE"), ProcessId, gotdata, nBytesTranss);
             return false;
         }
     }
@@ -3328,7 +3328,7 @@ void StartLogging(void)
         return;
 
     // Write First line.
-    _ftprintf_s(LogStream, _T("\n\n\n[%05d]Process:%s\n"), ProcessId, ProcessCmd);
+    _ftprintf_s(LogStream, _T("\n\n\n[%05u]Process:%s\n"), ProcessId, ProcessCmd);
 }
 
 void	InitDll(void)
@@ -3581,7 +3581,7 @@ UINT	GetInitValueFromRegistry(USHORT id, struct DEVICE_INIT_VALS * data_buf)
 	size_t size_ini = wcslen(REG_INIT); // Size of "Init"
 	size_t s = size_ini + size_dev + 10; // Size of entire buffer including slashes, ID etc
 	WCHAR * strInit = new WCHAR[s];
-	int actual_size = swprintf_s(strInit, s,L"%s%02d\\%s\0",REG_PARAM_DEV, id, REG_INIT);
+	int actual_size = swprintf_s(strInit, s,L"%s%02u\\%s\0",REG_PARAM_DEV, id, REG_INIT);
 	if (actual_size < 0 || actual_size >= s)
 		return 0; // Error: Creation of registry string failed
 
@@ -3694,13 +3694,13 @@ BOOL GetDevPosition(BYTE id, PJOYSTICK_POSITION_V2 pPosition)
 		if (gotdata && nBytesTranss)
 		{
 			if (LogStream)
-				_ftprintf_s(LogStream, _T("\n[%05u]Info: GetDevPosition() - gotdata=%d nBytesTranss=%d  Returns TRUE"), ProcessId, gotdata, nBytesTranss);
+				_ftprintf_s(LogStream, _T("\n[%05u]Info: GetDevPosition() - gotdata=%d nBytesTranss=%u  Returns TRUE"), ProcessId, gotdata, nBytesTranss);
 			return TRUE;
 		}
 		else
 		{
 			if (LogStream)
-				_ftprintf_s(LogStream, _T("\n[%05u]Info: GetDevPosition() - gotdata=%d nBytesTranss=%d  Returns FALSE"), ProcessId, gotdata, nBytesTranss);
+				_ftprintf_s(LogStream, _T("\n[%05u]Info: GetDevPosition() - gotdata=%d nBytesTranss=%u  Returns FALSE"), ProcessId, gotdata, nBytesTranss);
 			return FALSE;
 		}
 	}
