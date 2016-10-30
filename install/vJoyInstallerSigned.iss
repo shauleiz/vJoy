@@ -187,7 +187,6 @@ const
 var
 		SkipToPh2: 		boolean; (* True is installer resumes installation after Set Test mode & restart*)
 		OrigTestMode:	Boolean; (* Value of the original Test Mode *)
-		CalledBySpp:	Boolean; (* True is installer called by SPP Installer *)
 		DldRestart:		Boolean; (* True if delayed restart requested *)
 
 (* Forward Function declarations - Start *)
@@ -236,8 +235,6 @@ var
   Len: Longint;
   Res: Boolean;
   Names: TArrayOfString;
-  I: Integer;
-  S: String;
 
 begin
   // Get the first subkey under 'HIDCLASS' - expected values are 0000 or 0001
@@ -364,9 +361,6 @@ end;
 // Special version of the standard message box
 // If in VerySilent mode - dialog box supressed and message is sent to log file
 function vJoyMsgBox(const Text: String; const Typ: TMsgBoxType; const Buttons: Integer): Integer;
-
-var 
-  MsgBoxReturned: Integer;
 
 begin
   Result :=  IDOK;
@@ -511,10 +505,6 @@ end;
 (* Pre & Post-install operations *)
 procedure CurStepChanged(CurStep: TSetupStep);
 
-var
-  TmpFileName, ExecStdout, msg: string;
-  ResultCode: Integer;
-
 begin
 //	if  CurStep=ssInstall then
 //		MsgBox('CurStepChanged(ssInstall)' , mbInformation, MB_OK);	
@@ -569,8 +559,6 @@ end;
 *)
 
 function PrepareToInstall(var NeedsRestart: Boolean): String;
-var
-  RunOnceData: String;
   
 begin
 // Default
@@ -947,7 +935,7 @@ end;
 // Returns TRUE if need to restart
 function Exec_vJoyInstall(): Boolean;
 var
-  TmpFileName, ExecStdout, msg: string;
+  TmpFileName, msg: string;
   ResultCode: Integer;
   
   Begin
