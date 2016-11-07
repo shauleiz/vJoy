@@ -1212,7 +1212,7 @@ Return Value:
 
 	TraceEvents(TRACE_LEVEL_INFORMATION, DBG_INIT, "Device Count after decrementing is %d\n", DeviceCount(TRUE, 0));
 
-    WdfCollectionRemove(vJoyDeviceCollection, Device);
+    //WdfCollectionRemove(vJoyDeviceCollection, Device);
     WdfWaitLockRelease(vJoyDeviceCollectionLock);
 }
 
