@@ -358,15 +358,63 @@ extern "C" {
 		FfbDataPacket.cmd = 0;
 		FfbDataPacket.data = new UCHAR[BUFFERSIZE];
 
+		BOOL res;
+		DWORD err;
+
 		do
 		{
 			// This is an async (overlapped) transaction
 			memset(&FfbOverlapped, 0, sizeof(OVERLAPPED));
 			FfbOverlapped.hEvent = hIoctlEvent;
-			DeviceIoControl(h, IoCode, NULL, 0, &FfbData, IoSize, &bytes, &FfbOverlapped);
-			gotdata = GetOverlappedResult(h, &FfbOverlapped, &nBytesTranss, TRUE);
-			if (gotdata && nBytesTranss && nBytesTranss <= BUFFERSIZE && nBytesTranss>0)
-				FfbSendData(FfbData, nBytesTranss);
+			res = DeviceIoControl(h, IoCode, NULL, 0, &FfbData, IoSize, &bytes, &FfbOverlapped);
+			// Imedeate Return
+			if (res)
+			{
+				CloseHandle(FfbOverlapped.hEvent);
+				if (bytes)
+				{
+					if (LogStream)
+						_ftprintf_s(LogStream, _T("\n[%05u]Info: FfbWaitForData() - Returns (Immediatly) TRUE"), ProcessId);
+					return true;
+				}
+				else
+				{
+					if (LogStream)
+						_ftprintf_s(LogStream, _T("\n[%05u]Error: FfbWaitForData() - Returns (Immediatly) FALSE"), ProcessId);
+					return false;
+				}
+			}
+
+			// Delayed/Error
+			else
+			{
+				// Error getting the data
+				err = GetLastError();
+				if (err != ERROR_IO_PENDING)
+				{
+					if (LogStream)
+						_ftprintf_s(LogStream, _T("\n[%05u]Error: FfbWaitForData() - error (0x%X) Returns FALSE"), ProcessId, err);
+					CloseHandle(FfbOverlapped.hEvent);
+					return false;
+				}
+
+				// Wait until data ready
+				nBytesTranss = 0;
+				gotdata = GetOverlappedResult(h, &FfbOverlapped, &nBytesTranss, TRUE);
+				CloseHandle(FfbOverlapped.hEvent);
+				if (gotdata && nBytesTranss && nBytesTranss <= BUFFERSIZE && nBytesTranss>0)						
+				{
+					if (LogStream)
+						_ftprintf_s(LogStream, _T("\n[%05u]Info: FfbWaitForData() - gotdata=%d nBytesTranss=%u  Returns TRUE"), ProcessId, gotdata, nBytesTranss);
+					FfbSendData(FfbData, nBytesTranss);
+				}
+				else
+				{
+					if (LogStream)
+						_ftprintf_s(LogStream, _T("\n[%05u]Info: FfbWaitForData() - gotdata=%d nBytesTranss=%u  Returns FALSE"), ProcessId, gotdata, nBytesTranss);
+					return false;
+				}
+			}
 		} while (nBytesTranss);
 
 		return 0;
