@@ -700,7 +700,6 @@ Return Value:
     UpdateCollections(Device);
 
     bytesToCopy = G_DefaultHidDescriptor.DescriptorList[0].wReportLength;
-
     if (bytesToCopy == 0) {
         status = STATUS_INVALID_DEVICE_STATE;
         TraceEvents(TRACE_LEVEL_ERROR, DBG_IOCTL, "G_DefaultHidDescriptor's reportLenght is zero, 0x%x\n", status);
@@ -709,6 +708,13 @@ Return Value:
     };
 
     pDeviceContext = GetDeviceContext(Device);
+	if (!pDeviceContext || !pDeviceContext->ReportDescriptor) {
+		status = STATUS_INVALID_DEVICE_STATE;
+		TraceEvents(TRACE_LEVEL_ERROR, DBG_IOCTL, "ReportDescriptor == NULL 0x%x\n", status);
+		LogEvent(ERRLOG_REPORT_DESC_FAILED1, NULL, WdfDeviceWdmGetDeviceObject(Device));
+		return status;
+	};
+
     status = WdfMemoryCopyFromBuffer(memory, 0,  pDeviceContext->ReportDescriptor, bytesToCopy);
     switchState = WdfMemoryGetBuffer(memory, &NumBytesTransferred);
     if (!NT_SUCCESS(status)) {
@@ -2087,6 +2093,7 @@ void CleanUpDev(PDEVICE_EXTENSION   devContext)
     // Free HID Report Descriptor
     if (devContext->ReportDescriptor)
     {
+		G_DefaultHidDescriptor.DescriptorList[0].wReportLength = 0;
         ExFreePoolWithTag(devContext->ReportDescriptor, MEM_TAG_HIDRPRT);
         devContext->ReportDescriptor = NULL;
     };
@@ -2121,8 +2128,11 @@ PVOID ReAllocatePoolWithTag(PVOID orig, SIZE_T prevSize, POOL_TYPE PoolType, SIZ
     orig=NULL;
 
     out = ExAllocatePoolWithTag(PoolType, NumberOfBytes, Tag);
-    if (!out)
+	if (!out)
+	{
+		ExFreePoolWithTag(tmpPool, tmpTag);
         return NULL;
+	}
     RtlZeroMemory(out, prevSize);
     RtlCopyMemory(out, tmpPool, prevSize);
     ExFreePoolWithTag(tmpPool, tmpTag);
