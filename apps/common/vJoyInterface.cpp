@@ -154,7 +154,6 @@ FILE *fOut;
 BOOL FfbEffectState    = FALSE;
 FFBEType FfbEffectType = ET_NONE;
 HANDLE hFfbEvent;
-OVERLAPPED FfbOverlapped = {0};
 
 #ifdef STATIC
 #define SET_NS(x) vJoyNS::x
@@ -345,6 +344,7 @@ extern "C" {
 		BOOL	gotdata;
 		DWORD	nBytesTranss = 1;
 		HANDLE hIoctlEvent;
+		OVERLAPPED FfbOverlapped = { 0 };
 
 		// Signal the parent thread that this thread was created
 		SetEvent(hFfbEvent);
@@ -370,7 +370,7 @@ extern "C" {
 			// Imedeate Return
 			if (res)
 			{
-				CloseHandle(FfbOverlapped.hEvent);
+				//CloseHandle(FfbOverlapped.hEvent);
 				if (bytes)
 				{
 					if (LogStream)
@@ -394,14 +394,14 @@ extern "C" {
 				{
 					if (LogStream)
 						_ftprintf_s(LogStream, _T("\n[%05u]Error: FfbWaitForData() - error (0x%X) Returns FALSE"), ProcessId, err);
-					CloseHandle(FfbOverlapped.hEvent);
+					//CloseHandle(FfbOverlapped.hEvent);
 					return false;
 				}
 
 				// Wait until data ready
 				nBytesTranss = 0;
 				gotdata = GetOverlappedResult(h, &FfbOverlapped, &nBytesTranss, TRUE);
-				CloseHandle(FfbOverlapped.hEvent);
+				//CloseHandle(FfbOverlapped.hEvent);
 				if (gotdata && nBytesTranss && nBytesTranss <= BUFFERSIZE && nBytesTranss>0)						
 				{
 					if (LogStream)
