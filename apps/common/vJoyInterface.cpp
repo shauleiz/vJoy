@@ -502,9 +502,9 @@ namespace vJoyNS {
 		{
 			Set_stat(rID, VJD_STAT_OWN);
 			Set_hNotify(rID, RegisterHandleNotification(hWnd, hTmp));
+			Sync_Position(rID);
 			if (IsDeviceFfb(rID))
 				FfbStartThread(hTmp);
-			Sync_Position(rID);
 			return TRUE;
 		}
 		else
