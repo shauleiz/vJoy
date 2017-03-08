@@ -812,9 +812,10 @@ vJoyGetPositionData(
 			if (!pDevContext->positions[i])
 				return;
 
-			HidReport->InputReport.CollectionId = id;
+			
 			if (STATUS_SUCCESS == WdfWaitLockAcquire(pDevContext->positionLock, &timeout))
 			{
+				HidReport->InputReport.CollectionId = id;
 				HidReport->InputReport.bAxisX		= pDevContext->positions[i]->ValX;
 				HidReport->InputReport.bAxisY		= pDevContext->positions[i]->ValY;
 				HidReport->InputReport.bAxisZ		= pDevContext->positions[i]->ValZ;
