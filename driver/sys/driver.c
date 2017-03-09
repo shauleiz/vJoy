@@ -757,7 +757,8 @@ Return Value:
         } else
 		{
 			// Copy the data stored in the Device Context into the the output buffer
-			vJoyGetPositionData(HidReport,pDevContext,id, bytesReturned);
+			if (vJoyGetPositionData(HidReport, pDevContext, id, bytesReturned) != STATUS_SUCCESS)
+				status = STATUS_UNSUCCESSFUL;
 		}
 
         WdfRequestCompleteWithInformation(request, status, bytesReturned);
@@ -787,10 +788,12 @@ Arguments:
 
 Return Value:
 
-    None.
+    STATUS_SUCCESS if succeeded.
+	STATUS_TIMEOUT if failed because could not acquire lock
+	STATUS_ACCESS_VIOLATION if bad pointer
 
 --*/
-VOID
+NTSTATUS
 vJoyGetPositionData(
 	OUT HID_INPUT_REPORT_V2	*HidReport, 
 	IN DEVICE_EXTENSION		*pDevContext,
@@ -810,7 +813,7 @@ vJoyGetPositionData(
 			i = id-1;
 
 			if (!pDevContext->positions[i])
-				return;
+				return STATUS_ACCESS_VIOLATION;
 
 			
 			if (STATUS_SUCCESS == WdfWaitLockAcquire(pDevContext->positionLock, &timeout))
@@ -839,7 +842,11 @@ vJoyGetPositionData(
 				};
 				// DEBUGGING HidReport->InputReport.FFBVal		= 0xFF; // FFB Value
 				WdfWaitLockRelease(pDevContext->positionLock);
+
+				return STATUS_SUCCESS;
 			};
+
+			return STATUS_TIMEOUT;
 }
 
 

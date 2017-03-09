@@ -1462,7 +1462,7 @@ vJoyCompleteReadReport(
 	UCHAR		id
 	);
 
-VOID
+NTSTATUS
 vJoyGetPositionData(
 	IN HID_INPUT_REPORT_V2	*HidReport, 
 	IN DEVICE_EXTENSION		*pDevContext,
