@@ -732,6 +732,17 @@ Return Value:
 	if (!pDevContext->positions[id-1])
 		return STATUS_INVALID_PARAMETER;
 
+	// Test if device exists if not, return STATUS_NO_SUCH_DEVICE
+	if (!pDevContext->DeviceImplemented[id - 1])
+		return STATUS_NO_SUCH_DEVICE;
+
+	// Test if device "Dirty bit" is set - if not, return STATUS_INVALID_DEVICE_REQUEST
+	// Dirty Bit is set when new data is loaded to the position structure of a vJoy device
+	// and reset after data was read.
+	if (!pDevContext->PositionReady[id - 1])
+		return STATUS_INVALID_DEVICE_REQUEST;
+
+
     //
     // Check if there are any pending requests in the Read Report Interrupt Message Queue.
     // If a request is found then complete the pending request.
@@ -840,7 +851,11 @@ vJoyGetPositionData(
 					HidReport->InputReport.bButtonsEx2	= (ULONG)pDevContext->positions[i]->ValButtonsEx2;
 					HidReport->InputReport.bButtonsEx3	= (ULONG)pDevContext->positions[i]->ValButtonsEx3;
 				};
-				// DEBUGGING HidReport->InputReport.FFBVal		= 0xFF; // FFB Value
+
+				// Clear 'dearty bit'
+				// This means that the data above has already been read and should not be read again
+				pDevContext->PositionReady[i] = FALSE;
+
 				WdfWaitLockRelease(pDevContext->positionLock);
 
 				return STATUS_SUCCESS;

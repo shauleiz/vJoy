@@ -1284,6 +1284,12 @@ LoadPositions(PJOYSTICK_POSITION_V2 pPosition, PDEVICE_EXTENSION pDevContext, si
     i = pPosition->bDevice-1; // Index is zero-based
 
     WdfWaitLockAcquire(pDevContext->positionLock, NULL);
+
+	// Clear 'dearty bit'
+	// This means that the position data should not be read (It is not ready)
+	pDevContext->PositionReady[i] = FALSE;
+
+	// Copy position to context area
     pDevContext->positions[i]->ValX			= pPosition->wAxisX;
     pDevContext->positions[i]->ValY			= pPosition->wAxisY;
     pDevContext->positions[i]->ValZ			= pPosition->wAxisZ;
@@ -1305,6 +1311,10 @@ LoadPositions(PJOYSTICK_POSITION_V2 pPosition, PDEVICE_EXTENSION pDevContext, si
         pDevContext->positions[i]->ValButtonsEx2		= pPosition->lButtonsEx2;
         pDevContext->positions[i]->ValButtonsEx3		= pPosition->lButtonsEx3;
     };
+
+	// Set 'dearty bit'
+	// This means that the position data is ready to be read
+	pDevContext->PositionReady[i] = TRUE;
 
     WdfWaitLockRelease(pDevContext->positionLock);
 }
@@ -2004,6 +2014,9 @@ void InitializeDev(PDEVICE_EXTENSION   devContext, USHORT Mask, BOOLEAN ResetOnl
         devContext->positions[index]->ValSlider = data_buf.InitValAxis[6] * 0x7FFF / 100 + 1;
         devContext->positions[index]->ValDial = data_buf.InitValAxis[7] * 0x7FFF / 100 + 1;
         devContext->positions[index]->ValWheel = 0;
+
+		// Mark position data as ready to be read
+		devContext->PositionReady[index] = TRUE;
 
 		// Test if the initialization values refer to Discrete POVs
 		// The sign of Discrete POV initialization is value in the range 0x80-0x8F
