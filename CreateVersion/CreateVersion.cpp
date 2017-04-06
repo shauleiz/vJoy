@@ -22,7 +22,7 @@ static void find_delim(char *s, char **res, int *ix)
 
 int main(int argc, char **argv)
 {
-	unsigned int major = 0, mid = 0, minor = 0;
+	unsigned int major = 0, mid = 0, minor = 0, commits = 0;
 	char vbuf[4096] = { 0 };
 	char *version="0.0.0", *ncommits="0", *sha="0";
 	FILE *po;
@@ -75,17 +75,22 @@ int main(int argc, char **argv)
 
 	// Commit #	 - Will be used as build number
 	find_delim(vbuf, &ncommits, &buflen);
+
 	
 	// Version
 	version = vbuf;
 
 	// Break the version number into its components
-	int nFields = sscanf_s(version, "v%u.%u.%u",&major, &mid, &minor) ;
-	if (nFields != 3) {
+	int nFields = sscanf_s(version, "v%u.%u.%u.%u",&major, &mid, &minor, &commits) ;
+	if (nFields < 3) {
 		fprintf(stderr, "Version string corrupt\n");
 		outval = -4;
 		goto FINAL;
 	}
+
+	// Case of version of type v2.1.8
+	if (nFields == 3)
+		sscanf_s(ncommits, "%u", &commits);
 
 
 
@@ -95,9 +100,9 @@ FINAL:
 	fprintf(f, "#define VER_H_ %u\n", major);
 	fprintf(f, "#define VER_M_ %u\n", mid);
 	fprintf(f, "#define VER_L_ %u\n", minor);
-	fprintf(f, "#define BUILD %s\n", ncommits);
+	fprintf(f, "#define BUILD %u\n", commits);
  	fprintf(f, "\n");
-	fprintf(f, "#define FILEVER\t\t\t\t\"%u, %u, %u, %s\"\n", major, mid, minor, ncommits);
+	fprintf(f, "#define FILEVER\t\t\t\t\"%u, %u, %u, %u\"\n", major, mid, minor, commits);
 	fprintf(f, "#define PRODVER_TAG\t\t\t\"%s\"\n", version);
 	fprintf(f, "#define PRODVER_SHA1\t\t\"%s\"\n", sha);
  	fprintf(f, "\n");
