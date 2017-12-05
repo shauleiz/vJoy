@@ -277,10 +277,23 @@ Return Value:
 
 	// Child device's compatible ID is "hid_device_system_game"
 	// Additional ones may be added below
-	WdfPdoInitAddCompatibleID(DeviceInit, &CompatId);
+	status = WdfPdoInitAddCompatibleID(DeviceInit, &CompatId);
+	if (!NT_SUCCESS(status)) {
+		TraceEvents(TRACE_LEVEL_WARNING, DBG_PNP, "WdfPdoInitAddCompatibleID failed with status code 0x%x\n", status);
+		LogEventWithStatus(ERRLOG_DEVICE_FAILED, L"WdfPdoInitAddCompatibleID", NULL, status);
+	}
 
-	WdfPdoInitAssignDeviceID(DeviceInit, &DeviceId);
-	WdfPdoInitAssignInstanceID(DeviceInit, &InstanceId);
+	status = WdfPdoInitAssignDeviceID(DeviceInit, &DeviceId);
+	if (!NT_SUCCESS(status)) {
+		TraceEvents(TRACE_LEVEL_WARNING, DBG_PNP, "WdfPdoInitAssignDeviceID failed with status code 0x%x\n", status);
+		LogEventWithStatus(ERRLOG_DEVICE_FAILED, L"WdfPdoInitAssignDeviceID", NULL, status);
+	}
+
+	status = WdfPdoInitAssignInstanceID(DeviceInit, &InstanceId);
+	if (!NT_SUCCESS(status)) {
+		TraceEvents(TRACE_LEVEL_WARNING, DBG_PNP, "WdfPdoInitAssignInstanceID failed with status code 0x%x\n", status);
+		LogEventWithStatus(ERRLOG_DEVICE_FAILED, L"WdfPdoInitAssignInstanceID", NULL, status);
+	}
 
     //WdfDeviceInitAssignSDDLString(DeviceInit,
     //                                       &SDDL_DEVOBJ_SYS_ALL_ADM_RWX_WORLD_R_RES_R);
@@ -288,7 +301,7 @@ Return Value:
 
 
     WDF_OBJECT_ATTRIBUTES_INIT_CONTEXT_TYPE(&attributes, DEVICE_EXTENSION);
-	attributes.EvtCleanupCallback = vJoyEvtDeviceContextCleanup;
+	attributes.EvtCleanupCallback = (PFN_WDF_OBJECT_CONTEXT_CLEANUP)vJoyEvtDeviceContextCleanup; // See https://social.msdn.microsoft.com/Forums/en-US/ba0e4557-05a7-42a0-a960-cf2ded57ecfb/driver-analysis-undocumented-warning-c28118?forum=wdk
 
 #if 0
 	// Test with PNP requests
@@ -719,6 +732,17 @@ Return Value:
 	if (!pDevContext->positions[id-1])
 		return STATUS_INVALID_PARAMETER;
 
+	// Test if device exists if not, return STATUS_NO_SUCH_DEVICE
+	if (!pDevContext->DeviceImplemented[id - 1])
+		return STATUS_NO_SUCH_DEVICE;
+
+	// Test if device "Dirty bit" is set - if not, return STATUS_INVALID_DEVICE_REQUEST
+	// Dirty Bit is set when new data is loaded to the position structure of a vJoy device
+	// and reset after data was read.
+	if (!pDevContext->PositionReady[id - 1])
+		return STATUS_INVALID_DEVICE_REQUEST;
+
+
     //
     // Check if there are any pending requests in the Read Report Interrupt Message Queue.
     // If a request is found then complete the pending request.
@@ -744,7 +768,8 @@ Return Value:
         } else
 		{
 			// Copy the data stored in the Device Context into the the output buffer
-			vJoyGetPositionData(HidReport,pDevContext,id, bytesReturned);
+			if (vJoyGetPositionData(HidReport, pDevContext, id, bytesReturned) != STATUS_SUCCESS)
+				status = STATUS_UNSUCCESSFUL;
 		}
 
         WdfRequestCompleteWithInformation(request, status, bytesReturned);
@@ -774,10 +799,12 @@ Arguments:
 
 Return Value:
 
-    None.
+    STATUS_SUCCESS if succeeded.
+	STATUS_TIMEOUT if failed because could not acquire lock
+	STATUS_ACCESS_VIOLATION if bad pointer
 
 --*/
-VOID
+NTSTATUS
 vJoyGetPositionData(
 	OUT HID_INPUT_REPORT_V2	*HidReport, 
 	IN DEVICE_EXTENSION		*pDevContext,
@@ -797,11 +824,12 @@ vJoyGetPositionData(
 			i = id-1;
 
 			if (!pDevContext->positions[i])
-				return;
+				return STATUS_ACCESS_VIOLATION;
 
-			HidReport->InputReport.CollectionId = id;
+			
 			if (STATUS_SUCCESS == WdfWaitLockAcquire(pDevContext->positionLock, &timeout))
 			{
+				HidReport->InputReport.CollectionId = id;
 				HidReport->InputReport.bAxisX		= pDevContext->positions[i]->ValX;
 				HidReport->InputReport.bAxisY		= pDevContext->positions[i]->ValY;
 				HidReport->InputReport.bAxisZ		= pDevContext->positions[i]->ValZ;
@@ -823,9 +851,17 @@ vJoyGetPositionData(
 					HidReport->InputReport.bButtonsEx2	= (ULONG)pDevContext->positions[i]->ValButtonsEx2;
 					HidReport->InputReport.bButtonsEx3	= (ULONG)pDevContext->positions[i]->ValButtonsEx3;
 				};
-				// DEBUGGING HidReport->InputReport.FFBVal		= 0xFF; // FFB Value
+
+				// Clear 'dearty bit'
+				// This means that the data above has already been read and should not be read again
+				pDevContext->PositionReady[i] = FALSE;
+
 				WdfWaitLockRelease(pDevContext->positionLock);
+
+				return STATUS_SUCCESS;
 			};
+
+			return STATUS_TIMEOUT;
 }
 
 
@@ -1088,8 +1124,8 @@ VOID LogEvent(NTSTATUS code, PWSTR msg, PVOID pObj)
 	if (msg)
 	{
 		p->NumberOfStrings = 1;
-		wcscpy((PWSTR)((PUCHAR)p + p->StringOffset), msg);
-		// wcscpy_s((PWSTR) ((PUCHAR) p + p->StringOffset), sizeof(*msg)/sizeof(WCHAR),msg); // TODO: Fix this line and remove the line above
+		// wcscpy((PWSTR)((PUCHAR)p + p->StringOffset), msg);
+		wcscpy_s((PWSTR) ((PUCHAR) p + p->StringOffset), (ULONG)((wcslen(msg) + 1)),msg); // TODO: Fix this line and remove the line above
 	}
 	else
 		p->NumberOfStrings = 0;
@@ -1130,17 +1166,17 @@ VOID LogEventWithStatus(NTSTATUS code, PWSTR msg, PVOID pObj, NTSTATUS stat)
 	if (msg)
 	{
 		p->NumberOfStrings = 2;
-		wcscpy((PWSTR)((PUCHAR)p + p->StringOffset), msg);
-		//wcscpy_s((PWSTR)((PUCHAR)p + p->StringOffset), wcslen(msg) + 1, msg);	 // TODO: Fix this line and remove the line above
+		//wcscpy((PWSTR)((PUCHAR)p + p->StringOffset), msg);
+		wcscpy_s((PWSTR)((PUCHAR)p + p->StringOffset), (ULONG)(wcslen(msg) + 1), msg);	 // TODO: Fix this line and remove the line above
 
-		wcscpy((PWSTR)((PUCHAR)p + p->StringOffset + (wcslen(msg) + 1) * sizeof(WCHAR)), strStat);
-		//wcscpy_s((PWSTR)((PUCHAR)p + p->StringOffset + (wcslen(msg) + 1) * sizeof(WCHAR)), wcslen(strStat) + 1,strStat); // TODO: Fix this line and remove the line above
+		//wcscpy((PWSTR)((PUCHAR)p + p->StringOffset + (wcslen(msg) + 1) * sizeof(WCHAR)), strStat);
+		wcscpy_s((PWSTR)((PUCHAR)p + p->StringOffset + (wcslen(msg) + 1) * sizeof(WCHAR)), wcslen(strStat) + 1,strStat); // TODO: Fix this line and remove the line above
 	}
 	else
 	{
 		p->NumberOfStrings = 1;
-		wcscpy((PWSTR)((PUCHAR)p + p->StringOffset), strStat);
-		//wcscpy_s((PWSTR)((PUCHAR)p + p->StringOffset), wcslen(strStat) + 1, strStat);		// TODO: Fix this line and remove the line above
+		//wcscpy((PWSTR)((PUCHAR)p + p->StringOffset), strStat);
+		wcscpy_s((PWSTR)((PUCHAR)p + p->StringOffset), wcslen(strStat) + 1, strStat);		// TODO: Fix this line and remove the line above
 	};
 
 	IoWriteErrorLogEntry(p);

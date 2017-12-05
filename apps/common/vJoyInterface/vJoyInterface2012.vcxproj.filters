@@ -21,6 +21,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="vJoyInterface.def" />
+    <None Include="vJoyInterface.ruleset" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Header Files">

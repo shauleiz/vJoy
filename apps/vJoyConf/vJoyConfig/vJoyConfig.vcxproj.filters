@@ -34,9 +34,6 @@
     </ResourceCompile>
   </ItemGroup>
   <ItemGroup>
-    <Text Include="ReadMe.txt" />
-  </ItemGroup>
-  <ItemGroup>
     <Filter Include="Header Files">
       <UniqueIdentifier>{725fd14d-d00b-4ac0-b579-febdd93bb928}</UniqueIdentifier>
     </Filter>

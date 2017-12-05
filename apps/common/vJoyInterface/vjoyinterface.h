@@ -38,7 +38,17 @@ enum VjdStat  /* Declares an enumeration data type */
 #define BAD_N_VAL_CAPS				 	 -8
 #define BAD_ID_RANGE				 	 -9
 #define NO_SUCH_AXIS				 	 -10
+#define BAD_DEV_STAT				 	 -11
+#define NO_DEV_EXIST				 	 -12
+#define NO_FILE_EXIST				 	 -13
 
+/* Registry Constants */
+#define REG_PARAM		L"SYSTEM\\CurrentControlSet\\services\\vjoy\\Parameters"
+#define REG_PARAM_DEV0	L"SYSTEM\\CurrentControlSet\\services\\vjoy\\Parameters\\Device0"
+#define REG_PARAM_DEV	L"SYSTEM\\CurrentControlSet\\services\\vjoy\\Parameters\\Device"
+#define REG_DEVICE		L"Device"
+#define REG_INIT		L"Init"
+#define BTN_INIT		L"BTNS"
 
 /* Environment Variables */
 #define INTERFACE_LOG_LEVEL "VJOYINTERFACELOGLEVEL"
@@ -92,6 +102,7 @@ struct DEV_INFO {
 	BYTE	DriverFFB;		// Does this driver support FFB (False)
 	BYTE	DeviceFFB;		// Does this device support FFB (False)
 } ;
+
 
 
 typedef void (CALLBACK *RemovalCB)(BOOL, BOOL, PVOID);
@@ -286,7 +297,10 @@ namespace vJoyNS {
 	VJOYINTERFACE_API BOOL	__cdecl  GetVJDAxisMin(UINT rID, UINT Axis, LONG * Min); // Get logical Minimum value for a given axis defined in the specified VDJ
 	VJOYINTERFACE_API enum VjdStat	__cdecl	GetVJDStatus(UINT rID);			// Get the status of the specified vJoy Device.
 	// Added in 2.1.6
-	VJOYINTERFACE_API BOOL	__cdecl	isVJDExists(UINT rID);					// TRUE if the specified vJoy Device exists
+	VJOYINTERFACE_API BOOL	__cdecl	isVJDExists(UINT rID);					// TRUE if the specified vJoy Device exists																			
+	// Added in 2.1.8
+	VJOYINTERFACE_API int	__cdecl	GetOwnerPid(UINT rID);					// Reurn owner's Process ID if the specified vJoy Device exists
+
 
 	/////	Write access to vJoy Device - Basic
 	VJOYINTERFACE_API BOOL		__cdecl	AcquireVJD(UINT rID);				// Acquire the specified vJoy Device.

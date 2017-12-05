@@ -28,6 +28,7 @@ Revision History:
 
 #define USE_EXTERNAL_HARDCODED_HID_REPORT_DESCRIPTOR
 //#define USE_HARDCODED_HID_REPORT_DESCRIPTOR_5
+#define					NameSize 300
 
 #include <vjoy.h>
 
@@ -699,7 +700,6 @@ Return Value:
     UpdateCollections(Device);
 
     bytesToCopy = G_DefaultHidDescriptor.DescriptorList[0].wReportLength;
-
     if (bytesToCopy == 0) {
         status = STATUS_INVALID_DEVICE_STATE;
         TraceEvents(TRACE_LEVEL_ERROR, DBG_IOCTL, "G_DefaultHidDescriptor's reportLenght is zero, 0x%x\n", status);
@@ -708,6 +708,13 @@ Return Value:
     };
 
     pDeviceContext = GetDeviceContext(Device);
+	if (!pDeviceContext || !pDeviceContext->ReportDescriptor) {
+		status = STATUS_INVALID_DEVICE_STATE;
+		TraceEvents(TRACE_LEVEL_ERROR, DBG_IOCTL, "ReportDescriptor == NULL 0x%x\n", status);
+		LogEvent(ERRLOG_REPORT_DESC_FAILED1, NULL, WdfDeviceWdmGetDeviceObject(Device));
+		return status;
+	};
+
     status = WdfMemoryCopyFromBuffer(memory, 0,  pDeviceContext->ReportDescriptor, bytesToCopy);
     switchState = WdfMemoryGetBuffer(memory, &NumBytesTransferred);
     if (!NT_SUCCESS(status)) {
@@ -1211,7 +1218,7 @@ Return Value:
 
 	TraceEvents(TRACE_LEVEL_INFORMATION, DBG_INIT, "Device Count after decrementing is %d\n", DeviceCount(TRUE, 0));
 
-    WdfCollectionRemove(vJoyDeviceCollection, Device);
+    //WdfCollectionRemove(vJoyDeviceCollection, Device);
     WdfWaitLockRelease(vJoyDeviceCollectionLock);
 }
 
@@ -1277,6 +1284,12 @@ LoadPositions(PJOYSTICK_POSITION_V2 pPosition, PDEVICE_EXTENSION pDevContext, si
     i = pPosition->bDevice-1; // Index is zero-based
 
     WdfWaitLockAcquire(pDevContext->positionLock, NULL);
+
+	// Clear 'dearty bit'
+	// This means that the position data should not be read (It is not ready)
+	pDevContext->PositionReady[i] = FALSE;
+
+	// Copy position to context area
     pDevContext->positions[i]->ValX			= pPosition->wAxisX;
     pDevContext->positions[i]->ValY			= pPosition->wAxisY;
     pDevContext->positions[i]->ValZ			= pPosition->wAxisZ;
@@ -1299,7 +1312,39 @@ LoadPositions(PJOYSTICK_POSITION_V2 pPosition, PDEVICE_EXTENSION pDevContext, si
         pDevContext->positions[i]->ValButtonsEx3		= pPosition->lButtonsEx3;
     };
 
+	// Set 'dearty bit'
+	// This means that the position data is ready to be read
+	pDevContext->PositionReady[i] = TRUE;
+
     WdfWaitLockRelease(pDevContext->positionLock);
+}
+
+VOID GetPositions(PJOYSTICK_POSITION_V2 pPosition, PDEVICE_EXTENSION pDevContext, UCHAR id, size_t buffsize)
+{
+	UNREFERENCED_PARAMETER(buffsize);
+
+	int i;
+
+	i = id - 1; // Index is zero-based
+
+	WdfWaitLockAcquire(pDevContext->positionLock, NULL);
+	pPosition->wAxisX		= pDevContext->positions[i]->ValX;
+	pPosition->wAxisY		= pDevContext->positions[i]->ValY;
+	pPosition->wAxisZ		= pDevContext->positions[i]->ValZ;
+	pPosition->wAxisXRot	= pDevContext->positions[i]->ValRX;
+	pPosition->wAxisYRot	= pDevContext->positions[i]->ValRY;
+	pPosition->wAxisZRot	= pDevContext->positions[i]->ValRZ;
+	pPosition->wSlider		= pDevContext->positions[i]->ValSlider;
+	pPosition->wDial		= pDevContext->positions[i]->ValDial;
+	pPosition->lButtons		= pDevContext->positions[i]->ValButtons;
+	pPosition->bHats		= pDevContext->positions[i]->ValHats;
+	pPosition->bHatsEx1		= pDevContext->positions[i]->ValHatsEx1;
+	pPosition->bHatsEx2		= pDevContext->positions[i]->ValHatsEx2;
+	pPosition->bHatsEx3		= pDevContext->positions[i]->ValHatsEx3;
+	pPosition->lButtonsEx1	= pDevContext->positions[i]->ValButtonsEx1;
+	pPosition->lButtonsEx2	= pDevContext->positions[i]->ValButtonsEx2;
+	pPosition->lButtonsEx3	= pDevContext->positions[i]->ValButtonsEx3;
+	WdfWaitLockRelease(pDevContext->positionLock);
 }
 
 
@@ -1332,7 +1377,7 @@ PVOID GetReportDescriptorFromRegistry(USHORT * Size, USHORT * IdMask)
     PKEY_BASIC_INFORMATION 	pDeviceBasicInfo=NULL;
     ULONG					ResultLength;
     ULONG					nameLength;
-    WCHAR					DeviceKeyName[512];
+    WCHAR					DeviceKeyName[NameSize];
     size_t					pcb=0;
     USHORT					id=0;
 
@@ -1384,8 +1429,8 @@ PVOID GetReportDescriptorFromRegistry(USHORT * Size, USHORT * IdMask)
 
         // Copy name of subkey to unicode buffer and release temporary buffer
         nameLength = pDeviceBasicInfo->NameLength;
-        RtlZeroMemory(DeviceKeyName, 512);
-        status = RtlStringCbCopyNW(DeviceKeyName, 512*sizeof(WCHAR), pDeviceBasicInfo->Name, nameLength);
+        RtlZeroMemory(DeviceKeyName, NameSize);
+        status = RtlStringCbCopyNW(DeviceKeyName, NameSize *sizeof(WCHAR), pDeviceBasicInfo->Name, nameLength);
         if (!NT_SUCCESS(status))
         {
             LogEventWithStatus(ERRLOG_REP_REG_FAILED, L"RtlStringCbCopyNW", WdfDriverWdmGetDriverObject(WdfGetDriver()), status);
@@ -1396,8 +1441,10 @@ PVOID GetReportDescriptorFromRegistry(USHORT * Size, USHORT * IdMask)
         ExFreePoolWithTag(pDeviceBasicInfo, 'fnIb');
 
         // The sub-key name should range from "Device01" to "Device16"
-        RtlStringCbLengthW(REG_DEVICE, 512, &pcb);
-        if (!RtlEqualMemory(DeviceKeyName, REG_DEVICE, pcb))
+        status =   RtlStringCbLengthW(REG_DEVICE, NameSize, &pcb);
+		if (!NT_SUCCESS(status))
+			continue;
+		if (!RtlEqualMemory(DeviceKeyName, REG_DEVICE, pcb))
             continue;
 
         // Get the Subkey holding the configuration data
@@ -1518,7 +1565,7 @@ unsigned int GetInitValueFromRegistry(USHORT		id, PDEVICE_INIT_VALS data_buf)
 {
     NTSTATUS				status = STATUS_SUCCESS;
     WDFKEY					KeyDevice, KeyParameters;
-    WCHAR					DeviceKeyName[512] = { 0 };
+    WCHAR					DeviceKeyName[NameSize] = { 0 };
     UNICODE_STRING			strDev, strControl;
     PCWSTR					Axes[] = { L"X", L"Y", L"Z", L"RX", L"RY", L"RZ", L"SL1", L"SL2", L"POV1", L"POV2", L"POV3", L"POV4" };
     UCHAR					nAxes = 0;
@@ -1560,7 +1607,8 @@ unsigned int GetInitValueFromRegistry(USHORT		id, PDEVICE_INIT_VALS data_buf)
     status = WdfRegistryOpenKey(KeyParameters, &strDev, GENERIC_READ, WDF_NO_OBJECT_ATTRIBUTES, &KeyDevice);
     if (!NT_SUCCESS(status))
     {
-        LogEventWithStatus(ERRLOG_REP_REG_FAILED, L"WdfRegistryOpenKey", WdfDriverWdmGetDriverObject(WdfGetDriver()), status);
+		if (STATUS_OBJECT_NAME_NOT_FOUND != status)
+			LogEventWithStatus(ERRLOG_REP_REG_FAILED, L"WdfRegistryOpenKey", WdfDriverWdmGetDriverObject(WdfGetDriver()), status);
         WdfRegistryClose(KeyParameters);
         return 0;
     };
@@ -1967,25 +2015,48 @@ void InitializeDev(PDEVICE_EXTENSION   devContext, USHORT Mask, BOOLEAN ResetOnl
         devContext->positions[index]->ValDial = data_buf.InitValAxis[7] * 0x7FFF / 100 + 1;
         devContext->positions[index]->ValWheel = 0;
 
-        if (data_buf.InitValPov[0] == -1)
-            devContext->positions[index]->ValHats = (DWORD)-1;
-        else
-            devContext->positions[index]->ValHats = data_buf.InitValPov[0] * 35999 / 100;
+		// Mark position data as ready to be read
+		devContext->PositionReady[index] = TRUE;
 
-        if (data_buf.InitValPov[1] == -1)
-            devContext->positions[index]->ValHatsEx1 = (DWORD)-1;
-        else
-            devContext->positions[index]->ValHatsEx1 = data_buf.InitValPov[1] * 35999 / 100;
+		// Test if the initialization values refer to Discrete POVs
+		// The sign of Discrete POV initialization is value in the range 0x80-0x8F
+		// If one or more values are in the range it is adssumed the POVs are Discrete
+		if (
+			((data_buf.InitValPov[0] >> 4) == 8) ||
+			((data_buf.InitValPov[1] >> 4) == 8) ||
+			((data_buf.InitValPov[2] >> 4) == 8) ||
+			((data_buf.InitValPov[3] >> 4) == 8)
+			)
+			devContext->positions[index]->ValHats =
+			((data_buf.InitValPov[0] & 0xF) << 0) +
+			((data_buf.InitValPov[1] & 0xF) << 4) +
+			((data_buf.InitValPov[2] & 0xF) << 8) +
+			((data_buf.InitValPov[3] & 0xF) << 12);
 
-        if (data_buf.InitValPov[2] == -1)
-            devContext->positions[index]->ValHatsEx2 = (DWORD)-1;
-        else
-            devContext->positions[index]->ValHatsEx2 = data_buf.InitValPov[2] * 35999 / 100;
 
-        if (data_buf.InitValPov[3] == -1)
-            devContext->positions[index]->ValHatsEx3 = (DWORD)-1;
-        else
-            devContext->positions[index]->ValHatsEx3 = data_buf.InitValPov[3] * 35999 / 100;
+		// These are Continuous POVs
+		else
+		{
+			if (data_buf.InitValPov[0] == -1)
+				devContext->positions[index]->ValHats = (DWORD)-1;
+			else
+				devContext->positions[index]->ValHats = data_buf.InitValPov[0] * 35999 / 100;
+
+			if (data_buf.InitValPov[1] == -1)
+				devContext->positions[index]->ValHatsEx1 = (DWORD)-1;
+			else
+				devContext->positions[index]->ValHatsEx1 = data_buf.InitValPov[1] * 35999 / 100;
+
+			if (data_buf.InitValPov[2] == -1)
+				devContext->positions[index]->ValHatsEx2 = (DWORD)-1;
+			else
+				devContext->positions[index]->ValHatsEx2 = data_buf.InitValPov[2] * 35999 / 100;
+
+			if (data_buf.InitValPov[3] == -1)
+				devContext->positions[index]->ValHatsEx3 = (DWORD)-1;
+			else
+				devContext->positions[index]->ValHatsEx3 = data_buf.InitValPov[3] * 35999 / 100;
+		};
 
         devContext->positions[index]->ValButtons = ((DWORD *)(data_buf.ButtonMask))[0];
         devContext->positions[index]->ValButtonsEx1 = ((DWORD *)(data_buf.ButtonMask))[1];
@@ -2035,6 +2106,7 @@ void CleanUpDev(PDEVICE_EXTENSION   devContext)
     // Free HID Report Descriptor
     if (devContext->ReportDescriptor)
     {
+		G_DefaultHidDescriptor.DescriptorList[0].wReportLength = 0;
         ExFreePoolWithTag(devContext->ReportDescriptor, MEM_TAG_HIDRPRT);
         devContext->ReportDescriptor = NULL;
     };
@@ -2047,8 +2119,16 @@ PVOID ReAllocatePoolWithTag(PVOID orig, SIZE_T prevSize, POOL_TYPE PoolType, SIZ
     PVOID tmpPool, out;
     ULONG tmpTag = 'pmeT'; // 'Temp'
 
+	if ((PoolType & NonPagedPoolMustSucceed) != 0)
+		return NULL;
+
     if (!orig || !prevSize)
-        return ExAllocatePoolWithTag(PoolType, NumberOfBytes, Tag);
+	{ 
+        out = ExAllocatePoolWithTag(PoolType, NumberOfBytes, Tag);
+		if (out)
+			return out;
+		return NULL;
+	}
 
     tmpPool = ExAllocatePoolWithTag(PoolType, prevSize, tmpTag);
     if (!tmpPool)
@@ -2060,12 +2140,12 @@ PVOID ReAllocatePoolWithTag(PVOID orig, SIZE_T prevSize, POOL_TYPE PoolType, SIZ
     ExFreePoolWithTag(orig, Tag);
     orig=NULL;
 
-#pragma warning (push)
-#pragma warning( disable:28160 )
     out = ExAllocatePoolWithTag(PoolType, NumberOfBytes, Tag);
-#pragma warning (pop)
-    if (!out)
+	if (!out)
+	{
+		ExFreePoolWithTag(tmpPool, tmpTag);
         return NULL;
+	}
     RtlZeroMemory(out, prevSize);
     RtlCopyMemory(out, tmpPool, prevSize);
     ExFreePoolWithTag(tmpPool, tmpTag);
@@ -2098,7 +2178,7 @@ USHORT ParseIdInDescriptor(BYTE * desc, DWORD dDescSize)
     return id;
 }
 
-VOID FfbNotifyWrite(
+VOID  FfbNotifyWrite(
     WDFQUEUE Queue,
     WDFCONTEXT Context
     )

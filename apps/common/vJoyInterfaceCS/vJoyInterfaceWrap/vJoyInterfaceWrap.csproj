@@ -156,7 +156,7 @@
   <ItemGroup>
     <Compile Include="GlobalAssemblyInfo.cs" />
     <Compile Include="Wrapper.cs">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Compile>
   </ItemGroup>
   <ItemGroup>

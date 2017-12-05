@@ -66,3 +66,16 @@ apps/common/vJoyInterface/RCa11008
 apps/common/vJoyInterfaceStat/_vjoyinterface.h
 apps/common/vJoyInterface/RCa11704
 apps/vGenInterface/vGenTest/vXboxTest/ReadMe.txt
+apps/vGenInterface/vGenTest/FreeDev/FreeDev.vcxproj.filters
+apps/vGenInterface/vGenTest/FreeDev/ReadMe.txt
+*.odt#
+apps/common/vJoyInterfaceCS/WrapperTest/WrapperTest.ruleset
+apps/common/vJoyInterfaceStat/gen-versioninfo.h
+driver/sys/gen-versioninfo.h
+apps/vJoyInstall/CmdLine/gen-versioninfo.h
+driver/Package/gen-versioninfo.h
+SDK/ReadMe-2.1.5.odt
+apps/vJoyList/gen-versioninfo.h
+SDK.zip
+SDK/ReadMe.pdf
+SDK/c#/ReadMe.pdf

@@ -59,6 +59,7 @@ namespace vJoyDemo {
             /*2*/
             GetExistingDevices();
 
+
             /*3*/
             if (!AcquireVJD(GetCurrentReportId()))
             {
@@ -1629,20 +1630,21 @@ private: System::Boolean GetExistingDevices(void) {
 
     for (int i = 1; i <= 16; i++)
     {
-//		s = GetVJDStatus(i);
-//		if (s == VJD_STAT_FREE || s == VJD_STAT_OWN || s == VJD_STAT_BUSY)
-        if (isVJDExists(i))
-        {
-            exist = true;
-            listBoxTarget->Items->Add(i);
-            if (GetVJDStatus(i) == VJD_STAT_FREE && first_free < 0)
-                first_free = listBoxTarget->Items->Count - 1;
-        }
-    }
-    if (exist)
-        listBoxTarget->SelectedIndex = first_free;
+		//		s = GetVJDStatus(i);
+		//		if (s == VJD_STAT_FREE || s == VJD_STAT_OWN || s == VJD_STAT_BUSY)
+		if (isVJDExists(i))
+		{
+			exist = true;
+			listBoxTarget->Items->Add(i);
+			if (GetVJDStatus(i) == VJD_STAT_FREE && first_free < 0)
+				first_free = listBoxTarget->Items->Count - 1;
+		}
+	}
+	if (exist)
+		listBoxTarget->SelectedIndex = first_free;
 
-    return exist;
+
+	return exist;
 }
 
 private: System::Void Enable(bool driverOK) {
@@ -1817,7 +1819,8 @@ private: System::Void WatchDog_Tick(System::Object^  sender, System::EventArgs^ 
              if (ReportId>0)
              {
                  stat  = GetVJDStatus(ReportId);
-                 if (stat == VJD_STAT_OWN)
+				 
+				 if (stat == VJD_STAT_OWN)
                      return;
                  else
                  {

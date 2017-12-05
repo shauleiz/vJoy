@@ -2,10 +2,29 @@
 <Project ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LocalDebuggerDebuggerType>Mixed</LocalDebuggerDebuggerType>
-    <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
+    <DebuggerFlavor>WindowsRemoteDebugger</DebuggerFlavor>
+    <RemoteDebuggerConnection>RemoteWithoutAuthentication</RemoteDebuggerConnection>
+    <RemoteDebuggerCommand>\\VBOXSVR\c_drive\Users\Shaul\Documents\GitHubVisualStudio\vJoy\2.1.6\vJoy-Master\x64\Debug\vjoyfeeder.exe</RemoteDebuggerCommand>
+    <RemoteDebuggerCommandArguments>
+    </RemoteDebuggerCommandArguments>
+    <RemoteDebuggerServerName>DESKTOP-UIA12PP:4020</RemoteDebuggerServerName>
+    <DeploymentDirectory>\\VBOXSVR\c_drive\Users\Shaul\Documents\GitHubVisualStudio\vJoy\2.1.6\vJoy-Master\x64\Debug</DeploymentDirectory>
+    <RemoteDebuggerDeployDebugCppRuntime>true</RemoteDebuggerDeployDebugCppRuntime>
+    <RemoteDebuggerWorkingDirectory>\\VBOXSVR\c_drive\Users\Shaul\Documents\GitHubVisualStudio\vJoy\2.1.6\vJoy-Master\x64\Debug</RemoteDebuggerWorkingDirectory>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug_CPP|x64'">
     <LocalDebuggerDebuggerType>Mixed</LocalDebuggerDebuggerType>
     <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
+    <RemoteDebuggerCommand>\\VBOXSVR\c_drive\Users\Shaul\Documents\GitHubVisualStudio\vJoy\2.1.6\vJoy-Master\win32\Debug\vjoyfeeder.exe</RemoteDebuggerCommand>
+    <RemoteDebuggerWorkingDirectory>\\VBOXSVR\c_drive\Users\Shaul\Documents\GitHubVisualStudio\vJoy\2.1.6\vJoy-Master\win32\Debug</RemoteDebuggerWorkingDirectory>
+    <RemoteDebuggerServerName>SHAUL-VPC:4020</RemoteDebuggerServerName>
+    <RemoteDebuggerConnection>RemoteWithoutAuthentication</RemoteDebuggerConnection>
+    <DeploymentDirectory>\\VBOXSVR\c_drive\Users\Shaul\Documents\GitHubVisualStudio\vJoy\2.1.6\vJoy-Master\win32\Debug</DeploymentDirectory>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <DebuggerFlavor>WindowsRemoteDebugger</DebuggerFlavor>
   </PropertyGroup>
 </Project>

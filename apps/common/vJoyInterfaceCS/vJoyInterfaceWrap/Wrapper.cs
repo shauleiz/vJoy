@@ -329,6 +329,9 @@ namespace vJoyInterfaceWrap
         [DllImport("vJoyInterface.dll", EntryPoint = "isVJDExists")]
         private static extern bool _isVJDExists(UInt32 rID);
 
+        [DllImport("vJoyInterface.dll", EntryPoint = "GetOwnerPid")]
+        private static extern int _GetOwnerPid(UInt32 rID);
+
         /////	Write access to vJoy Device - Basic
         [DllImport("vJoyInterface.dll", EntryPoint = "AcquireVJD")]
         private static extern bool _AcquireVJD(UInt32 rID);
@@ -501,6 +504,7 @@ namespace vJoyInterfaceWrap
         public bool GetVJDAxisMax(UInt32 rID, HID_USAGES Axis, ref long Max) { return _GetVJDAxisMax(rID, (uint)Axis, ref Max); }
         public bool GetVJDAxisMin(UInt32 rID, HID_USAGES Axis, ref long Min) { return _GetVJDAxisMin(rID, (uint)Axis, ref Min); }
         public bool isVJDExists(UInt32 rID) { return _isVJDExists(rID); }
+        public int  GetOwnerPid(UInt32 rID) { return _GetOwnerPid(rID); }
 
         /////	Write access to vJoy Device - Basic
         public bool AcquireVJD(UInt32 rID) { return _AcquireVJD(rID); }

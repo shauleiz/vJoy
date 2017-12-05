@@ -18,6 +18,7 @@
 #pragma comment(lib, "vJoyInterfaceStat.lib")
 #pragma comment(lib, "XOutputStatic_1_2.lib")
 
+extern "C" {
 
 #pragma region Interface Functions (vJoy)
 VGENINTERFACE_API SHORT GetvJoyVersion(void)
@@ -25,14 +26,20 @@ VGENINTERFACE_API SHORT GetvJoyVersion(void)
 	return vJoyNS::GetvJoyVersion();
 }
 
+VGENINTERFACE_API	BOOL		vJoyEnabled(void) 
+{
+	return vJoyNS::vJoyEnabled();
+}
+
 VGENINTERFACE_API int GetVJDButtonNumber(UINT rID)	// Get the number of buttons defined in the specified device
 {
 	if (Range_vXbox(rID))
 	{
-		if (!IX_isControllerPluggedIn(to_vXbox(rID)))
-			return 0;
-		else
+		BOOL Exist;
+		if (SUCCEEDED(IX_isControllerPluggedIn(to_vXbox(rID), &Exist)) && Exist)
 			return 10;
+		else
+			return 0;
 	}
 	else
 		return vJoyNS::GetVJDButtonNumber(rID);
@@ -42,10 +49,11 @@ VGENINTERFACE_API int GetVJDDiscPovNumber(UINT rID)	// Get the number of POVs de
 {
 	if (Range_vXbox(rID))
 	{
-		if (!IX_isControllerPluggedIn(to_vXbox(rID)))
-			return 0;
-		else
+		BOOL Exist;
+		if (SUCCEEDED(IX_isControllerPluggedIn(to_vXbox(rID), &Exist)) && Exist)
 			return 1;
+		else
+			return 0;
 	}
 	else
 		return vJoyNS::GetVJDDiscPovNumber(rID);
@@ -63,16 +71,19 @@ VGENINTERFACE_API BOOL GetVJDAxisExist(UINT rID, UINT Axis) // Test if given axi
 {
 	if (Range_vXbox(rID))
 	{
-		if (!IX_isControllerPluggedIn(to_vXbox(rID)))
-			return FALSE;
-			
-		if ((Axis == HID_USAGE_X) || (Axis == HID_USAGE_Y) || (Axis == HID_USAGE_Z) || (Axis == HID_USAGE_RX) || (Axis == HID_USAGE_RY) || (Axis == HID_USAGE_RZ))
-			return TRUE;
+		BOOL Exist;
+		if (SUCCEEDED(IX_isControllerPluggedIn(to_vXbox(rID), &Exist)) && Exist)
+		{
+			if ((Axis == HID_USAGE_X) || (Axis == HID_USAGE_Y) || (Axis == HID_USAGE_Z) || (Axis == HID_USAGE_RX) || (Axis == HID_USAGE_RY) || (Axis == HID_USAGE_RZ))
+				return TRUE;
+			else
+				return FALSE;
+		}
 		else
 			return FALSE;
 	}
 	else
-		return vJoyNS::GetVJDAxisExist(rID, Axis);
+		return (vJoyNS::GetVJDAxisExist(rID, Axis) == TRUE);
 }
 
 VGENINTERFACE_API BOOL GetVJDAxisMax(UINT rID, UINT Axis, LONG * Max) // Get logical Maximum value for a given axis defined in the specified VDJ
@@ -129,10 +140,19 @@ VGENINTERFACE_API enum VjdStat GetVJDStatus(UINT rID)			// Get the status of the
 {
 	if (Range_vXbox(rID))
 	{
-		if (IX_isControllerPluggedIn(to_vXbox(rID)))
-			return VJD_STAT_OWN;
-		else
-			return VJD_STAT_UNKN;
+		BOOL Exist, Owned;
+		if SUCCEEDED(IX_isControllerOwned(to_vXbox(rID), &Owned))
+		{
+			if (Owned)
+				return VJD_STAT_OWN;
+		}
+
+		if SUCCEEDED(IX_isControllerPluggedIn(to_vXbox(rID), &Exist))
+		{
+			if (Exist)
+				return VJD_STAT_BUSY;
+		}
+			return VJD_STAT_FREE;
 	}
 	else
 		return vJoyNS::GetVJDStatus(rID);
@@ -141,7 +161,13 @@ VGENINTERFACE_API enum VjdStat GetVJDStatus(UINT rID)			// Get the status of the
 VGENINTERFACE_API BOOL isVJDExists(UINT rID)					// TRUE if the specified vJoy Device exists
 {
 	if (Range_vXbox(rID))
-		return (IX_isControllerPluggedIn(to_vXbox(rID)));
+	{
+
+		BOOL Exist;
+		if SUCCEEDED(IX_isControllerPluggedIn(to_vXbox(rID), &Exist))
+					 return Exist;
+		return FALSE;
+	}
 	else
 		return vJoyNS::isVJDExists(rID);
 }
@@ -193,27 +219,32 @@ VGENINTERFACE_API BOOL UpdateVJD(UINT rID, PVOID pData)	// Update the position d
 VGENINTERFACE_API BOOL SetAxis(LONG Value, UINT rID, UINT Axis)		// Write Value to a given axis defined in the specified VDJ 
 {
 	if (Range_vJoy(rID))
-		return vJoyNS::SetAxis(Value, rID, Axis);
+		return (vJoyNS::SetAxis(Value, rID, Axis) == TRUE);
 
 	if (Range_vXbox(rID))
 	{
-		if (!IX_isControllerPluggedIn(to_vXbox(rID)))
+		if (!SUCCEEDED(IX_isControllerPluggedIn(to_vXbox(rID))))
 			return FALSE;
+
+		// Remap Axes
+		Axis = Axis - HID_USAGE_X + 1;
 
 		// If Axis is X,Y,RX,RY (1,2,4,5) then remap range:
 		// 0 - 32768  ==> -32768 - 32767
 		SHORT vx_Value;
 		if (Axis == 1 || Axis == 2 || Axis == 4 || Axis == 5)
 		{
-			vx_Value = static_cast<SHORT>(2 * (Value - 1) - 32767);
+			if (Value > 32767)
+				Value = 32767;
+			vx_Value = static_cast<SHORT>((Value- 16384)*2);
 			if (Axis == 1)
-				return IX_SetAxisLx(to_vXbox(rID), vx_Value);
+				return SUCCEEDED(IX_SetAxisLx(to_vXbox(rID), vx_Value));
 			if (Axis == 2)
-				return IX_SetAxisLy(to_vXbox(rID), vx_Value);
+				return SUCCEEDED(IX_SetAxisLy(to_vXbox(rID), vx_Value));
 			if (Axis == 4)
-				return IX_SetAxisRx(to_vXbox(rID), vx_Value);
+				return SUCCEEDED(IX_SetAxisRx(to_vXbox(rID), vx_Value));
 			if (Axis == 5)
-				return IX_SetAxisRy(to_vXbox(rID), vx_Value);
+				return SUCCEEDED(IX_SetAxisRy(to_vXbox(rID), vx_Value));
 		}
 
 		// If Triggers (3,6) then remap range:
@@ -222,9 +253,9 @@ VGENINTERFACE_API BOOL SetAxis(LONG Value, UINT rID, UINT Axis)		// Write Value 
 		{
 			vx_Value = static_cast<SHORT>((Value - 1) /128);
 			if (Axis == 3)
-				return IX_SetTriggerR(to_vXbox(rID), static_cast<BYTE>(vx_Value));
+				return SUCCEEDED(IX_SetTriggerR(to_vXbox(rID), static_cast<BYTE>(vx_Value)));
 			if (Axis == 6)
-				return IX_SetTriggerL(to_vXbox(rID), static_cast<BYTE>(vx_Value));
+				return SUCCEEDED(IX_SetTriggerL(to_vXbox(rID), static_cast<BYTE>(vx_Value)));
 		}
 		else 
 			return FALSE;
@@ -239,7 +270,7 @@ VGENINTERFACE_API BOOL SetBtn(BOOL Value, UINT rID, UCHAR nBtn)		// Write Value 
 		return vJoyNS::SetBtn(Value, rID, nBtn);
 
 	if (Range_vXbox(rID))
-		return IX_SetBtn(to_vXbox(rID), Value, nBtn);
+		return SUCCEEDED(IX_SetBtn(to_vXbox(rID), Value, nBtn));
 
 	return FALSE;
 }
@@ -387,7 +418,7 @@ VGENINTERFACE_API DWORD Ffb_h_Eff_Constant(const FFB_DATA * Packet, FFB_EFF_CONS
 #pragma endregion Interface Functions (vJoy)
 
 #pragma region Interface Functions (vXbox)
-VGENINTERFACE_API DWORD isVBusExists(void)
+VGENINTERFACE_API DWORD isVBusExist(void)
 {
 	return IX_isVBusExists();
 }
@@ -453,7 +484,7 @@ VGENINTERFACE_API DWORD ResetControllerDPad(UINT UserIndex)
 #endif // SPECIFICRESET
 
 
-VGENINTERFACE_API DWORD SetBtn(UINT UserIndex, WORD Button, BOOL Press)
+VGENINTERFACE_API DWORD SetButton(UINT UserIndex, WORD Button, BOOL Press)
 {
 	return IX_SetBtn(UserIndex, Press,  Button);
 }
@@ -588,65 +619,154 @@ VGENINTERFACE_API DWORD GetVibration(UINT UserIndex, PXINPUT_VIBRATION pVib)
 #pragma endregion Interface Functions (vXbox)
 
 #pragma region Interface Functions (Common)
-VGENINTERFACE_API HDEVICE AcquireDev(UINT DevId, DevType dType)
-{
-	if (dType == vJoy)
-		return IJ_AcquireVJD(DevId);
-
-	if (dType == vXbox)
-	{
-		if (STATUS_SUCCESS == IX_PlugIn(DevId))
-			return GetDevHandle(DevId, vXbox);
-		else
-			return INVALID_DEV;
-	}
-
-	return INVALID_DEV;
-}
-
-VGENINTERFACE_API VOID 	RelinquishDev(HDEVICE hDev)			// Relinquish a Device.
-{
-	if (isDevice_vJoy(hDev))
-		IJ_RelinquishVJD(hDev);
-
-	if (isDevice_vXbox(hDev))
-		IX_UnPlug(GetDeviceId(hDev));
-}
-
-VGENINTERFACE_API DevType GetDevType(HDEVICE hDev)			// Get device type (vJoy/vXbox)
-{
-	if (isDevice_vJoy(hDev))
-		return vJoy;
-	else
-		return vXbox;
-}
-
-VGENINTERFACE_API BOOL isDevOwned(UINT DevId, DevType dType)
-{
-	if (dType == vJoy)
-		return (vJoyNS::GetVJDStatus(DevId) == VJD_STAT_OWN);
-
-	if (dType == vXbox)
-		return IX_isControllerOwned(DevId);
-
-	return FALSE;
-}
-
-VGENINTERFACE_API BOOL isDevExist(UINT DevId, DevType dType)
+VGENINTERFACE_API DWORD AcquireDev(UINT DevId, DevType dType, HDEVICE * hDev)
 {
 	if (dType == vJoy)
 	{
-		VjdStat stat = vJoyNS::GetVJDStatus(DevId);
-		if ((stat == VJD_STAT_OWN) || (stat == VJD_STAT_BUSY))
-			return TRUE;
+		*hDev = IJ_AcquireVJD(DevId);
+		if (INVALID_DEV == *hDev)
+			return STATUS_UNSUCCESSFUL;
 		else
-			return FALSE;
+			return STATUS_SUCCESS;
 	};
 
 	if (dType == vXbox)
-		return IX_isControllerOwned(DevId);
+	{
+		DWORD res = IX_PlugIn(DevId);
+		if (STATUS_SUCCESS == res)
+			res = GetDevHandle(DevId, vXbox, hDev);
+		else
+			*hDev = INVALID_DEV;
+		return res;
+	}
 
-	return FALSE;
+	return STATUS_INVALID_PARAMETER_2;
+}
+
+VGENINTERFACE_API DWORD 	RelinquishDev(HDEVICE hDev)			// Relinquish a Device.
+{
+	if (!ValidDev(hDev))
+		return STATUS_INVALID_HANDLE;
+
+	if (isDevice_vJoy(hDev) == STATUS_SUCCESS)
+		return IJ_RelinquishVJD(hDev);
+
+	if (isDevice_vXbox(hDev) == STATUS_SUCCESS)
+		return IX_UnPlug(GetDeviceId(hDev));
+
+	return STATUS_INVALID_HANDLE;
+}
+
+VGENINTERFACE_API  DWORD GetDevType(HDEVICE hDev, DevType * dType)			// Get device type (vJoy/vXbox)
+{
+	DWORD res;
+
+	if (!dType)
+		return STATUS_INVALID_PARAMETER_2;
+
+	if (!ValidDev(hDev))
+		return STATUS_INVALID_HANDLE;
+
+	UINT id = GetDeviceId(hDev);
+
+	res = isDevice_vJoy(hDev);
+	if (res == STATUS_SUCCESS)
+		*dType = vJoy;
+
+	else
+	{
+		res = isDevice_vXbox(hDev);
+		if (res == STATUS_SUCCESS)
+			* dType = vXbox;
+	}
+
+	BOOL Owned;
+	if SUCCEEDED(isDevOwned(id, *dType, &Owned))
+	{
+		if (!Owned)
+			return STATUS_DEVICE_REMOVED;
+	}
+
+	return res;
+}
+
+VGENINTERFACE_API DWORD isDevOwned(UINT DevId, DevType dType, BOOL * Owned)
+{
+	DWORD res;
+
+	if (!Owned)
+		return STATUS_INVALID_PARAMETER_3;
+
+	if (dType == vJoy)
+	{
+		if (vJoyNS::GetVJDStatus(DevId) == VJD_STAT_OWN)
+			*Owned = TRUE;
+		else
+			*Owned = FALSE;
+		return STATUS_SUCCESS;
+	}
+
+	if (dType == vXbox)
+	{
+		res = IX_isControllerOwned(DevId, Owned);
+		return res;
+	}
+
+	return STATUS_UNSUCCESSFUL;
+}
+
+VGENINTERFACE_API DWORD isDevExist(UINT DevId, DevType dType, BOOL * Exist)
+{
+	DWORD res;
+
+	if (!Exist)
+		return STATUS_INVALID_PARAMETER_3;
+
+	if (dType == vJoy)
+	{
+		VjdStat stat = vJoyNS::GetVJDStatus(DevId);
+		if ((stat == VJD_STAT_OWN) || (stat == VJD_STAT_BUSY) || (stat == VJD_STAT_FREE))
+			*Exist = TRUE;
+		else
+			*Exist = FALSE;
+		return STATUS_SUCCESS;
+	};
+
+	if (dType == vXbox)
+	{ 
+		res = IX_isControllerPluggedIn(DevId, Exist);
+		return res;
+	}
+	
+	return STATUS_UNSUCCESSFUL;
+}
+
+VGENINTERFACE_API DWORD isDevFree(UINT DevId, DevType dType, BOOL * Free)
+{
+	DWORD res;
+
+	if (!Free)
+		return STATUS_INVALID_PARAMETER_3;
+
+	if (dType == vJoy)
+	{
+		VjdStat stat = vJoyNS::GetVJDStatus(DevId);
+		if ((stat == VJD_STAT_FREE))
+			*Free = TRUE;
+		else
+			*Free = FALSE;
+		return STATUS_SUCCESS;
+	};
+
+	BOOL Exist;
+	if (dType == vXbox)
+	{
+		res = IX_isControllerPluggedIn(DevId, &Exist);
+		*Free = !Exist;
+		return res;
+}
+
+	return STATUS_UNSUCCESSFUL;
 }
 
 // Cannot implement isDevOwned(h) because only an OWNED device has a handle
@@ -670,88 +790,264 @@ VGENINTERFACE_API BOOL isDevOwned(HDEVICE hDev)
 }
 #endif // 0
 
-VGENINTERFACE_API UINT GetDevNumber(HDEVICE hDev)// If vJoy: Number=Id; If vXbox: Number=Led#
+VGENINTERFACE_API DWORD GetDevNumber(HDEVICE hDev, UINT * dNumber)// If vJoy: Number=Id; If vXbox: Number=Led#
 {
+	DWORD res;
+	DevType dType;
+
+	if (!dNumber)
+		return STATUS_INVALID_PARAMETER_2;
+
+	if (!ValidDev(hDev))
+		return STATUS_INVALID_HANDLE;
+
+	// Get id + Type and verify it is owned
 	UINT id = GetDeviceId(hDev);
-	if (isDevice_vJoy(hDev))
-		return id;
-	
-	BYTE Led = 0;
-	BOOL res = IX_GetLedNumber(id, &Led);
-	if (res)
-		return Led;
+	res = GetDevType(hDev, &dType);
+	if FAILED(res)
+		return res;
+
+	// If not owned - return
+	BOOL Owned;
+	if SUCCEEDED(isDevOwned(id, dType, &Owned))
+	{
+		if (!Owned)
+			return STATUS_DEVICE_REMOVED;
+	}
+
+	res = isDevice_vJoy(hDev);
+	if (res == STATUS_SUCCESS)
+		*dNumber = id;
 	else
-		return 0;
+	{
+		BYTE Led = 0;
+		res = IX_GetLedNumber(id, &Led);
+		if (res == STATUS_SUCCESS)
+			*dNumber = Led;
+	}
+
+	return res;
 }
 
-VGENINTERFACE_API UINT GetDevId(HDEVICE hDev)	// Return Device ID to be used with vXbox API and Backward compatibility API
+VGENINTERFACE_API DWORD GetDevId(HDEVICE hDev, UINT * dID)	// Return Device ID to be used with vXbox API and Backward compatibility API
 {
-	return GetDeviceId(hDev);
+	DWORD res;
+	DevType dType;
+
+	if (!dID)
+		return STATUS_INVALID_PARAMETER_2;
+
+	if (!ValidDev(hDev))
+		return STATUS_INVALID_HANDLE;
+
+	*dID = GetDeviceId(hDev);
+	res = GetDevType(hDev, &dType);
+	if FAILED(res)
+		return res;
+
+	// If not owned - return
+	BOOL Owned;
+	if SUCCEEDED(isDevOwned(*dID, dType, &Owned))
+	{
+		if (!Owned)
+			return STATUS_DEVICE_REMOVED;
+	}
+
+	if (!dID)
+		return STATUS_INVALID_HANDLE;
+	else
+		return STATUS_SUCCESS;
 }
 
-VGENINTERFACE_API HDEVICE GetDevHandle(UINT DevId, DevType dType) // Return device handle from Device ID and Device type
+VGENINTERFACE_API DWORD GetDevHandle(UINT DevId, DevType dType, HDEVICE * hDev) // Return device handle from Device ID and Device type
 {
-	return GetDevice(dType, DevId);
+	// If not owned - return
+	BOOL Owned;
+
+	if (!hDev)
+		return STATUS_INVALID_PARAMETER_3;
+
+	// Get handle from container
+	*hDev = GetDevice(dType, DevId);
+
+	// If handle is valid check that device still owned
+	if ValidDev(*hDev)
+	{
+		if SUCCEEDED(isDevOwned(DevId, dType, &Owned))
+		{
+			if (Owned)
+				return STATUS_SUCCESS; // Owned
+		}
+
+		// Handle is OK but device was removed so we remove the entry from the container
+		DestroyDevice(*hDev);
+		return STATUS_DEVICE_REMOVED; 
+	}
+	else
+		return STATUS_UNSUCCESSFUL;
 }
 
-VGENINTERFACE_API BOOL isAxisExists(HDEVICE hDev, UINT nAxis)	// Does Axis exist.
+VGENINTERFACE_API DWORD isAxisExist(HDEVICE hDev, UINT nAxis, BOOL * Exist)	// Does Axis exist.
 {
-	if (isDevice_vJoy(hDev))
-		return IJ_GetVJDAxisExist(hDev, nAxis);
+	BOOL Owned;
+	DWORD res;
+	UINT id;
+	DevType dType;
 
-	if (isDevice_vXbox(hDev) && nAxis >= 1 && nAxis <= 6)
-		return TRUE;
+	if (!Exist)
+		return STATUS_INVALID_PARAMETER_3;
 
-	return FALSE;
+	res = GetDevId(hDev, &id);
+	if FAILED(res)
+		return res;
+
+	res = GetDevType(hDev, &dType);
+	if FAILED(res)
+		return res;
+
+	res = isDevOwned(id, dType, &Owned);
+	if FAILED(res)
+		return res;
+	if (!Owned)
+		return STATUS_DEVICE_REMOVED;
+
+	if SUCCEEDED(isDevice_vJoy(hDev))
+	{
+		*Exist = IJ_GetVJDAxisExist(hDev, nAxis);
+		return STATUS_SUCCESS;
+	}
+
+
+	if SUCCEEDED(isDevice_vXbox(hDev))
+	{
+		if (nAxis >= 1 && nAxis <= 6)
+			*Exist = TRUE;
+		else
+			*Exist = FALSE;
+		return STATUS_SUCCESS;
+	}
+
+
+	return STATUS_UNSUCCESSFUL;
 }
 
-VGENINTERFACE_API UINT GetDevButtonN(HDEVICE hDev)			// Get number of buttons in device
+VGENINTERFACE_API DWORD GetDevButtonN(HDEVICE hDev, UINT * nBtn)			// Get number of buttons in device
 {
-	if (isDevice_vJoy(hDev))
-		return IJ_GetVJDButtonNumber(hDev);
+	BOOL Owned;
+	DWORD res;
+	UINT id;
+	DevType dType;
 
-	if (isDevice_vXbox(hDev))
-		return 10;
+	if (!nBtn)
+		return STATUS_INVALID_PARAMETER_3;
 
-	return 0;
+	res = GetDevId(hDev, &id);
+	if FAILED(res)
+		return res;
+
+	res = GetDevType(hDev, &dType);
+	if FAILED(res)
+		return res;
+
+	res = isDevOwned(id, dType, &Owned);
+	if FAILED(res)
+		return res;
+	if (!Owned)
+		return STATUS_DEVICE_REMOVED;
+
+	if SUCCEEDED(isDevice_vJoy(hDev))
+	{ 
+		* nBtn = IJ_GetVJDButtonNumber(hDev);
+		return STATUS_SUCCESS;
+	}
+
+	if SUCCEEDED(isDevice_vXbox(hDev))
+	{
+		*nBtn = 10;
+		return STATUS_SUCCESS;
+	}
+
+	return STATUS_UNSUCCESSFUL;
 }
 
-VGENINTERFACE_API UINT GetDevHatN(HDEVICE hDev)				// Get number of Hat Switches in device
+VGENINTERFACE_API DWORD GetDevHatN(HDEVICE hDev, UINT * nHat)				// Get number of Hat Switches in device
 {
-	if (isDevice_vJoy(hDev))
-		return (IJ_GetVJDDiscPovNumber(hDev) + IJ_GetVJDContPovNumber(hDev));
+	BOOL Owned;
+	DWORD res;
+	UINT id;
+	DevType dType;
 
-	if (isDevice_vXbox(hDev))
-		return 1;
+	if (!nHat)
+		return STATUS_INVALID_PARAMETER_3;
 
-	return 0;
+	res = GetDevId(hDev, &id);
+	if FAILED(res)
+		return res;
+
+	res = GetDevType(hDev, &dType);
+	if FAILED(res)
+		return res;
+
+	res = isDevOwned(id, dType, &Owned);
+	if FAILED(res)
+		return res;
+	if (!Owned)
+		return STATUS_DEVICE_REMOVED;
+
+	if SUCCEEDED(isDevice_vJoy(hDev))
+	{
+		*nHat = (IJ_GetVJDDiscPovNumber(hDev) + IJ_GetVJDContPovNumber(hDev));
+		return STATUS_SUCCESS;
+	}
+
+	if SUCCEEDED(isDevice_vXbox(hDev))
+	{
+		*nHat = 1;
+		return STATUS_SUCCESS;
+
+	}
+
+	return STATUS_UNSUCCESSFUL;
 }
 
 
-VGENINTERFACE_API BOOL SetDevButton(HDEVICE hDev, UINT Button, BOOL Press)
+VGENINTERFACE_API DWORD SetDevButton(HDEVICE hDev, UINT Button, BOOL Press)
 {
-	if (isDevice_vJoy(hDev))
-		return IJ_SetBtn(Press, hDev, Button);
+	BOOL bRes;
 
-	if (isDevice_vXbox(hDev))
-		return IX_SetBtn( hDev,  Press,  Button);
+	if SUCCEEDED(isDevice_vJoy(hDev))
+	{
+		bRes = IJ_SetBtn(Press, hDev, Button);
+		if (bRes == TRUE)
+			return STATUS_SUCCESS;
+		else
+			return STATUS_UNSUCCESSFUL;
+	}
 
-	return FALSE;
+	if SUCCEEDED(isDevice_vXbox(hDev))
+		return IX_SetBtn(hDev, Press, Button);
+
+	return STATUS_INVALID_HANDLE;
 }
 
-VGENINTERFACE_API BOOL SetDevAxis(HDEVICE hDev, UINT Axis, FLOAT Value)
-{
-	if (isDevice_vJoy(hDev))
+VGENINTERFACE_API DWORD SetDevAxis(HDEVICE hDev, UINT Axis, FLOAT Value)
+{		
+	BOOL bRes;
+	if SUCCEEDED(isDevice_vJoy(hDev))
 	{
 		// Convert Value from range 0-100 to range 0-32768
 		LONG vj_Value = static_cast <LONG>(32768 * Value / 100);
 		// Convert Axis from 1-8 to HID_USAGE_X-HID_USAGE_SL0
 		UINT vj_Axis = Axis + HID_USAGE_X - 1;
 
-		return IJ_SetAxis(vj_Value, hDev, vj_Axis);
+		bRes = IJ_SetAxis(vj_Value, hDev, vj_Axis);
+		if (bRes == TRUE)
+			return STATUS_SUCCESS;
+		else
+			return STATUS_UNSUCCESSFUL;
 	}
 
-	if (isDevice_vXbox(hDev))
+	if SUCCEEDED(isDevice_vXbox(hDev))
 	{
 		// Convert Value from range (0 - 100) to range (-32768 - 32767) for axes X,Y,RX,RY
 		SHORT vx_Value = static_cast <SHORT>((65535 * Value / 100) - 32768);
@@ -779,45 +1075,46 @@ VGENINTERFACE_API BOOL SetDevAxis(HDEVICE hDev, UINT Axis, FLOAT Value)
 				return IX_SetTriggerL(hDev, vx_TValue);
 
 			default:
-				return FALSE;
+				return STATUS_INVALID_HANDLE;
 				break;
 		}
 	}
 
-	return FALSE;
+	return STATUS_INVALID_HANDLE;
 }
 
-VGENINTERFACE_API BOOL  SetDevPov(HDEVICE hDev, UINT nPov, FLOAT Value)
+VGENINTERFACE_API DWORD  SetDevPov(HDEVICE hDev, UINT nPov, FLOAT Value)
 {
-	if (isDevice_vJoy(hDev))
+	if SUCCEEDED(isDevice_vJoy(hDev))
 	{
 		// Don't test for type - just try
 
-		// Continuous: Convert Value from range 0-100 to range 0-35999 (-1 means Reset)
+		// Continuous: Convert Value from range 0-359.99 to range 0-35999 (-1 means Reset)
 		LONG vj_Value = -1;
 		if (Value >= 0)
-			vj_Value = static_cast <LONG>(35999 * Value / 100);
+			vj_Value = static_cast <LONG>(Value * 100);
 		BOOL res = IJ_SetContPov(vj_Value, hDev, nPov);
 		if (res == TRUE)
-			return TRUE;
+			return STATUS_SUCCESS;
 
 		// Discrete: Convert Value from range 0-100 to descrete values (-1 means Reset)
 		int vjd_Value = -1;
 		switch (static_cast <int>(Value))
 		{
 			case 0:
+			case 360:
 				vjd_Value = 0;
 				break;
 
-			case 25:
+			case 90:
 				vjd_Value = 1;
 				break;
 
-			case 50:
+			case 180:
 				vjd_Value = 2;
 				break;
 
-			case 75:
+			case 270:
 				vjd_Value = 3;
 				break;
 
@@ -825,39 +1122,45 @@ VGENINTERFACE_API BOOL  SetDevPov(HDEVICE hDev, UINT nPov, FLOAT Value)
 				break;
 		}
 
-		return IJ_SetDiscPov(vjd_Value, hDev, nPov);
+		res = IJ_SetDiscPov(vjd_Value, hDev, nPov);
+		if (res == TRUE)
+			return STATUS_SUCCESS;
+		else
+			return STATUS_UNSUCCESSFUL;
 	}
 
-	if (isDevice_vXbox(hDev))
+	if SUCCEEDED(isDevice_vXbox(hDev))
 	{
 		if (nPov != 1)
 			return FALSE;
 
 		if (Value == 0)
 			return IX_SetDpad(hDev, DPAD_UP);
-		if (Value == 12.5)
+		if (Value == 45)
 			return IX_SetDpad(hDev, DPAD_UP | DPAD_RIGHT);
-		if (Value == 25)
+		if (Value == 90)
 			return IX_SetDpad(hDev, DPAD_RIGHT);
-		if (Value == 37.5)
+		if (Value == 135)
 			return IX_SetDpad(hDev, DPAD_DOWN | DPAD_RIGHT);
-		if (Value == 50)
+		if (Value == 180)
 			return IX_SetDpad(hDev, DPAD_DOWN);
-		if (Value == 62.5)
+		if (Value == 225)
 			return IX_SetDpad(hDev, DPAD_DOWN | DPAD_LEFT);
-		if (Value == 75)
+		if (Value == 270)
 			return IX_SetDpad(hDev, DPAD_LEFT);
-		if (Value == 87.5)
+		if (Value == 315)
 			return IX_SetDpad(hDev, DPAD_UP | DPAD_LEFT);
 
 		return IX_SetDpad(hDev, DPAD_OFF);
 	}
 
-	return FALSE;
+	return STATUS_INVALID_HANDLE;
 
 }
 
 #pragma endregion
+
+} //extern "C"
 
 #pragma region Internal vXbox
 DWORD	IX_isVBusExists(void)
@@ -1700,18 +2003,20 @@ HDEVICE	IJ_AcquireVJD(UINT rID)
 	return INVALID_DEV;
 }
 
-VOID IJ_RelinquishVJD(HDEVICE hDev)			// Relinquish the specified vJoy Device.
+DWORD IJ_RelinquishVJD(HDEVICE hDev)			// Relinquish the specified vJoy Device.
 {
-	if (ValidDev(hDev) && isDevice_vJoy(hDev))
+	if (ValidDev(hDev) && SUCCEEDED(isDevice_vJoy(hDev)))
 	{
 		vJoyNS::RelinquishVJD(GetDeviceId(hDev));
 		DestroyDevice(hDev);
+		return STATUS_SUCCESS;
 	}
+	return STATUS_UNSUCCESSFUL;
 }
 
 BOOL IJ_isVJDExists(HDEVICE hDev)
 {
-	if (ValidDev(hDev) && isDevice_vJoy(hDev))
+	if (ValidDev(hDev) && SUCCEEDED(isDevice_vJoy(hDev)))
 		return vJoyNS::isVJDExists(GetDeviceId(hDev));
 	else
 		return FALSE;
@@ -1719,65 +2024,84 @@ BOOL IJ_isVJDExists(HDEVICE hDev)
 
 VjdStat IJ_GetVJDStatus(HDEVICE hDev)
 {
-	if (ValidDev(hDev) && isDevice_vJoy(hDev))
+	if (ValidDev(hDev) && SUCCEEDED(isDevice_vJoy(hDev)))
 		return vJoyNS::GetVJDStatus(GetDeviceId(hDev));
 	else
 		return VJD_STAT_UNKN;
 }
 
 BOOL IJ_GetVJDAxisExist(HDEVICE hDev, UINT Axis)
-{
-	if (ValidDev(hDev) && isDevice_vJoy(hDev))
-		return vJoyNS::GetVJDAxisExist(GetDeviceId(hDev), Axis+ HID_USAGE_X-1);
+{	
+	BOOL bRes;
+
+	if (ValidDev(hDev) && SUCCEEDED(isDevice_vJoy(hDev)))
+		bRes = vJoyNS::GetVJDAxisExist(GetDeviceId(hDev), Axis+ HID_USAGE_X-1);
+	if (bRes == TRUE)
+		return bRes;
+	
 	return FALSE;
 }
 
 int	IJ_GetVJDButtonNumber(HDEVICE hDev)	// Get the number of buttons defined in the specified VDJ
 {
-	if (ValidDev(hDev) && isDevice_vJoy(hDev))
+	if (ValidDev(hDev) && SUCCEEDED(isDevice_vJoy(hDev)))
 		return vJoyNS::GetVJDButtonNumber(GetDeviceId(hDev));
 	return FALSE;
 }
 
 int IJ_GetVJDDiscPovNumber(HDEVICE hDev)   // Get the number of POVs defined in the specified device
 {
-	if (ValidDev(hDev) && isDevice_vJoy(hDev))
+	if (ValidDev(hDev) && SUCCEEDED(isDevice_vJoy(hDev)))
 		return vJoyNS::GetVJDDiscPovNumber(GetDeviceId(hDev));
 	return 0;
 }
 
 int IJ_GetVJDContPovNumber(HDEVICE hDev)	// Get the number of descrete-type POV hats defined in the specified VDJ
 {
-	if (ValidDev(hDev) && isDevice_vJoy(hDev))
+	if (ValidDev(hDev) && SUCCEEDED(isDevice_vJoy(hDev)))
 		return vJoyNS::GetVJDContPovNumber(GetDeviceId(hDev));
 	return 0;
 }
 
 BOOL IJ_SetAxis(LONG Value, HDEVICE hDev, UINT Axis)		// Write Value to a given axis defined in the specified VDJ 
 {
-	if (ValidDev(hDev) && isDevice_vJoy(hDev))
+	if (ValidDev(hDev) && SUCCEEDED(isDevice_vJoy(hDev)))
 		return vJoyNS::SetAxis(Value,GetDeviceId(hDev), Axis);
 	return FALSE;
 }
 
 BOOL IJ_SetBtn(BOOL Value, HDEVICE hDev, UCHAR nBtn)		// Write Value to a given button defined in the specified VDJ 
 {
-	if (ValidDev(hDev) && isDevice_vJoy(hDev))
+	if (ValidDev(hDev) && SUCCEEDED(isDevice_vJoy(hDev)))
 		return vJoyNS::SetBtn(Value,GetDeviceId(hDev), nBtn);
 	return FALSE;
 }
 
 BOOL IJ_SetDiscPov(int Value, HDEVICE hDev, UCHAR nPov)	// Write Value to a given descrete POV defined in the specified VDJ 
 {
-	if (ValidDev(hDev) && isDevice_vJoy(hDev))
-		return vJoyNS::SetDiscPov(Value, GetDeviceId(hDev), nPov);
+	UINT id;
+	
+	if (ValidDev(hDev) && SUCCEEDED(isDevice_vJoy(hDev)))
+	{ 
+		id = GetDeviceId(hDev);
+		if (vJoyNS::GetVJDDiscPovNumber(id) == 0)
+			return FALSE;
+		return vJoyNS::SetDiscPov(Value, id, nPov);
+	}
 	return FALSE;
 }
 
 BOOL IJ_SetContPov(DWORD Value, HDEVICE hDev, UCHAR nPov)	// Write Value to a given continuous POV defined in the specified VDJ 
 {
-	if (ValidDev(hDev) && isDevice_vJoy(hDev))
-		return vJoyNS::SetContPov(Value, GetDeviceId(hDev), nPov);
+	UINT id;
+	
+	if (ValidDev(hDev) && SUCCEEDED(isDevice_vJoy(hDev)))
+	{ 
+		id = GetDeviceId(hDev);
+		if (vJoyNS::GetVJDContPovNumber(id) == 0)
+			return FALSE;
+		return vJoyNS::SetContPov(Value, id, nPov);
+	}
 	return FALSE;
 }
 
@@ -1820,12 +2144,14 @@ HDEVICE CreateDevice(DevType Type, UINT i)
 		return INVALID_DEV;
 }
 
-void DestroyDevice(HDEVICE dev)
+void DestroyDevice(HDEVICE & dev)
 {
 	std::map<HDEVICE, DEVICE>::iterator it;
 	it = DevContainer.find(dev);
 	if (it != DevContainer.end())
 		DevContainer.erase(it);
+
+	dev = INVALID_DEV;
 }
 
 HDEVICE GetDevice(DevType Type, UINT i)
@@ -1852,34 +2178,34 @@ UINT GetDeviceId(HDEVICE h)
 	return it->second.Id;
 }
 
-BOOL isDevice_vJoy(HDEVICE h)
+DWORD isDevice_vJoy(HDEVICE h)
 {
 	// Get the device structure
 	std::map<HDEVICE, DEVICE>::iterator it;
 	it = DevContainer.find(h);
 	if (it == DevContainer.end())
-		return 0;
+		return STATUS_INVALID_HANDLE;
 
 	// Get the device ID
 	if (it->second.Type == vJoy)
-		return TRUE;
+		return STATUS_SUCCESS;
 	else
-		return FALSE;
+		return STATUS_UNSUCCESSFUL;
 }
 
-BOOL isDevice_vXbox(HDEVICE h)
+DWORD isDevice_vXbox(HDEVICE h)
 {
 	// Get the device structure
 	std::map<HDEVICE, DEVICE>::iterator it;
 	it = DevContainer.find(h);
 	if (it == DevContainer.end())
-		return 0;
+		return STATUS_INVALID_HANDLE;
 
 	// Get the device ID
 	if (it->second.Type == vXbox)
-		return TRUE;
+		return STATUS_SUCCESS;
 	else
-		return FALSE;
+		return STATUS_UNSUCCESSFUL;
 }
 
 void * GetDevicePos(HDEVICE h)
