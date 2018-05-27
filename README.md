@@ -11,4 +11,4 @@ To build the project:
 
 Caution:
 You will need to install Visual Studio 2015 (Free)
-To build the entire project including the driver you need to install the SDK and puchase a liense to sign drivers.
+To build the entire project including the driver you need to install the SDK and puchase a license to sign drivers.
