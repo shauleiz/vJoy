@@ -940,6 +940,9 @@ int CreateHidReportDesc(void ** data, UINT nButtons, bool * axes, int nPovHatsCo
     if (nButtons>128)
         nButtons = 128;
 
+	/* Special case of zero buttons - Local Min Usage is 0 rather than 1 */
+	UINT localminusage_buttons = nButtons ? 0x01 : 0x00;
+
     // POV (Cont): 0-4
     if (nPovHatsCont<0)
         nPovHatsCont = 0;
@@ -1107,8 +1110,8 @@ int CreateHidReportDesc(void ** data, UINT nButtons, bool * axes, int nPovHatsCo
             NEXT_BYTE(buffer, 0x00)
             NEXT_BYTE(buffer, HIDP_GLOBAL_UNIT_1)			// UNIT (None):				65 00
             NEXT_BYTE(buffer, 0x00)
-            NEXT_BYTE(buffer, HIDP_LOCAL_USAGE_MIN_1)		// USAGE_MINIMUM(1):		19 01
-            NEXT_BYTE(buffer, 0x01)
+            NEXT_BYTE(buffer, HIDP_LOCAL_USAGE_MIN_1)		// USAGE_MINIMUM(1):		19 01/00
+            NEXT_BYTE(buffer, localminusage_buttons)
             NEXT_BYTE(buffer, HIDP_LOCAL_USAGE_MAX_1)		// USAGE_MAXIMUM(nButtons):	29 nButtons
             NEXT_BYTE(buffer, nButtons)
             NEXT_BYTE(buffer, HIDP_GLOBAL_REPORT_SIZE)		// REPORT_SIZE(1):			75 01
