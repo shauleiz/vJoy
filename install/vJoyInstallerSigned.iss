@@ -59,8 +59,8 @@ AppCopyright=Copyright (c) 2005-2016 by Shaul Eizikovich
 MinVersion = 6.0.6000
 
 ;SignTool=DigiCert sign /sha1 "6d 54 71 df 6b bf af a5 d5 90 0c 88 c0 8d f0 e9 c5 13 69 0a"  /noInput  $f
-SignTool=sig sign /a /v /i DigiCert /t http://timestamp.digicert.com $f
-SignedUninstaller=yes
+;SignTool=sig sign /a /v /i DigiCert /t http://timestamp.digicert.com $f
+SignedUninstaller=no
 DisableDirPage=yes
 DisableProgramGroupPage=yes
 DisableReadyMemo=true
