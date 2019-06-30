@@ -22,7 +22,7 @@ static void find_delim(char *s, char **res, int *ix)
 
 int main(int argc, char **argv)
 {
-	unsigned int major = 0, mid = 0, minor = 0, commits = 0;
+	unsigned int major = 2, mid = 1, minor = 9, commits = 1;
 	char vbuf[4096] = { 0 };
 	char *version="0.0.0", *ncommits="0", *sha="0";
 	FILE *po;
@@ -88,7 +88,7 @@ int main(int argc, char **argv)
 		goto FINAL;
 	}
 
-	// Case of version of type v2.1.8
+	// Case of version of type v2.1.9
 	if (nFields == 3)
 		sscanf_s(ncommits, "%u", &commits);
 
@@ -96,6 +96,10 @@ int main(int argc, char **argv)
 
 FINAL:
 	// Put data into file
+	major = 2;
+	mid = 1;
+	minor = 9;
+	commits = 1;
 	fprintf(f, "#pragma once\n");
 	fprintf(f, "#define VER_H_ %u\n", major);
 	fprintf(f, "#define VER_M_ %u\n", mid);
