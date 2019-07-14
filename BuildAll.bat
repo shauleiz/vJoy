@@ -32,7 +32,7 @@ if not %BUILD_STATUS%==0 goto fail
 :signapps
 echo %DATE% %TIME%: Signing the applications
 IF NOT EXIST %DigiCertUtil% GOTO NOUTIL
-%DigiCertUtil% sign /sha1 "6d 54 71 df 6b bf af a5 d5 90 0c 88 c0 8d f0 e9 c5 13 69 0a" /noInput .\%Target64%\vJoyList.exe*.\%Target32%\vJoyList.exe*.\%Target64%\vJoyConf.exe*.\%Target32%\vJoyConf.exe*.\%Target64%\vJoyFeeder.exe*.\%Target32%\vJoyFeeder.exe
+%DigiCertUtil% sign /sha1 "6b 05 e5 cc 0d b8 8a 0d 89 62 48 2e cb 9c d9 59 e1 b0 57 90" /noInput .\%Target64%\vJoyList.exe*.\%Target32%\vJoyList.exe*.\%Target64%\vJoyConf.exe*.\%Target32%\vJoyConf.exe*.\%Target64%\vJoyFeeder.exe*.\%Target32%\vJoyFeeder.exe
 set SIGN_STATUS=%ERRORLEVEL%
 if not %SIGN_STATUS%==0 goto fail
 echo %DATE% %TIME%: Signing the applications - OK
