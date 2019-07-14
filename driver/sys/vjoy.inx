@@ -31,6 +31,7 @@ CatalogFile = vJoy.cat
 [SourceDisksFiles]
 vjoy.sys = 99
 hidkmdf.sys = 99
+WdfCoInstaller$KMDFCOINSTALLERVERSION$.dll=99 ; make sure the number matches with SourceDisksNames
 
 [SourceDisksNames]
 99 = %DISK_NAME%,,,""
@@ -39,7 +40,8 @@ hidkmdf.sys = 99
 CopySystemSysFiles = 12      
 CopyFunctionDriver = 12      
 ;CopyFilterDriver = 12      
-CopyFilesDLL = 11 
+CopyFilesDLL = 11
+vjoy.Inst_CoInstaller_CopyFiles = 11
 
 [Manufacturer]
 %VENDOR%=Vendor, NT$ARCH$, NT$ARCH$.6.1
@@ -47,11 +49,11 @@ CopyFilesDLL = 11
 
 ; For XP and later
 [Vendor.NT$ARCH$]
-%vjoy%    = vjoy.Inst, root\VID_1234&PID_BEAD&REV_0218
+%vjoy%    = vjoy.Inst, root\VID_1234&PID_BEAD&REV_0219
 
 ; For Win7 and later so that we can use inbox HID-KMDF mapper
 [Vendor.NT$ARCH$.6.1]
-%vjoy%    = vjoy.Inst.Win7, root\VID_1234&PID_BEAD&REV_0218
+%vjoy%    = vjoy.Inst.Win7, root\VID_1234&PID_BEAD&REV_0219
 
 
 ;===============================================================
@@ -71,9 +73,6 @@ AddReg = vjoy.AddReg
 [vjoy.Inst.NT.Services]
 AddService = hidkmdf,,hidkmdf_Service_Inst,
 AddService = vjoy,0x00000002, vjoy_Service_Inst, vjoy_EventLog_Inst
-
-[CopyFunctionDriver]
-hidkmdf.sys
 
 [vjoy.AddReg]
 HKR,,"UpperFilters",0x00010000,"hidkmdf"
@@ -177,6 +176,7 @@ HKLM,%WMRWFF%\%F_CUST%,Attributes,1,28,00,0f,00,05,c8,00,00,fd,03,00,00,fd,03,00
 
 [CopyFunctionDriver]
 vjoy.sys
+hidkmdf.sys
 
 [CopyFilesDLL]
 ;Hid.dll,,,0x00000010    ;COPYFLG_NO_OVERWRITE (for win2k)
@@ -200,9 +200,6 @@ ServiceBinary  = %12%\vjoy.sys
 ;================================================================
 ;--- WDF Coinstaller installation ------
 ;
-[DestinationDirs]
-vjoy.Inst_CoInstaller_CopyFiles = 11
-
 [vjoy.Inst.NT.CoInstallers]
 AddReg=vjoy.Inst_CoInstaller_AddReg
 CopyFiles=vjoy.Inst_CoInstaller_CopyFiles
@@ -212,9 +209,6 @@ HKR,,CoInstallers32,0x00010000, "WdfCoInstaller$KMDFCOINSTALLERVERSION$.dll,WdfC
 
 [vjoy.Inst_CoInstaller_CopyFiles]
 WdfCoInstaller$KMDFCOINSTALLERVERSION$.dll
-
-[SourceDisksFiles]
-WdfCoInstaller$KMDFCOINSTALLERVERSION$.dll=99 ; make sure the number matches with SourceDisksNames
 
 [vjoy.Inst.NT.Wdf]
 KmdfService = vjoy, vjoy_wdfsect
