@@ -1,6 +1,12 @@
 # vJoy
 Virtual Joystick
 
+This project supports Windows 7 to Windows 10 1803
+
+For newer versions of Windows go to Fork: https://github.com/jshafer817/vJoy
+
+
+
 For much more go to vJoy web site: http://vjoystick.sourceforge.net
 
 To build the project:
