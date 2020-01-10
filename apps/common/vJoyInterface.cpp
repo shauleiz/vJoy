@@ -161,6 +161,22 @@ HANDLE hFfbEvent;
 #define SET_NS(x) x
 #endif
 
+void __cdecl FfbFunction(PVOID data)
+{
+	_tprintf("\nIn vJoy interface!!!");
+	FFB_DATA* FfbData = (FFB_DATA*)data;
+	int size = FfbData->size;
+	_tprintf("\nFFB Size %d\n", size);
+
+	_tprintf("Cmd:%08.8X ", FfbData->cmd);
+	_tprintf("ID:%02.2X ", FfbData->data[0]);
+	_tprintf("Size:%02.2d ", static_cast<int>(FfbData->size - 8));
+	_tprintf(" - ");
+	for (UINT i = 0; i < FfbData->size - 8; i++)
+		_tprintf(" %02.2X", (UINT)FfbData->data[i]);
+	_tprintf("\n");
+}
+
 
 extern "C" {
 	void	DeviceChange(WPARAM wParam, LPARAM lParam);
@@ -336,7 +352,7 @@ extern "C" {
 	{
 		// Loop on read FFB data from vJoy
 
-#define BUFFERSIZE 100 // TODO: Change to correct number
+#define BUFFERSIZE 256 // TODO: Change to correct number
 		UINT	IoCode = GET_FFB_DATA;
 		UINT	IoSize = BUFFERSIZE;
 		ULONG	bytes;
@@ -425,22 +441,41 @@ extern "C" {
 		// The incoming data is copied to a global structure
 		// The emessage is posted to inform the main window loop that new data has arrived
 	{
+#ifdef PRINT
+		_tprintf("\nIn vJoy interface!!!");
+		_tprintf("\nbytes trans %d\n", nBytesTranss);
+		for (UINT i = 0; i < nBytesTranss; i++)
+			_tprintf(" %02.2X", (UINT)FfbData[i]);
+#endif
 		FfbDataPacket.size = *(ULONG *)(&FfbData[0]);
 		FfbDataPacket.cmd = *(ULONG *)(&FfbData[4]);
 		ULONG offset = 2 * sizeof(ULONG);
+#ifdef PRINT
+		_tprintf("\nsize offset %d %d", FfbDataPacket.size, offset);
+#endif
 		if (FfbDataPacket.size < offset)
 			return;
-
-		for (UINT i = 0; i<FfbDataPacket.size - offset; i++)
+#ifdef PRINT
+		_tprintf("\nCopying %d", FfbDataPacket.size - offset);
+#endif
+		for (UINT i = 0; i<FfbDataPacket.size - offset; i++) {
 			FfbDataPacket.data[i] = FfbData[i + offset];
+#ifdef PRINT
+			_tprintf(" %02.2X", (UINT)FfbDataPacket.data[i]);
+#endif
+		}
+#ifdef PRINT
+		_tprintf("\nFFB data ptr=%p", FfbDataPacket.data);
+#endif
 
 		SendMessage(hWnd, FFB_DATA_READY, 0, 0);
 	}
 
 	void FfbProcessData(WPARAM wParam, LPARAM lParam)
 	{
-
-
+#ifdef PRINT
+		FfbFunction((PVOID)&FfbDataPacket);
+#endif
 		if (FfbGebFunc)
 			FfbGebFunc((PVOID)(&FfbDataPacket), FfbUserData);
 

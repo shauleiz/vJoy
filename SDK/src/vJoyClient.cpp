@@ -188,7 +188,7 @@ void CALLBACK FfbFunction(PVOID data)
 	_tprintf("Size:%02.2d ", static_cast<int>(FfbData->size - 8));
 	_tprintf(" - ");
 	for (UINT i = 0; i < FfbData->size - 8; i++)
-		_tprintf(" %02.2X", (UINT)FfbData->data);
+		_tprintf(" %02.2X", (UINT)FfbData->data[i]);
 	_tprintf("\n");
 }
 
@@ -343,7 +343,14 @@ void CALLBACK FfbFunction1(PVOID data, PVOID userdata)
 		_tprintf("\n >> Ramp Start: %d", TwosCompByte2Int(RampEffect.Start) * 10000 / 127);
 		_tprintf("\n >> Ramp End: %d", TwosCompByte2Int(RampEffect.End) * 10000 / 127);
 	};
+#pragma endregion
 
+#pragma region Constant Effect
+	FFB_EFF_CONSTANT CstEffect;
+	if (ERROR_SUCCESS == Ffb_h_Eff_Constant((FFB_DATA*)data, &CstEffect)) {
+		_tprintf("\n >> BlockIndex: %d", CstEffect.EffectBlockIndex);
+		_tprintf("\n >> Magnitude: %d", CstEffect.Magnitude);
+	};
 #pragma endregion
 
 	_tprintf("\n");
