@@ -26,7 +26,7 @@ BOOL EffectOpStr(FFBOP Op, LPTSTR Str);
 int  Polar2Deg(BYTE Polar);
 int  Byte2Percent(BYTE InByte);
 int TwosCompByte2Int(BYTE in);
-
+int TwosCompInt2Int(USHORT in);
 
 int ffb_direction = 0;
 int ffb_strenght = 0;
@@ -231,8 +231,6 @@ void CALLBACK FfbFunction1(PVOID data, PVOID userdata)
 		if (Effect.Polar)
 		{
 			_tprintf("\n >> Direction: %d deg (%02x)", Polar2Deg(Effect.Direction), Effect.Direction);
-
-
 		}
 		else
 		{
@@ -294,22 +292,22 @@ void CALLBACK FfbFunction1(PVOID data, PVOID userdata)
 			_tprintf("\n >> Y Axis");
 		else
 			_tprintf("\n >> X Axis");
-		_tprintf("\n >> Center Point Offset: %d", TwosCompByte2Int(Condition.CenterPointOffset)*10000/127);
-		_tprintf("\n >> Positive Coefficient: %d", TwosCompByte2Int(Condition.PosCoeff)*10000/127);
-		_tprintf("\n >> Negative Coefficient: %d", TwosCompByte2Int(Condition.NegCoeff)*10000/127);
-		_tprintf("\n >> Positive Saturation: %d", Condition.PosSatur*10000/255);
-		_tprintf("\n >> Negative Saturation: %d", Condition.NegSatur*10000/255);
-		_tprintf("\n >> Dead Band: %d", Condition.DeadBand*10000/255);
+		_tprintf("\n >> Center Point Offset: %d", TwosCompInt2Int(Condition.CenterPointOffset));
+		_tprintf("\n >> Positive Coefficient: %d", TwosCompInt2Int(Condition.PosCoeff));
+		_tprintf("\n >> Negative Coefficient: %d", TwosCompInt2Int(Condition.NegCoeff));
+		_tprintf("\n >> Positive Saturation: %d", TwosCompInt2Int(Condition.PosSatur));
+		_tprintf("\n >> Negative Saturation: %d", TwosCompInt2Int(Condition.NegSatur));
+		_tprintf("\n >> Dead Band: %d", TwosCompInt2Int(Condition.DeadBand));
 	}
 #pragma endregion
 #pragma region Envelope
 	FFB_EFF_ENVLP Envelope;
 	if (ERROR_SUCCESS == Ffb_h_Eff_Envlp((FFB_DATA *)data, &Envelope))
 	{
-		_tprintf("\n >> Attack Level: %d", Envelope.AttackLevel*10000/255);
-		_tprintf("\n >> Fade Level: %d", Envelope.FadeLevel*10000/255);
 		_tprintf("\n >> Attack Time: %d", static_cast<int>(Envelope.AttackTime));
+		_tprintf("\n >> Attack Level: %d", Envelope.AttackLevel);
 		_tprintf("\n >> Fade Time: %d", static_cast<int>(Envelope.FadeTime));
+		_tprintf("\n >> Fade Level: %d", Envelope.FadeLevel);
 	};
 
 #pragma endregion
@@ -317,8 +315,8 @@ void CALLBACK FfbFunction1(PVOID data, PVOID userdata)
 	FFB_EFF_PERIOD EffPrd;
 	if (ERROR_SUCCESS == Ffb_h_Eff_Period((FFB_DATA *)data, &EffPrd))
 	{
-		_tprintf("\n >> Magnitude: %d", EffPrd.Magnitude * 10000 / 255);
-		_tprintf("\n >> Offset: %d", TwosCompByte2Int(EffPrd.Offset) * 10000 / 127);
+		_tprintf("\n >> Magnitude: %d", EffPrd.Magnitude);
+		_tprintf("\n >> Offset: %d", TwosCompInt2Int(EffPrd.Offset));
 		_tprintf("\n >> Phase: %d", EffPrd.Phase * 3600 / 255);
 		_tprintf("\n >> Period: %d", static_cast<int>(EffPrd.Period));
 	};
@@ -340,8 +338,8 @@ void CALLBACK FfbFunction1(PVOID data, PVOID userdata)
 	FFB_EFF_RAMP RampEffect;
 	if (ERROR_SUCCESS == Ffb_h_Eff_Ramp((FFB_DATA *)data, &RampEffect))
 	{
-		_tprintf("\n >> Ramp Start: %d", TwosCompByte2Int(RampEffect.Start) * 10000 / 127);
-		_tprintf("\n >> Ramp End: %d", TwosCompByte2Int(RampEffect.End) * 10000 / 127);
+		_tprintf("\n >> Ramp Start: %d", TwosCompInt2Int(RampEffect.Start));
+		_tprintf("\n >> Ramp End: %d", TwosCompInt2Int(RampEffect.End));
 	};
 #pragma endregion
 
@@ -349,10 +347,10 @@ void CALLBACK FfbFunction1(PVOID data, PVOID userdata)
 	FFB_EFF_CONSTANT CstEffect;
 	if (ERROR_SUCCESS == Ffb_h_Eff_Constant((FFB_DATA*)data, &CstEffect)) {
 		_tprintf("\n >> BlockIndex: %d", CstEffect.EffectBlockIndex);
-		_tprintf("\n >> Magnitude: %d", CstEffect.Magnitude);
+		_tprintf("\n >> Magnitude: %d", TwosCompInt2Int(CstEffect.Magnitude));
 	};
 #pragma endregion
-
+	
 	_tprintf("\n");
 	FfbFunction(data);
 	_tprintf("\n ====================================================\n");
@@ -575,4 +573,19 @@ int TwosCompByte2Int(BYTE in)
 	}
 	else
 		return (int)in;
+}
+
+
+// Convert One-Byte 2's complement input to integer
+int TwosCompInt2Int(USHORT in)
+{
+	int tmp;
+	SHORT inv = ~in + 1;
+	BOOL isNeg = in>>15;
+	if (isNeg) {
+		tmp = (int)(inv);
+		tmp = -1*tmp;
+		return tmp;
+	} else
+	return (int)in;
 }
