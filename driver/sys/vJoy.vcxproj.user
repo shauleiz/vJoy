@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <SignMode>ProductionSign</SignMode>
+    <SignMode>TestSign</SignMode>
     <ProductionCertificate>CN=On-site Dental Systems (Justin Shafer), O=On-site Dental Systems (Justin Shafer), L=North Richland Hills, S=Texas, C=US, SERIALNUMBER=A214013764, OID.2.5.4.15=Business Entity, OID.1.3.6.1.4.1.311.60.2.1.1=Tarrant County, OID.1.3.6.1.4.1.311.60.2.1.2=Texas, OID.1.3.6.1.4.1.311.60.2.1.3=US | 6B05E5CC0DB88A0D8962482ECB9CD959E1B05790</ProductionCertificate>
     <CrossCertificateFile>$(SolutionDir)\DigiCert High Assurance EV Root CA.crt</CrossCertificateFile>
   </PropertyGroup>
@@ -21,7 +21,7 @@
     <CrossCertificateFile>$(SolutionDir)\DigiCert High Assurance EV Root CA.crt</CrossCertificateFile>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <SignMode>ProductionSign</SignMode>
+    <SignMode>TestSign</SignMode>
     <ProductionCertificate>CN=On-site Dental Systems (Justin Shafer), O=On-site Dental Systems (Justin Shafer), L=North Richland Hills, S=Texas, C=US, SERIALNUMBER=A214013764, OID.2.5.4.15=Business Entity, OID.1.3.6.1.4.1.311.60.2.1.1=Tarrant County, OID.1.3.6.1.4.1.311.60.2.1.2=Texas, OID.1.3.6.1.4.1.311.60.2.1.3=US | 6B05E5CC0DB88A0D8962482ECB9CD959E1B05790</ProductionCertificate>
     <DebugDeployment>True</DebugDeployment>
     <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
