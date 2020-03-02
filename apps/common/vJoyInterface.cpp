@@ -383,6 +383,14 @@ extern "C" {
 			memset(&FfbOverlapped, 0, sizeof(OVERLAPPED));
 			FfbOverlapped.hEvent = hIoctlEvent;
 			res = DeviceIoControl(h, IoCode, NULL, 0, &FfbData, IoSize, &bytes, &FfbOverlapped);
+/*
+			_tprintf("In vJoy interface!!!\n");
+			FFB_DATA* FfbData2 = (FFB_DATA*)&FfbData;
+			int size = FfbData2->size;
+			_tprintf("FFB Size %d\n", size);
+
+			_tprintf("Cmd:%08.8X \n", FfbData2->cmd);
+*/
 			// Imedeate Return
 			if (res)
 			{
