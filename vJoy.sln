@@ -6,6 +6,10 @@ MinimumVisualStudioVersion = 12.0
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "FfbMon", "FfbMon", "{6FD535C1-9D8A-4AD2-835E-FA6BF948B424}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Apps", "Apps", "{668338B4-E510-42C4-B7B1-E98608F8C0B0}"
+	ProjectSection(SolutionItems) = preProject
+		BuildAll.bat = BuildAll.bat
+		README.md = README.md
+	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "VJoyFeeder", "VJoyFeeder", "{BACB45A8-0AC0-4B4A-9137-48C6494F2446}"
 EndProject
