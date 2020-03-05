@@ -1,31 +1,35 @@
 echo off
+
+SET BuildMode=Release
+REM SET BuildMode=Debug
+
 SET VS=2019\Community
 SET BUILDER=%ProgramFiles(x86)%\Microsoft Visual Studio\%VS%\MSBuild\Current\Bin\MSBuild.exe
-SET Target64=x64\Release
-SET Target32=Win32\Release
-SET DigiCertUtil=%USERPROFILE%\DESKTOP\DigiCertUtil.exe
-SET InnoCompiler=%ProgramFiles(x86)%\Inno Setup 5\ISCC.exe
+SET Target64=x64\%BuildMode%
+SET Target32=Win32\%BuildMode%
+SET DigiCertUtil=DigiCertUtil.exe
+SET InnoCompiler=%ProgramFiles(x86)%\Inno Setup 6\ISCC.exe
 
 
 :build32
 echo %DATE% %TIME%: Cleaning vJoy (x86) 
-"%BUILDER%"  vjoy.sln  /maxcpucount:1 /t:clean /p:Platform=Win32;Configuration=Release
+"%BUILDER%"  vjoy.sln  /maxcpucount:1 /t:clean /p:Platform=Win32;Configuration=%BuildMode%
 set BUILD_STATUS=%ERRORLEVEL%
 if not %BUILD_STATUS%==0 goto fail
 
 echo %DATE% %TIME%: Building vJoy (x86)
-"%BUILDER%"  vjoy.sln  /maxcpucount:4  /p:Platform=Win32;Configuration=Release
+"%BUILDER%"  vjoy.sln  /maxcpucount:4  /p:Platform=Win32;Configuration=%BuildMode%
 set BUILD_STATUS=%ERRORLEVEL%
 if not %BUILD_STATUS%==0 goto fail
 
 :build64
 echo %DATE% %TIME%: Cleaning vJoy (x64)
-"%BUILDER%"  vjoy.sln  /maxcpucount:1 /t:clean /p:Platform=x64;Configuration=Release
+"%BUILDER%"  vjoy.sln  /maxcpucount:1 /t:clean /p:Platform=x64;Configuration=%BuildMode%
 set BUILD_STATUS=%ERRORLEVEL%
 if not %BUILD_STATUS%==0 goto fail
 
 echo %DATE% %TIME%: Building vJoy (x64)
-"%BUILDER%"  vjoy.sln  /maxcpucount:4  /p:Platform=x64;Configuration=Release
+"%BUILDER%"  vjoy.sln  /maxcpucount:4  /p:Platform=x64;Configuration=%BuildMode%
 set BUILD_STATUS=%ERRORLEVEL%
 if not %BUILD_STATUS%==0 goto fail
 
