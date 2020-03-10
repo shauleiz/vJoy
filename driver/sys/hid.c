@@ -344,24 +344,21 @@ vJoyGetFeature(
     // Byte[3]: Block Load Full (1-3)
     // Byte[4]: Block Load Error (1-3)
     ////////////////////////////////////////
-    if ((transferPacket->reportId&0x0F) == 0x02)
-    {
+    if ((transferPacket->reportId&0x0F) == 0x02) {
         ucTmp = (PUCHAR)transferPacket->reportBuffer;
         ucTmp[0] = transferPacket->reportId;
-        ucTmp[1] = 1; // Effect Block Index = 1
+        ucTmp[1] = devContext->FfbReportLastCreatedBlockIndex[id-1]; // Lastly created Effect Block Index
         ucTmp[3] = 0; // Load Full = 0
-        if (devContext->FfbEnable[id-1])
-        {
+        if (devContext->FfbEnable[id-1]) {
             ucTmp[2] = 1; // Load Success = 1
             ucTmp[4] = 0; // Load Error =0
-        }
-        else
-        {
+        } else {
             ucTmp[2] = 0; // Load Success = 0
             ucTmp[4] = 1; // Load Error =1
         };
     };
 
+    // Report ID 3?
     if ((transferPacket->reportId&0x0F) == 3 && !devContext->FfbEnable[id-1])
         status = STATUS_NO_SUCH_DEVICE;
 

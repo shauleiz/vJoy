@@ -93,6 +93,7 @@ DEFINE_GUID(GUID_DEVINTERFACE_VJOY, 0x781EF630, 0x72B2, 0x11d2, 0xB8, 0x52, 0x00
 #define F_LOAD_POSITIONS	0x910
 #define F_GETATTRIB			0x911
 #define F_GET_FFB_DATA		0x912
+#define F_SET_FFB_DATA		0x914
 #define F_SET_FFB_STAT		0x913
 #define F_GET_FFB_STAT		0x916
 #define F_GET_DEV_INFO      0x917
@@ -111,6 +112,7 @@ DEFINE_GUID(GUID_DEVINTERFACE_VJOY, 0x781EF630, 0x72B2, 0x11d2, 0xB8, 0x52, 0x00
 #define LOAD_POSITIONS	            CTL_CODE (FILE_DEVICE_UNKNOWN, F_LOAD_POSITIONS, METHOD_BUFFERED, FILE_WRITE_ACCESS)
 #define GET_POSITIONS	            CTL_CODE (FILE_DEVICE_UNKNOWN, F_GET_POSITIONS, METHOD_BUFFERED, FILE_READ_ACCESS)
 #define GET_FFB_DATA	            CTL_CODE (FILE_DEVICE_UNKNOWN, F_GET_FFB_DATA, METHOD_OUT_DIRECT, FILE_ANY_ACCESS)
+#define SET_FFB_DATA	            CTL_CODE (FILE_DEVICE_UNKNOWN, F_SET_FFB_DATA, METHOD_BUFFERED, FILE_ANY_ACCESS)
 #define SET_FFB_STAT	            CTL_CODE (FILE_DEVICE_UNKNOWN, F_SET_FFB_STAT, METHOD_NEITHER, FILE_ANY_ACCESS)
 #define GET_FFB_STAT	            CTL_CODE (FILE_DEVICE_UNKNOWN, F_GET_FFB_STAT, METHOD_BUFFERED, FILE_ANY_ACCESS)
 #define GET_DEV_INFO			    CTL_CODE (FILE_DEVICE_UNKNOWN, F_GET_DEV_INFO, METHOD_BUFFERED, FILE_ANY_ACCESS)
@@ -233,6 +235,34 @@ typedef struct _JOYSTICK_POSITION_V2
 	LONG lButtonsEx2; // Buttons 65-96
 	LONG lButtonsEx3; // Buttons 97-128
 } JOYSTICK_POSITION_V2, *PJOYSTICK_POSITION_V2;
+
+
+//-------------
+// FFB Features to be placed in vJoy's driver memory context
+
+// FFB: Create New Effect Feature Report=1
+typedef struct _FFB_NEW_EFFECT_REPORT
+{
+	BYTE	effectType;	// Enum (1..12): ET 26,27,30,31,32,33,34,40,41,42,43,28
+	USHORT	byteCount;	// 0..511
+} FFB_NEW_EFFECT_REPORT, * PFFB_NEW_EFFECT_REPORT;
+
+// FFB: PID Block Load Feature Report=2
+typedef struct _FFB_PID_BLOCK_LOAD_REPORT
+{
+	BYTE    effectBlockIndex;	// 1..40
+	BYTE	loadStatus;	// 1=Success,2=Full,3=Error
+	USHORT	ramPoolAvailable;	// =0 or 0xFFFF?
+} FFB_PID_BLOCK_LOAD_REPORT, * PFFB_PID_BLOCK_LOAD_REPORT;
+
+// FFB: PID Pool Feature Report=3
+typedef struct _FFB_PID_POOL_REPORT
+{
+	USHORT	ramPoolSize;	// ?
+	BYTE	maxSimultaneousEffects;	// ?? 40?
+	BYTE	memoryManagement;	// Bits: 0=DeviceManagedPool, 1=SharedParameterBlocks
+} FFB_PID_POOL_REPORT, * PFFB_PID_POOL_REPORT;
+
 
 
 // HID Descriptor definitions - Axes

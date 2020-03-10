@@ -38,7 +38,17 @@ enum VjdStat  /* Declares an enumeration data type */
 #define BAD_N_VAL_CAPS				 	 -8
 #define BAD_ID_RANGE				 	 -9
 #define NO_SUCH_AXIS				 	 -10
+#define BAD_DEV_STAT				 	 -11
+#define NO_DEV_EXIST				 	 -12
+#define NO_FILE_EXIST				 	 -13
 
+/* Registry Constants */
+#define REG_PARAM		L"SYSTEM\\CurrentControlSet\\services\\vjoy\\Parameters"
+#define REG_PARAM_DEV0	L"SYSTEM\\CurrentControlSet\\services\\vjoy\\Parameters\\Device0"
+#define REG_PARAM_DEV	L"SYSTEM\\CurrentControlSet\\services\\vjoy\\Parameters\\Device"
+#define REG_DEVICE		L"Device"
+#define REG_INIT		L"Init"
+#define BTN_INIT		L"BTNS"
 
 /* Environment Variables */
 #define INTERFACE_LOG_LEVEL "VJOYINTERFACELOGLEVEL"
@@ -240,9 +250,41 @@ typedef struct _FFB_EFF_ENVLP {
 	DWORD 		FadeTime;	   // Time of the fading: 0 - 4294967295
 } FFB_EFF_ENVLP, *PFFB_EFF_ENVLP;
 
-#define FFB_DATA_READY	 WM_USER+31
 
-typedef void (CALLBACK *FfbGenCB)(PVOID, PVOID);
+// structs transferred in public.h
+#if 0
+//-------------
+// FFB Features to be placed in vJoy's driver memory context
+
+// FFB: Create New Effect Feature Report=1
+typedef struct _FFB_NEW_EFFECT_REPORT
+{
+	BYTE	effectType;	// Enum (1..12): ET 26,27,30,31,32,33,34,40,41,42,43,28
+	USHORT	byteCount;	// 0..511
+} FFB_NEW_EFFECT_REPORT, * PFFB_NEW_EFFECT_REPORT;
+
+// FFB: PID Block Load Feature Report=2
+typedef struct _FFB_PID_BLOCK_LOAD_REPORT
+{
+	BYTE    effectBlockIndex;	// 1..40
+	BYTE	loadStatus;	// 1=Success,2=Full,3=Error
+	USHORT	ramPoolAvailable;	// =0 or 0xFFFF?
+} FFB_PID_BLOCK_LOAD_REPORT, * PFFB_PID_BLOCK_LOAD_REPORT;
+
+// FFB: PID Pool Feature Report=3
+typedef struct _FFB_PID_POOL_REPORT
+{
+	USHORT	ramPoolSize;	// ?
+	BYTE	maxSimultaneousEffects;	// ?? 40?
+	BYTE	memoryManagement;	// Bits: 0=DeviceManagedPool, 1=SharedParameterBlocks
+} FFB_PID_POOL_REPORT, * PFFB_PID_POOL_REPORT;
+#endif
+
+
+// SendMessage event when FFB data is ready
+#define FFB_DATA_READY	 (WM_USER+31)
+
+typedef void (CALLBACK* FfbGenCB)(PVOID, PVOID);
 #endif
 
 
@@ -343,7 +385,10 @@ namespace vJoyNS {
 	VJOYINTERFACE_API DWORD		__cdecl Ffb_h_EffNew(const FFB_DATA * Packet, FFBEType * Effect);
 
 	// Added in 2.1.6
-	VJOYINTERFACE_API DWORD		__cdecl Ffb_h_Eff_Constant(const FFB_DATA * Packet, FFB_EFF_CONSTANT *  ConstantEffect);
+	VJOYINTERFACE_API DWORD		__cdecl Ffb_h_Eff_Constant(const FFB_DATA * Packet, FFB_EFF_CONSTANT* ConstantEffect);
+	// Added in 2.1.10
+	VJOYINTERFACE_API BOOL		__cdecl Ffb_h_UpdatePIDBlockLoad(UINT rID, FFB_PID_BLOCK_LOAD_REPORT* PIDBlockLoad); // Update the PID Block load of the specified vJoy Device.
+
 #pragma endregion
 
 #pragma warning( pop )

@@ -1287,6 +1287,13 @@ typedef struct _DEVICE_EXTENSION{ // Needs to be changed
 	True: FFB is active
 	*/
 	BOOLEAN FfbEnable[MAX_N_DEVICES];
+	
+	/*
+	 When a Get report 2 is send, return lastly created block index value
+	 that was updated by userland side using an IODeviceControl().
+	*/
+	LONG FfbReportLastCreatedBlockIndex[MAX_N_DEVICES];
+
 	/*
 	FfbXferLock:
 	Wait lock to ensure that request transfer function will not be re-entrant

@@ -2144,6 +2144,45 @@ namespace vJoyNS {
 		return ERROR_SUCCESS;
 	}
 
+	VJOYINTERFACE_API BOOL		__cdecl Ffb_h_UpdatePIDBlockLoad(UINT rID, FFB_PID_BLOCK_LOAD_REPORT* PIDBlockLoad)
+		// Update the PID Block load of the specified vJoy Device.
+	{
+		PVOID pData = PIDBlockLoad;
+		if (!pData || (vJoyDevices.find(rID) == vJoyDevices.end()) || Get_h(rID) == INVALID_HANDLE_VALUE || Get_stat(rID) != VJD_STAT_OWN)
+			return FALSE;
+
+		UINT	IoCode = SET_FFB_DATA;
+		UINT	IoSize = sizeof(FFB_PID_BLOCK_LOAD_REPORT);
+		ULONG	bytes;
+		HANDLE	hIoctlEvent;
+		OVERLAPPED OverLapped ={ 0 };
+
+		// Preparing
+		hIoctlEvent = CreateEvent(NULL, TRUE, TRUE, NULL);
+		memset(&OverLapped, 0, sizeof(OVERLAPPED));
+		OverLapped.hEvent = hIoctlEvent;
+
+		// Send joystick position structure to vJoy device
+		BOOL res = DeviceIoControl(Get_h(rID), IoCode, pData, IoSize, NULL, 0, &bytes, &OverLapped);
+
+		// Test Results
+		if (!res) {
+			// The transaction failed.
+			// If it is just because it is pending then wait otherwise it is an error
+			DWORD err = GetLastError();
+			if (err != ERROR_IO_PENDING)
+				res = FALSE;
+			else {	// Wait for write to complete
+				DWORD WaitRet = WaitForSingleObject(OverLapped.hEvent, 500);
+				if (WAIT_OBJECT_0 == WaitRet)
+					res = TRUE;
+				else
+					res = FALSE;
+			}
+		}
+		CloseHandle(OverLapped.hEvent);
+		return res;
+	}
 
 #pragma endregion
 

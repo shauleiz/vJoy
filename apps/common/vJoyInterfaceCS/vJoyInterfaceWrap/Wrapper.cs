@@ -284,6 +284,18 @@ namespace vJoyInterfaceWrap
         }
 
 
+        [StructLayout(LayoutKind.Explicit)]
+        public struct FFB_PID_BLOCK_LOAD_REPORT
+        {
+            [FieldOffset(0)]
+            public Byte effectBlockIndex; // 1..40
+            [FieldOffset(4)]
+            public Byte loadStatus;             // 1=Success,2=Full,3=Error
+            [FieldOffset(8)]
+            public UInt16 ramPoolAvailable;    // =0 or 0xFFFF?
+        }
+    
+
         /***************************************************/
         /***** Import from file vJoyInterface.dll (C) ******/
         /***************************************************/
@@ -477,6 +489,11 @@ namespace vJoyInterfaceWrap
          [DllImport("vJoyInterface.dll", EntryPoint = "Ffb_h_Eff_Constant")]
          private static extern UInt32 _Ffb_h_Eff_Constant(IntPtr Packet, ref FFB_EFF_CONSTANT ConstantEffect);
 
+        [DllImport("vJoyInterface.dll", EntryPoint = "Ffb_h_UpdatePIDBlockLoad")]
+        private static extern bool _Ffb_h_UpdatePIDBlockLoad(UInt32 rID, ref FFB_PID_BLOCK_LOAD_REPORT PIDBlockLoad);
+
+
+
         /***************************************************/
         /********** Export functions (C#) ******************/
         /***************************************************/
@@ -608,6 +625,7 @@ namespace vJoyInterfaceWrap
         public UInt32 Ffb_h_Eff_Period(IntPtr Packet, ref FFB_EFF_PERIOD Effect) { return _Ffb_h_Eff_Period( Packet, ref  Effect); }
         public UInt32 Ffb_h_EffNew(IntPtr Packet, ref FFBEType Effect) { return _Ffb_h_EffNew( Packet, ref  Effect); }
         public UInt32 Ffb_h_Eff_Ramp(IntPtr Packet, ref FFB_EFF_RAMP RampEffect) { return _Ffb_h_Eff_Ramp( Packet, ref  RampEffect);}
-        public UInt32 Ffb_h_Eff_Constant(IntPtr Packet, ref FFB_EFF_CONSTANT ConstantEffect) { return _Ffb_h_Eff_Constant(Packet, ref  ConstantEffect); }
+        public bool Ffb_h_UpdatePIDBlockLoad(UInt32 rID, ref FFB_PID_BLOCK_LOAD_REPORT PIDBlock) { return _Ffb_h_UpdatePIDBlockLoad(rID, ref PIDBlock); }
+
     }
 }
