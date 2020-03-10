@@ -4,6 +4,7 @@
     <SignMode>TestSign</SignMode>
     <ProductionCertificate>CN=On-site Dental Systems (Justin Shafer), O=On-site Dental Systems (Justin Shafer), L=North Richland Hills, S=Texas, C=US, SERIALNUMBER=A214013764, OID.2.5.4.15=Business Entity, OID.1.3.6.1.4.1.311.60.2.1.1=Tarrant County, OID.1.3.6.1.4.1.311.60.2.1.2=Texas, OID.1.3.6.1.4.1.311.60.2.1.3=US | 6B05E5CC0DB88A0D8962482ECB9CD959E1B05790</ProductionCertificate>
     <CrossCertificateFile>$(SolutionDir)\DigiCert High Assurance EV Root CA.crt</CrossCertificateFile>
+    <TestCertificate>CN="WDKTestCert Benjamin,132277919481947922" | 0E33DBA13D3AF4CA5BA140EF6C35C50652292AAB</TestCertificate>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug_CPP|Win32'">
     <SignMode>ProductionSign</SignMode>
@@ -11,9 +12,10 @@
     <CrossCertificateFile>$(SolutionDir)\DigiCert High Assurance EV Root CA.crt</CrossCertificateFile>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <SignMode>ProductionSign</SignMode>
+    <SignMode>TestSign</SignMode>
     <ProductionCertificate>CN=On-site Dental Systems (Justin Shafer), O=On-site Dental Systems (Justin Shafer), L=North Richland Hills, S=Texas, C=US, SERIALNUMBER=A214013764, OID.2.5.4.15=Business Entity, OID.1.3.6.1.4.1.311.60.2.1.1=Tarrant County, OID.1.3.6.1.4.1.311.60.2.1.2=Texas, OID.1.3.6.1.4.1.311.60.2.1.3=US | 6B05E5CC0DB88A0D8962482ECB9CD959E1B05790</ProductionCertificate>
     <CrossCertificateFile>$(SolutionDir)\DigiCert High Assurance EV Root CA.crt</CrossCertificateFile>
+    <TestCertificate>CN="WDKTestCert Benjamin,132277919481947922" | 0E33DBA13D3AF4CA5BA140EF6C35C50652292AAB</TestCertificate>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release_CPP|Win32'">
     <SignMode>ProductionSign</SignMode>
@@ -24,8 +26,19 @@
     <SignMode>TestSign</SignMode>
     <ProductionCertificate>CN=On-site Dental Systems (Justin Shafer), O=On-site Dental Systems (Justin Shafer), L=North Richland Hills, S=Texas, C=US, SERIALNUMBER=A214013764, OID.2.5.4.15=Business Entity, OID.1.3.6.1.4.1.311.60.2.1.1=Tarrant County, OID.1.3.6.1.4.1.311.60.2.1.2=Texas, OID.1.3.6.1.4.1.311.60.2.1.3=US | 6B05E5CC0DB88A0D8962482ECB9CD959E1B05790</ProductionCertificate>
     <DebugDeployment>True</DebugDeployment>
-    <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
+    <DebuggerFlavor>DbgengKernelDebugger</DebuggerFlavor>
     <CrossCertificateFile>$(SolutionDir)\DigiCert High Assurance EV Root CA.crt</CrossCertificateFile>
+    <TestCertificate>CN="WDKTestCert Benjamin,132277919481947922" | 0E33DBA13D3AF4CA5BA140EF6C35C50652292AAB</TestCertificate>
+    <DbgengKernelMachineName>HP-6330</DbgengKernelMachineName>
+    <RemoveDriver>True</RemoveDriver>
+    <InstallMode>HardwareId</InstallMode>
+    <HardwareIdString>root\VID_1234&amp;PID_BEAD&amp;REV_0219</HardwareIdString>
+    <CommandLine />
+    <ScriptPath>C:\Program Files (x86)\Windows Kits\10\Testing\Tests\Utilities\DefaultDriverPackageInstallationTask.dll</ScriptPath>
+    <DbgengRemoteMachineName>HP-6330</DbgengRemoteMachineName>
+    <DeployFiles />
+    <ScriptName>Microsoft.DriverKit.DefaultDriverPackageInstallationClass.PerformDefaultDriverPackageInstallation</ScriptName>
+    <ScriptDeviceQuery />
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug_CPP|x64'">
     <SignMode>ProductionSign</SignMode>
@@ -35,9 +48,10 @@
     <CrossCertificateFile>$(SolutionDir)\DigiCert High Assurance EV Root CA.crt</CrossCertificateFile>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <SignMode>ProductionSign</SignMode>
+    <SignMode>TestSign</SignMode>
     <ProductionCertificate>CN=On-site Dental Systems (Justin Shafer), O=On-site Dental Systems (Justin Shafer), L=North Richland Hills, S=Texas, C=US, SERIALNUMBER=A214013764, OID.2.5.4.15=Business Entity, OID.1.3.6.1.4.1.311.60.2.1.1=Tarrant County, OID.1.3.6.1.4.1.311.60.2.1.2=Texas, OID.1.3.6.1.4.1.311.60.2.1.3=US | 6B05E5CC0DB88A0D8962482ECB9CD959E1B05790</ProductionCertificate>
     <CrossCertificateFile>$(SolutionDir)\DigiCert High Assurance EV Root CA.crt</CrossCertificateFile>
+    <TestCertificate>CN="WDKTestCert Benjamin,132277919481947922" | 0E33DBA13D3AF4CA5BA140EF6C35C50652292AAB</TestCertificate>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release_CPP|x64'">
     <SignMode>ProductionSign</SignMode>

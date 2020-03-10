@@ -88,7 +88,9 @@ Return Value:
     WDF_DRIVER_CONFIG		config;
     //WDF_OBJECT_ATTRIBUTES	attributes;
     WDFDRIVER				hDriver;
-	
+
+	// BM: why is this code been added compared to Shaul's version?
+#if 0
 	//
 	//// Create a framework driver object to represent our driver.
 	//
@@ -119,6 +121,7 @@ Return Value:
 		LogEventWithStatus(ERRLOG_DRIVER_FAILED, L"WdfDriverCreate", DriverObject, status);
 		return status;
 	};
+#endif
 
     //
     // Initialize WPP Tracing
