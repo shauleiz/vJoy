@@ -540,18 +540,24 @@ Return Value:
         id = GetIdFromRawPdoRequest(Request, pExtension);
         // Illegal ID
         if (id==0xFFFF) {
-			TraceEvents(TRACE_LEVEL_INFORMATION, DBG_INIT, "vJoy_EvtIoDeviceControlForRawPdo[SET_FFB_DATA]: failed with id=%x\n", id);
+			TraceEvents(TRACE_LEVEL_INFORMATION, DBG_INIT, "vJoy_EvtIoDeviceControlForRawPdo[SET_FFB_DATA]: failed with id=%d\n", id);
 			WdfRequestComplete(Request, STATUS_NO_SUCH_DEVICE);
             return;
         };
 
 
-        // Get device context for this id
+		TraceEvents(TRACE_LEVEL_INFORMATION, DBG_INIT, "vJoy_EvtIoDeviceControlForRawPdo[SET_FFB_DATA]: id=%d\n", id);
+		// Get device context for this id
         pDevContext = GetDeviceContext(pdoData->hParentDevice);
 		// Save block index
-		pDevContext->FfbReportLastCreatedBlockIndex[id] = pPIDBlock->effectBlockIndex;
+		LONG blockIdx = pPIDBlock->effectBlockIndex;
+		if (blockIdx<1) 
+			blockIdx = 1;
+		if (blockIdx>40)
+			blockIdx = 40;
+		pDevContext->FfbReportLastCreatedBlockIndex[id-1] = blockIdx-1;
 
-		TraceEvents(TRACE_LEVEL_INFORMATION, DBG_INIT, "vJoy_EvtIoDeviceControlForRawPdo[SET_FFB_DATA]: done with saved BlockIndex=%d\n", pDevContext->FfbReportLastCreatedBlockIndex[id]);
+		TraceEvents(TRACE_LEVEL_INFORMATION, DBG_INIT, "vJoy_EvtIoDeviceControlForRawPdo[SET_FFB_DATA]: done with saved BlockIndex=%d\n", blockIdx);
 
 		// WdfRequestComplete(Request, status) will be done after the switch()
 		// so we just break.

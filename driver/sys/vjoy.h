@@ -1291,6 +1291,7 @@ typedef struct _DEVICE_EXTENSION{ // Needs to be changed
 	/*
 	 When a Get report 2 is send, return lastly created block index value
 	 that was updated by userland side using an IODeviceControl().
+	 base 0..max_effect-1
 	*/
 	LONG FfbReportLastCreatedBlockIndex[MAX_N_DEVICES];
 

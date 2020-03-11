@@ -336,7 +336,7 @@ vJoyGetFeature(
         return status;
     }
 
-    TraceEvents(TRACE_LEVEL_INFORMATION, DBG_INIT, "vJoyGetFeature: reportId=%x\n", (transferPacket->reportId&0x0F));
+    TraceEvents(TRACE_LEVEL_INFORMATION, DBG_INIT, "vJoyGetFeature: id=%d, reportId=%x\n", id, (transferPacket->reportId&0x0F));
 
     ////////////////////////////////////////
     // Report ID 2
@@ -348,7 +348,7 @@ vJoyGetFeature(
     if ((transferPacket->reportId&0x0F) == 0x02) {
         ucTmp = (PUCHAR)transferPacket->reportBuffer;
         ucTmp[0] = transferPacket->reportId;
-        ucTmp[1] = (UCHAR)(devContext->FfbReportLastCreatedBlockIndex[id-1]&0xFF); // Lastly created Effect Block Index
+        ucTmp[1] = (UCHAR)((devContext->FfbReportLastCreatedBlockIndex[id-1]+1)&0xFF); // Lastly created Effect Block Index start at 1
         ucTmp[3] = 0; // Load Full = 0
         if (devContext->FfbEnable[id-1]) {
             ucTmp[2] = 1; // Load Success = 1
@@ -1808,9 +1808,9 @@ void InitializeDeviceContext(PDEVICE_EXTENSION   devContext)
     devContext->ReportDescriptor = NULL;
     devContext->positionLock = NULL;
 
-    // Default lastly created BlockIndex is 1
+    // Default lastly created BlockIndex is 0
     for (i=0; i<MAX_N_DEVICES; i++)
-        devContext->FfbReportLastCreatedBlockIndex[i] = 1;
+        devContext->FfbReportLastCreatedBlockIndex[i] = 0;
 }
 
 /*
