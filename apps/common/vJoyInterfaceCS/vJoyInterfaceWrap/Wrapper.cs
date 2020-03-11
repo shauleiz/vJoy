@@ -625,6 +625,7 @@ namespace vJoyInterfaceWrap
         public UInt32 Ffb_h_Eff_Period(IntPtr Packet, ref FFB_EFF_PERIOD Effect) { return _Ffb_h_Eff_Period( Packet, ref  Effect); }
         public UInt32 Ffb_h_EffNew(IntPtr Packet, ref FFBEType Effect) { return _Ffb_h_EffNew( Packet, ref  Effect); }
         public UInt32 Ffb_h_Eff_Ramp(IntPtr Packet, ref FFB_EFF_RAMP RampEffect) { return _Ffb_h_Eff_Ramp( Packet, ref  RampEffect);}
+        public UInt32 Ffb_h_Eff_Constant(IntPtr Packet, ref FFB_EFF_CONSTANT ConstantEffect) { return _Ffb_h_Eff_Constant(Packet, ref  ConstantEffect); }
         public bool Ffb_h_UpdatePIDBlockLoad(UInt32 rID, ref FFB_PID_BLOCK_LOAD_REPORT PIDBlock) { return _Ffb_h_UpdatePIDBlockLoad(rID, ref PIDBlock); }
 
     }
