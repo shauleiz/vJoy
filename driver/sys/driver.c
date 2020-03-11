@@ -650,6 +650,7 @@ vJoyCompleteWriteReport(
 		return status;
 	};
 
+	TraceEvents(TRACE_LEVEL_INFORMATION, DBG_INIT, "vJoyCompleteWriteReport:reportId=%d\n", transferPacket->reportId);
 	// Switch By report ID
 	switch (transferPacket->reportId)
 	{

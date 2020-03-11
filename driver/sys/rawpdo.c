@@ -522,75 +522,40 @@ Return Value:
         }
         return;
 
-        case SET_FFB_DATA:
-            /* Set the status of the FFB data like Block Index */
+    case SET_FFB_DATA:
+        /* Set the status of the FFB data like Block Index */
+		TraceEvents(TRACE_LEVEL_INFORMATION, DBG_INIT, "vJoy_EvtIoDeviceControlForRawPdo[SET_FFB_DATA]: begin\n");
+		
+		//KdBreakPoint(); // Break When loading FFB PIB Block load
+        status = WdfRequestRetrieveInputBuffer(Request, sizeof(FFB_PID_BLOCK_LOAD_REPORT), &buffer, &bufSize);
+        if (!NT_SUCCESS(status))
+            break;
+		TraceEvents(TRACE_LEVEL_INFORMATION, DBG_INIT, "vJoy_EvtIoDeviceControlForRawPdo[SET_FFB_DATA]: bytesReceived=%d\n", bufSize);
+		if (bufSize<sizeof(FFB_PID_BLOCK_LOAD_REPORT))
+            break;
+        PFFB_PID_BLOCK_LOAD_REPORT pPIDBlock = (PFFB_PID_BLOCK_LOAD_REPORT)buffer;
 
-            KdBreakPoint(); // Break When loading FFB PIB Block load
-            status = WdfRequestRetrieveInputBuffer(Request, sizeof(FFB_PID_BLOCK_LOAD_REPORT), &buffer, &bufSize);
-            if (!NT_SUCCESS(status))
-                break;
-            if (bufSize<sizeof(FFB_PID_BLOCK_LOAD_REPORT))
-                break;
-            PFFB_PID_BLOCK_LOAD_REPORT pPIDBlock = buffer;
-
-            // Get interface that this IRP came from,
-            // then get the implicated id of the top-level collection
-            id = GetIdFromRawPdoRequest(Request, pExtension);
-            // Illegal ID
-            if (id==0xFFFF) {
-                WdfRequestComplete(Request, STATUS_NO_SUCH_DEVICE);
-                return;
-            };
-
-            // Get the incoming report and compare the id in the report
-            // to the implicated id of the top-level collection
-            // They should match
-            iReport = buffer;
-            if (iReport->bDevice != id) {
-                WdfRequestComplete(Request, STATUS_CANCELLED);
-                return;
-            };
-
-            // Save block index
-            pDevContext = GetDeviceContext(pdoData->hParentDevice);
-            pDevContext->FfbReportLastCreatedBlockIndex[id] = pPIDBlock->effectBlockIndex;
-
-            // Check if there are any pending requests in the Read Report Interrupt Message Queue.
-            // If a request is found then complete the pending request.
-            WDFREQUEST           request;
-            PHID_INPUT_REPORT_V2 HidReport = NULL;
-            status = WdfIoQueueRetrieveNextRequest(pDevContext->ReadReportMsgQueue, &request);
-            if (NT_SUCCESS(status)) {
-                //
-                // IOCTL_HID_READ_REPORT is METHOD_NEITHER so WdfRequestRetrieveOutputBuffer
-                // will correctly retrieve buffer from Irp->UserBuffer. Remember that
-                // HIDCLASS provides the buffer in the Irp->UserBuffer field
-                // irrespective of the ioctl buffer type. However, framework is very
-                // strict about type checking. You cannot get Irp->UserBuffer by using
-                // WdfRequestRetrieveOutputMemory if the ioctl is not a METHOD_NEITHER
-                // internal ioctl.
-                //
-                bytesToCopy = sizeof(HID_INPUT_REPORT_V2);
-                status = WdfRequestRetrieveOutputBuffer(request, bytesToCopy, &HidReport, &bytesReturned);
-                if (!NT_SUCCESS(status)) {
-                    TraceEvents(TRACE_LEVEL_ERROR, DBG_IOCTL,
-                                "WdfRequestRetrieveOutputBuffer failed with status: 0x%x\n", status);
-                } else {
-                    // Copy the data stored in the Device Context into the the output buffer
-                    if (vJoyGetPositionData(HidReport, pDevContext, id, bytesReturned) != STATUS_SUCCESS)
-                        status = STATUS_UNSUCCESSFUL;
-                }
-
-                WdfRequestCompleteWithInformation(request, status, bytesReturned);
-
-            } else {
-                if (status == STATUS_INVALID_DEVICE_STATE)
-                    TraceEvents(TRACE_LEVEL_ERROR, DBG_IOCTL, "WdfIoQueueRetrieveNextRequest status STATUS_INVALID_DEVICE_STATE\n");
-                if (status != STATUS_NO_MORE_ENTRIES)
-                    TraceEvents(TRACE_LEVEL_ERROR, DBG_IOCTL, "WdfIoQueueRetrieveNextRequest status %08x\n", status);
-            }
-
+        // Get interface that this IRP came from,
+        // then get the implicated id of the top-level collection
+        id = GetIdFromRawPdoRequest(Request, pExtension);
+        // Illegal ID
+        if (id==0xFFFF) {
+			TraceEvents(TRACE_LEVEL_INFORMATION, DBG_INIT, "vJoy_EvtIoDeviceControlForRawPdo[SET_FFB_DATA]: failed with id=%x\n", id);
+			WdfRequestComplete(Request, STATUS_NO_SUCH_DEVICE);
             return;
+        };
+
+
+        // Get device context for this id
+        pDevContext = GetDeviceContext(pdoData->hParentDevice);
+		// Save block index
+		pDevContext->FfbReportLastCreatedBlockIndex[id] = pPIDBlock->effectBlockIndex;
+
+		TraceEvents(TRACE_LEVEL_INFORMATION, DBG_INIT, "vJoy_EvtIoDeviceControlForRawPdo[SET_FFB_DATA]: done with saved BlockIndex=%d\n", pDevContext->FfbReportLastCreatedBlockIndex[id]);
+
+		// WdfRequestComplete(Request, status) will be done after the switch()
+		// so we just break.
+		break;
 
 	case GET_DRV_DEV_EN:
 		// Get the number of devices that are currently enabled
