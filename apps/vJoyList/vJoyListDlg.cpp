@@ -7,8 +7,7 @@
 #include "vJoyList.h"
 #include "vJoyListDlg.h"
 #include "afxdialogex.h"
-#include "..\..\inc\public.h"
-#include "../../inc/vjoyinterface.h"
+#include <vjoyinterface.h>
 
 #pragma comment(lib, "vJoyInterface.lib")
 

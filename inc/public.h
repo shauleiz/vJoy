@@ -61,10 +61,14 @@ DEFINE_GUID(GUID_DEVINTERFACE_VJOY, 0x781EF630, 0x72B2, 0x11d2, 0xB8, 0x52, 0x00
 #define VJOY_INTERFACE				L"Device_"
 
 // Version parts
-#define VER_X_	0
+// Will be taken from CreateVersion.exe in gen-versioninfo.h
+#ifndef VER_H_
 #define VER_H_	2
-#define VER_M_	1
-#define VER_L_	9
+#define VER_M_	2
+#define VER_L_	0
+#define BUILD	0
+#define VER_X_	0
+#endif
 
 #define STRINGIFY_1(x)   #x
 #define STRINGIFY(x)     STRINGIFY_1(x)
@@ -240,28 +244,50 @@ typedef struct _JOYSTICK_POSITION_V2
 //-------------
 // FFB Features to be placed in vJoy's driver memory context
 
+// Max 1..40 effect block index
+#define MAX_FFB_EFFECTS_BLOCK_INDEX (0x28)
+
+#if 0
 // FFB: Create New Effect Feature Report=1
 typedef struct _FFB_NEW_EFFECT_REPORT
 {
 	BYTE	effectType;	// Enum (1..12): ET 26,27,30,31,32,33,34,40,41,42,43,28
 	USHORT	byteCount;	// 0..511
 } FFB_NEW_EFFECT_REPORT, * PFFB_NEW_EFFECT_REPORT;
+#endif
 
 // FFB: PID Block Load Feature Report=2
+// Only one per device
 typedef struct _FFB_PID_BLOCK_LOAD_REPORT
 {
-	BYTE    effectBlockIndex;	// 1..40
-	BYTE	loadStatus;	// 1=Success,2=Full,3=Error
-	USHORT	ramPoolAvailable;	// =0 or 0xFFFF?
+    BYTE    EffectBlockIndex;	// 1..40
+    BYTE	LoadStatus;	        // 0 ongoing, 1=Success,2=Full,3=Error
+    USHORT	RAMPoolAvailable;	// =0 if full, or sizeof(FFB_PID_EFFECT_STATE_REPORT) * (40 - created) 
 } FFB_PID_BLOCK_LOAD_REPORT, * PFFB_PID_BLOCK_LOAD_REPORT;
 
 // FFB: PID Pool Feature Report=3
 typedef struct _FFB_PID_POOL_REPORT
 {
-	USHORT	ramPoolSize;	// ?
-	BYTE	maxSimultaneousEffects;	// ?? 40?
-	BYTE	memoryManagement;	// Bits: 0=DeviceManagedPool, 1=SharedParameterBlocks
+    USHORT	RAMPoolSize;	// 0xFFFF
+    BYTE	MaxSimultaneousEffects;	// 10
+    BYTE	MemoryManagement;	// Bits: 0=DeviceManagedPool, 1=SharedParameterBlocks
 } FFB_PID_POOL_REPORT, * PFFB_PID_POOL_REPORT;
+
+// FFB: PID Effect State Report
+// Up to MAX_FFB_EFFECTS_BLOCK_INDEX per device
+typedef struct _FFB_PID_EFFECT_STATE_REPORT
+{
+    BYTE	EffectState;	// ?
+} FFB_PID_EFFECT_STATE_REPORT, * PFFB_PID_EFFECT_STATE_REPORT;
+
+// All FFB PID data, one per device
+// This struct will be transfered between vJoy and client application
+typedef struct _FFB_DEVICE_PID
+{
+    FFB_PID_BLOCK_LOAD_REPORT   PIDBlockLoad;
+    FFB_PID_POOL_REPORT         PIDPool;
+    FFB_PID_EFFECT_STATE_REPORT EffectState[MAX_FFB_EFFECTS_BLOCK_INDEX];
+} FFB_DEVICE_PID, * PFFB_DEVICE_PID;
 
 
 
@@ -289,6 +315,8 @@ typedef struct _FFB_PID_POOL_REPORT
 #define HID_USAGE_DMPR  0x41    //    Usage ET Damper
 #define HID_USAGE_INRT  0x42    //    Usage ET Inertia
 #define HID_USAGE_FRIC  0x43    //    Usage ET Friction
+#define HID_USAGE_CUSTM 0x28    //    Usage ET Custom Force Data
+#define HID_USAGE_RESERVD 0x29  //    Usage ET Reserved (unused)
 
 
 // HID Descriptor definitions - FFB Report IDs

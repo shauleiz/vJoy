@@ -15,6 +15,9 @@
 #define VJOYINTERFACE_API
 #endif
 
+// Add vJoy driver's own public defines (IOCtl, HID, memory structs like JOYSTICK_POSITION_V2)
+#include <public.h>
+
 ///////////////////////////// vJoy device (collection) status ////////////////////////////////////////////
 #ifndef VJDSTAT
 #define VJDSTAT
@@ -206,6 +209,7 @@ typedef struct _FFB_EFF_REPORT {
 	WORD		Duration;// Value in milliseconds. 0xFFFF means infinite
 	WORD		TrigerRpt;
 	WORD		SamplePrd;
+	WORD		StartDelay;
 	BYTE		Gain;
 	BYTE		TrigerBtn;
 	BOOL		Polar; // How to interpret force direction Polar (0-360°) or Cartesian (X,Y)
@@ -215,6 +219,7 @@ typedef struct _FFB_EFF_REPORT {
 		BYTE	DirX; // X direction: Positive values are To the right of the center (X); Negative are Two's complement
 	};
 	BYTE		DirY; // Y direction: Positive values are below the center (Y); Negative are Two's complement
+    
 } FFB_EFF_REPORT, *PFFB_EFF_REPORT;
 //} FFB_EFF_CONST, *PFFB_EFF_CONST;
 
@@ -251,36 +256,9 @@ typedef struct _FFB_EFF_ENVLP {
 	DWORD 		FadeTime;	   // Time of the fading: 0 - 4294967295
 } FFB_EFF_ENVLP, *PFFB_EFF_ENVLP;
 
-
-// structs transferred in public.h
-#if 0
-//-------------
-// FFB Features to be placed in vJoy's driver memory context
-
-// FFB: Create New Effect Feature Report=1
-typedef struct _FFB_NEW_EFFECT_REPORT
-{
-	BYTE	effectType;	// Enum (1..12): ET 26,27,30,31,32,33,34,40,41,42,43,28
-	USHORT	byteCount;	// 0..511
-} FFB_NEW_EFFECT_REPORT, * PFFB_NEW_EFFECT_REPORT;
-
-// FFB: PID Block Load Feature Report=2
-typedef struct _FFB_PID_BLOCK_LOAD_REPORT
-{
-	BYTE    effectBlockIndex;	// 1..40
-	BYTE	loadStatus;	// 1=Success,2=Full,3=Error
-	USHORT	ramPoolAvailable;	// =0 or 0xFFFF?
-} FFB_PID_BLOCK_LOAD_REPORT, * PFFB_PID_BLOCK_LOAD_REPORT;
-
-// FFB: PID Pool Feature Report=3
-typedef struct _FFB_PID_POOL_REPORT
-{
-	USHORT	ramPoolSize;	// ?
-	BYTE	maxSimultaneousEffects;	// ?? 40?
-	BYTE	memoryManagement;	// Bits: 0=DeviceManagedPool, 1=SharedParameterBlocks
-} FFB_PID_POOL_REPORT, * PFFB_PID_POOL_REPORT;
-#endif
-
+//NOTE:
+// All other FFB structs and defines (PID, Effect Block Status, ...) are in public.h
+// The only struct mainly used is FFB_DEVICE_PID, one per device
 
 // SendMessage event when FFB data is ready
 #define FFB_DATA_READY	 (WM_USER+31)
@@ -389,7 +367,7 @@ namespace vJoyNS {
 	// Added in 2.1.6
 	VJOYINTERFACE_API DWORD		__cdecl Ffb_h_Eff_Constant(const FFB_DATA * Packet, FFB_EFF_CONSTANT *  ConstantEffect);
 	// Added in 2.1.10
-	VJOYINTERFACE_API BOOL		__cdecl Ffb_h_UpdatePIDBlockLoad(UINT rID, FFB_PID_BLOCK_LOAD_REPORT* PIDBlockLoad); // Update the PID Block load of the specified vJoy Device.
+	VJOYINTERFACE_API BOOL		__cdecl Ffb_h_UpdatePID(UINT rID, FFB_DEVICE_PID* DevicePID); // Update the Ffb PID of the specified vJoy Device.
 
 #pragma endregion
 

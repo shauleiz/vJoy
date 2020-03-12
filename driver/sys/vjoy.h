@@ -60,7 +60,7 @@ Revision History:
 #include <TCHAR.H>
 #include <errcodes.h>
 
-#include "../../inc/public.h"
+#include <public.h>
 
 #define _DRIVER_NAME_					"VJOY: "
 #define FEATURE_COLLECTION_REPORT_ID	3
@@ -1270,7 +1270,7 @@ typedef struct _DEVICE_EXTENSION{ // Needs to be changed
 	///////////////  Force Feedback Section (FFB) (Start) ///////////////////////////////////////////
 	/*
 	Two FFB sets of manual queues.
-	FfbWriteQ[] (WriteQ): DirectInptut requests IOCTL_HID_SET_FEATURE and IOCTL_HID_WRITE_REPORT
+	FfbWriteQ[] (WriteQ): DirectInput requests IOCTL_HID_SET_FEATURE and IOCTL_HID_WRITE_REPORT
 	are forwarded to one of these manual queue according to the device ID.
 	FfbReadQ[] (ReadQ): Feeder GET_FFB_DATA is always forwarded to one of these manual queue according to the device ID.
 	The index of the Queue is ID-1 (Range 0-15)
@@ -1291,9 +1291,12 @@ typedef struct _DEVICE_EXTENSION{ // Needs to be changed
 	/*
 	 When a Get report 2 is send, return lastly created block index value
 	 that was updated by userland side using an IODeviceControl().
-	 base 0..max_effect-1
+	 base 1..max_effect. A 0 value means not yet created
 	*/
 	LONG FfbReportLastCreatedBlockIndex[MAX_N_DEVICES];
+	
+	// Per device PID data
+	FFB_DEVICE_PID FfbPIDData[MAX_N_DEVICES];
 
 	/*
 	FfbXferLock:

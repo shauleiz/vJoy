@@ -1911,15 +1911,16 @@ namespace vJoyNS {
 		Effect->Duration = (WORD)((Packet->data[4] << 8) + (Packet->data[3]));
 		Effect->TrigerRpt = (WORD)((Packet->data[6] << 8) + (Packet->data[5]));
 		Effect->SamplePrd = (WORD)((Packet->data[8] << 8) + (Packet->data[7]));
-		Effect->Gain = Packet->data[9];
-		Effect->TrigerBtn = Packet->data[10];
-		Effect->Polar = (Packet->data[11] == 0x04);
+		Effect->StartDelay = (WORD)((Packet->data[10] << 8) + (Packet->data[9]));
+		Effect->Gain = Packet->data[11];
+		Effect->TrigerBtn = Packet->data[12];
+		Effect->Polar = (Packet->data[13] == 0x04);
 		if (Effect->Polar)
-			Effect->Direction = Packet->data[12];
+			Effect->Direction = Packet->data[14];
 		else
 		{
-			Effect->DirX = Packet->data[12];
-			Effect->DirY = Packet->data[13];
+			Effect->DirX = Packet->data[14];
+			Effect->DirY = Packet->data[15];
 		}
 		return ERROR_SUCCESS;
 	}
@@ -2144,7 +2145,7 @@ namespace vJoyNS {
 		return ERROR_SUCCESS;
 	}
 
-	VJOYINTERFACE_API BOOL		__cdecl Ffb_h_UpdatePIDBlockLoad(UINT rID, FFB_PID_BLOCK_LOAD_REPORT* PIDBlockLoad)
+	VJOYINTERFACE_API BOOL		__cdecl Ffb_h_UpdatePID(UINT rID, FFB_DEVICE_PID* PIDBlockLoad)
 		// Update the PID Block load of the specified vJoy Device.
 	{
 		PVOID pData = PIDBlockLoad;
@@ -2152,7 +2153,7 @@ namespace vJoyNS {
 			return FALSE;
 
 		UINT	IoCode = SET_FFB_DATA;
-		UINT	IoSize = sizeof(FFB_PID_BLOCK_LOAD_REPORT);
+		UINT	IoSize = sizeof(FFB_DEVICE_PID);
 		ULONG	bytes;
 		HANDLE	hIoctlEvent;
 		OVERLAPPED OverLapped ={ 0 };

@@ -22,7 +22,7 @@ static void find_delim(char *s, char **res, int *ix)
 
 int main(int argc, char **argv)
 {
-	unsigned int major = 2, mid = 1, minor = 9, commits = 2;
+	unsigned int major = 2, mid = 2, minor = 0, commits = 0;
 	char vbuf[4096] = { 0 };
 	char *version="0.0.0", *ncommits="0", *sha="0";
 	FILE *po;

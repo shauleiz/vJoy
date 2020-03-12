@@ -170,16 +170,18 @@ namespace vJoyInterfaceWrap
             [FieldOffset(12)]
             public UInt16 SamplePrd;
             [FieldOffset(14)]
-            public Byte Gain;
-            [FieldOffset(15)]
-            public Byte TrigerBtn;
+            public UInt16 StartDelay;
             [FieldOffset(16)]
+            public Byte Gain;
+            [FieldOffset(17)]
+            public Byte TrigerBtn;
+            [FieldOffset(18)]
             public bool Polar; // How to interpret force direction Polar (0-360°) or Cartesian (X,Y)
-            [FieldOffset(20)]
+            [FieldOffset(22)]
             public Byte Direction; // Polar direction: (0x00-0xFF correspond to 0-360°)
-            [FieldOffset(20)]
+            [FieldOffset(22)]
             public Byte DirX; // X direction: Positive values are To the right of the center (X); Negative are Two's complement
-            [FieldOffset(21)]
+            [FieldOffset(23)]
             public Byte DirY; // Y direction: Positive values are below the center (Y); Negative are Two's complement
         }
 
@@ -197,16 +199,18 @@ namespace vJoyInterfaceWrap
             [FieldOffset(12)]
             public UInt16 SamplePrd;
             [FieldOffset(14)]
-            public Byte Gain;
-            [FieldOffset(15)]
-            public Byte TrigerBtn;
+            public UInt16 StartDelay;
             [FieldOffset(16)]
+            public Byte Gain;
+            [FieldOffset(17)]
+            public Byte TrigerBtn;
+            [FieldOffset(18)]
             public bool Polar; // How to interpret force direction Polar (0-360°) or Cartesian (X,Y)
-            [FieldOffset(20)]
+            [FieldOffset(22)]
             public Byte Direction; // Polar direction: (0x00-0xFF correspond to 0-360°)
-            [FieldOffset(20)]
+            [FieldOffset(22)]
             public Byte DirX; // X direction: Positive values are To the right of the center (X); Negative are Two's complement
-            [FieldOffset(21)]
+            [FieldOffset(23)]
             public Byte DirY; // Y direction: Positive values are below the center (Y); Negative are Two's complement
         }
 
@@ -284,17 +288,49 @@ namespace vJoyInterfaceWrap
         }
 
 
-        [StructLayout(LayoutKind.Explicit)]
+        public const int MAX_FFB_EFFECTS_BLOCK_INDEX = 0x28;
+
+        [StructLayout(LayoutKind.Explicit, Size = 4)]
         public struct FFB_PID_BLOCK_LOAD_REPORT
         {
             [FieldOffset(0)]
-            public Byte effectBlockIndex; // 1..40
-            [FieldOffset(4)]
-            public Byte loadStatus;             // 1=Success,2=Full,3=Error
-            [FieldOffset(8)]
-            public UInt16 ramPoolAvailable;    // =0 or 0xFFFF?
+            public Byte EffectBlockIndex;	// 1..40
+            [FieldOffset(1)]
+            public Byte LoadStatus;	        // 0 ongoing, 1=Success,2=Full,3=Error
+            [FieldOffset(2)]
+            public UInt16 RAMPoolAvailable;	// =0 if full, or sizeof(FFB_PID_EFFECT_STATE_REPORT) * (40 - created
         }
-    
+
+        [StructLayout(LayoutKind.Explicit, Size = 4)]
+        public struct FFB_PID_POOL_REPORT
+        {
+            [FieldOffset(0)]
+            public UInt16 RAMPoolSize;	// 0xFFFF
+            [FieldOffset(2)]
+            public Byte MaxSimultaneousEffects;	// 10
+            [FieldOffset(3)]
+            public Byte MemoryManagement;	// Bits: 0=DeviceManagedPool, 1=SharedParameterBlocks
+        }
+
+        [StructLayout(LayoutKind.Explicit, Size = 1)]
+        public struct FFB_PID_EFFECT_STATE_REPORT
+        {
+            [FieldOffset(0)]
+            public Byte EffectState;
+        }
+
+        [StructLayout(LayoutKind.Explicit, Size = 48)]
+        public struct FFB_DEVICE_PID
+        {
+            [FieldOffset(0)]
+            public FFB_PID_BLOCK_LOAD_REPORT PIDBlockLoad;
+            [FieldOffset(4)]
+            public FFB_PID_POOL_REPORT PIDPool;
+            [FieldOffset(8)]
+            [MarshalAs(UnmanagedType.ByValArray, SizeConst = MAX_FFB_EFFECTS_BLOCK_INDEX)]
+            public FFB_PID_EFFECT_STATE_REPORT []EffectState;
+        }
+
 
         /***************************************************/
         /***** Import from file vJoyInterface.dll (C) ******/
@@ -489,8 +525,8 @@ namespace vJoyInterfaceWrap
          [DllImport("vJoyInterface.dll", EntryPoint = "Ffb_h_Eff_Constant")]
          private static extern UInt32 _Ffb_h_Eff_Constant(IntPtr Packet, ref FFB_EFF_CONSTANT ConstantEffect);
 
-        [DllImport("vJoyInterface.dll", EntryPoint = "Ffb_h_UpdatePIDBlockLoad")]
-        private static extern bool _Ffb_h_UpdatePIDBlockLoad(UInt32 rID, ref FFB_PID_BLOCK_LOAD_REPORT PIDBlockLoad);
+        [DllImport("vJoyInterface.dll", EntryPoint = "Ffb_h_UpdatePID")]
+        private static extern bool _Ffb_h_UpdatePID(UInt32 rID, ref FFB_DEVICE_PID PIDBlockLoad);
 
 
 
@@ -626,7 +662,7 @@ namespace vJoyInterfaceWrap
         public UInt32 Ffb_h_EffNew(IntPtr Packet, ref FFBEType Effect) { return _Ffb_h_EffNew( Packet, ref  Effect); }
         public UInt32 Ffb_h_Eff_Ramp(IntPtr Packet, ref FFB_EFF_RAMP RampEffect) { return _Ffb_h_Eff_Ramp( Packet, ref  RampEffect);}
         public UInt32 Ffb_h_Eff_Constant(IntPtr Packet, ref FFB_EFF_CONSTANT ConstantEffect) { return _Ffb_h_Eff_Constant(Packet, ref  ConstantEffect); }
-        public bool Ffb_h_UpdatePIDBlockLoad(UInt32 rID, ref FFB_PID_BLOCK_LOAD_REPORT PIDBlock) { return _Ffb_h_UpdatePIDBlockLoad(rID, ref PIDBlock); }
+        public bool Ffb_h_UpdatePID(UInt32 rID, ref FFB_DEVICE_PID PID) { return _Ffb_h_UpdatePID(rID, ref PID); }
 
     }
 }

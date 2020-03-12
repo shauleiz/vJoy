@@ -1693,22 +1693,36 @@ void CreateFfbDesc(std::vector<BYTE> * buffer, BYTE ReportId)
 // Mask: Bit-mask representing the effects required
 void ModifyFfbEffectDesc(std::vector<BYTE> * buffer, UINT16 Mask)
 {
-    int Effect[] {0x26, 0x27, 0x30, 0x31, 0x32, 0x33, 0x34, 0x40, 0x41, 0x42, 0x43};
+    int Effect[] { HID_USAGE_CONST,
+        HID_USAGE_RAMP,
+        HID_USAGE_SQUR,
+        HID_USAGE_SINE,
+        HID_USAGE_TRNG,
+        HID_USAGE_STUP,
+        HID_USAGE_STDN,
+        HID_USAGE_SPRNG,
+        HID_USAGE_DMPR,
+        HID_USAGE_INRT,
+        HID_USAGE_FRIC
+    };
     BYTE nEff = sizeof(Effect) / sizeof(int);
 
     // Search for sequence(0x09, 0x25, 0xA1, 0x02)
     for (auto &i : *buffer)
     {
-        if ((i == 0x09) && (*std::next(&i, 1) == 0x25) && (*std::next(&i, 2) == 0xA1) && (*std::next(&i, 3) == 0x02))
+        if ((i == 0x09) && (*std::next(&i, 1) == 0x25) && (*std::next(&i, 2) == 0xA1) && (*std::next(&i, 3) == 0x02)) {
             // Sequence found - now replace by going over the effects 
-            for (BYTE e = 0; e < nEff ; e++)
-            {
-                if ((Mask >> (nEff-e-1)) & 0x01)
+            for (BYTE e = 0; e < nEff; e++) {
+                if ((Mask >> (nEff-e-1)) & 0x01) {
+                    // Fill all effects types
                     *std::next(&i, 5 + e * 2) = Effect[e];
-                else
-                    *std::next(&i, 5 + e * 2) = 0x29;
-            };
-    };
+                } else {
+                    // Fill unused effect (reserved)
+                    *std::next(&i, 5 + e * 2) = HID_USAGE_RESERVD;
+                }
+            }
+        }
+    }
 }
 
 //// Calculate FFB State

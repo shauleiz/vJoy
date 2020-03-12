@@ -309,7 +309,7 @@
     <IntDir>$(Platform)\$(Configuration)\</IntDir>
     <EnableInf2cat>false</EnableInf2cat>
     <Inf2CatWindowsVersionList>10_$(DDKPlatform);7_$(DDKPlatform)</Inf2CatWindowsVersionList>
-    <IncludePath>$(KM_IncludePath);$(KMDF_INC_PATH)$(KMDF_VER_PATH);$(SolutionDir)Inc;$(IncludePath)</IncludePath>
+    <IncludePath>$(ProjectDir)..\..\inc;$(KM_IncludePath);$(KMDF_INC_PATH)$(KMDF_VER_PATH);$(IncludePath)</IncludePath>
     <ExecutablePath>$(ExecutablePath);$(WDKContentRoot)bin\x86;$(WDKContentRoot)tools\tracing\x64;$(LOCALAPPDATA)\Atlassian\SourceTree\git_local\bin</ExecutablePath>
     <PostBuildEventUseInBuild>false</PostBuildEventUseInBuild>
     <CodeAnalysisRuleSet>..\..\..\..\..\..\..\Program Files (x86)\Windows Kits\10\CodeAnalysis\DriverMinimumRules.ruleset</CodeAnalysisRuleSet>
@@ -692,6 +692,7 @@
     <Inf Include="vjoy.inx" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\inc\public.h" />
     <ClInclude Include="errcodes.h" />
     <ClInclude Include="hidReportDesc.h" />
     <ClInclude Include="hidReportDescSingle.h" />

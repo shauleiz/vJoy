@@ -53,7 +53,7 @@ vjoy.Inst_CoInstaller_CopyFiles = 11
 
 ; For Win7 and later so that we can use inbox HID-KMDF mapper
 [Vendor.NT$ARCH$.6.1]
-%vjoy%    = vjoy.Inst.Win7, root\VID_1234&PID_BEAD&REV_0219
+%vjoy%    = vjoy.Inst.Win7, root\VID_1234&PID_BEAD&REV_0220
 
 
 ;===============================================================

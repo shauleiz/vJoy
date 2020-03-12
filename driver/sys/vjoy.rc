@@ -1,6 +1,6 @@
 #include <windows.h>
 #include <ntverp.h>
-#include "..\..\inc\public.h"
+#include <public.h>
 #include <gen-versioninfo.h>
 
 #undef	VER_PRODUCTNAME_STR

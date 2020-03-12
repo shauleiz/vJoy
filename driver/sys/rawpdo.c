@@ -527,13 +527,13 @@ Return Value:
 		TraceEvents(TRACE_LEVEL_INFORMATION, DBG_INIT, "vJoy_EvtIoDeviceControlForRawPdo[SET_FFB_DATA]: begin\n");
 		
 		//KdBreakPoint(); // Break When loading FFB PIB Block load
-        status = WdfRequestRetrieveInputBuffer(Request, sizeof(FFB_PID_BLOCK_LOAD_REPORT), &buffer, &bufSize);
+        status = WdfRequestRetrieveInputBuffer(Request, sizeof(FFB_DEVICE_PID), &buffer, &bufSize);
         if (!NT_SUCCESS(status))
             break;
-		TraceEvents(TRACE_LEVEL_INFORMATION, DBG_INIT, "vJoy_EvtIoDeviceControlForRawPdo[SET_FFB_DATA]: bytesReceived=%d\n", bufSize);
-		if (bufSize<sizeof(FFB_PID_BLOCK_LOAD_REPORT))
+		TraceEvents(TRACE_LEVEL_INFORMATION, DBG_INIT, "vJoy_EvtIoDeviceControlForRawPdo[SET_FFB_DATA]: bytesReceived=%d, expected=%d\n", bufSize, sizeof(FFB_DEVICE_PID));
+		if (bufSize<sizeof(FFB_DEVICE_PID))
             break;
-        PFFB_PID_BLOCK_LOAD_REPORT pPIDBlock = (PFFB_PID_BLOCK_LOAD_REPORT)buffer;
+		PFFB_DEVICE_PID pPID = (PFFB_DEVICE_PID)buffer;
 
         // Get interface that this IRP came from,
         // then get the implicated id of the top-level collection
@@ -549,15 +549,10 @@ Return Value:
 		TraceEvents(TRACE_LEVEL_INFORMATION, DBG_INIT, "vJoy_EvtIoDeviceControlForRawPdo[SET_FFB_DATA]: id=%d\n", id);
 		// Get device context for this id
         pDevContext = GetDeviceContext(pdoData->hParentDevice);
-		// Save block index
-		LONG blockIdx = pPIDBlock->effectBlockIndex;
-		if (blockIdx<1) 
-			blockIdx = 1;
-		if (blockIdx>40)
-			blockIdx = 40;
-		pDevContext->FfbReportLastCreatedBlockIndex[id-1] = blockIdx-1;
+		// Copy PID data
+		pDevContext->FfbPIDData[id-1] = *pPID;
 
-		TraceEvents(TRACE_LEVEL_INFORMATION, DBG_INIT, "vJoy_EvtIoDeviceControlForRawPdo[SET_FFB_DATA]: done with saved BlockIndex=%d\n", blockIdx);
+		TraceEvents(TRACE_LEVEL_INFORMATION, DBG_INIT, "vJoy_EvtIoDeviceControlForRawPdo[SET_FFB_DATA]: done with saved BlockIndex=%d\n", pPID->PIDBlockLoad.EffectBlockIndex);
 
 		// WdfRequestComplete(Request, status) will be done after the switch()
 		// so we just break.

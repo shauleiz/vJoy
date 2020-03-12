@@ -348,13 +348,15 @@ vJoyGetFeature(
     if ((transferPacket->reportId&0x0F) == 0x02) {
         ucTmp = (PUCHAR)transferPacket->reportBuffer;
         ucTmp[0] = transferPacket->reportId;
-        ucTmp[1] = (UCHAR)((devContext->FfbReportLastCreatedBlockIndex[id-1]+1)&0xFF); // Lastly created Effect Block Index start at 1
-        ucTmp[3] = 0; // Load Full = 0
+        // Lastly created Effect Block Index start at 1. 0 means not yet created
+        ucTmp[1] = (UCHAR)((devContext->FfbPIDData[id-1].PIDBlockLoad.EffectBlockIndex)&0xFF);
         if (devContext->FfbEnable[id-1]) {
-            ucTmp[2] = 1; // Load Success = 1
-            ucTmp[4] = 0; // Load Error =0
+            ucTmp[2] = (UCHAR)((devContext->FfbPIDData[id-1].PIDBlockLoad.LoadStatus)&0xFF);
+            ucTmp[3] = (UCHAR)((devContext->FfbPIDData[id-1].PIDBlockLoad.RAMPoolAvailable)&0xFF); 
+            ucTmp[4] = (UCHAR)((devContext->FfbPIDData[id-1].PIDBlockLoad.RAMPoolAvailable>>8)&0xFF);; // Load Error =0
         } else {
             ucTmp[2] = 0; // Load Success = 0
+            ucTmp[3] = 0; // Load Full = 0
             ucTmp[4] = 1; // Load Error =1
         };
         TraceEvents(TRACE_LEVEL_INFORMATION, DBG_INIT, "vJoyGetFeature: ucTmp[1]=%d\n", ucTmp[1]);
@@ -1808,9 +1810,21 @@ void InitializeDeviceContext(PDEVICE_EXTENSION   devContext)
     devContext->ReportDescriptor = NULL;
     devContext->positionLock = NULL;
 
-    // Default lastly created BlockIndex is 0
-    for (i=0; i<MAX_N_DEVICES; i++)
-        devContext->FfbReportLastCreatedBlockIndex[i] = 0;
+    // Default lastly created BlockIndex is 0 (not created)
+    for (i=0; i<MAX_N_DEVICES; i++) {
+        PFFB_DEVICE_PID pid = &(devContext->FfbPIDData[i]);
+        pid->PIDPool.MaxSimultaneousEffects = 10;
+        pid->PIDPool.MemoryManagement = 0;
+        pid->PIDPool.RAMPoolSize = 0xFFFF;
+
+        pid->PIDBlockLoad.EffectBlockIndex = 1;
+        pid->PIDBlockLoad.LoadStatus = 0;
+        pid->PIDBlockLoad.RAMPoolAvailable = 0xFFFF;
+
+        for (int j=0; j<MAX_FFB_EFFECTS_BLOCK_INDEX; j++) {
+            pid->EffectState[j].EffectState = 0;
+        }
+    }
 }
 
 /*
