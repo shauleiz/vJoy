@@ -1822,7 +1822,7 @@ void InitializeDeviceContext(PDEVICE_EXTENSION   devContext)
         pid->PIDBlockLoad.RAMPoolAvailable = 0xFFFF;
 
         for (int j=0; j<MAX_FFB_EFFECTS_BLOCK_INDEX; j++) {
-            pid->EffectState[j].EffectState = 0;
+            pid->EffectStates[j].EffectState = 0;
         }
     }
 }

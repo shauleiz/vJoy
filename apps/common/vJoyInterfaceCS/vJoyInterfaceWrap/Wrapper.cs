@@ -328,7 +328,7 @@ namespace vJoyInterfaceWrap
             public FFB_PID_POOL_REPORT PIDPool;
             [FieldOffset(8)]
             [MarshalAs(UnmanagedType.ByValArray, SizeConst = MAX_FFB_EFFECTS_BLOCK_INDEX)]
-            public FFB_PID_EFFECT_STATE_REPORT []EffectState;
+            public FFB_PID_EFFECT_STATE_REPORT []EffectStates;
         }
 
 

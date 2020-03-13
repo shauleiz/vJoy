@@ -121,6 +121,8 @@ https://docs.microsoft.com/en-us/windows-hardware/drivers/gettingstarted/writing
 A good tutorial on how to setup your target computer and start a debug session
 is available here:
 
+https://docs.microsoft.com/en-us/windows-hardware/drivers/gettingstarted/provision-a-target-computer-wdk-8-1
+
 https://docs.microsoft.com/en-us/windows-hardware/drivers/debugger/debug-universal-drivers---step-by-step-lab--echo-kernel-mode-
 
 For NET debugging, see also:
