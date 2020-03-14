@@ -3538,7 +3538,7 @@ void	CalcInitValue(USHORT id, struct DEVICE_INIT_VALS* data_buf)
 {
     UINT mask_device = 0, mask_master = 0;
     DEVICE_INIT_VALS  init_master;
-    UCHAR InitValAxis[VJOY_NUMBER_OF_AXES] = { 50, 50, 50, 0, 0, 0, 0, 0 };
+    UCHAR InitValAxis[VJOY_NUMBER_OF_AXES] = { 50, 50, 50, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
     UCHAR InitValPov[VJOY_NUMBER_OF_HAT] = { (UCHAR)-1, (UCHAR)-1, (UCHAR)-1, (UCHAR)-1 };
     UCHAR ButtonMask[VJOY_NUMBER_OF_BUTTONS/8] = { 0 };
     int i, j;
@@ -3596,7 +3596,9 @@ void	CalcInitValue(USHORT id, struct DEVICE_INIT_VALS* data_buf)
 
 UINT	GetInitValueFromRegistry(USHORT id, struct DEVICE_INIT_VALS* data_buf)
 {
-    PCWSTR	Axes[VJOY_NUMBER_OF_AXES] = { L"X", L"Y", L"Z", L"RX", L"RY", L"RZ", L"SL1", L"SL2" };
+    PCWSTR	Axes[VJOY_NUMBER_OF_AXES] = {
+        L"X", L"Y", L"Z", L"RX", L"RY", L"RZ", L"SL1", L"SL2", 
+        L"WHL", L"ACC", L"BRK", L"CLU", L"STE", L"AIL", L"RUD", L"THR" };
     UCHAR	nAxes = 0;
     PCWSTR	Povs[VJOY_NUMBER_OF_HAT] = { L"POV1", L"POV2", L"POV3", L"POV4" };
     UCHAR	nPovs = 0;
