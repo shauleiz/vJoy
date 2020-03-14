@@ -53,6 +53,14 @@ static const int g_Controls[] = {
     IDC_CHK_RZ,
     IDC_CHK_SL0,
     IDC_CHK_SL1,
+    IDC_CHK_WHEEL,
+    IDC_CHK_ACCELERATOR,
+    IDC_CHK_BRAKE,
+    IDC_CHK_CLUTCH,
+    IDC_CHK_STEERING,
+    IDC_CHK_AILERON,
+    IDC_CHK_RUDDER,
+    IDC_CHK_THROTTLE,
     IDC_BTN_GRP,
     IDC_EDIT1,
     IDC_NBTN,
@@ -64,7 +72,7 @@ static const int g_Controls[] = {
     IDC_REVT_BTN,
     IDC_ADDDEL_BTN,
     IDC_STATUS,
-    IDC_CHK_ENVJOY
+    IDC_CHK_ENVJOY,
 };
 
 // Forward declarations of functions included in this code module:
@@ -310,6 +318,15 @@ INT_PTR CALLBACK DlgTabCB(HWND hDlgTab, UINT message, WPARAM wParam, LPARAM lPar
         case IDC_CHK_RZ:
         case IDC_CHK_SL0:
         case IDC_CHK_SL1:
+        case IDC_CHK_WHEEL:
+        case IDC_CHK_ACCELERATOR:
+        case IDC_CHK_BRAKE:
+        case IDC_CHK_CLUTCH:
+        case IDC_CHK_STEERING:
+        case IDC_CHK_AILERON:
+        case IDC_CHK_RUDDER:
+        case IDC_CHK_THROTTLE:
+
         case IDC_POV_DESC:
         case IDC_POV_CONT:
         case IDC_CHK_FFB_CONST:
@@ -713,6 +730,16 @@ void EnableTab(int iTab, BOOL Enable)
     EnableWindow(GetDlgItem(hDlgTab, IDC_CHK_RZ), Enable);
     EnableWindow(GetDlgItem(hDlgTab, IDC_CHK_SL0), Enable);
     EnableWindow(GetDlgItem(hDlgTab, IDC_CHK_SL1), Enable);
+
+    EnableWindow(GetDlgItem(hDlgTab, IDC_CHK_WHEEL), Enable);
+    EnableWindow(GetDlgItem(hDlgTab, IDC_CHK_ACCELERATOR), Enable);
+    EnableWindow(GetDlgItem(hDlgTab, IDC_CHK_BRAKE), Enable);
+    EnableWindow(GetDlgItem(hDlgTab, IDC_CHK_CLUTCH), Enable);
+    EnableWindow(GetDlgItem(hDlgTab, IDC_CHK_STEERING), Enable);
+    EnableWindow(GetDlgItem(hDlgTab, IDC_CHK_AILERON), Enable);
+    EnableWindow(GetDlgItem(hDlgTab, IDC_CHK_RUDDER), Enable);
+    EnableWindow(GetDlgItem(hDlgTab, IDC_CHK_THROTTLE), Enable);
+
     EnableWindow(GetDlgItem(hDlgTab, IDC_NBTN), Enable);
     EnableWindow(GetDlgItem(hDlgTab, IDC_POV_DESC), Enable);
     EnableWindow(GetDlgItem(hDlgTab, IDC_POV_CONT), Enable);
@@ -733,6 +760,15 @@ void PopulateTab(int iTab)
     BOOL Exist_SL0 = TRUE;
     BOOL Exist_SL1 = TRUE;
 
+    BOOL Exist_Wheel = TRUE;
+    BOOL Exist_Accelerator = TRUE;
+    BOOL Exist_Brake = TRUE;
+    BOOL Exist_Clutch = TRUE;
+    BOOL Exist_Steering = TRUE;
+    BOOL Exist_Aileron = TRUE;
+    BOOL Exist_Rudder = TRUE;
+    BOOL Exist_Throttle = TRUE;
+
     int nBtn = 32;
     int nDiscPov = 0;
     int nContPov = 0;
@@ -748,6 +784,15 @@ void PopulateTab(int iTab)
         Exist_RZ = vJoyDevice[iTab]->AxisExists(HID_USAGE_RZ);
         Exist_SL0 = vJoyDevice[iTab]->AxisExists(HID_USAGE_SL0);
         Exist_SL1 = vJoyDevice[iTab]->AxisExists(HID_USAGE_SL1);
+
+        Exist_Wheel = vJoyDevice[iTab]->AxisExists(HID_USAGE_WHL);
+        Exist_Accelerator = vJoyDevice[iTab]->AxisExists(HID_USAGE_ACCELERATOR);
+        Exist_Brake = vJoyDevice[iTab]->AxisExists(HID_USAGE_BRAKE);
+        Exist_Clutch = vJoyDevice[iTab]->AxisExists(HID_USAGE_CLUTCH);
+        Exist_Steering = vJoyDevice[iTab]->AxisExists(HID_USAGE_STEERING);
+        Exist_Aileron = vJoyDevice[iTab]->AxisExists(HID_USAGE_AILERON);
+        Exist_Rudder = vJoyDevice[iTab]->AxisExists(HID_USAGE_RUDDER);
+        Exist_Throttle = vJoyDevice[iTab]->AxisExists(HID_USAGE_THROTTLE);
 
         // Buttons
         nBtn = vJoyDevice[iTab]->GetButtonNumber();
@@ -767,6 +812,15 @@ void PopulateTab(int iTab)
     CheckDlgButton(hDlgTab, IDC_CHK_RZ, Exist_RZ);
     CheckDlgButton(hDlgTab, IDC_CHK_SL0, Exist_SL0);
     CheckDlgButton(hDlgTab, IDC_CHK_SL1, Exist_SL1);
+
+    CheckDlgButton(hDlgTab, IDC_CHK_WHEEL, Exist_Wheel);
+    CheckDlgButton(hDlgTab, IDC_CHK_ACCELERATOR, Exist_Accelerator);
+    CheckDlgButton(hDlgTab, IDC_CHK_BRAKE, Exist_Brake);
+    CheckDlgButton(hDlgTab, IDC_CHK_CLUTCH, Exist_Clutch);
+    CheckDlgButton(hDlgTab, IDC_CHK_STEERING, Exist_Steering);
+    CheckDlgButton(hDlgTab, IDC_CHK_AILERON, Exist_Aileron);
+    CheckDlgButton(hDlgTab, IDC_CHK_RUDDER, Exist_Rudder);
+    CheckDlgButton(hDlgTab, IDC_CHK_THROTTLE, Exist_Throttle);
 
     // Buttons
     TCHAR nBtnStr[4];
@@ -858,6 +912,15 @@ void GetCtrlState(HWND hDlg, bool* AxisArr, int* nPovCont, int* nPovDisc, int* n
     AxisArr[5] = (IsDlgButtonChecked(hDlg, IDC_CHK_RZ) == BST_CHECKED);
     AxisArr[6] = (IsDlgButtonChecked(hDlg, IDC_CHK_SL0) == BST_CHECKED);
     AxisArr[7] = (IsDlgButtonChecked(hDlg, IDC_CHK_SL1) == BST_CHECKED);
+
+    AxisArr[8] = (IsDlgButtonChecked(hDlg, IDC_CHK_WHEEL) == BST_CHECKED);
+    AxisArr[9] = (IsDlgButtonChecked(hDlg, IDC_CHK_ACCELERATOR) == BST_CHECKED);
+    AxisArr[10] = (IsDlgButtonChecked(hDlg, IDC_CHK_BRAKE) == BST_CHECKED);
+    AxisArr[11] = (IsDlgButtonChecked(hDlg, IDC_CHK_CLUTCH) == BST_CHECKED);
+    AxisArr[12] = (IsDlgButtonChecked(hDlg, IDC_CHK_STEERING) == BST_CHECKED);
+    AxisArr[13] = (IsDlgButtonChecked(hDlg, IDC_CHK_AILERON) == BST_CHECKED);
+    AxisArr[14] = (IsDlgButtonChecked(hDlg, IDC_CHK_RUDDER) == BST_CHECKED);
+    AxisArr[15] = (IsDlgButtonChecked(hDlg, IDC_CHK_THROTTLE) == BST_CHECKED);
 
     // Number of buttons
     TCHAR nBtnStr[4];
