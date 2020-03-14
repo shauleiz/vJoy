@@ -221,6 +221,7 @@ typedef struct _JOYSTICK_POSITION
 #define VJOY_NUMBER_OF_AXES (8) // Maximum number of axes
 #define VJOY_NUMBER_OF_HAT (4) // Maximum number of hats
 #define VJOY_NUMBER_OF_BUTTONS (128) // Maximum number of hat
+#define VJOY_AXIS_MAX_VALUE (0x7FFF) // Maximum value for an axis
 
 #elif USE_JOYSTICK_API_VERSION == 2
 
@@ -248,6 +249,7 @@ typedef struct _JOYSTICK_POSITION_V2
     LONG	wAxisVBRX;
     LONG	wAxisVBRY;
     LONG	wAxisVBRZ;
+
     LONG	lButtons;	// 32 buttons: 0x00000001 means button1 is pressed, 0x80000000 -> button32 is pressed
     DWORD	bHats;		// Lower 4 bits: HAT switch or 16-bit of continuous HAT switch
     DWORD	bHatsEx1;	// Lower 4 bits: HAT switch or 16-bit of continuous HAT switch
@@ -259,14 +261,15 @@ typedef struct _JOYSTICK_POSITION_V2
     LONG lButtonsEx2; // Buttons 65-96
     LONG lButtonsEx3; // Buttons 97-128
 } JOYSTICK_POSITION_V2, * PJOYSTICK_POSITION_V2;
+typedef JOYSTICK_POSITION_V2 JOYSTICK_POSITION;
+typedef PJOYSTICK_POSITION_V2 PJOYSTICK_POSITION;
 
 #define VJOY_MAX_N_DEVICES  16 // Maximum number of vJoy devices
 #define VJOY_NUMBER_OF_AXES (8) // Maximum number of axes
 #define VJOY_NUMBER_OF_HAT (4) // Maximum number of hats
 #define VJOY_NUMBER_OF_BUTTONS (128) // Maximum number of hat
+#define VJOY_AXIS_MAX_VALUE (0x7FFF) // Maximum value for an axis
 
-typedef JOYSTICK_POSITION_V2 JOYSTICK_POSITION;
-typedef PJOYSTICK_POSITION_V2 PJOYSTICK_POSITION;
 
 #elif USE_JOYSTICK_API_VERSION == 3
 
@@ -274,61 +277,65 @@ typedef PJOYSTICK_POSITION_V2 PJOYSTICK_POSITION;
 typedef struct _JOYSTICK_POSITION_V3
 {
     /// JOYSTICK_POSITION
-    BYTE	bDevice;	// Index of device. 1-based.
+    BYTE    bDevice;	// Index of device. 1-based.
 
-    LONG	wAxisX;
-    LONG	wAxisY;
-    LONG	wAxisZ;
-    LONG	wAxisXRot;
-    LONG	wAxisYRot;
-    LONG	wAxisZRot;
-    LONG	wSlider;
-    LONG	wDial;
+    LONG    wThrottle;
+    LONG    wRudder;
+    LONG    wAileron;
 
-    LONG	wWheel;
-    LONG	wAccelerator;
-    LONG	wBrake;
-    LONG	wClutch;
-    LONG	wSteering;
-    LONG	wThrottle;
-    LONG	wRudder;
-    LONG	wAileron;
+    LONG    wAxisX;
+    LONG    wAxisY;
+    LONG    wAxisZ;
+    LONG    wAxisXRot;
+    LONG    wAxisYRot;
+    LONG    wAxisZRot;
+    LONG    wSlider;
+    LONG    wDial;
 
-    LONG	wAxisVX;
-    LONG	wAxisVY;
-    LONG	wAxisVZ;
-    LONG	wAxisVBRX;
-    LONG	wAxisVBRY;
-    LONG	wAxisVBRZ;
+    LONG    wWheel;
+    LONG    wAccelerator;
+    LONG    wBrake;
+    LONG    wClutch;
+    LONG    wSteering;
 
-    /// JOYSTICK_POSITION_V2 Extenssion
+    LONG    wAxisVX;
+    LONG    wAxisVY;
+
     LONG    lButtons;	// 32 buttons: 0x00000001 means button1 is pressed, 0x80000000 -> button32 is pressed
-    LONG    lButtonsEx1; // Buttons 33-64
-    LONG    lButtonsEx2; // Buttons 65-96
-    LONG    lButtonsEx3; // Buttons 97-128
 
     DWORD   bHats;		// Lower 4 bits: HAT switch or 16-bit of continuous HAT switch
     DWORD   bHatsEx1;	// Lower 4 bits: HAT switch or 16-bit of continuous HAT switch
     DWORD   bHatsEx2;	// Lower 4 bits: HAT switch or 16-bit of continuous HAT switch
     DWORD   bHatsEx3;	// Lower 4 bits: HAT switch or 16-bit of continuous HAT switch LONG lButtonsEx1; // Buttons 33-64
 
+    /// JOYSTICK_POSITION_V2 Extenssion
+    LONG    lButtonsEx1; // Buttons 33-64
+    LONG    lButtonsEx2; // Buttons 65-96
+    LONG    lButtonsEx3; // Buttons 97-128
+
+    // JOYSTICK Extension V3: replacing old slots and moving them at the tail
+    LONG    wAxisVZ;
+    LONG    wAxisVBRX;
+    LONG    wAxisVBRY;
+    LONG    wAxisVBRZ;
+
 } JOYSTICK_POSITION_V3, * PJOYSTICK_POSITION_V3;
+typedef JOYSTICK_POSITION_V3 JOYSTICK_POSITION;
+typedef PJOYSTICK_POSITION_V3 PJOYSTICK_POSITION;
 
 #define VJOY_MAX_N_DEVICES  (16) // Maximum number of vJoy devices
 #define VJOY_NUMBER_OF_AXES (16) // Maximum number of axes
 #define VJOY_NUMBER_OF_HAT (4) // Maximum number of hats
 #define VJOY_NUMBER_OF_BUTTONS (128) // Maximum number of hat
-#define VJOY_AXIS_MAX_VALUE (0xFFFF) // Maximum value for an axis
+#define VJOY_AXIS_MAX_VALUE (0x7FFF) // Maximum value for an axis
 
-typedef JOYSTICK_POSITION_V3 JOYSTICK_POSITION;
-typedef PJOYSTICK_POSITION_V3 PJOYSTICK_POSITION;
 #endif
 
 
 //-------------
 // FFB Features to be placed in vJoy's driver memory context
 
-// Max 1..40 effect block index. 0x28=40d
+// Max 1..40 effect block index. 0x28=40dv
 #define MAX_FFB_EFFECTS_BLOCK_INDEX (0x28) 
 
 #if 0

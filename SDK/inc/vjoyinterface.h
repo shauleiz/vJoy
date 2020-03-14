@@ -66,8 +66,6 @@ enum VjdStat  /* Declares an enumeration data type */
 // Device Axis/POVs/Buttons
 struct DEVCTRLS {
     BOOL Init;
-    BOOL	Rudder;
-    BOOL	Aileron;
     BOOL	AxisX;
     BOOL	AxisY;
     BOOL	AxisZ;
@@ -76,13 +74,23 @@ struct DEVCTRLS {
     BOOL	AxisZRot;
     BOOL	Slider;
     BOOL	Dial;
+    
     BOOL	Wheel;
+    BOOL	Accelerator;
+    BOOL	Brake;
+    BOOL	Clutch;
+    BOOL	Steering;
+    BOOL	Rudder;
+    BOOL	Aileron;
+    BOOL	Throttle;
+
     BOOL	AxisVX;
     BOOL	AxisVY;
     BOOL	AxisVZ;
     BOOL	AxisVBRX;
     BOOL	AxisVBRY;
     BOOL	AxisVBRZ;
+
     INT		nButtons;	
     INT		nDescHats;
     INT		nContHats;
@@ -366,8 +374,9 @@ namespace vJoyNS {
 
     // Added in 2.1.6
     VJOYINTERFACE_API DWORD		__cdecl Ffb_h_Eff_Constant(const FFB_DATA * Packet, FFB_EFF_CONSTANT *  ConstantEffect);
-    // Added in 2.1.10
+    // Added in 2.2.0
     VJOYINTERFACE_API BOOL		__cdecl Ffb_h_UpdatePID(UINT rID, FFB_DEVICE_PID* DevicePID); // Update the Ffb PID of the specified vJoy Device.
+    VJOYINTERFACE_API BOOL		__cdecl	GetPositionVJD(UINT rID, PVOID pData);	// Read the position data of the specified vJoy Device.
 
 #pragma endregion
 
