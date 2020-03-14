@@ -8,6 +8,7 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Apps", "Apps", "{668338B4-E510-42C4-B7B1-E98608F8C0B0}"
 	ProjectSection(SolutionItems) = preProject
 		BuildAll.bat = BuildAll.bat
+		CreateSdk.bat = CreateSdk.bat
 		README.md = README.md
 	EndProjectSection
 EndProject
