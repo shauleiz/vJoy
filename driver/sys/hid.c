@@ -1580,6 +1580,7 @@ unsigned int GetInitValueFromRegistry(USHORT		id, PDEVICE_INIT_VALS data_buf)
     // Check that buffer size is sufficient
     nAxes = sizeof(Axes) / sizeof(PCWSTR);
     // BM was sizeof(nButtons) / 8
+    // Size in bytes, axes include pov (16+4)
     if (data_buf->cb < (2 + nAxes + (sizeof(nButtons)/8) )) {
         LogEventWithStatus(ERRLOG_REP_REG_FAILED, L"GetInitValueFromRegistry: Buffer size too small", WdfDriverWdmGetDriverObject(WdfGetDriver()), status);
         return 0;

@@ -3610,6 +3610,7 @@ UINT	GetInitValueFromRegistry(USHORT id, struct DEVICE_INIT_VALS* data_buf)
     nAxes = sizeof(Axes) / sizeof(PCWSTR);
     nPovs = sizeof(Povs) / sizeof(PCWSTR);
     // BM was sizeof(nButtons) / 8
+    // Size in bytes, axes include pov (16+4)
     if (data_buf->cb < (2 + nAxes + nPovs + (sizeof(nButtons)/8) ))
         return 0;
 

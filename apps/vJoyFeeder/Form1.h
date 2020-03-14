@@ -31,6 +31,7 @@ namespace vJoyDemo {
         {
             // Form init
             ReportId = -1;
+            Acquired = false;
 
             // IDE-Generated initialization of the form
             InitializeComponent();
@@ -60,7 +61,7 @@ namespace vJoyDemo {
 
 
             /*3*/
-            if (!AcquireVJD(GetCurrentReportId())) {
+            if (!AcquireVJD(GetAndUpdateReportId())) {
                 textBoxInfo->Text = L"Cannot open vJoy Device - Cannot continue\r\n";
                 //return;
             };
@@ -93,7 +94,10 @@ namespace vJoyDemo {
     private: System::Windows::Forms::TextBox^ textBoxInfo;
     private: HDEVNOTIFY hDeviceNotifyInterFace;
     private: HDEVNOTIFY hDeviceNotifyHandle;
+           // Selected ID
     private: int ReportId;
+           // True if acquired
+    private: bool Acquired;
     private: String^ CbName;
            //private: System::Int32 max_axis;
 
@@ -273,7 +277,7 @@ namespace vJoyDemo {
             3. Get the current values and set the controls accordingly
         */
 
-        GetCurrentReportId();
+        GetAndUpdateReportId();
 
         // Select Target device box
         this->groupBoxTarget->Enabled = (ReportId>=0);
@@ -638,6 +642,8 @@ namespace vJoyDemo {
 
         // If no target selected then NO-OP
         if (listBoxTarget->SelectedIndex == -1)
+            return;
+        if (!Acquired)
             return;
 
         // Report Id
@@ -1941,6 +1947,7 @@ namespace vJoyDemo {
 
     private: System::Void checkBoxEnableFeeding_Click(System::Object^ sender, System::EventArgs^ e) {
         this->checkBoxEnableFeeding->Checked = !this->checkBoxEnableFeeding->Checked;
+        TargetChanged(sender, e);
     }
 
     private: System::Void trackBar_Scroll(System::Windows::Forms::TrackBar^ tb, System::Windows::Forms::TextBox^ txt) {
@@ -2250,7 +2257,7 @@ namespace vJoyDemo {
     }
 
 
-    private: int GetCurrentReportId(void) {
+    private: int GetAndUpdateReportId(void) {
         // Get the selected value from the target's listbox
         if (listBoxTarget->SelectedIndex <0)
             ReportId = -1;
@@ -2366,24 +2373,30 @@ namespace vJoyDemo {
         static int sindex = -1;
         int index = sindex;
 
-        if (ReportId>0)
+        if (ReportId>0 && Acquired) {
             RelinquishVJD(ReportId); // if (CloseJoystickDevice())
+            Acquired = false;
+        }
 
-        if (AcquireVJD(GetCurrentReportId())) {
-            index = listBoxTarget->SelectedIndex;
-            ValidControls();
-            update_from_vjoy();
-        } else /*if (index >0)*/
-        {
-            //listBoxTarget->SelectedIndex = index;
-            String^ message;
-            if (ReportId>0)
-                message = L"vJoy Device " + ReportId + " cannot be accessed\r\nPerhaps some other device has alredy opened a handle to it\r\n";
-            else
-                message = L"vJoy Device cannot be accessed\r\nPerhaps some other device has alredy opened a handle to it\r\n";
-            String^ title = L"vJoyFeeder";
-            textBoxInfo->Text = message;
-            MessageBox::Show(this, textBoxInfo->Text, title, MessageBoxButtons::OK, MessageBoxIcon::Warning);
+        if (this->checkBoxEnableFeeding->Checked) {
+            if (AcquireVJD(GetAndUpdateReportId())) {
+                Acquired = true;
+                index = listBoxTarget->SelectedIndex;
+                ValidControls();
+                update_from_vjoy();
+            } else /*if (index >0)*/
+            {
+                Acquired = false;
+                //listBoxTarget->SelectedIndex = index;
+                String^ message;
+                if (ReportId>0)
+                    message = L"vJoy Device " + ReportId + " cannot be accessed\r\nPerhaps some other device has alredy opened a handle to it\r\n";
+                else
+                    message = L"vJoy Device cannot be accessed\r\nPerhaps some other device has alredy opened a handle to it\r\n";
+                String^ title = L"vJoyFeeder";
+                textBoxInfo->Text = message;
+                MessageBox::Show(this, textBoxInfo->Text, title, MessageBoxButtons::OK, MessageBoxIcon::Warning);
+            }
         }
     }
 
@@ -2405,7 +2418,7 @@ namespace vJoyDemo {
         WORD VerDll, VerDrv;
         if (!DriverMatch(&VerDll, &VerDrv)) {
             _stprintf_s(Msg, MSG_SIZE, _T("Failed\r\nvJoy Driver (version %04x) does not match vJoyInterface DLL (version %04x)"), VerDrv, VerDll);
-            return FALSE;
+            //return FALSE;
         }
 
         if (!version) {
@@ -2427,7 +2440,12 @@ namespace vJoyDemo {
         // Covert absolute value to a number in the range 0-100
         if (max==min)
             return 0;
-        return 100*(val-min)/(max-min);
+        int pct = 100*(val-min)/(max-min);
+        if (pct>100)
+            pct = 100;
+        if (pct<0)
+            pct = 0;
+        return pct;
     }
 
     private: long ConvAbsolute(long val, long max, long min)
@@ -2448,18 +2466,22 @@ namespace vJoyDemo {
         */
         if (ReportId>0) {
             stat = GetVJDStatus(ReportId);
-
-            if (stat == VJD_STAT_OWN) {
-                if (this->checkBoxEnableFeeding->Checked) {
-                    return;
-                } else {
-                    update_from_vjoy();
-                }
-            } else {
+            switch (stat) {
+            case VJD_STAT_FREE:
+            case VJD_STAT_BUSY:
+                Acquired = false;
+                update_from_vjoy();
+                break;
+            case VJD_STAT_OWN:
+                Acquired = true;
+                break;
+            case VJD_STAT_UNKN:
+            case VJD_STAT_MISS:
+            default:
                 ReportId = -1;
                 Enable(false);
-                return;
-            };
+                break;
+            }
         }
         /*
         If device is not acquired then test if it could be enabled
@@ -2467,7 +2489,7 @@ namespace vJoyDemo {
         */
         else if (vJoyEnabled()) {
             GetExistingDevices();
-            GetCurrentReportId();
+            GetAndUpdateReportId();
             if (ReportId>0) {
                 Enable(true);
             }
