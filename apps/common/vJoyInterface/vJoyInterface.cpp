@@ -3678,7 +3678,7 @@ void SavePosition(UINT rID, PVOID pData)
 BOOL GetDevPosition(BYTE id, PJOYSTICK_POSITION pPosition)
 {
     UINT	IoCode = GET_POSITIONS;
-    UINT	IoSize = sizeof(JOYSTICK_POSITION) - 4*sizeof(LONG);
+    UINT	IoSize = sizeof(JOYSTICK_POSITION);
     ULONG	bytes;
     HANDLE	hIoctlEvent;
     OVERLAPPED OverLapped = { 0 };
