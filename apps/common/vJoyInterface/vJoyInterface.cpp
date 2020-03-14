@@ -541,15 +541,15 @@ namespace vJoyNS {
         Set_stat(rID, VJD_STAT_FREE);
     }
 
+    /**
+        First, the saved position is updated.
+        Then,
+        This function writes the position data to the specified VJD
+        The VJD should be open for writing. If not the function returns FALSE
+        If the data is NULL or if the Report ID (rID) is out of range then the function returns FALSE.
+        The function will return TRUE only if the writing was successful
+    **/
     VJOYINTERFACE_API BOOL	__cdecl	UpdateVJD(UINT rID, PVOID pData)
-        /**
-            First, the saved position is updated.
-            Then,
-            This function writes the position data to the specified VJD
-            The VJD should be open for writing. If not the function returns FALSE
-            If the data is NULL or if the Report ID (rID) is out of range then the function returns FALSE.
-            The function will return TRUE only if the writing was successful
-        **/
     {
         // Make sure the the ID is set
         ((PJOYSTICK_POSITION)pData)->bDevice = (BYTE)rID;
@@ -560,6 +560,20 @@ namespace vJoyNS {
         // Send joystick position structure to vJoy device
         return Update(rID);
     }
+
+    /*
+     Read current positions vJoy device
+    */
+    VJOYINTERFACE_API BOOL	__cdecl	GetPositionVJD(UINT rID, PVOID pData)
+    {
+        // Make sure the the ID is set
+        PJOYSTICK_POSITION pPosition = (PJOYSTICK_POSITION)pData;
+        pPosition->bDevice = (BYTE)rID;
+
+        // Update position
+        return GetDevPosition(rID, pPosition);
+    }
+
 
     VJOYINTERFACE_API BOOL	__cdecl	isVJDExists(UINT rID)
     {
@@ -870,24 +884,33 @@ namespace vJoyNS {
             return vJoyDevices[rID].DeviceControls.AxisY;
         case HID_USAGE_Z:
             return vJoyDevices[rID].DeviceControls.AxisZ;
-            break;
         case HID_USAGE_RX:
             return vJoyDevices[rID].DeviceControls.AxisXRot;
-            break;
         case HID_USAGE_RY:
             return vJoyDevices[rID].DeviceControls.AxisYRot;
-            break;
         case HID_USAGE_RZ:
             return vJoyDevices[rID].DeviceControls.AxisZRot;
-            break;
         case HID_USAGE_SL0:
             return vJoyDevices[rID].DeviceControls.Slider;
-            break;
         case HID_USAGE_SL1:
             return vJoyDevices[rID].DeviceControls.Dial;
-            break;
+
         case HID_USAGE_WHL:
             return vJoyDevices[rID].DeviceControls.Wheel;
+        case HID_USAGE_ACCELERATOR:
+            return vJoyDevices[rID].DeviceControls.Accelerator;
+        case HID_USAGE_BRAKE:
+            return vJoyDevices[rID].DeviceControls.Brake;
+        case HID_USAGE_CLUTCH:
+            return vJoyDevices[rID].DeviceControls.Clutch;
+        case HID_USAGE_STEERING:
+            return vJoyDevices[rID].DeviceControls.Steering;
+        case HID_USAGE_AILERON:
+            return vJoyDevices[rID].DeviceControls.Aileron;
+        case HID_USAGE_RUDDER:
+            return vJoyDevices[rID].DeviceControls.Rudder;
+        case HID_USAGE_THROTTLE:
+            return vJoyDevices[rID].DeviceControls.Throttle;
         };
 
         return FALSE;
@@ -950,75 +973,75 @@ namespace vJoyNS {
                 _ftprintf_s(LogStream, _T("\n[%05u]Error: GetVJDButtonNumber(rID=%u) - HidD_GetPreparsedData() failed"), ProcessId, rID);
             CloseHandle(h);
             return BAD_PREPARSED_DATA;
-        } else
+    } else
             stat = HidP_GetCaps(PreparsedData, &Capabilities);
-        if (stat != HIDP_STATUS_SUCCESS) {
-            if (LogStream)
-                _ftprintf_s(LogStream, _T("\n[%05u]Error: GetVJDButtonNumber(rID=%u) - HidP_GetCaps() failed"), ProcessId, rID);
-            CloseHandle(h);
-            return NO_CAPS;
-        }
-
-        if (LogStream) {
-            _ftprintf_s(LogStream, _T("\n[%05u]Info: GetVJDButtonNumber(rID=%u) - Capabilities: "), ProcessId, rID);
-            _ftprintf_s(LogStream, _T("\t Usage=0x%x;"), Capabilities.Usage);
-            _ftprintf_s(LogStream, _T("\t UsagePage=0x%x;"), Capabilities.UsagePage);
-            _ftprintf_s(LogStream, _T("\t InputReportByteLength=%u;"), Capabilities.InputReportByteLength);
-            _ftprintf_s(LogStream, _T("\t NumberLinkCollectionNodes=%u;"), Capabilities.NumberLinkCollectionNodes);
-            _ftprintf_s(LogStream, _T("\t NumberInputButtonCaps=%u;"), Capabilities.NumberInputButtonCaps);
-            _ftprintf_s(LogStream, _T("\t NumberInputValueCaps=%u;"), Capabilities.NumberInputValueCaps);
-            _ftprintf_s(LogStream, _T("\t NumberInputDataIndices=%u;"), Capabilities.NumberInputDataIndices);
-        }
-
-        // Get Button data
-        int ButtonBaseIndex, nButtons = 0;
-        USHORT n = Capabilities.NumberInputButtonCaps;
-        if (n < 1) {
-            if (LogStream)
-                _ftprintf_s(LogStream, _T("\n[%05u]Error: GetVJDButtonNumber(rID=%u) - Number of button Caps is %u"), ProcessId, rID, n);
-            CloseHandle(h);
-            return BAD_N_BTN_CAPS;
-        }
-        HIDP_BUTTON_CAPS* bCaps = new HIDP_BUTTON_CAPS[n];
-        SecureZeroMemory(bCaps, sizeof(HIDP_BUTTON_CAPS)*n);
-        stat = HidP_GetButtonCaps(HidP_Input, bCaps, &n, PreparsedData);
-        if (stat != HIDP_STATUS_SUCCESS) {
-            if (LogStream)
-                _ftprintf_s(LogStream, _T("\n[%05u]Error: GetVJDButtonNumber(rID=%u) - HidP_GetButtonCaps() failed"), ProcessId, rID);
-            CloseHandle(h);
-            delete[] 	bCaps;
-            return BAD_BTN_CAPS;
-        }
-
-        if (LogStream) {
-            _ftprintf_s(LogStream, _T("\n[%05u]Info: GetVJDButtonNumber(rID=%u) - Button Capabilities: "), ProcessId, rID);
-            _ftprintf_s(LogStream, _T("\t UsagePage=0x%x;"), bCaps[0].UsagePage);
-            _ftprintf_s(LogStream, _T("\t ReportID=%u;"), bCaps[0].ReportID);
-            _ftprintf_s(LogStream, _T("\t UsageMax=%u;"), (bCaps[0].Range).UsageMax);
-            _ftprintf_s(LogStream, _T("\t UsageMin=%u;"), (bCaps[0].Range).UsageMin);
-            _ftprintf_s(LogStream, _T("\t DataIndexMin=%u;"), (bCaps[0].Range).DataIndexMin);
-        }
-
-        // Assuming one button range, get the number of buttons
-        if (bCaps[0].IsRange) {
-            nButtons += (bCaps[0].Range).UsageMax - (bCaps[0].Range).UsageMin + 1;
-            ButtonBaseIndex = (bCaps[0].Range).DataIndexMin;
-        } else {
-            if (LogStream)
-                _ftprintf_s(LogStream, _T("\n[%05u]Error: GetVJDButtonNumber(rID=%u) - Bad Range"), ProcessId, rID);
-            CloseHandle(h);
-            delete[] 	bCaps;
-            return BAD_BTN_RANGE;
-        }
-
-        delete[] 	bCaps;
-        //	HidD_FreePreparsedData(PreparsedData);
-        CloseHandle(h);
-
+    if (stat != HIDP_STATUS_SUCCESS) {
         if (LogStream)
-            _ftprintf_s(LogStream, _T("\n[%05u]Info: GetVJDButtonNumber(rID=%u) - Return(nButtons=%d)"), ProcessId, rID, nButtons);
-        return nButtons;
+            _ftprintf_s(LogStream, _T("\n[%05u]Error: GetVJDButtonNumber(rID=%u) - HidP_GetCaps() failed"), ProcessId, rID);
+        CloseHandle(h);
+        return NO_CAPS;
     }
+
+    if (LogStream) {
+        _ftprintf_s(LogStream, _T("\n[%05u]Info: GetVJDButtonNumber(rID=%u) - Capabilities: "), ProcessId, rID);
+        _ftprintf_s(LogStream, _T("\t Usage=0x%x;"), Capabilities.Usage);
+        _ftprintf_s(LogStream, _T("\t UsagePage=0x%x;"), Capabilities.UsagePage);
+        _ftprintf_s(LogStream, _T("\t InputReportByteLength=%u;"), Capabilities.InputReportByteLength);
+        _ftprintf_s(LogStream, _T("\t NumberLinkCollectionNodes=%u;"), Capabilities.NumberLinkCollectionNodes);
+        _ftprintf_s(LogStream, _T("\t NumberInputButtonCaps=%u;"), Capabilities.NumberInputButtonCaps);
+        _ftprintf_s(LogStream, _T("\t NumberInputValueCaps=%u;"), Capabilities.NumberInputValueCaps);
+        _ftprintf_s(LogStream, _T("\t NumberInputDataIndices=%u;"), Capabilities.NumberInputDataIndices);
+    }
+
+    // Get Button data
+    int ButtonBaseIndex, nButtons = 0;
+    USHORT n = Capabilities.NumberInputButtonCaps;
+    if (n < 1) {
+        if (LogStream)
+            _ftprintf_s(LogStream, _T("\n[%05u]Error: GetVJDButtonNumber(rID=%u) - Number of button Caps is %u"), ProcessId, rID, n);
+        CloseHandle(h);
+        return BAD_N_BTN_CAPS;
+    }
+    HIDP_BUTTON_CAPS* bCaps = new HIDP_BUTTON_CAPS[n];
+    SecureZeroMemory(bCaps, sizeof(HIDP_BUTTON_CAPS)*n);
+    stat = HidP_GetButtonCaps(HidP_Input, bCaps, &n, PreparsedData);
+    if (stat != HIDP_STATUS_SUCCESS) {
+        if (LogStream)
+            _ftprintf_s(LogStream, _T("\n[%05u]Error: GetVJDButtonNumber(rID=%u) - HidP_GetButtonCaps() failed"), ProcessId, rID);
+        CloseHandle(h);
+        delete[] 	bCaps;
+        return BAD_BTN_CAPS;
+    }
+
+    if (LogStream) {
+        _ftprintf_s(LogStream, _T("\n[%05u]Info: GetVJDButtonNumber(rID=%u) - Button Capabilities: "), ProcessId, rID);
+        _ftprintf_s(LogStream, _T("\t UsagePage=0x%x;"), bCaps[0].UsagePage);
+        _ftprintf_s(LogStream, _T("\t ReportID=%u;"), bCaps[0].ReportID);
+        _ftprintf_s(LogStream, _T("\t UsageMax=%u;"), (bCaps[0].Range).UsageMax);
+        _ftprintf_s(LogStream, _T("\t UsageMin=%u;"), (bCaps[0].Range).UsageMin);
+        _ftprintf_s(LogStream, _T("\t DataIndexMin=%u;"), (bCaps[0].Range).DataIndexMin);
+    }
+
+    // Assuming one button range, get the number of buttons
+    if (bCaps[0].IsRange) {
+        nButtons += (bCaps[0].Range).UsageMax - (bCaps[0].Range).UsageMin + 1;
+        ButtonBaseIndex = (bCaps[0].Range).DataIndexMin;
+    } else {
+        if (LogStream)
+            _ftprintf_s(LogStream, _T("\n[%05u]Error: GetVJDButtonNumber(rID=%u) - Bad Range"), ProcessId, rID);
+        CloseHandle(h);
+        delete[] 	bCaps;
+        return BAD_BTN_RANGE;
+    }
+
+    delete[] 	bCaps;
+    //	HidD_FreePreparsedData(PreparsedData);
+    CloseHandle(h);
+
+    if (LogStream)
+        _ftprintf_s(LogStream, _T("\n[%05u]Info: GetVJDButtonNumber(rID=%u) - Return(nButtons=%d)"), ProcessId, rID, nButtons);
+    return nButtons;
+}
 
 
     VJOYINTERFACE_API int	__cdecl GetVJDDiscPovNumber(UINT rID)
@@ -1052,7 +1075,7 @@ namespace vJoyNS {
         if (!ok) {
             CloseHandle(h);
             return 0;
-        };
+    };
         stat = HidP_GetCaps(PreparsedData, &Capabilities);
         if (stat != HIDP_STATUS_SUCCESS) {
             CloseHandle(h);
@@ -1117,7 +1140,7 @@ namespace vJoyNS {
         if (!ok) {
             CloseHandle(h);
             return 0;
-        }
+    }
         stat = HidP_GetCaps(PreparsedData, &Capabilities);
         if (stat != HIDP_STATUS_SUCCESS) {
             CloseHandle(h);
@@ -1310,7 +1333,13 @@ namespace vJoyNS {
             HID_USAGE_SL0	0x36
             HID_USAGE_SL1	0x37
             HID_USAGE_WHL	0x38
-
+            HID_USAGE_ACCELERATOR   0xC4
+            HID_USAGE_BRAKE         0xC5
+            HID_USAGE_CLUTCH        0xC6
+            HID_USAGE_STEERING      0xC8
+            HID_USAGE_AILERON       0xB0
+            HID_USAGE_RUDDER        0xBA
+            HID_USAGE_THROTTLE      0xBB
         */
         if (rID < 1 || rID>16 || Axis<HID_USAGE_X || Axis>HID_USAGE_WHL)
             return FALSE;
@@ -1340,7 +1369,7 @@ namespace vJoyNS {
         case HID_USAGE_SL1:
             vJoyDevices[rID].position.wDial = Value;
             break;
-        
+
         case HID_USAGE_WHL:
             vJoyDevices[rID].position.wWheel = Value;
             break;
@@ -1507,7 +1536,7 @@ namespace vJoyNS {
             //HidD_FreePreparsedData(PreparsedData);
             CloseHandle(h);
             return FALSE;
-        }
+    }
 
         // returns a top-level collection's HIDP_CAPS structure.
         stat = HidP_GetCaps(PreparsedData, &Capabilities);
@@ -1694,7 +1723,7 @@ namespace vJoyNS {
             //HidD_FreePreparsedData(PreparsedData);
             CloseHandle(h);
             return FALSE;
-        }
+    }
 
         // returns a top-level collection's HIDP_CAPS structure.
         stat = HidP_GetCaps(PreparsedData, &Capabilities);
@@ -2246,7 +2275,7 @@ HANDLE	GetHandleByIndex(int index)
     if (functionClassDeviceData) {
         functionClassDeviceData->cbSize = sizeof(SP_DEVICE_INTERFACE_DETAIL_DATA);
         ZeroMemory(functionClassDeviceData->DevicePath, sizeof(functionClassDeviceData->DevicePath));
-    } else {
+} else {
         if (LogStream)
             _ftprintf_s(LogStream, _T("\n[%05u]Error: GetHandleByIndex(index=%d) - Failed to allocate functionClassDeviceData"), ProcessId, index);
         LocalFree(functionClassDeviceData);
@@ -2688,7 +2717,7 @@ BOOL	GetDeviceNameSpace(char** NameSpace, int* Size, BOOL Refresh, DWORD* error)
         if (deviceInterfaceDetailData) {
             deviceInterfaceDetailData->cbSize = sizeof(SP_DEVICE_INTERFACE_DETAIL_DATA);
             ZeroMemory(deviceInterfaceDetailData->DevicePath, sizeof(deviceInterfaceDetailData->DevicePath));
-        } else {
+    } else {
             if (error)
                 *error = GetLastError();
             if (LogStream)
@@ -2741,7 +2770,7 @@ BOOL	GetDeviceNameSpace(char** NameSpace, int* Size, BOOL Refresh, DWORD* error)
         } else
             return FALSE;
 
-    } //  SetupDiEnumDeviceInterfaces <<
+} //  SetupDiEnumDeviceInterfaces <<
     else {
         if (error)
             *error = GetLastError();
@@ -3625,28 +3654,31 @@ UINT	GetInitValueFromRegistry(USHORT id, struct DEVICE_INIT_VALS* data_buf)
     return Mask;
 }
 
-void	SavePosition(UINT rID, PVOID pData)
+/// <summary>
+/// Save current position to the global saved position member of array position
+/// </summary>
+/// <param name="rID"></param>
+/// <param name="pData"></param>
+void SavePosition(UINT rID, PVOID pData)
 {
-    /*
-        Save current position to the global saved position member of array position
-    */
-
     if (!pData || (vJoyDevices.find(rID) == vJoyDevices.end()))
         return;
 
     memcpy(&(vJoyDevices[rID].position), pData, sizeof(JOYSTICK_POSITION));
 }
 
+/// <summary>
+/// This function gets the joystick position of a given device by device ID.
+/// Function does not change values in structure vJoyDevices[id].position
+/// </summary>
+/// <param name="id"></param>
+/// <param name="pPosition"></param>
+/// <returns>Returns TRUE if pPosition points to a valid position data.
+/// Otherwise returns FALSE</returns>
 BOOL GetDevPosition(BYTE id, PJOYSTICK_POSITION pPosition)
-/*
-    This function gets the joystick position of a given device by device ID
-    Returns TRUE if pPosition points to a valid position data.
-    Otherwise returns FALSE
-    Function does not change values in structure vJoyDevices[id].position
-*/
 {
     UINT	IoCode = GET_POSITIONS;
-    UINT	IoSize = sizeof(JOYSTICK_POSITION);
+    UINT	IoSize = sizeof(JOYSTICK_POSITION) - 4*sizeof(LONG);
     ULONG	bytes;
     HANDLE	hIoctlEvent;
     OVERLAPPED OverLapped = { 0 };
@@ -3662,6 +3694,9 @@ BOOL GetDevPosition(BYTE id, PJOYSTICK_POSITION pPosition)
     if (res) {
         CloseHandle(OverLapped.hEvent);
         if (bytes) {
+            // In case driver did not fill id
+            if (pPosition->bDevice == 0)
+                pPosition->bDevice = id;
             if (LogStream)
                 _ftprintf_s(LogStream, _T("\n[%05u]Info: GetDevPosition() - Returns (Immediatly) TRUE"), ProcessId);
             return TRUE;
@@ -3690,6 +3725,9 @@ BOOL GetDevPosition(BYTE id, PJOYSTICK_POSITION pPosition)
 
         // Data received and it is not empty
         if (gotdata && nBytesTranss) {
+            // In case driver did not fill id
+            if (pPosition->bDevice == 0)
+                pPosition->bDevice = id;
             if (LogStream)
                 _ftprintf_s(LogStream, _T("\n[%05u]Info: GetDevPosition() - gotdata=%d nBytesTranss=%u  Returns TRUE"), ProcessId, gotdata, nBytesTranss);
             return TRUE;
@@ -3704,16 +3742,16 @@ BOOL GetDevPosition(BYTE id, PJOYSTICK_POSITION pPosition)
 }
 
 
-
-BOOL	Update(UINT rID)
-/**
-    This function writes the position data to the specified VJD
-    The VJD should be open for writing. If not the function returns FALSE
-    If the data is NULL or if the Report ID (rID) is out of range then the function returns FALSE.
-    The function will return TRUE only if the writing was successful
-**/
+/// <summary>
+/// This function writes the position data to the specified VJD
+/// The VJD should be open for writing.If not the function returns FALSE
+/// If the data is NULL or if the Report ID(rID) is out of range then the function returns FALSE.
+/// The function will return TRUE only if the writing was successful
+/// </summary>
+/// <param name="rID"></param>
+/// <returns></returns>
+BOOL Update(UINT rID)
 {
-
     PVOID pData = &(vJoyDevices[rID].position);
     if (!pData || (vJoyDevices.find(rID) == vJoyDevices.end()) || Get_h(rID) == INVALID_HANDLE_VALUE || Get_stat(rID) != VJD_STAT_OWN)
         return FALSE;
@@ -3783,7 +3821,7 @@ int	DbgGetCaps(void)
     if (!ok) {
         CloseHandle(h);
         return BAD_PREPARSED_DATA;
-    }
+}
 
     // returns a top-level collection's HIDP_CAPS structure.
     stat = HidP_GetCaps(PreparsedData, &Capabilities);
@@ -3905,7 +3943,7 @@ int	DbgGetCaps(void)
     CloseHandle(h);
 
     return 0;
-}
+    }
 
 // Update control structure of the given vJoy Device
 // Use this function to detect which axes exist, the number of POVs and the number of buttons
@@ -3932,7 +3970,7 @@ INT		GetControls(UINT rID)
     if (!ok) {
         CloseHandle(h);
         return BAD_PREPARSED_DATA;
-    }
+}
 
     // Get device's capabilities
     stat = HidP_GetCaps(PreparsedData, &Capabilities);
@@ -4045,6 +4083,7 @@ BOOL	AreControlsInit(UINT rID)
     return vJoyDevices[rID].DeviceControls.Init;
 }
 
+// Parse HID descriptor to deduce whether an axis is present
 BOOL	GetAxisCaps(UINT rID, UINT Axis, HIDP_VALUE_CAPS* ValCaps)
 {
     NTSTATUS stat = HIDP_STATUS_SUCCESS;
@@ -4069,7 +4108,7 @@ BOOL	GetAxisCaps(UINT rID, UINT Axis, HIDP_VALUE_CAPS* ValCaps)
     if (!ok) {
         CloseHandle(h);
         return BAD_PREPARSED_DATA;
-    }
+}
     stat = HidP_GetCaps(PreparsedData, &Capabilities);
     if (stat != HIDP_STATUS_SUCCESS) {
         CloseHandle(h);

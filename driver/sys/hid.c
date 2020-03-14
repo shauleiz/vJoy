@@ -1326,6 +1326,8 @@ VOID GetPositions(PJOYSTICK_POSITION pPosition, PDEVICE_EXTENSION pDevContext, U
     i = id - 1; // Index is zero-based
 
     WdfWaitLockAcquire(pDevContext->positionLock, NULL);
+    pPosition->bDevice = id;
+
     pPosition->wAxisX = pDevContext->positions[i]->ValX;
     pPosition->wAxisY = pDevContext->positions[i]->ValY;
     pPosition->wAxisZ = pDevContext->positions[i]->ValZ;

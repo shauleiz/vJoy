@@ -843,6 +843,16 @@ vJoyGetPositionData(
         HidReport->InputReport.bAxisRZ = pDevContext->positions[i]->ValRZ;
         HidReport->InputReport.bSlider = pDevContext->positions[i]->ValSlider;
         HidReport->InputReport.bDial = pDevContext->positions[i]->ValDial;
+
+        HidReport->InputReport.bWheel = pDevContext->positions[i]->ValWheel;
+        HidReport->InputReport.bAccelerator = pDevContext->positions[i]->ValAccelerator;
+        HidReport->InputReport.bBrake = pDevContext->positions[i]->ValBrake;
+        HidReport->InputReport.bClutch = pDevContext->positions[i]->ValClutch;
+        HidReport->InputReport.bSteering = pDevContext->positions[i]->ValSteering;
+        HidReport->InputReport.bAileron = pDevContext->positions[i]->ValAileron;
+        HidReport->InputReport.bRudder = pDevContext->positions[i]->ValRudder;
+        HidReport->InputReport.bThrottle = pDevContext->positions[i]->ValThrottle;
+
         HidReport->InputReport.bHats = pDevContext->positions[i]->ValHats;
         HidReport->InputReport.bHatsEx1 = pDevContext->positions[i]->ValHatsEx1;
         HidReport->InputReport.bHatsEx2 = pDevContext->positions[i]->ValHatsEx2;
