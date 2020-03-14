@@ -1566,7 +1566,10 @@ unsigned int GetInitValueFromRegistry(USHORT		id, PDEVICE_INIT_VALS data_buf)
     WDFKEY					KeyDevice, KeyParameters;
     WCHAR					DeviceKeyName[NameSize] = { 0 };
     UNICODE_STRING			strDev, strControl;
-    PCWSTR					Axes[VJOY_NUMBER_OF_AXES] = { L"X", L"Y", L"Z", L"RX", L"RY", L"RZ", L"SL1", L"SL2", L"POV1", L"POV2", L"POV3", L"POV4" };
+    PCWSTR					Axes[] = { 
+        L"X", L"Y", L"Z", L"RX", L"RY", L"RZ", L"SL1", L"SL2",
+        L"WHL", L"ACC", L"BRK", L"CLU", L"STE", L"AIL", L"RUD", L"THR",
+        L"POV1", L"POV2", L"POV3", L"POV4" };
     UCHAR					nAxes = 0;
     int						iAxis;
     unsigned int			Mask = 0;
@@ -1576,7 +1579,8 @@ unsigned int GetInitValueFromRegistry(USHORT		id, PDEVICE_INIT_VALS data_buf)
 
     // Check that buffer size is sufficient
     nAxes = sizeof(Axes) / sizeof(PCWSTR);
-    if (data_buf->cb < (2 + nAxes + (nButtons/8))) {
+    // BM was sizeof(nButtons) / 8
+    if (data_buf->cb < (2 + nAxes + (sizeof(nButtons)/8) )) {
         LogEventWithStatus(ERRLOG_REP_REG_FAILED, L"GetInitValueFromRegistry: Buffer size too small", WdfDriverWdmGetDriverObject(WdfGetDriver()), status);
         return 0;
     };
@@ -1657,9 +1661,9 @@ void   CalcInitValue(USHORT		id, PDEVICE_INIT_VALS data_buf)
     DEVICE_INIT_VALS  init_master;
     unsigned int mask_device = 0, mask_master = 0;
     int i, j, k;
-    UCHAR InitValAxis[8] = { 50, 50, 50, 0, 0, 0, 0, 0 };
-    UCHAR InitValPov[4] = { (UCHAR)-1, (UCHAR)-1, (UCHAR)-1, (UCHAR)-1 };
-    UCHAR ButtonMask[16] = { 0 };
+    UCHAR InitValAxis[VJOY_NUMBER_OF_AXES] = { 50, 50, 50, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+    UCHAR InitValPov[VJOY_NUMBER_OF_HAT] = { (UCHAR)-1, (UCHAR)-1, (UCHAR)-1, (UCHAR)-1 };
+    UCHAR ButtonMask[VJOY_NUMBER_OF_BUTTONS/8] = { 0 };
     int nAxes, nPovs, offset;
 
     PAGED_CODE();
@@ -1922,26 +1926,23 @@ void ResetDeviceControls(int id, PDEVICE_EXTENSION devContext, PDEVICE_INIT_VALS
     TraceEvents(TRACE_LEVEL_INFORMATION, DBG_INIT, "ResetDeviceControls: Resetting device:%d [granted]\n", id);
 
     // Initialize all fields
-    devContext->positions[index]->ValThrottle = 0;
-    devContext->positions[index]->ValRudder = 0;
-    devContext->positions[index]->ValAileron = 0;
-    devContext->positions[index]->ValX = pdata_buf->InitValAxis[0] * VJOY_AXIS_MAX_VALUE / 100 + 1;//0x7FFF/2+1;
-    devContext->positions[index]->ValY = pdata_buf->InitValAxis[1] * VJOY_AXIS_MAX_VALUE / 100 + 1;//0x7FFF/2+1;
-    devContext->positions[index]->ValZ = pdata_buf->InitValAxis[2] * VJOY_AXIS_MAX_VALUE / 100 + 1;//0x7FFF/2+1;
-    devContext->positions[index]->ValRX = pdata_buf->InitValAxis[3] * VJOY_AXIS_MAX_VALUE / 100 + 1;
-    devContext->positions[index]->ValRY = pdata_buf->InitValAxis[4] * VJOY_AXIS_MAX_VALUE / 100 + 1;
-    devContext->positions[index]->ValRZ = pdata_buf->InitValAxis[5] * VJOY_AXIS_MAX_VALUE / 100 + 1;
-    devContext->positions[index]->ValSlider = pdata_buf->InitValAxis[6] * VJOY_AXIS_MAX_VALUE / 100 + 1;
-    devContext->positions[index]->ValDial = pdata_buf->InitValAxis[7] * VJOY_AXIS_MAX_VALUE / 100 + 1;
+    devContext->positions[index]->ValX = pdata_buf->InitValAxis[0] * VJOY_AXIS_MAX_VALUE / 2 + 1;//0x7FFF/2+1;
+    devContext->positions[index]->ValY = pdata_buf->InitValAxis[1] * VJOY_AXIS_MAX_VALUE / 2 + 1;//0x7FFF/2+1;
+    devContext->positions[index]->ValZ = pdata_buf->InitValAxis[2] * VJOY_AXIS_MAX_VALUE / 2 + 1;//0x7FFF/2+1;
+    devContext->positions[index]->ValRX = pdata_buf->InitValAxis[3] * VJOY_AXIS_MAX_VALUE / 2 + 1;
+    devContext->positions[index]->ValRY = pdata_buf->InitValAxis[4] * VJOY_AXIS_MAX_VALUE / 2 + 1;
+    devContext->positions[index]->ValRZ = pdata_buf->InitValAxis[5] * VJOY_AXIS_MAX_VALUE / 2 + 1;
+    devContext->positions[index]->ValSlider = pdata_buf->InitValAxis[6] * VJOY_AXIS_MAX_VALUE / 2 + 1;
+    devContext->positions[index]->ValDial = pdata_buf->InitValAxis[7] * VJOY_AXIS_MAX_VALUE / 2 + 1;
 
-    devContext->positions[index]->ValWheel = pdata_buf->InitValAxis[8] * VJOY_AXIS_MAX_VALUE / 100 + 1;
-    devContext->positions[index]->ValAccelerator = pdata_buf->InitValAxis[9] * VJOY_AXIS_MAX_VALUE / 100 + 1;
-    devContext->positions[index]->ValBrake = pdata_buf->InitValAxis[10] * VJOY_AXIS_MAX_VALUE / 100 + 1;
-    devContext->positions[index]->ValClutch = pdata_buf->InitValAxis[11] * VJOY_AXIS_MAX_VALUE / 100 + 1;
-    devContext->positions[index]->ValSteering = pdata_buf->InitValAxis[12] * VJOY_AXIS_MAX_VALUE / 100 + 1;
-    devContext->positions[index]->ValThrottle = pdata_buf->InitValAxis[13] * VJOY_AXIS_MAX_VALUE / 100 + 1;
-    devContext->positions[index]->ValRudder = pdata_buf->InitValAxis[14] * VJOY_AXIS_MAX_VALUE / 100 + 1;
-    devContext->positions[index]->ValAileron = pdata_buf->InitValAxis[15] * VJOY_AXIS_MAX_VALUE / 100 + 1;
+    devContext->positions[index]->ValWheel = pdata_buf->InitValAxis[8] * VJOY_AXIS_MAX_VALUE / 2 + 1;
+    devContext->positions[index]->ValAccelerator = pdata_buf->InitValAxis[9] * VJOY_AXIS_MAX_VALUE / 2 + 1;
+    devContext->positions[index]->ValBrake = pdata_buf->InitValAxis[10] * VJOY_AXIS_MAX_VALUE / 2 + 1;
+    devContext->positions[index]->ValClutch = pdata_buf->InitValAxis[11] * VJOY_AXIS_MAX_VALUE / 2 + 1;
+    devContext->positions[index]->ValSteering = pdata_buf->InitValAxis[12] * VJOY_AXIS_MAX_VALUE / 2 + 1;
+    devContext->positions[index]->ValThrottle = pdata_buf->InitValAxis[13] * VJOY_AXIS_MAX_VALUE / 2 + 1;
+    devContext->positions[index]->ValRudder = pdata_buf->InitValAxis[14] * VJOY_AXIS_MAX_VALUE / 2 + 1;
+    devContext->positions[index]->ValAileron = pdata_buf->InitValAxis[15] * VJOY_AXIS_MAX_VALUE / 2 + 1;
 
     if (pdata_buf->InitValPov[0] == -1)
         devContext->positions[index]->ValHats = (DWORD)-1;
@@ -2010,26 +2011,23 @@ void InitializeDev(PDEVICE_EXTENSION   devContext, USHORT Mask, BOOLEAN ResetOnl
         CalcInitValue((USHORT)index + 1, &data_buf);
 
         // Initialize all fields
-        devContext->positions[index]->ValThrottle = 0;
-        devContext->positions[index]->ValRudder = 0;
-        devContext->positions[index]->ValAileron = 0;
-        devContext->positions[index]->ValX = data_buf.InitValAxis[0] * VJOY_AXIS_MAX_VALUE / 100 +1;//0x7FFF/2+1;
-        devContext->positions[index]->ValY = data_buf.InitValAxis[1] * VJOY_AXIS_MAX_VALUE / 100 + 1;//0x7FFF/2+1;
-        devContext->positions[index]->ValZ = data_buf.InitValAxis[2] * VJOY_AXIS_MAX_VALUE / 100 + 1;//0x7FFF/2+1;
-        devContext->positions[index]->ValRX = data_buf.InitValAxis[3] * VJOY_AXIS_MAX_VALUE / 100 + 1;
-        devContext->positions[index]->ValRY = data_buf.InitValAxis[4] * VJOY_AXIS_MAX_VALUE / 100 + 1;
-        devContext->positions[index]->ValRZ = data_buf.InitValAxis[5] * VJOY_AXIS_MAX_VALUE / 100 + 1;
-        devContext->positions[index]->ValSlider = data_buf.InitValAxis[6] * VJOY_AXIS_MAX_VALUE / 100 + 1;
-        devContext->positions[index]->ValDial = data_buf.InitValAxis[7] * VJOY_AXIS_MAX_VALUE / 100 + 1;
+        devContext->positions[index]->ValX = data_buf.InitValAxis[0] * VJOY_AXIS_MAX_VALUE / 2 +1;//0x7FFF/2+1;
+        devContext->positions[index]->ValY = data_buf.InitValAxis[1] * VJOY_AXIS_MAX_VALUE / 2 + 1;//0x7FFF/2+1;
+        devContext->positions[index]->ValZ = data_buf.InitValAxis[2] * VJOY_AXIS_MAX_VALUE / 2 + 1;//0x7FFF/2+1;
+        devContext->positions[index]->ValRX = data_buf.InitValAxis[3] * VJOY_AXIS_MAX_VALUE / 2 + 1;
+        devContext->positions[index]->ValRY = data_buf.InitValAxis[4] * VJOY_AXIS_MAX_VALUE / 2 + 1;
+        devContext->positions[index]->ValRZ = data_buf.InitValAxis[5] * VJOY_AXIS_MAX_VALUE / 2 + 1;
+        devContext->positions[index]->ValSlider = data_buf.InitValAxis[6] * VJOY_AXIS_MAX_VALUE / 2 + 1;
+        devContext->positions[index]->ValDial = data_buf.InitValAxis[7] * VJOY_AXIS_MAX_VALUE / 2 + 1;
         // Should be 0?
-        devContext->positions[index]->ValWheel = data_buf.InitValAxis[8] * VJOY_AXIS_MAX_VALUE / 100 + 1;
-        devContext->positions[index]->ValAccelerator = data_buf.InitValAxis[9] * VJOY_AXIS_MAX_VALUE / 100 + 1;
-        devContext->positions[index]->ValBrake = data_buf.InitValAxis[10] * VJOY_AXIS_MAX_VALUE / 100 + 1;
-        devContext->positions[index]->ValClutch = data_buf.InitValAxis[11] * VJOY_AXIS_MAX_VALUE / 100 + 1;
-        devContext->positions[index]->ValSteering = data_buf.InitValAxis[12] * VJOY_AXIS_MAX_VALUE / 100 + 1;
-        devContext->positions[index]->ValThrottle = data_buf.InitValAxis[13] * VJOY_AXIS_MAX_VALUE / 100 + 1;
-        devContext->positions[index]->ValRudder = data_buf.InitValAxis[14] * VJOY_AXIS_MAX_VALUE / 100 + 1;
-        devContext->positions[index]->ValAileron = data_buf.InitValAxis[15] * VJOY_AXIS_MAX_VALUE / 100 + 1;
+        devContext->positions[index]->ValWheel = data_buf.InitValAxis[8] * VJOY_AXIS_MAX_VALUE / 2 + 1;
+        devContext->positions[index]->ValAccelerator = data_buf.InitValAxis[9] * VJOY_AXIS_MAX_VALUE / 2 + 1;
+        devContext->positions[index]->ValBrake = data_buf.InitValAxis[10] * VJOY_AXIS_MAX_VALUE / 2 + 1;
+        devContext->positions[index]->ValClutch = data_buf.InitValAxis[11] * VJOY_AXIS_MAX_VALUE / 2 + 1;
+        devContext->positions[index]->ValSteering = data_buf.InitValAxis[12] * VJOY_AXIS_MAX_VALUE / 2 + 1;
+        devContext->positions[index]->ValThrottle = data_buf.InitValAxis[13] * VJOY_AXIS_MAX_VALUE / 2 + 1;
+        devContext->positions[index]->ValRudder = data_buf.InitValAxis[14] * VJOY_AXIS_MAX_VALUE / 2 + 1;
+        devContext->positions[index]->ValAileron = data_buf.InitValAxis[15] * VJOY_AXIS_MAX_VALUE / 2 + 1;
 
         // Mark position data as ready to be read
         devContext->PositionReady[index] = TRUE;

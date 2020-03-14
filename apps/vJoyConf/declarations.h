@@ -5,11 +5,13 @@
 
 // Axes:
 // The following define the Internal names and fixed order of the axes (Based on structure DIJOYSTATE2)
+/*
 #define AxesIDs {\
     L"X", L"Y", L"Z", L"Rx", L"Ry", L"Rz", L"S1", L"S2",\
     L"VX", L"VY", L"VZ", L"VRx", L"VRy", L"VRz", L"VS1", L"VS2",\
     L"AX", L"AY", L"AZ", L"ARx", L"ARy", L"ARz", L"AS1", L"AS2",\
     L"FX", L"FY", L"FZ", L"FRx", L"FRy", L"FRz", L"FS1", L"FS2"}
+*/
 
 
 

@@ -955,6 +955,15 @@ void ReportConfSingleDev(BYTE ReportId)
     BOOL SL0_Exist = GetVJDAxisExist(ReportId, HID_USAGE_SL0); // Test if given axis defined in the specified VDJ
     BOOL SL1_Exist = GetVJDAxisExist(ReportId, HID_USAGE_SL1); // Test if given axis defined in the specified VDJ
 
+    BOOL Wheel_Exist = GetVJDAxisExist(ReportId, HID_USAGE_WHL); // Test if given axis defined in the specified VDJ
+    BOOL Accelerator_Exist = GetVJDAxisExist(ReportId, HID_USAGE_ACCELERATOR); // Test if given axis defined in the specified VDJ
+    BOOL Brake_Exist = GetVJDAxisExist(ReportId, HID_USAGE_BRAKE); // Test if given axis defined in the specified VDJ
+    BOOL Clutch_Exist = GetVJDAxisExist(ReportId, HID_USAGE_CLUTCH); // Test if given axis defined in the specified VDJ
+    BOOL Steering_Exist = GetVJDAxisExist(ReportId, HID_USAGE_STEERING); // Test if given axis defined in the specified VDJ
+    BOOL Aileron_Exist = GetVJDAxisExist(ReportId, HID_USAGE_AILERON); // Test if given axis defined in the specified VDJ
+    BOOL Rudder_Exist = GetVJDAxisExist(ReportId, HID_USAGE_RUDDER); // Test if given axis defined in the specified VDJ
+    BOOL Throttle_Exist = GetVJDAxisExist(ReportId, HID_USAGE_THROTTLE); // Test if given axis defined in the specified VDJ
+
     // FFB Section
     BOOL CONST_Exist = IsDeviceFfbEffect(ReportId, HID_USAGE_CONST);
     BOOL RAMP_Exist = IsDeviceFfbEffect(ReportId, HID_USAGE_RAMP);
@@ -1001,6 +1010,23 @@ void ReportConfSingleDev(BYTE ReportId)
         axis = (SL0_Exist == TRUE) ? L"Sl0" : L"-";
         wprintf_s(L"%s ", axis);
         axis = (SL1_Exist == TRUE) ? L"Sl1" : L"-";
+        wprintf_s(L"%s ", axis);
+
+        axis = (Wheel_Exist == TRUE) ? L"Wheel" : L"-";
+        wprintf_s(L"%s ", axis);
+        axis = (Accelerator_Exist == TRUE) ? L"Accelerator" : L"-";
+        wprintf_s(L"%s ", axis);
+        axis = (Brake_Exist == TRUE) ? L"Brake" : L"-";
+        wprintf_s(L"%s ", axis);
+        axis = (Clutch_Exist == TRUE) ? L"Clutch" : L"-";
+        wprintf_s(L"%s ", axis);
+        axis = (Steering_Exist == TRUE) ? L"Steering" : L"-";
+        wprintf_s(L"%s ", axis);
+        axis = (Aileron_Exist == TRUE) ? L"Aileron" : L"-";
+        wprintf_s(L"%s ", axis);
+        axis = (Rudder_Exist == TRUE) ? L"Rudder" : L"-";
+        wprintf_s(L"%s ", axis);
+        axis = (Throttle_Exist == TRUE) ? L"Throttle" : L"-";
         wprintf_s(L"%s ", axis);
 
         wprintf_s(L"\nFFB Effects:\t\t");
@@ -1061,6 +1087,25 @@ void ReportConfSingleDev(BYTE ReportId)
         wprintf_s(L"%s ", axis);
         axis = (SL1_Exist == TRUE) ? L"Sl1" : L"";
         wprintf_s(L"%s ", axis);
+
+        axis = (Wheel_Exist == TRUE) ? L"Wheel" : L"";
+        wprintf_s(L"%s ", axis);
+        axis = (Accelerator_Exist == TRUE) ? L"Accelerator" : L"";
+        wprintf_s(L"%s ", axis);
+        axis = (Brake_Exist == TRUE) ? L"Brake" : L"";
+        wprintf_s(L"%s ", axis);
+        axis = (Clutch_Exist == TRUE) ? L"Clutch" : L"";
+        wprintf_s(L"%s ", axis);
+        axis = (Steering_Exist == TRUE) ? L"Steering" : L"";
+        wprintf_s(L"%s ", axis);
+        axis = (Aileron_Exist == TRUE) ? L"Aileron" : L"";
+        wprintf_s(L"%s ", axis);
+        axis = (Rudder_Exist == TRUE) ? L"Rudder" : L"";
+        wprintf_s(L"%s ", axis);
+        axis = (Throttle_Exist == TRUE) ? L"Throttle" : L"";
+        wprintf_s(L"%s ", axis);
+
+
 
         wprintf_s(L"-b %d ", nButtons);
         if (DiscPovNumber)
