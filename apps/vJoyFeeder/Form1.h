@@ -61,10 +61,12 @@ namespace vJoyDemo {
 
 
             /*3*/
+            /*
             if (!AcquireVJD(GetAndUpdateReportId())) {
                 textBoxInfo->Text = L"Cannot open vJoy Device - Cannot continue\r\n";
                 //return;
-            };
+            }
+            */
 
             /*4*/
             ResetAll();
@@ -522,7 +524,8 @@ namespace vJoyDemo {
         ReportId = System::Convert::ToInt32(listBoxTarget->SelectedItem->ToString());
 
         // Send info to selected vJoy Device
-        GetPositionVJD(ReportId, (PVOID)&Report);
+        if (!GetPositionVJD(ReportId, (PVOID)&Report))
+            return;
         if (ReportId!=Report.bDevice)
             return;
 
