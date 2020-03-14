@@ -1,3 +1,7 @@
+
+// This is used as generic "blocks" of HID descriptors that are packed together
+// when vJoy config tool change the HKLM to reflect the new configuration
+
 BYTE TLID;
 std::vector<std::vector<BYTE>>  FfbDescriptor ={ {
         /*********************** Force Feedback section Device 1 [Start] ***********************/

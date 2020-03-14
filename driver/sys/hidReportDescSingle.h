@@ -8,27 +8,43 @@
 	/***************** Eight Axes ************************************/
 	0x09, 0x01,                    //   USAGE (Pointer)
 	0x15, 0x00,                    //   LOGICAL_MINIMUM (0)
-	0x26, 0xff, 0x7f,              //   LOGICAL_MAXIMUM (32767)
+	0x26, (VJOY_AXIS_MAX_VALUE&0xFF), ((VJOY_AXIS_MAX_VALUE>>8)&0xFF), //   LOGICAL_MAXIMUM (32767) -> 65535
 	0x75, 0x20,                    //   REPORT_SIZE (32)
 	0x95, 0x01,                    //   REPORT_COUNT (1)
 	0xa1, 0x00,                    //   COLLECTION (Physical)
-	0x09, 0x30,                    //     USAGE (X)
-	0x81, 0x02,                    //     INPUT (Data,Var,Abs)
-	0x09, 0x31,                    //     USAGE (Y)
-	0x81, 0x02,                    //     INPUT (Data,Var,Abs)
-	0x09, 0x32,                    //     USAGE (Z)
-	0x81, 0x02,                    //     INPUT (Data,Var,Abs)
-	0x09, 0x33,                    //     USAGE (Rx)
-	0x81, 0x02,                    //     INPUT (Data,Var,Abs)
-	0x09, 0x34,                    //     USAGE (Ry)
-	0x81, 0x02,                    //     INPUT (Data,Var,Abs)
-	0x09, 0x35,                    //     USAGE (Rz)
-	0x81, 0x02,                    //     INPUT (Data,Var,Abs)
-	0x09, 0x36,                    //     USAGE (Slider)
-	0x81, 0x02,                    //     INPUT (Data,Var,Abs)
-	0x09, 0x37,                    //     USAGE (Dial)
-	0x81, 0x02,                    //     INPUT (Data,Var,Abs)
-	0xc0,                          //   END_COLLECTION
+	    0x09, 0x30,                    //     USAGE (X)
+	    0x81, 0x02,                    //     INPUT (Data,Var,Abs)
+	    0x09, 0x31,                    //     USAGE (Y)
+	    0x81, 0x02,                    //     INPUT (Data,Var,Abs)
+	    0x09, 0x32,                    //     USAGE (Z)
+	    0x81, 0x02,                    //     INPUT (Data,Var,Abs)
+	    0x09, 0x33,                    //     USAGE (Rx)
+	    0x81, 0x02,                    //     INPUT (Data,Var,Abs)
+	    0x09, 0x34,                    //     USAGE (Ry)
+	    0x81, 0x02,                    //     INPUT (Data,Var,Abs)
+	    0x09, 0x35,                    //     USAGE (Rz)
+	    0x81, 0x02,                    //     INPUT (Data,Var,Abs)
+	    0x09, 0x36,                    //     USAGE (Slider)
+	    0x81, 0x02,                    //     INPUT (Data,Var,Abs)
+        0x09, 0x37,                    //     USAGE (Dial)
+        0x81, 0x02,                    //     INPUT (Data,Var,Abs)
+        0x09, 0x38,                    //     USAGE (Wheel)
+        0x81, 0x02,                    //     INPUT (Data,Var,Abs)
+        0x09, 0xC4,                    //     USAGE (Accelerator)
+        0x81, 0x02,                    //     INPUT (Data,Var,Abs)
+        0x09, 0xC5,                    //     USAGE (Brake)
+        0x81, 0x02,                    //     INPUT (Data,Var,Abs)
+        0x09, 0xC6,                    //     USAGE (Clutch)
+        0x81, 0x02,                    //     INPUT (Data,Var,Abs)
+        0x09, 0xC8,                    //     USAGE (Steering)
+        0x81, 0x02,                    //     INPUT (Data,Var,Abs)
+        0x09, 0xB0,                    //     USAGE (Aileron)
+        0x81, 0x02,                    //     INPUT (Data,Var,Abs)
+        0x09, 0xBA,                    //     USAGE (Rudder)
+        0x81, 0x02,                    //     INPUT (Data,Var,Abs)
+        0x09, 0xBB,                    //     USAGE (Throttle)
+        0x81, 0x02,                    //     INPUT (Data,Var,Abs)
+    0xc0,                          //   END_COLLECTION
 	/***************** Place holder for 4 POV Hat switches *******************/
 	0x75, 0x20,                    //   REPORT_SIZE (32)
 	0x95, 0x04,                    //   REPORT_COUNT (4)
@@ -45,6 +61,7 @@
 	0x75, 0x01,                    //   REPORT_SIZE (1)
 	0x95, 0x08,                    //   REPORT_COUNT (8)
 	0x81, 0x02,                    //   INPUT (Data,Var,Abs)
+
 	/***************** Place holder for 120 buttons *******************/
 	0x75, 0x78,                    //   REPORT_SIZE (120)
 	0x95, 0x01,                    //   REPORT_COUNT (1)
@@ -91,8 +108,10 @@
        0x75,0x01,    //    Report Size 1
        0x95,0x05,    //    Report Count 5
        0x81,0x02,    //    Input (Variable)
+
        0x95,0x03,    //    Report Count 3
        0x81,0x03,    //    Input (Constant, Variable)
+
        0x09,0x94,    //    Usage Effect Playing
        0x15,0x00,    //    Logical Minimum 0
        0x25,0x01,    //    Logical Maximum 1
@@ -101,6 +120,7 @@
        0x75,0x01,    //    Report Size 1
        0x95,0x01,    //    Report Count 1
        0x81,0x02,    //    Input (Variable)
+
        0x09,0x22,    //    Usage Effect Block Index
        0x15,0x01,    //    Logical Minimum 1
        0x25,0x28,    //    Logical Maximum 28h (40d)

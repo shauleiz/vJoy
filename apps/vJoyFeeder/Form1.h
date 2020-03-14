@@ -404,7 +404,7 @@ private: System::Windows::Forms::Label^  label1;
 // Fill the data structure with data collected from the controls
 // Then send to vJoy Device
     private: System::Void js_update(void) {
-                 JOYSTICK_POSITION_V2	Report;
+                 JOYSTICK_POSITION	Report;
                  static UINT pov[4]={(UINT)-1,(UINT)-1,(UINT)-1,(UINT)-1};
 
 

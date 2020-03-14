@@ -10,11 +10,11 @@ Copyright (c) Shaul Eizikovich.  All rights reserved.
 Module Name:
 
     public.h
-    
+
 Abstract:
 
     Public header file for the vJoy project
-	Developpers that need to interface with vJoy need to include this file
+    Developpers that need to interface with vJoy need to include this file
 
 Author:
 
@@ -32,6 +32,7 @@ Revision History:
 --*/
 #ifndef _PUBLIC_H
 #define _PUBLIC_H
+#pragma once
 
 // Compilation directives
 #define PPJOY_MODE
@@ -69,6 +70,16 @@ DEFINE_GUID(GUID_DEVINTERFACE_VJOY, 0x781EF630, 0x72B2, 0x11d2, 0xB8, 0x52, 0x00
 #define BUILD	0
 #define VER_X_	0
 #endif
+
+
+// Use to select which level of API is being used by the driver : 1 2 or 3
+// See JOYSTICK_POSITION, JOYSTICK_POSITION_V2, JOYSTICK_POSITION_V3
+#define USE_JOYSTICK_API_VERSION 3
+
+#ifndef USE_JOYSTICK_API_VERSION
+#error "Must select an API version!"
+#endif // !USE_JOYSTICK_API_VERSION
+
 
 #define STRINGIFY_1(x)   #x
 #define STRINGIFY(x)     STRINGIFY_1(x)
@@ -134,7 +145,6 @@ DEFINE_GUID(GUID_DEVINTERFACE_VJOY, 0x781EF630, 0x72B2, 0x11d2, 0xB8, 0x52, 0x00
 #define IOCTL_HID_SET_FEATURE	0xB0191
 #define IOCTL_HID_WRITE_REPORT	0xB000F
 
-#define MAX_N_DEVICES	16 // Maximum number of vJoy devices
 
 
 typedef struct _HID_DEVICE_ATTRIBUTES {
@@ -159,10 +169,10 @@ typedef struct _HID_DEVICE_ATTRIBUTES {
 //enum DevType { vJoy, vXbox };
 
 // Error levels for status report
-enum ERRLEVEL {INFO, WARN, ERR, FATAL, APP};
+enum ERRLEVEL { INFO, WARN, ERR, FATAL, APP };
 // Status report function prototype
 #ifdef WINAPI
-typedef BOOL (WINAPI *StatusMessageFunc)(void * output, TCHAR * buffer, enum ERRLEVEL level);
+typedef BOOL(WINAPI* StatusMessageFunc)(void* output, TCHAR* buffer, enum ERRLEVEL level);
 #endif
 
 ///////////////////////////////////////////////////////////////
@@ -176,83 +186,157 @@ typedef BOOL (WINAPI *StatusMessageFunc)(void * output, TCHAR * buffer, enum ERR
 //	JOYSTICK_POSITION iReport;
 //	:
 //	DeviceIoControl (hDevice, 100, &iReport, sizeof(HID_INPUT_REPORT), NULL, 0, &bytes, NULL)
+
+#if USE_JOYSTICK_API_VERSION == 1
+
 typedef struct _JOYSTICK_POSITION
 {
-	BYTE	bDevice;	// Index of device. 1-based.
-	LONG	wThrottle;
-	LONG	wRudder;
-	LONG	wAileron;
-	LONG	wAxisX;
-	LONG	wAxisY;
-	LONG	wAxisZ;
-	LONG	wAxisXRot;
-	LONG	wAxisYRot;
-	LONG	wAxisZRot;
-	LONG	wSlider;
-	LONG	wDial;
-	LONG	wWheel;
-	LONG	wAxisVX;
-	LONG	wAxisVY;
-	LONG	wAxisVZ;
-	LONG	wAxisVBRX;
-	LONG	wAxisVBRY;
-	LONG	wAxisVBRZ;
-	LONG	lButtons;	// 32 buttons: 0x00000001 means button1 is pressed, 0x80000000 -> button32 is pressed
-	DWORD	bHats;		// Lower 4 bits: HAT switch or 16-bit of continuous HAT switch
-	DWORD	bHatsEx1;	// 16-bit of continuous HAT switch
-	DWORD	bHatsEx2;	// 16-bit of continuous HAT switch
-	DWORD	bHatsEx3;	// 16-bit of continuous HAT switch
-} JOYSTICK_POSITION, *PJOYSTICK_POSITION;
+    BYTE	bDevice;	// Index of device. 1-based.
+    LONG	wThrottle;
+    LONG	wRudder;
+    LONG	wAileron;
+    LONG	wAxisX;
+    LONG	wAxisY;
+    LONG	wAxisZ;
+    LONG	wAxisXRot;
+    LONG	wAxisYRot;
+    LONG	wAxisZRot;
+    LONG	wSlider;
+    LONG	wDial;
+    LONG	wWheel;
+    LONG	wAxisVX;
+    LONG	wAxisVY;
+    LONG	wAxisVZ;
+    LONG	wAxisVBRX;
+    LONG	wAxisVBRY;
+    LONG	wAxisVBRZ;
+    LONG	lButtons;	// 32 buttons: 0x00000001 means button1 is pressed, 0x80000000 -> button32 is pressed
+    DWORD	bHats;		// Lower 4 bits: HAT switch or 16-bit of continuous HAT switch
+    DWORD	bHatsEx1;	// 16-bit of continuous HAT switch
+    DWORD	bHatsEx2;	// 16-bit of continuous HAT switch
+    DWORD	bHatsEx3;	// 16-bit of continuous HAT switch
+} JOYSTICK_POSITION, * PJOYSTICK_POSITION;
+
+#define VJOY_MAX_N_DEVICES  16 // Maximum number of vJoy devices
+#define VJOY_NUMBER_OF_AXES (8) // Maximum number of axes
+#define VJOY_NUMBER_OF_HAT (4) // Maximum number of hats
+#define VJOY_NUMBER_OF_BUTTONS (128) // Maximum number of hat
+
+#elif USE_JOYSTICK_API_VERSION == 2
 
 // Superset of JOYSTICK_POSITION
 // Extension of JOYSTICK_POSITION with Buttons 33-128 appended to the end of the structure.
 typedef struct _JOYSTICK_POSITION_V2
 {
-	/// JOYSTICK_POSITION
-	BYTE	bDevice;	// Index of device. 1-based.
-	LONG	wThrottle;
-	LONG	wRudder;
-	LONG	wAileron;
-	LONG	wAxisX;
-	LONG	wAxisY;
-	LONG	wAxisZ;
-	LONG	wAxisXRot;
-	LONG	wAxisYRot;
-	LONG	wAxisZRot;
-	LONG	wSlider;
-	LONG	wDial;
-	LONG	wWheel;
-	LONG	wAxisVX;
-	LONG	wAxisVY;
-	LONG	wAxisVZ;
-	LONG	wAxisVBRX;
-	LONG	wAxisVBRY;
-	LONG	wAxisVBRZ;
-	LONG	lButtons;	// 32 buttons: 0x00000001 means button1 is pressed, 0x80000000 -> button32 is pressed
-	DWORD	bHats;		// Lower 4 bits: HAT switch or 16-bit of continuous HAT switch
-	DWORD	bHatsEx1;	// Lower 4 bits: HAT switch or 16-bit of continuous HAT switch
-	DWORD	bHatsEx2;	// Lower 4 bits: HAT switch or 16-bit of continuous HAT switch
-	DWORD	bHatsEx3;	// Lower 4 bits: HAT switch or 16-bit of continuous HAT switch LONG lButtonsEx1; // Buttons 33-64
-	
-	/// JOYSTICK_POSITION_V2 Extenssion
-	LONG lButtonsEx1; // Buttons 33-64
-	LONG lButtonsEx2; // Buttons 65-96
-	LONG lButtonsEx3; // Buttons 97-128
-} JOYSTICK_POSITION_V2, *PJOYSTICK_POSITION_V2;
+    /// JOYSTICK_POSITION
+    BYTE	bDevice;	// Index of device. 1-based.
+    LONG	wThrottle;
+    LONG	wRudder;
+    LONG	wAileron;
+    LONG	wAxisX;
+    LONG	wAxisY;
+    LONG	wAxisZ;
+    LONG	wAxisXRot;
+    LONG	wAxisYRot;
+    LONG	wAxisZRot;
+    LONG	wSlider;
+    LONG	wDial;
+    LONG	wWheel;
+    LONG	wAxisVX;
+    LONG	wAxisVY;
+    LONG	wAxisVZ;
+    LONG	wAxisVBRX;
+    LONG	wAxisVBRY;
+    LONG	wAxisVBRZ;
+    LONG	lButtons;	// 32 buttons: 0x00000001 means button1 is pressed, 0x80000000 -> button32 is pressed
+    DWORD	bHats;		// Lower 4 bits: HAT switch or 16-bit of continuous HAT switch
+    DWORD	bHatsEx1;	// Lower 4 bits: HAT switch or 16-bit of continuous HAT switch
+    DWORD	bHatsEx2;	// Lower 4 bits: HAT switch or 16-bit of continuous HAT switch
+    DWORD	bHatsEx3;	// Lower 4 bits: HAT switch or 16-bit of continuous HAT switch LONG lButtonsEx1; // Buttons 33-64
+
+    /// JOYSTICK_POSITION_V2 Extenssion
+    LONG lButtonsEx1; // Buttons 33-64
+    LONG lButtonsEx2; // Buttons 65-96
+    LONG lButtonsEx3; // Buttons 97-128
+} JOYSTICK_POSITION_V2, * PJOYSTICK_POSITION_V2;
+
+#define VJOY_MAX_N_DEVICES  16 // Maximum number of vJoy devices
+#define VJOY_NUMBER_OF_AXES (8) // Maximum number of axes
+#define VJOY_NUMBER_OF_HAT (4) // Maximum number of hats
+#define VJOY_NUMBER_OF_BUTTONS (128) // Maximum number of hat
+
+typedef JOYSTICK_POSITION_V2 JOYSTICK_POSITION;
+typedef PJOYSTICK_POSITION_V2 PJOYSTICK_POSITION;
+
+#elif USE_JOYSTICK_API_VERSION == 3
+
+// Extension of JOYSTICK_POSITION for more axes
+typedef struct _JOYSTICK_POSITION_V3
+{
+    /// JOYSTICK_POSITION
+    BYTE	bDevice;	// Index of device. 1-based.
+
+    LONG	wAxisX;
+    LONG	wAxisY;
+    LONG	wAxisZ;
+    LONG	wAxisXRot;
+    LONG	wAxisYRot;
+    LONG	wAxisZRot;
+    LONG	wSlider;
+    LONG	wDial;
+
+    LONG	wWheel;
+    LONG	wAccelerator;
+    LONG	wBrake;
+    LONG	wClutch;
+    LONG	wSteering;
+    LONG	wThrottle;
+    LONG	wRudder;
+    LONG	wAileron;
+
+    LONG	wAxisVX;
+    LONG	wAxisVY;
+    LONG	wAxisVZ;
+    LONG	wAxisVBRX;
+    LONG	wAxisVBRY;
+    LONG	wAxisVBRZ;
+
+    /// JOYSTICK_POSITION_V2 Extenssion
+    LONG    lButtons;	// 32 buttons: 0x00000001 means button1 is pressed, 0x80000000 -> button32 is pressed
+    LONG    lButtonsEx1; // Buttons 33-64
+    LONG    lButtonsEx2; // Buttons 65-96
+    LONG    lButtonsEx3; // Buttons 97-128
+
+    DWORD   bHats;		// Lower 4 bits: HAT switch or 16-bit of continuous HAT switch
+    DWORD   bHatsEx1;	// Lower 4 bits: HAT switch or 16-bit of continuous HAT switch
+    DWORD   bHatsEx2;	// Lower 4 bits: HAT switch or 16-bit of continuous HAT switch
+    DWORD   bHatsEx3;	// Lower 4 bits: HAT switch or 16-bit of continuous HAT switch LONG lButtonsEx1; // Buttons 33-64
+
+} JOYSTICK_POSITION_V3, * PJOYSTICK_POSITION_V3;
+
+#define VJOY_MAX_N_DEVICES  (16) // Maximum number of vJoy devices
+#define VJOY_NUMBER_OF_AXES (16) // Maximum number of axes
+#define VJOY_NUMBER_OF_HAT (4) // Maximum number of hats
+#define VJOY_NUMBER_OF_BUTTONS (128) // Maximum number of hat
+#define VJOY_AXIS_MAX_VALUE (0xFFFF) // Maximum value for an axis
+
+typedef JOYSTICK_POSITION_V3 JOYSTICK_POSITION;
+typedef PJOYSTICK_POSITION_V3 PJOYSTICK_POSITION;
+#endif
 
 
 //-------------
 // FFB Features to be placed in vJoy's driver memory context
 
-// Max 1..40 effect block index
-#define MAX_FFB_EFFECTS_BLOCK_INDEX (0x28)
+// Max 1..40 effect block index. 0x28=40d
+#define MAX_FFB_EFFECTS_BLOCK_INDEX (0x28) 
 
 #if 0
 // FFB: Create New Effect Feature Report=1
 typedef struct _FFB_NEW_EFFECT_REPORT
 {
-	BYTE	effectType;	// Enum (1..12): ET 26,27,30,31,32,33,34,40,41,42,43,28
-	USHORT	byteCount;	// 0..511
+    BYTE	effectType;	// Enum (1..12): ET 26,27,30,31,32,33,34,40,41,42,43,28
+    USHORT	byteCount;	// 0..511
 } FFB_NEW_EFFECT_REPORT, * PFFB_NEW_EFFECT_REPORT;
 #endif
 
@@ -277,7 +361,8 @@ typedef struct _FFB_PID_POOL_REPORT
 // Up to MAX_FFB_EFFECTS_BLOCK_INDEX per device
 typedef struct _FFB_PID_EFFECT_STATE_REPORT
 {
-    BYTE	EffectState;	// ?
+    BYTE	IsUsed;         // For CreateEffect/GetNextFree()
+    BYTE	EffectState;    // 0: not def, 1 runnning, 2 stopped
 } FFB_PID_EFFECT_STATE_REPORT, * PFFB_PID_EFFECT_STATE_REPORT;
 
 // All FFB PID data, one per device
@@ -292,50 +377,59 @@ typedef struct _FFB_DEVICE_PID
 
 
 // HID Descriptor definitions - Axes
-#define HID_USAGE_X		0x30
-#define HID_USAGE_Y		0x31
-#define HID_USAGE_Z		0x32
-#define HID_USAGE_RX	0x33
-#define HID_USAGE_RY	0x34
-#define HID_USAGE_RZ	0x35
-#define HID_USAGE_SL0	0x36
-#define HID_USAGE_SL1	0x37
-#define HID_USAGE_WHL	0x38
-#define HID_USAGE_POV	0x39
+#define HID_USAGE_X             0x30
+#define HID_USAGE_Y             0x31
+#define HID_USAGE_Z             0x32
+#define HID_USAGE_RX            0x33
+#define HID_USAGE_RY            0x34
+#define HID_USAGE_RZ            0x35
+#define HID_USAGE_SL0           0x36
+#define HID_USAGE_SL1           0x37
+#define HID_USAGE_WHL           0x38
+#define HID_USAGE_POV           0x39
+#define HID_USAGE_ACCELERATOR   0xC4
+#define HID_USAGE_BRAKE         0xC5
+#define HID_USAGE_CLUTCH        0xC6
+#define HID_USAGE_STEERING      0xC8
+#define HID_USAGE_AILERON       0xB0
+#define HID_USAGE_RUDDER        0xBA
+#define HID_USAGE_THROTTLE      0xBB
+
+
 
 // HID Descriptor definitions - FFB Effects
-#define HID_USAGE_CONST 0x26    //    Usage ET Constant Force
-#define HID_USAGE_RAMP  0x27    //    Usage ET Ramp
-#define HID_USAGE_SQUR  0x30    //    Usage ET Square
-#define HID_USAGE_SINE  0x31    //    Usage ET Sine
-#define HID_USAGE_TRNG  0x32    //    Usage ET Triangle
-#define HID_USAGE_STUP  0x33    //    Usage ET Sawtooth Up
-#define HID_USAGE_STDN  0x34    //    Usage ET Sawtooth Down
-#define HID_USAGE_SPRNG 0x40    //    Usage ET Spring
-#define HID_USAGE_DMPR  0x41    //    Usage ET Damper
-#define HID_USAGE_INRT  0x42    //    Usage ET Inertia
-#define HID_USAGE_FRIC  0x43    //    Usage ET Friction
-#define HID_USAGE_CUSTM 0x28    //    Usage ET Custom Force Data
-#define HID_USAGE_RESERVD 0x29  //    Usage ET Reserved (unused)
+#define HID_USAGE_CONST     0x26    //    Usage ET Constant Force
+#define HID_USAGE_RAMP      0x27    //    Usage ET Ramp
+#define HID_USAGE_SQUR      0x30    //    Usage ET Square
+#define HID_USAGE_SINE      0x31    //    Usage ET Sine
+#define HID_USAGE_TRNG      0x32    //    Usage ET Triangle
+#define HID_USAGE_STUP      0x33    //    Usage ET Sawtooth Up
+#define HID_USAGE_STDN      0x34    //    Usage ET Sawtooth Down
+#define HID_USAGE_SPRNG     0x40    //    Usage ET Spring
+#define HID_USAGE_DMPR      0x41    //    Usage ET Damper
+#define HID_USAGE_INRT      0x42    //    Usage ET Inertia
+#define HID_USAGE_FRIC      0x43    //    Usage ET Friction
+#define HID_USAGE_CUSTM     0x28    //    Usage ET Custom Force Data
+#define HID_USAGE_RESERVD   0x29  //    Usage ET Reserved (unused)
 
 
 // HID Descriptor definitions - FFB Report IDs
-#define HID_ID_STATE	0x02	// Usage PID State report
-#define HID_ID_EFFREP	0x01	// Usage Set Effect Report
-#define HID_ID_ENVREP	0x02	// Usage Set Envelope Report
-#define HID_ID_CONDREP	0x03	// Usage Set Condition Report
-#define HID_ID_PRIDREP	0x04	// Usage Set Periodic Report
-#define HID_ID_CONSTREP	0x05	// Usage Set Constant Force Report
-#define HID_ID_RAMPREP	0x06	// Usage Set Ramp Force Report
-#define HID_ID_CSTMREP	0x07	// Usage Custom Force Data Report
-#define HID_ID_SMPLREP	0x08	// Usage Download Force Sample
-#define HID_ID_EFOPREP	0x0A	// Usage Effect Operation Report
-#define HID_ID_BLKFRREP	0x0B	// Usage PID Block Free Report
-#define HID_ID_CTRLREP	0x0C	// Usage PID Device Control
-#define HID_ID_GAINREP	0x0D	// Usage Device Gain Report
-#define HID_ID_SETCREP	0x0E	// Usage Set Custom Force Report
-#define HID_ID_NEWEFREP	0x01	// Usage Create New Effect Report
-#define HID_ID_BLKLDREP	0x02	// Usage Block Load Report
-#define HID_ID_POOLREP	0x03	// Usage PID Pool Report
+#define HID_ID_STATE        0x02	// Usage PID State report
+#define HID_ID_EFFREP       0x01	// Usage Set Effect Report
+#define HID_ID_ENVREP       0x02	// Usage Set Envelope Report
+#define HID_ID_CONDREP      0x03	// Usage Set Condition Report
+#define HID_ID_PRIDREP      0x04	// Usage Set Periodic Report
+#define HID_ID_CONSTREP     0x05	// Usage Set Constant Force Report
+#define HID_ID_RAMPREP      0x06	// Usage Set Ramp Force Report
+#define HID_ID_CSTMREP      0x07	// Usage Custom Force Data Report
+#define HID_ID_SMPLREP      0x08	// Usage Download Force Sample
+#define HID_ID_EFOPREP      0x0A	// Usage Effect Operation Report
+#define HID_ID_BLKFRREP     0x0B	// Usage PID Block Free Report
+#define HID_ID_CTRLREP      0x0C	// Usage PID Device Control
+#define HID_ID_GAINREP      0x0D	// Usage Device Gain Report
+#define HID_ID_SETCREP      0x0E	// Usage Set Custom Force Report
+#define HID_ID_NEWEFREP     0x01	// Usage Create New Effect Report
+#define HID_ID_BLKLDREP     0x02	// Usage Block Load Report
+#define HID_ID_POOLREP      0x03	// Usage PID Pool Report
 
 #endif

@@ -29,7 +29,7 @@ HINSTANCE hInst;								// current instance
 HWND  hTabs;	  // Handle to tabs control
 HWND  hwndToolTip; // Handle to tooltip window
 HINSTANCE g_hInstance;
-std::vector<CvJoyDevice *> vJoyDevice;
+std::vector<CvJoyDevice*> vJoyDevice;
 std::vector<int> vControls;
 HWND  hDlgTab; // Dialog box inside the tab control
 HWND  hTopDlg; // Top Dialog
@@ -83,9 +83,9 @@ BOOL				Initialize(void);
 void				EnableTab(int iTab, BOOL Enable);
 void				PopulateTab(int iTab);
 void				InitializeTab(HWND hTab);
-void				GetCtrlState(HWND hDlg, bool *AxisArr, int *nPovCont, int *nPovDisc, int *nButtons, bool *Ffb);
-int 				CreateHidReportDesc(void ** data, UINT nButtons, bool * axes, int nPovHatsCont, int nPovHatsDir, BYTE ReportId, bool Ffb);
-void				WriteHidReportDescToReg(int target, UCHAR * Descriptor, int size);
+void				GetCtrlState(HWND hDlg, bool* AxisArr, int* nPovCont, int* nPovDisc, int* nButtons, bool* Ffb);
+int 				CreateHidReportDesc(void** data, UINT nButtons, bool* axes, int nPovHatsCont, int nPovHatsDir, BYTE ReportId, bool Ffb);
+void				WriteHidReportDescToReg(int target, UCHAR* Descriptor, int size);
 void				DeleteHidReportDescFromReg(int target);
 BOOL				isOnlyDevice(UINT Id);
 void				DeleteDevice(int Id);
@@ -102,8 +102,8 @@ void				vJoyDeviceRemoved(void);
 void				vJoyDeviceArrived(void);
 VOID CALLBACK		RefreshAll(HWND hwnd, UINT uMsg, UINT_PTR idEvent, DWORD dwTime);
 int					GetCurrentTabIndex(void);
-void				CreateFfbDesc(std::vector<BYTE> * buffer, BYTE ReportId);
-void				ModifyFfbEffectDesc(std::vector<BYTE> * buffer, UINT16 Mask);
+void				CreateFfbDesc(std::vector<BYTE>* buffer, BYTE ReportId);
+void				ModifyFfbEffectDesc(std::vector<BYTE>* buffer, UINT16 Mask);
 int					GetFfbState(void);
 void				EnableFfbEffectCB(BOOL Enable);
 void				UpdateFfbEffectCB(int rID);
@@ -113,9 +113,9 @@ void				FfbCBChanged(void);
 UINT16				GetFfbEffectMask(void);
 
 int APIENTRY _tWinMain(_In_ HINSTANCE hInstance,
-                     _In_opt_ HINSTANCE hPrevInstance,
-                     _In_ LPTSTR    lpCmdLine,
-                     _In_ int       nCmdShow)
+    _In_opt_ HINSTANCE hPrevInstance,
+    _In_ LPTSTR    lpCmdLine,
+    _In_ int       nCmdShow)
 {
     UNREFERENCED_PARAMETER(hPrevInstance);
     UNREFERENCED_PARAMETER(lpCmdLine);
@@ -138,12 +138,10 @@ int APIENTRY _tWinMain(_In_ HINSTANCE hInstance,
 
     // Start top dialog box message loop
     MSG Msg;
-    while (GetMessage(&Msg, NULL, 0, 0))
-    {
+    while (GetMessage(&Msg, NULL, 0, 0)) {
         if (TranslateAccelerator(hTopDlg, hAccel, &Msg))
             continue;
-        if (!IsDialogMessage(hTopDlg, &Msg))
-        {
+        if (!IsDialogMessage(hTopDlg, &Msg)) {
             TranslateMessage(&Msg);
             DispatchMessage(&Msg);
         }
@@ -161,8 +159,7 @@ INT_PTR CALLBACK vJoyConfCB(HWND hDlg, UINT message, WPARAM wParam, LPARAM lPara
     bool Checked;
 
     UNREFERENCED_PARAMETER(lParam);
-    switch (message)
-    {
+    switch (message) {
     case WM_VJOYCHANGED:
         if (wParam && lParam) // First remove message
             vJoyDeviceRemoved();
@@ -178,26 +175,22 @@ INT_PTR CALLBACK vJoyConfCB(HWND hDlg, UINT message, WPARAM wParam, LPARAM lPara
         return (INT_PTR)TRUE;
 
     case WM_COMMAND:
-        if (LOWORD(wParam) == IDOK || LOWORD(wParam) == IDCANCEL)
-        {
-            if (OnClosing())
-            {
+        if (LOWORD(wParam) == IDOK || LOWORD(wParam) == IDCANCEL) {
+            if (OnClosing()) {
                 EndDialog(hDlg, LOWORD(wParam));
                 PostQuitMessage(0);
             }
-                
+
             return (INT_PTR)TRUE;
         }
 
-        if ((wParam&0xFFFF) == IDC_RSTALL)
-        {
+        if ((wParam&0xFFFF) == IDC_RSTALL) {
             OnResetAll(hDlg);
             break;
         }
 
         // Enable vJoy checkbox
-        if ((LOWORD(wParam) == IDC_CHK_ENVJOY) && (HIWORD(wParam) == BN_CLICKED))
-        {
+        if ((LOWORD(wParam) == IDC_CHK_ENVJOY) && (HIWORD(wParam) == BN_CLICKED)) {
             Checked = (IsDlgButtonChecked(hDlg, IDC_CHK_ENVJOY) == BST_CHECKED);
             if (Checked)
                 enable(GetvJoyVersion());
@@ -213,22 +206,19 @@ INT_PTR CALLBACK vJoyConfCB(HWND hDlg, UINT message, WPARAM wParam, LPARAM lPara
 
 
     case WM_NOTIFY:
-        if (((LPNMHDR)lParam)->idFrom == IDC_DEVTABS)
-        {
-            if (((LPNMHDR)lParam)->code == TCN_SELCHANGING)
-            { 
+        if (((LPNMHDR)lParam)->idFrom == IDC_DEVTABS) {
+            if (((LPNMHDR)lParam)->code == TCN_SELCHANGING) {
                 SetWindowLongPtr(hDlg, DWLP_MSGRESULT, OnSelChanging(hDlgTab));
                 return  (INT_PTR)TRUE;
-                };
+            };
             if (((LPNMHDR)lParam)->code == TCN_SELCHANGE)
                 OnSelChanged(hDlgTab);
-                
-            return  (INT_PTR)TRUE;			
+
+            return  (INT_PTR)TRUE;
         }
 
         // Tooltips
-        if (((LPNMHDR)lParam)->code == TTN_GETDISPINFO)
-        {
+        if (((LPNMHDR)lParam)->code == TTN_GETDISPINFO) {
             UpdateToolTip((LPVOID)lParam);
             return  (INT_PTR)TRUE;
         };
@@ -241,11 +231,10 @@ INT_PTR CALLBACK vJoyConfCB(HWND hDlg, UINT message, WPARAM wParam, LPARAM lPara
 // Message handler for top dialog box.
 INT_PTR CALLBACK DlgTabCB(HWND hDlgTab, UINT message, WPARAM wParam, LPARAM lParam)
 {
-    UNREFERENCED_PARAMETER(lParam);	
-    int nButtons=0;
+    UNREFERENCED_PARAMETER(lParam);
+    int nButtons = 0;
 
-    switch (message)
-    {
+    switch (message) {
     case WM_INITDIALOG:
         // Place the tab dialog box in the tabs control and display it
         SetWindowPos(hDlgTab, HWND_TOP, 0, 45, 0, 0, SWP_NOSIZE);
@@ -256,8 +245,7 @@ INT_PTR CALLBACK DlgTabCB(HWND hDlgTab, UINT message, WPARAM wParam, LPARAM lPar
 
     case WM_NOTIFY:
         // Tooltips
-        if (((LPNMHDR)lParam)->code == TTN_GETDISPINFO)
-        {
+        if (((LPNMHDR)lParam)->code == TTN_GETDISPINFO) {
             UpdateToolTip((LPVOID)lParam);
             return  (INT_PTR)TRUE;
         };
@@ -267,8 +255,7 @@ INT_PTR CALLBACK DlgTabCB(HWND hDlgTab, UINT message, WPARAM wParam, LPARAM lPar
     case WM_COMMAND:
         if (LOWORD(wParam) == IDC_POV_LST && HIWORD(wParam) == LBN_SELCHANGE)
             OnUserChanged();
-        if (LOWORD(wParam) == IDC_NBTN && HIWORD(wParam) == EN_CHANGE)
-        {
+        if (LOWORD(wParam) == IDC_NBTN && HIWORD(wParam) == EN_CHANGE) {
             TCHAR nBtnStr[5];
             // 	Limit the values of number of buttons
             GetWindowText(GetDlgItem(hDlgTab, IDC_NBTN), nBtnStr, 5);
@@ -281,8 +268,7 @@ INT_PTR CALLBACK DlgTabCB(HWND hDlgTab, UINT message, WPARAM wParam, LPARAM lPar
             OnUserChanged();
         };
 
-        switch (wParam&0xFFFF)
-        {
+        switch (wParam&0xFFFF) {
         case IDOK:
         case IDCANCEL:
             EndDialog(hDlgTab, LOWORD(wParam));
@@ -379,16 +365,12 @@ BOOL TopDialogInit(HWND hDlg)
     // Place the tabs
     // Unimplemented devices marked with '[]'
     std::wstring s;
-    for (UINT i = MAX_N_DEVICES; i ; i--)
-    {
+    for (UINT i = VJOY_MAX_N_DEVICES; i; i--) {
 #if 0
-        if ((vJoyDevice.size() >= i) && (vJoyDevice[i - 1]->Exists()))
-        {
+        if ((vJoyDevice.size() >= i) && (vJoyDevice[i - 1]->Exists())) {
             s = std::to_wstring(i);
             tie.iImage = (i - 1) * 2; // TODO
-        }
-        else
-        {
+        } else {
             s = L"[" + std::to_wstring(i) + L"]";
             tie.iImage = (1 + (i - 1) * 2); // TODO
         };
@@ -406,9 +388,9 @@ BOOL TopDialogInit(HWND hDlg)
     if (hImageList)
         TabCtrl_SetImageList(hTabs, hImageList);
 
-    
+
     GetFfbState();
-    for (UINT i = MAX_N_DEVICES; i; i--)
+    for (UINT i = VJOY_MAX_N_DEVICES; i; i--)
         RefreshTabState(i);
 
     // Create the dialog box that is imbedded in the tab control
@@ -440,17 +422,13 @@ BOOL OnSelChanging(HWND hDlg)
     // The tab was changed by the user
     // Ask the user if to Apply (Yes/No/Cancel)
     int mb_res = MessageBox(NULL, Res2TStr(IDS_I_CHNGNG), Res2TTtl(IDS_T_CHNGNG), MB_YESNOCANCEL | MB_ICONQUESTION);
-    if (mb_res == IDYES)
-    {
+    if (mb_res == IDYES) {
         OnApply(hDlg);
         return FALSE;
-    }
-    else if (mb_res == IDNO)
-    {
+    } else if (mb_res == IDNO) {
         OnRevert(hDlg, TRUE);
         return FALSE;
-    }
-    else
+    } else
         return TRUE;
 }
 
@@ -464,14 +442,11 @@ void OnSelChanged(HWND hDlg)
     // Get the current selection - extract the ID 
     int iTab = GetCurrentTabIndex();
 
-    if (SerialNunberStr)
-    {
+    if (SerialNunberStr) {
         // Display the device number and version
         LoadStringW(hInst, IDS_DEVNUM, buf1, MAX_MSG_SIZE);
         swprintf_s(buf2, MAX_MSG_SIZE, buf1, iTab + 1, SerialNunberStr);
-    }
-    else
-    {
+    } else {
         // Display the device number
         LoadStringW(hInst, IDS_DEVNUM2, buf1, MAX_MSG_SIZE);
         swprintf_s(buf2, MAX_MSG_SIZE, buf1, iTab + 1);
@@ -489,16 +464,13 @@ void OnSelChanged(HWND hDlg)
     //EnableWindow(hDlgTab, FALSE);
 
     PopulateTab(iTab);
-    if (vJoyDevice[iTab]->Exists())
-    {
+    if (vJoyDevice[iTab]->Exists()) {
         SetWindowText(GetDlgItem(hDlgTab, IDC_STATUS), TEXT(""));
         SetWindowText(GetDlgItem(hDlgTab, IDC_ADDDEL_BTN), Res2TStr(IDS_DELDEV));
         AddBtn = FALSE;
         EnableTab(iTab, TRUE);
         swprintf_s(buf1, MAX_MSG_SIZE, L"");
-    }
-    else
-    {
+    } else {
         SetWindowText(GetDlgItem(hDlgTab, IDC_STATUS), Res2TStr(IDS_STAT_NOT_IMP));
         SetWindowText(GetDlgItem(hDlgTab, IDC_ADDDEL_BTN), Res2TStr(IDS_ADDDEV));
         AddBtn = TRUE;
@@ -542,7 +514,7 @@ void OnApply(HWND hDlg)
     if (!sTab)
         return;
 
-    bool AxisChecked[8] = { 0 };
+    bool AxisChecked[VJOY_NUMBER_OF_AXES] = { 0 };
     int nPovHatsCont = 0, nPovHatsDir = 0, nButtons = 0;
     bool FfbEn = false;
 
@@ -555,21 +527,20 @@ void OnApply(HWND hDlg)
 
     // Call external C-function that creats an array of bytes that holds
     // the HID Report Descriptor
-    
-        UCHAR **out2 = (UCHAR **)malloc(sizeof(UCHAR *));
-        if (!out2)
-            return;
-        int desc_size = CreateHidReportDesc((void **)out2, nButtons, AxisChecked, nPovHatsCont, nPovHatsDir, (int)(iTab + 1), FfbEn);
-        if ((desc_size <= 0))
-        {
-            free(out2);
-            MessageBox(NULL, Res2TStr(IDC_FAILED_CREATE), Res2TTtl(IDS_APP_TITLE), MB_OK | MB_ICONERROR);
-            return;
-        };
 
-        // Write descriptor to registry
-        WriteHidReportDescToReg((int)(iTab + 1), *out2, desc_size);
+    UCHAR** out2 = (UCHAR**)malloc(sizeof(UCHAR*));
+    if (!out2)
+        return;
+    int desc_size = CreateHidReportDesc((void**)out2, nButtons, AxisChecked, nPovHatsCont, nPovHatsDir, (int)(iTab + 1), FfbEn);
+    if ((desc_size <= 0)) {
         free(out2);
+        MessageBox(NULL, Res2TStr(IDC_FAILED_CREATE), Res2TTtl(IDS_APP_TITLE), MB_OK | MB_ICONERROR);
+        return;
+    };
+
+    // Write descriptor to registry
+    WriteHidReportDescToReg((int)(iTab + 1), *out2, desc_size);
+    free(out2);
 
 
     // Refresh
@@ -582,14 +553,13 @@ void OnApply(HWND hDlg)
 
     // Refresh the state of the affected tab
     RefreshTabState(iTab + 1);
-    
+
 }
 
 // Revert button pressed
 void OnRevert(HWND hDlg, BOOL Quiet)
 {
-    if (!Quiet)
-    {
+    if (!Quiet) {
         if (MessageBox(NULL, Res2TStr(IDS_RUSURE_REVT), Res2TTtl(IDS_T_RUSURE_REVT), MB_YESNO | MB_ICONQUESTION) == IDNO)
             return;
     };
@@ -631,7 +601,7 @@ void OnResetAll(HWND hDlg)
     EnableWindow(GetDlgItem(hDlgTab, IDC_REVT_BTN), Changed);
 
     // Refresh statuses of all tabs
-    for (int i = MAX_N_DEVICES; i; i--)
+    for (int i = VJOY_MAX_N_DEVICES; i; i--)
         RefreshTabState(i);
 }
 
@@ -662,7 +632,7 @@ void OnUserChanged(void)
     EnableWindow(GetDlgItem(hDlgTab, IDC_APPLY_BTN), Changed);
     EnableWindow(GetDlgItem(hDlgTab, IDC_REVT_BTN), Changed);
 
-    WCHAR ChangedStr[MAX_MSG_SIZE] = (L""); 
+    WCHAR ChangedStr[MAX_MSG_SIZE] = (L"");
     LoadStringW(hInst, IDS_STAT_CHNGD, ChangedStr, MAX_MSG_SIZE);
     SetWindowTextW(GetDlgItem(hDlgTab, IDC_STATLINE), ChangedStr);
 }
@@ -702,19 +672,16 @@ BOOL Initialize()
 {
 
     // Is vJoy installed?
-    if (!vJoyEnabled())
-    {
+    if (!vJoyEnabled()) {
         //	MessageBox(NULL, Res2TStr(IDC_NOT_EXIST), Res2TTtl(IDS_APP_TITLE), MB_OK | MB_ICONERROR);
         //	return FALSE;
         vJoyIsOn = FALSE;  // vJoy Enable checkbox unchecked
     }
 
-    else
-    {
+    else {
         // Does DLL match vJoy driver
         WORD DllVer, DrvVer;
-        if (!DriverMatch(&DllVer, &DrvVer))
-        {
+        if (!DriverMatch(&DllVer, &DrvVer)) {
             TCHAR msg[250] = { 0 };
             _stprintf_s(msg, Res2TStr(IDC_VER_MISMATCH), DllVer, DrvVer);
             if (IDYES != MessageBox(NULL, msg, Res2TStr(IDS_APP_TITLE), MB_YESNO | MB_ICONWARNING))
@@ -725,9 +692,8 @@ BOOL Initialize()
     // Create a vector device objects
     // Vector item n points at vJoy object with id=n+1
     vJoyDevice.clear();
-    for (auto i = 1; i <= MAX_N_DEVICES; i++)
-    {
-        CvJoyDevice * d = new CvJoyDevice(i);
+    for (auto i = 1; i <= VJOY_MAX_N_DEVICES; i++) {
+        CvJoyDevice* d = new CvJoyDevice(i);
         vJoyDevice.push_back(d);
     };
 
@@ -766,12 +732,12 @@ void PopulateTab(int iTab)
     BOOL Exist_RZ = TRUE;
     BOOL Exist_SL0 = TRUE;
     BOOL Exist_SL1 = TRUE;
+
     int nBtn = 32;
     int nDiscPov = 0;
     int nContPov = 0;
 
-    if (vJoyDevice[iTab]->Exists())
-    {
+    if (vJoyDevice[iTab]->Exists()) {
         //// Get data from driver
         // Axes
         Exist_X = vJoyDevice[iTab]->AxisExists(HID_USAGE_X);
@@ -808,14 +774,11 @@ void PopulateTab(int iTab)
     SetWindowText(GetDlgItem(hDlgTab, IDC_NBTN), nBtnStr);
 
     // POV
-    if (nDiscPov)
-    {
+    if (nDiscPov) {
         SendMessage(GetDlgItem(hDlgTab, IDC_POV_DESC), BM_SETCHECK, BST_CHECKED, 0);
         SendMessage(GetDlgItem(hDlgTab, IDC_POV_CONT), BM_SETCHECK, BST_UNCHECKED, 0);
         SendMessage(GetDlgItem(hDlgTab, IDC_POV_LST), LB_SETCURSEL, nDiscPov, 0);
-    }
-    else
-    {
+    } else {
         SendMessage(GetDlgItem(hDlgTab, IDC_POV_DESC), BM_SETCHECK, BST_UNCHECKED, 0);
         SendMessage(GetDlgItem(hDlgTab, IDC_POV_CONT), BM_SETCHECK, BST_CHECKED, 0);
         SendMessage(GetDlgItem(hDlgTab, IDC_POV_LST), LB_SETCURSEL, nContPov, 0);
@@ -826,16 +789,13 @@ void PopulateTab(int iTab)
     // and only for the first 15 tabs
     BOOL FfbSupported = FALSE;
     vJoyFfbCap(&FfbSupported);
-    if (iTab >= MAX_N_FFB || !FfbSupported)
-    {
+    if (iTab >= MAX_N_FFB || !FfbSupported) {
         //ShowWindow(GetDlgItem(hDlgTab, IDC_FRAME_FFB), SW_HIDE);
         //ShowWindow(GetDlgItem(hDlgTab, IDC_CHK_FFB), SW_HIDE); 
         EnableWindow(GetDlgItem(hDlgTab, IDC_CHK_FFB), FALSE);
         SendMessage(GetDlgItem(hDlgTab, IDC_CHK_FFB), BM_SETCHECK, BST_UNCHECKED, 0);
         ClearFfbEffectCB();
-    }
-    else
-    {
+    } else {
         //ShowWindow(GetDlgItem(hDlgTab, IDC_CHK_FFB), SW_SHOW);
 
         // Show if FFB supported for this device
@@ -858,8 +818,7 @@ void PopulateTab(int iTab)
         UpdateFfbEffectCB(iTab + 1);
     if (Button_GetCheck(GetDlgItem(hDlgTab, IDC_CHK_FFB)) == BST_CHECKED)
         EnableFfbEffectCB(TRUE);
-    else
-    {
+    else {
         EnableFfbEffectCB(FALSE);
         ClearFfbEffectCB();
     }
@@ -887,7 +846,7 @@ void InitializeTab(HWND hTab)
 }
 
 // Read the state of Tab dialog box controls
-void GetCtrlState(HWND hDlg, bool *AxisArr, int *nPovCont, int *nPovDisc, int *nButtons, bool *Ffb)
+void GetCtrlState(HWND hDlg, bool* AxisArr, int* nPovCont, int* nPovDisc, int* nButtons, bool* Ffb)
 {
 
     // Axes
@@ -933,26 +892,45 @@ Return:
 Positive value: Size of HID Report Descriptor (output buffer) in bytes.
 
 */
-int CreateHidReportDesc(void ** data, UINT nButtons, bool * axes, int nPovHatsCont, int nPovHatsDir, BYTE ReportId, bool Ffb)
+int CreateHidReportDesc(void** data, UINT nButtons, bool* axes, int nPovHatsCont, int nPovHatsDir, BYTE ReportId, bool Ffb)
 {
     /* normalize if illegal parameters are passed */
     // Buttons: 0-128
-    if (nButtons>128)
-        nButtons = 128;
+    if (nButtons>VJOY_NUMBER_OF_BUTTONS)
+        nButtons = VJOY_NUMBER_OF_BUTTONS;
 
-	/* Special case of zero buttons - Local Min Usage is 0 rather than 1 */
-	UINT localminusage_buttons = nButtons ? 0x01 : 0x00;
+    /* Special case of zero buttons - Local Min Usage is 0 rather than 1 */
+    UINT localminusage_buttons = nButtons ? 0x01 : 0x00;
 
     // POV (Cont): 0-4
     if (nPovHatsCont<0)
         nPovHatsCont = 0;
-    if (nPovHatsCont>4)
-        nPovHatsCont = 4;
+    if (nPovHatsCont>VJOY_NUMBER_OF_HAT)
+        nPovHatsCont = VJOY_NUMBER_OF_HAT;
     // POV (Dir): 0-4
     if (nPovHatsDir<0)
         nPovHatsDir = 0;
-    if (nPovHatsDir>4)
-        nPovHatsDir = 4;
+    if (nPovHatsDir>VJOY_NUMBER_OF_HAT)
+        nPovHatsDir = VJOY_NUMBER_OF_HAT;
+
+    BYTE AxesHID[]{
+        HID_USAGE_X,
+        HID_USAGE_Y,
+        HID_USAGE_Z,
+        HID_USAGE_RX,
+        HID_USAGE_RY,
+        HID_USAGE_RZ,
+        HID_USAGE_SL0,
+        HID_USAGE_SL1,
+        HID_USAGE_WHL,
+        HID_USAGE_ACCELERATOR,
+        HID_USAGE_BRAKE,
+        HID_USAGE_CLUTCH,
+        HID_USAGE_STEERING,
+        HID_USAGE_AILERON,
+        HID_USAGE_RUDDER,
+        HID_USAGE_THROTTLE,
+    };
 
     /* Create a data buffer large enough to hold the resulting HID Report Descriptor */
     //int buffer_size = 1023;
@@ -979,7 +957,7 @@ int CreateHidReportDesc(void ** data, UINT nButtons, bool * axes, int nPovHatsCo
         NEXT_BYTE(buffer, HIDP_GLOBAL_LOG_MIN_1)			// LOGICAL_MINIMUM(0):				15 00
         NEXT_BYTE(buffer, 0)
         NEXT_BYTE(buffer, HIDP_GLOBAL_LOG_MAX_2)			// LOGICAL_MAXIMUM(32767):			26 FF 7F
-        NEXT_SHORT(buffer, 0x7FFF)
+        NEXT_SHORT(buffer, VJOY_AXIS_MAX_VALUE)
         NEXT_BYTE(buffer, HIDP_GLOBAL_REPORT_SIZE)		// REPORT_SIZE(32):					75 20
         NEXT_BYTE(buffer, 0x20)
         NEXT_BYTE(buffer, HIDP_GLOBAL_REPORT_COUNT_1)	// REPORT_COUNT(1):					95 01
@@ -988,28 +966,23 @@ int CreateHidReportDesc(void ** data, UINT nButtons, bool * axes, int nPovHatsCo
         NEXT_BYTE(buffer, 0x00)
 
         /** Collection 2 **/
-        /* Loop on fitst 8 Axes */
-    for (int i = 0; i<8; i++)
-    {
-        if (axes[i])
-        {
-            // Insert Axis
-            NEXT_BYTE(buffer, HIDP_LOCAL_USAGE_1)	// USAGE(X+offset):					0x09 0x30+i
-                NEXT_BYTE(buffer, HID_USAGE_GENERIC_X + i)
-                NEXT_BYTE(buffer, HIDP_MAIN_INPUT_1)		// INPUT (Data,Var,Abs):			0x81 0x02
-                NEXT_BYTE(buffer, 0x02)
-        }
-        else
-        {
-            // Insert place holder
-            NEXT_BYTE(buffer, HIDP_MAIN_INPUT_1)		// INPUT (Cnst,Ary,Abs):			0x81 0x01
-                NEXT_BYTE(buffer, 0x01)
+        /* Loop on fitst Axes */
+        for (int i = 0; i<VJOY_NUMBER_OF_AXES; i++) {
+            if (axes[i]) {
+                // Insert Axis
+                NEXT_BYTE(buffer, HIDP_LOCAL_USAGE_1)	// USAGE(X+offset):					0x09 0x30+i
+                    NEXT_BYTE(buffer, AxesHID[i])
+                    NEXT_BYTE(buffer, HIDP_MAIN_INPUT_1)		// INPUT (Data,Var,Abs):			0x81 0x02
+                    NEXT_BYTE(buffer, 0x02)
+            } else {
+                // Insert place holder
+                NEXT_BYTE(buffer, HIDP_MAIN_INPUT_1)		// INPUT (Cnst,Ary,Abs):			0x81 0x01
+                    NEXT_BYTE(buffer, 0x01)
+            };
         };
-    };
     NEXT_BYTE(buffer, HIDP_MAIN_ENDCOLLECTION)		// END_COLLECTION:					0xC0
 
-        if (nPovHatsDir)
-        {
+        if (nPovHatsDir) {
             // POV - supported: One switch at most, 5-state only
             NEXT_BYTE(buffer, HIDP_GLOBAL_LOG_MIN_1)			// LOGICAL_MINIMUM(0):		15 00
                 NEXT_BYTE(buffer, 0x00)
@@ -1028,8 +1001,7 @@ int CreateHidReportDesc(void ** data, UINT nButtons, bool * axes, int nPovHatsCo
                 NEXT_BYTE(buffer, 0x01)
 
                 // Insert 1-4 5-state POVs
-                for (int i = 1; i <= nPovHatsDir; i++)
-                {
+                for (int i = 1; i <= nPovHatsDir; i++) {
                     NEXT_BYTE(buffer, HIDP_LOCAL_USAGE_1)			// USAGE(Hat switch):		0x09 0x39
                         NEXT_BYTE(buffer, HID_USAGE_GENERIC_HATSWITCH)
                         NEXT_BYTE(buffer, HIDP_MAIN_INPUT_1)				// INPUT (Data,Var,Abs):	0x81 0x02
@@ -1041,112 +1013,104 @@ int CreateHidReportDesc(void ** data, UINT nButtons, bool * axes, int nPovHatsCo
                 NEXT_BYTE(buffer, 0x20 - nPovHatsDir)
                 NEXT_BYTE(buffer, HIDP_MAIN_INPUT_1)				// INPUT (Cnst,Ary,Abs):	0x81 0x01
                 NEXT_BYTE(buffer, 0x01)
-        }
-        else if (nPovHatsCont)
-        {
-            // Continuous POV
-            NEXT_BYTE(buffer, HIDP_GLOBAL_LOG_MIN_1)			// LOGICAL_MINIMUM(0):		15 00
-                NEXT_BYTE(buffer, 0x00)
-                NEXT_BYTE(buffer, HIDP_GLOBAL_LOG_MAX_4)			// LOGICAL_MAXIMUM(35900):	27 3c 8c 00 00
-                NEXT_SHORT(buffer, 0x8C3C)
-                NEXT_SHORT(buffer, 0x0000)
-                NEXT_BYTE(buffer, HIDP_GLOBAL_PHY_MIN_1)			// PHYSICAL_MINIMUM (0):	35 00
-                NEXT_BYTE(buffer, 0x00)
-                NEXT_BYTE(buffer, HIDP_GLOBAL_PHY_MAX_4)			// PHYSICAL_MAXIMUM (35900):	47 3c 8c 00 00
-                NEXT_SHORT(buffer, 0x8C3C)
-                NEXT_SHORT(buffer, 0x0000)
-                NEXT_BYTE(buffer, HIDP_GLOBAL_UNIT_1)			// UNIT (Eng Rot:Angular Pos):	65 14
-                NEXT_BYTE(buffer, 0x14)
-                //
-                NEXT_BYTE(buffer, HIDP_GLOBAL_REPORT_SIZE)		// REPORT_SIZE(32):			75 20
-                NEXT_BYTE(buffer, 0x20)
-                NEXT_BYTE(buffer, HIDP_GLOBAL_REPORT_COUNT_1)	// REPORT_COUNT(1):			95 01
-                NEXT_BYTE(buffer, 0x01)
+        } else if (nPovHatsCont) {
+                // Continuous POV
+                NEXT_BYTE(buffer, HIDP_GLOBAL_LOG_MIN_1)			// LOGICAL_MINIMUM(0):		15 00
+                    NEXT_BYTE(buffer, 0x00)
+                    NEXT_BYTE(buffer, HIDP_GLOBAL_LOG_MAX_4)			// LOGICAL_MAXIMUM(35900):	27 3c 8c 00 00
+                    NEXT_SHORT(buffer, 0x8C3C)
+                    NEXT_SHORT(buffer, 0x0000)
+                    NEXT_BYTE(buffer, HIDP_GLOBAL_PHY_MIN_1)			// PHYSICAL_MINIMUM (0):	35 00
+                    NEXT_BYTE(buffer, 0x00)
+                    NEXT_BYTE(buffer, HIDP_GLOBAL_PHY_MAX_4)			// PHYSICAL_MAXIMUM (35900):	47 3c 8c 00 00
+                    NEXT_SHORT(buffer, 0x8C3C)
+                    NEXT_SHORT(buffer, 0x0000)
+                    NEXT_BYTE(buffer, HIDP_GLOBAL_UNIT_1)			// UNIT (Eng Rot:Angular Pos):	65 14
+                    NEXT_BYTE(buffer, 0x14)
+                    //
+                    NEXT_BYTE(buffer, HIDP_GLOBAL_REPORT_SIZE)		// REPORT_SIZE(32):			75 20
+                    NEXT_BYTE(buffer, 0x20)
+                    NEXT_BYTE(buffer, HIDP_GLOBAL_REPORT_COUNT_1)	// REPORT_COUNT(1):			95 01
+                    NEXT_BYTE(buffer, 0x01)
 
-                // Insert 1-4 continuous POVs
-                for (int i = 1; i <= nPovHatsCont; i++)
-                {
-                    NEXT_BYTE(buffer, HIDP_LOCAL_USAGE_1)			// USAGE(Hat switch):		0x09 0x39
-                        NEXT_BYTE(buffer, HID_USAGE_GENERIC_HATSWITCH)
-                        NEXT_BYTE(buffer, HIDP_MAIN_INPUT_1)				// INPUT (Data,Var,Abs):	0x81 0x02
-                        NEXT_BYTE(buffer, 0x02)
+                    // Insert 1-4 continuous POVs
+                    for (int i = 1; i <= nPovHatsCont; i++) {
+                        NEXT_BYTE(buffer, HIDP_LOCAL_USAGE_1)			// USAGE(Hat switch):		0x09 0x39
+                            NEXT_BYTE(buffer, HID_USAGE_GENERIC_HATSWITCH)
+                            NEXT_BYTE(buffer, HIDP_MAIN_INPUT_1)				// INPUT (Data,Var,Abs):	0x81 0x02
+                            NEXT_BYTE(buffer, 0x02)
+                    };
+
+                // Insert 1-3 continuous POV place holders
+                if (nPovHatsCont<4) {
+                    NEXT_BYTE(buffer, HIDP_GLOBAL_REPORT_COUNT_1)	// REPORT_COUNT(3):		95 03
+                        NEXT_BYTE(buffer, 0x04 - nPovHatsCont)
+                        NEXT_BYTE(buffer, HIDP_MAIN_INPUT_1)				// INPUT (Cnst,Ary,Abs):	0x81 0x01
+                        NEXT_BYTE(buffer, 0x01)
                 };
-
-            // Insert 1-3 continuous POV place holders
-            if (nPovHatsCont<4)
-            {
-                NEXT_BYTE(buffer, HIDP_GLOBAL_REPORT_COUNT_1)	// REPORT_COUNT(3):		95 03
-                    NEXT_BYTE(buffer, 0x04 - nPovHatsCont)
+            } else {
+                // Sixteen 4-bit padding
+                NEXT_BYTE(buffer, HIDP_GLOBAL_REPORT_SIZE)		// REPORT_SIZE(32):			75 20
+                    NEXT_BYTE(buffer, 0x20)
+                    NEXT_BYTE(buffer, HIDP_GLOBAL_REPORT_COUNT_1)	// REPORT_COUNT(4):			95 04
+                    NEXT_BYTE(buffer, 0x04)
                     NEXT_BYTE(buffer, HIDP_MAIN_INPUT_1)				// INPUT (Cnst,Ary,Abs):	0x81 0x01
                     NEXT_BYTE(buffer, 0x01)
             };
-        }
-        else
-        {
-            // Sixteen 4-bit padding
-            NEXT_BYTE(buffer, HIDP_GLOBAL_REPORT_SIZE)		// REPORT_SIZE(32):			75 20
-                NEXT_BYTE(buffer, 0x20)
-                NEXT_BYTE(buffer, HIDP_GLOBAL_REPORT_COUNT_1)	// REPORT_COUNT(4):			95 04
-                NEXT_BYTE(buffer, 0x04)
-                NEXT_BYTE(buffer, HIDP_MAIN_INPUT_1)				// INPUT (Cnst,Ary,Abs):	0x81 0x01
+
+
+            // Buttons - up to 32 buttons supported. Only the NUMBER of buttons can be set
+            //int nButtons = 0;
+            //for (int i=0; i<MAX_BUTTONS; i++)
+            //	if (buttons[i]) 
+            //		nButtons++;
+
+            // There are buttons
+            NEXT_BYTE(buffer, HIDP_GLOBAL_USAGE_PAGE_1)		// USAGE_PAGE(Buttons):		05 09
+                NEXT_BYTE(buffer, HID_USAGE_PAGE_BUTTON)
+                NEXT_BYTE(buffer, HIDP_GLOBAL_LOG_MIN_1)			// LOGICAL_MINIMUM(0):		15 00
+                NEXT_BYTE(buffer, 0x00)
+                NEXT_BYTE(buffer, HIDP_GLOBAL_LOG_MAX_1)			// LOGICAL_MAXIMUM(0):		25 01
                 NEXT_BYTE(buffer, 0x01)
-        };
+                NEXT_BYTE(buffer, HIDP_GLOBAL_UNIT_EXP_1)		// UNIT_EXPONENT(0):		55 00
+                NEXT_BYTE(buffer, 0x00)
+                NEXT_BYTE(buffer, HIDP_GLOBAL_UNIT_1)			// UNIT (None):				65 00
+                NEXT_BYTE(buffer, 0x00)
+                NEXT_BYTE(buffer, HIDP_LOCAL_USAGE_MIN_1)		// USAGE_MINIMUM(1):		19 01/00
+                NEXT_BYTE(buffer, localminusage_buttons)
+                NEXT_BYTE(buffer, HIDP_LOCAL_USAGE_MAX_1)		// USAGE_MAXIMUM(nButtons):	29 nButtons
+                NEXT_BYTE(buffer, nButtons)
+                NEXT_BYTE(buffer, HIDP_GLOBAL_REPORT_SIZE)		// REPORT_SIZE(1):			75 01
+                NEXT_BYTE(buffer, 0x01)
+                NEXT_BYTE(buffer, HIDP_GLOBAL_REPORT_COUNT_1)	// REPORT_COUNT(nButtons):	95 nButtons
+                NEXT_BYTE(buffer, nButtons)
+                NEXT_BYTE(buffer, HIDP_MAIN_INPUT_1)				// INPUT (Data,Var,Abs):	0x81 0x02
+                NEXT_BYTE(buffer, 0x02)
+
+                // Padding, if there are less than 32 buttons
+                if (nButtons < VJOY_NUMBER_OF_BUTTONS) {
+                    NEXT_BYTE(buffer, HIDP_GLOBAL_REPORT_SIZE)	// REPORT_SIZE(x):		75 32-nButtons
+                        NEXT_BYTE(buffer, VJOY_NUMBER_OF_BUTTONS - nButtons)
+                        NEXT_BYTE(buffer, HIDP_GLOBAL_REPORT_COUNT_1)	// REPORT_COUNT(1):	95 nButtons
+                        NEXT_BYTE(buffer, 0x01)
+                        NEXT_BYTE(buffer, HIDP_MAIN_INPUT_1)			// INPUT (Cnst,Ary,Abs):0x81 0x01
+                        NEXT_BYTE(buffer, 0x01)
+                };
 
 
-        // Buttons - up to 32 buttons supported. Only the NUMBER of buttons can be set
-        //int nButtons = 0;
-        //for (int i=0; i<MAX_BUTTONS; i++)
-        //	if (buttons[i]) 
-        //		nButtons++;
+            // Insert FFB section to the descriptor if the user chose to
+            if (Ffb) {
+                CreateFfbDesc(&buffer, ReportId);
+                UINT16 mask = GetFfbEffectMask();
+                ModifyFfbEffectDesc(&buffer, mask);
+            }
 
-        // There are buttons
-        NEXT_BYTE(buffer, HIDP_GLOBAL_USAGE_PAGE_1)		// USAGE_PAGE(Buttons):		05 09
-            NEXT_BYTE(buffer, HID_USAGE_PAGE_BUTTON)
-            NEXT_BYTE(buffer, HIDP_GLOBAL_LOG_MIN_1)			// LOGICAL_MINIMUM(0):		15 00
-            NEXT_BYTE(buffer, 0x00)
-            NEXT_BYTE(buffer, HIDP_GLOBAL_LOG_MAX_1)			// LOGICAL_MAXIMUM(0):		25 01
-            NEXT_BYTE(buffer, 0x01)
-            NEXT_BYTE(buffer, HIDP_GLOBAL_UNIT_EXP_1)		// UNIT_EXPONENT(0):		55 00
-            NEXT_BYTE(buffer, 0x00)
-            NEXT_BYTE(buffer, HIDP_GLOBAL_UNIT_1)			// UNIT (None):				65 00
-            NEXT_BYTE(buffer, 0x00)
-            NEXT_BYTE(buffer, HIDP_LOCAL_USAGE_MIN_1)		// USAGE_MINIMUM(1):		19 01/00
-            NEXT_BYTE(buffer, localminusage_buttons)
-            NEXT_BYTE(buffer, HIDP_LOCAL_USAGE_MAX_1)		// USAGE_MAXIMUM(nButtons):	29 nButtons
-            NEXT_BYTE(buffer, nButtons)
-            NEXT_BYTE(buffer, HIDP_GLOBAL_REPORT_SIZE)		// REPORT_SIZE(1):			75 01
-            NEXT_BYTE(buffer, 0x01)
-            NEXT_BYTE(buffer, HIDP_GLOBAL_REPORT_COUNT_1)	// REPORT_COUNT(nButtons):	95 nButtons
-            NEXT_BYTE(buffer, nButtons)
-            NEXT_BYTE(buffer, HIDP_MAIN_INPUT_1)				// INPUT (Data,Var,Abs):	0x81 0x02
-            NEXT_BYTE(buffer, 0x02)
+            NEXT_BYTE(buffer, HIDP_MAIN_ENDCOLLECTION)			// END_COLLECTION:					0xC0
 
-            // Padding, if there are less than 32 buttons
-            if (nButtons < MAX_BUTTONS)
-            {
-                NEXT_BYTE(buffer, HIDP_GLOBAL_REPORT_SIZE)	// REPORT_SIZE(x):		75 32-nButtons
-                    NEXT_BYTE(buffer, MAX_BUTTONS - nButtons)
-                    NEXT_BYTE(buffer, HIDP_GLOBAL_REPORT_COUNT_1)	// REPORT_COUNT(1):	95 nButtons
-                    NEXT_BYTE(buffer, 0x01)
-                    NEXT_BYTE(buffer, HIDP_MAIN_INPUT_1)			// INPUT (Cnst,Ary,Abs):0x81 0x01
-                    NEXT_BYTE(buffer, 0x01)
-            };
+                UCHAR* orig = &buffer[0];
+            *data = (void**)orig;
 
-
-        // Insert FFB section to the descriptor if the user chose to
-        if (Ffb)
-        {
-            CreateFfbDesc(&buffer, ReportId);
-            UINT16 mask = GetFfbEffectMask();
-            ModifyFfbEffectDesc(&buffer, mask);
-        }
-
-        NEXT_BYTE(buffer, HIDP_MAIN_ENDCOLLECTION)			// END_COLLECTION:					0xC0
-
-        UCHAR * orig = &buffer[0];
-        *data = (void **)orig;
-
-        return (int)buffer.size();
+            return (int)buffer.size();
 
 }
 
@@ -1157,7 +1121,7 @@ Key:	HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\services\vjoy\Parameters\Device
 Name:	HidReportDesctiptor
 Type:	REG_BINARY
 */
-void WriteHidReportDescToReg(int target, UCHAR * Descriptor, int size)
+void WriteHidReportDescToReg(int target, UCHAR* Descriptor, int size)
 {
     /* Open registry - Most of the path should exist */
     HKEY hParams, hDevDef;
@@ -1173,16 +1137,14 @@ void WriteHidReportDescToReg(int target, UCHAR * Descriptor, int size)
 
     // Create Key
     RegRes = RegCreateKey(HKEY_LOCAL_MACHINE, lpRegParam, &hDevDef);
-    if (RegRes != ERROR_SUCCESS)
-    {
+    if (RegRes != ERROR_SUCCESS) {
         RegCloseKey(hParams);
         return;	// Error
     };
 
     /* Write the data */
     RegRes = RegSetValueEx(hDevDef, DESC_NAME, 0, REG_BINARY, Descriptor, size);
-    if (RegRes != ERROR_SUCCESS)
-    {
+    if (RegRes != ERROR_SUCCESS) {
         RegCloseKey(hParams);
         RegCloseKey(hDevDef);
         return;	// Error
@@ -1190,13 +1152,13 @@ void WriteHidReportDescToReg(int target, UCHAR * Descriptor, int size)
 
     /* Write the data Size*/
     DWORD dSize = (DWORD)size;
-    RegSetValueEx(hDevDef, DESC_SIZE, 0, REG_DWORD, (const BYTE *)(&dSize), 4);
+    RegSetValueEx(hDevDef, DESC_SIZE, 0, REG_DWORD, (const BYTE*)(&dSize), 4);
     RegCloseKey(hParams);
     RegCloseKey(hDevDef);
 }
 
 /*
-    Delete the HID Report Descriptor from the registry Key:	
+    Delete the HID Report Descriptor from the registry Key:
     HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\services\vjoy\Parameters\Device0
 */
 void DeleteHidReportDescFromReg(int target)
@@ -1214,8 +1176,7 @@ void DeleteHidReportDescFromReg(int target)
     if (target)
         top = bottom = target;
 
-    for (int i = bottom; i <= top; i++)
-    {
+    for (int i = bottom; i <= top; i++) {
         // Create target key string from target number
         WCHAR RegParam[sizeof(REG_PARAM_DEV) + 3] = { 0 };
         swprintf_s(RegParam, sizeof(REG_PARAM_DEV) + 3, REG_PARAM_DEV  L"%02d", i);
@@ -1240,9 +1201,8 @@ BOOL isOnlyDevice(UINT Id)
     if (!vJoyDevice[Id - 1]->Exists())
         return FALSE;
 
-    UINT i=0;
-    while (i < vJoyDevice.size())
-    {
+    UINT i = 0;
+    while (i < vJoyDevice.size()) {
         i++;
         if (i == Id)
             continue;
@@ -1279,7 +1239,7 @@ void AddDevice(int Id)
     OnApply(hDlgTab);
 
     // Refresh all tab icons
-    for (int i = MAX_N_DEVICES; i; i--)
+    for (int i = VJOY_MAX_N_DEVICES; i; i--)
         RefreshTabState(i);
 
     // Refresh Tab
@@ -1289,16 +1249,16 @@ void AddDevice(int Id)
 // Return the string related to the resource string ID
 LPTSTR Res2TStr(UINT uId)
 {
-    int res =  LoadString( hInst, uId, g_msg, MAX_LOADSTRING);
+    int res = LoadString(hInst, uId, g_msg, MAX_LOADSTRING);
     if (!res)
         return TEXT("");
     return g_msg;
-} 
+}
 
 // Return the string related to the resource string ID (Use it for titles)
 LPTSTR Res2TTtl(UINT uId)
 {
-    int res =  LoadString( hInst, uId, g_ttl, MAX_LOADSTRING);
+    int res = LoadString(hInst, uId, g_ttl, MAX_LOADSTRING);
     if (!res)
         return TEXT("");
     return g_ttl;
@@ -1325,8 +1285,7 @@ HWND CreateToolTip(HWND hDlg, const int arr[], int size)
 
 
     // Initializing Tooltip per control
-    if (hwndToolTip)
-    {
+    if (hwndToolTip) {
         // General initialization
         TOOLINFO toolInfo = { 0 };
         toolInfo.cbSize = TTTOOLINFO_V1_SIZE;
@@ -1336,8 +1295,7 @@ HWND CreateToolTip(HWND hDlg, const int arr[], int size)
 
         // Loop on all controls that require tooltip
         vControls.assign(arr, arr + size);
-        for (auto ctrl : vControls)
-        {
+        for (auto ctrl : vControls) {
             HWND hwndTool = GetDlgItem(hDlg, ctrl);
             toolInfo.uId = (UINT_PTR)hwndTool;
             SendMessage(hwndToolTip, TTM_ADDTOOL, 0, (LPARAM)&toolInfo);
@@ -1364,8 +1322,7 @@ void DisplayToolTip(LPNMTTDISPINFO lpttt, int TxtID, int TitleID, int Icon)
 
     if (TitleID<0)
         SendMessage(hwndToolTip, TTM_SETTITLE, TTI_NONE, (LPARAM)TEXT(""));
-    else
-    {
+    else {
         LoadString(g_hInstance, TitleID, TitleText, MAX_MSG_SIZE);
         SendMessage(hwndToolTip, TTM_SETTITLE, Icon, (LPARAM)TitleText);
     };
@@ -1481,23 +1438,22 @@ HIMAGELIST CreateTabsImageList(void)
     HIMAGELIST hList;
     HBITMAP bitmap;
 
-    int icons[] = 
+    int icons[] =
     {
         IDI_1_ON, IDI_1_OFF, IDI_2_ON, IDI_2_OFF, IDI_3_ON, IDI_3_OFF, IDI_4_ON, IDI_4_OFF,
         IDI_5_ON, IDI_5_OFF, IDI_6_ON, IDI_6_OFF, IDI_7_ON, IDI_7_OFF, IDI_8_ON, IDI_8_OFF,
-        IDI_9_ON, IDI_9_OFF, IDI_10_ON, IDI_10_OFF, IDI_11_ON, IDI_11_OFF, IDI_12_ON, IDI_12_OFF, 
+        IDI_9_ON, IDI_9_OFF, IDI_10_ON, IDI_10_OFF, IDI_11_ON, IDI_11_OFF, IDI_12_ON, IDI_12_OFF,
         IDI_13_ON, IDI_13_OFF, IDI_14_ON, IDI_14_OFF, IDI_15_ON, IDI_15_OFF, IDI_16_ON, IDI_16_OFF, IDI_16_DEL
     };
     int iLast = sizeof(icons) / sizeof(int);
 
     // Creat a list of 16x16 images that may contain up to 4 icons
-    hList = ImageList_Create(16, 16, ILC_COLOR32,iLast , 0); // 
+    hList = ImageList_Create(16, 16, ILC_COLOR32, iLast, 0); // 
     if (!hList)
         return hList;
 
     // Load icons to the limmage list
-    for (int i = 0; i<iLast; ++i)
-    {
+    for (int i = 0; i<iLast; ++i) {
         icon = reinterpret_cast<HICON>(LoadImage(g_hInstance, MAKEINTRESOURCE(icons[i]), IMAGE_ICON, 16, 16, LR_LOADTRANSPARENT));
         if (!icon)
             continue;
@@ -1521,19 +1477,15 @@ void RefreshTabState(int Id)
     tie.iImage = -1;
 
     // Special case - Tab #16  +  Active FFB state
-    if ((Id == 16) &&   (FfbState == 2) )
-            tie.iImage = 32;
+    if ((Id == 16) &&   (FfbState == 2))
+        tie.iImage = 32;
 
     // All other tabs
-    else
-    {
+    else {
 
-        if (vJoyDevice[Id - 1]->Exists())
-        {
+        if (vJoyDevice[Id - 1]->Exists()) {
             tie.iImage = (Id - 1) * 2; // TODO
-        }
-        else
-        {
+        } else {
             tie.iImage = (1 + (Id - 1) * 2); // TODO
         };
     };
@@ -1547,15 +1499,13 @@ BOOL isBitnessCompat(BOOL Quiet)
     SYSTEM_INFO info;
     GetNativeSystemInfo(&info);
 
-    if ((info.wProcessorArchitecture == PROCESSOR_ARCHITECTURE_AMD64) && x86)
-    {
+    if ((info.wProcessorArchitecture == PROCESSOR_ARCHITECTURE_AMD64) && x86) {
         if (!Quiet)
             MessageBox(NULL, Res2TStr(IDS_I_FOR32), Res2TTtl(IDS_APP_TITLE), MB_OK | MB_ICONERROR);
         return FALSE;
     };
 
-    if ((info.wProcessorArchitecture == PROCESSOR_ARCHITECTURE_INTEL) && !x86)
-    { 		
+    if ((info.wProcessorArchitecture == PROCESSOR_ARCHITECTURE_INTEL) && !x86) {
         if (!Quiet)
             MessageBox(NULL, Res2TStr(IDS_I_FOR64), Res2TTtl(IDS_APP_TITLE), MB_OK | MB_ICONERROR);
         return FALSE;
@@ -1583,8 +1533,7 @@ void vJoyDeviceRemoved(void)
     // Change all tab icons to inactive
     tie.mask = TCIF_IMAGE;
     tie.iImage = -1;
-    for (int Id = MAX_N_DEVICES; Id; Id--)
-    {
+    for (int Id = VJOY_MAX_N_DEVICES; Id; Id--) {
         tie.iImage = (1 + (Id - 1) * 2);
         TabCtrl_SetItem(hTabs, Id - 1, &tie);
     };
@@ -1594,7 +1543,7 @@ void vJoyDeviceRemoved(void)
     EnableWindow(GetDlgItem(hDlgTab, IDC_ADDDEL_BTN), FALSE);
     EnableWindow(GetDlgItem(hTopDlg, IDC_RSTALL), FALSE);
 
-}  
+}
 
 // This function is called for every arriving device
 // It resets the refresh-timer to 1000mSec
@@ -1625,7 +1574,7 @@ VOID CALLBACK RefreshAll(HWND hwnd, UINT uMsg, UINT_PTR idEvent, DWORD dwTime)
 
 
     // Update tab icons
-    for (int i = MAX_N_DEVICES; i; i--)
+    for (int i = VJOY_MAX_N_DEVICES; i; i--)
         RefreshTabState(i);
 
     KillTimer(hwnd, idEvent);
@@ -1652,7 +1601,7 @@ int GetCurrentTabIndex(void)
 
 // Appends the FFB section of the descriptor to a given buff
 // The FFB section is given as a global array of bytes
-void CreateFfbDesc(std::vector<BYTE> * buffer, BYTE ReportId)
+void CreateFfbDesc(std::vector<BYTE>* buffer, BYTE ReportId)
 {
 
     // Vector of bytes depending on the ID
@@ -1680,8 +1629,7 @@ void CreateFfbDesc(std::vector<BYTE> * buffer, BYTE ReportId)
     // Replace the first byte of each sub vector with the corresponding varible (exclude first sub vector)
     // Append modified sub vector to buffer
     buffer->insert(buffer->end(), FfbDescriptor[0].begin(), FfbDescriptor[0].end());
-    for (UINT i = 1; i < FfbDescriptor.size(); i++)
-    {
+    for (UINT i = 1; i < FfbDescriptor.size(); i++) {
         FfbDescriptor[i][0] = vars[i - 1];
         buffer->insert(buffer->end(), FfbDescriptor[i].begin(), FfbDescriptor[i].end());
     }
@@ -1691,9 +1639,9 @@ void CreateFfbDesc(std::vector<BYTE> * buffer, BYTE ReportId)
 // Parameters:
 // Buffer: Descriptor to be modified
 // Mask: Bit-mask representing the effects required
-void ModifyFfbEffectDesc(std::vector<BYTE> * buffer, UINT16 Mask)
+void ModifyFfbEffectDesc(std::vector<BYTE>* buffer, UINT16 Mask)
 {
-    int Effect[] { HID_USAGE_CONST,
+    int Effect[]{ HID_USAGE_CONST,
         HID_USAGE_RAMP,
         HID_USAGE_SQUR,
         HID_USAGE_SINE,
@@ -1708,8 +1656,7 @@ void ModifyFfbEffectDesc(std::vector<BYTE> * buffer, UINT16 Mask)
     BYTE nEff = sizeof(Effect) / sizeof(int);
 
     // Search for sequence(0x09, 0x25, 0xA1, 0x02)
-    for (auto &i : *buffer)
-    {
+    for (auto& i : *buffer) {
         if ((i == 0x09) && (*std::next(&i, 1) == 0x25) && (*std::next(&i, 2) == 0xA1) && (*std::next(&i, 3) == 0x02)) {
             // Sequence found - now replace by going over the effects 
             for (BYTE e = 0; e < nEff; e++) {
@@ -1737,25 +1684,21 @@ int GetFfbState(void)
 {
     BOOL FfbSupported = FALSE;
     vJoyFfbCap(&FfbSupported);
-    if (!FfbSupported)
-    {
+    if (!FfbSupported) {
         FfbState = 0;
         return 	FfbState;
     };
 
     // Test if device 16 exists
     int Id = 16;
-    if (vJoyDevice[Id - 1]->Exists())
-    {
+    if (vJoyDevice[Id - 1]->Exists()) {
         FfbState = 0;
         return 	FfbState;
     };
 
     // Test if any of the lower 15 devices supports FFB
-    for (int id = 1; id <= MAX_N_FFB; id++)
-    {
-        if (IsDeviceFfb(id))
-        {
+    for (int id = 1; id <= MAX_N_FFB; id++) {
+        if (IsDeviceFfb(id)) {
             FfbState = 2;
             return 	FfbState;
         };
@@ -1767,9 +1710,9 @@ int GetFfbState(void)
 // Enable/Disable all Checkboxes related to FFB Effects
 void EnableFfbEffectCB(BOOL Enable)
 {
-    int cb[] 
-    { 
-        IDC_CHK_FFB_CONST,  IDC_CHK_FFB_RAMP, IDC_CHK_FFB_SQUARE,  IDC_CHK_FFB_SINE, 
+    int cb[]
+    {
+        IDC_CHK_FFB_CONST,  IDC_CHK_FFB_RAMP, IDC_CHK_FFB_SQUARE,  IDC_CHK_FFB_SINE,
         IDC_CHK_FFB_TRI, IDC_CHK_FFB_STUP,  IDC_CHK_FFB_STDN,  IDC_CHK_FFB_SPRING,
         IDC_CHK_FFB_DAMPER,  IDC_CHK_FFB_INERTIA, IDC_CHK_FFB_FRICTION
     };
@@ -1784,15 +1727,14 @@ void UpdateFfbEffectCB(int rID)
 {
     BOOL isEffect;
     HWND h;
-    int pairs[][2] 
-    { 
+    int pairs[][2]
+    {
         { IDC_CHK_FFB_CONST, 0x26 }, { IDC_CHK_FFB_RAMP, 0x27 }, { IDC_CHK_FFB_SQUARE, 0x30 }, { IDC_CHK_FFB_SINE, 0x31 },
         { IDC_CHK_FFB_TRI, 0x32 }, { IDC_CHK_FFB_STUP, 0x33 }, { IDC_CHK_FFB_STDN, 0x34 }, { IDC_CHK_FFB_SPRING, 0x40 },
         { IDC_CHK_FFB_DAMPER, 0x41 }, { IDC_CHK_FFB_INERTIA, 0x42 }, { IDC_CHK_FFB_FRICTION, 0x43 }
     };
 
-    for (auto effect : pairs)
-    {
+    for (auto effect : pairs) {
         if (!vJoyDevice[rID - 1]->Exists())
             isEffect = FALSE;
         else
@@ -1813,8 +1755,7 @@ void ClearFfbEffectCB(void)
             IDC_CHK_FFB_DAMPER, IDC_CHK_FFB_INERTIA, IDC_CHK_FFB_FRICTION
     };
 
-    for (auto effect : cb)
-    {
+    for (auto effect : cb) {
         h = GetDlgItem(hDlgTab, effect);
         SendMessage(h, BM_SETCHECK, FALSE, 0);
     };
@@ -1831,8 +1772,7 @@ void SetFfbEffectCB(void)
             IDC_CHK_FFB_DAMPER, IDC_CHK_FFB_INERTIA, IDC_CHK_FFB_FRICTION
     };
 
-    for (auto effect : cb)
-    {
+    for (auto effect : cb) {
         h = GetDlgItem(hDlgTab, effect);
         SendMessage(h, BM_SETCHECK, TRUE, 0);
     };
@@ -1845,7 +1785,7 @@ void SetFfbEffectCB(void)
 void FfbCBChanged(void)
 {
     // Get current Tab
-    int id = TabCtrl_GetCurSel(hTabs) +1 ;
+    int id = TabCtrl_GetCurSel(hTabs) +1;
     if (id<1)
         return;
 
@@ -1855,15 +1795,12 @@ void FfbCBChanged(void)
     EnableFfbEffectCB(Checked);
 
 
-    if (Checked)
-    {
+    if (Checked) {
         if (IsDeviceFfb(id))
             UpdateFfbEffectCB(id);
         else
             SetFfbEffectCB();
-    }
-    else
-    {
+    } else {
         if (!IsDeviceFfb(id))
             ClearFfbEffectCB();
     };
@@ -1883,8 +1820,7 @@ UINT16 GetFfbEffectMask(void)
             IDC_CHK_FFB_DAMPER, IDC_CHK_FFB_INERTIA, IDC_CHK_FFB_FRICTION
     };
 
-    for (auto effect : cb)
-    {
+    for (auto effect : cb) {
         BOOL Checked = FALSE, Enabled = FALSE;
         h = GetDlgItem(hDlgTab, effect);
         if (Button_GetCheck(h) == BST_CHECKED)

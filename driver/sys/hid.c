@@ -37,20 +37,20 @@ Revision History:
 #endif
 
 #ifdef ALLOC_PRAGMA
-    #pragma alloc_text( PAGE, vJoySetFeature)
-    #pragma alloc_text( PAGE, SendVendorCommand)
-    #pragma alloc_text (PAGE, vJoyEvtIoDeviceControl)
-    #pragma alloc_text (PAGE, vJoyCreateControlDevice)
-    #pragma alloc_text (PAGE, vJoyDeleteControlDevice)
-    #pragma alloc_text (PAGE, vJoyEvtDeviceContextCleanup)
-    #pragma alloc_text (PAGE, GetReportDescriptorFromRegistry)
-    #pragma alloc_text (PAGE, GetInitValueFromRegistry)
-    #pragma alloc_text (PAGE, CalcInitValue)
-    //#pragma alloc_text (PAGE, UpdateCollections)
-    #pragma alloc_text (PAGE, vJoyEvtDeviceReleaseHardware)
-    #pragma alloc_text (PAGE, vJoyEvtDevicePrepareHardware)
-    #pragma alloc_text (PAGE, vJoyEvtDeviceSelfManagedIoFlush)
-    #pragma alloc_text (PAGE, vJoyEvtDevicePnpStateChange)
+#pragma alloc_text( PAGE, vJoySetFeature)
+#pragma alloc_text( PAGE, SendVendorCommand)
+#pragma alloc_text (PAGE, vJoyEvtIoDeviceControl)
+#pragma alloc_text (PAGE, vJoyCreateControlDevice)
+#pragma alloc_text (PAGE, vJoyDeleteControlDevice)
+#pragma alloc_text (PAGE, vJoyEvtDeviceContextCleanup)
+#pragma alloc_text (PAGE, GetReportDescriptorFromRegistry)
+#pragma alloc_text (PAGE, GetInitValueFromRegistry)
+#pragma alloc_text (PAGE, CalcInitValue)
+//#pragma alloc_text (PAGE, UpdateCollections)
+#pragma alloc_text (PAGE, vJoyEvtDeviceReleaseHardware)
+#pragma alloc_text (PAGE, vJoyEvtDevicePrepareHardware)
+#pragma alloc_text (PAGE, vJoyEvtDeviceSelfManagedIoFlush)
+#pragma alloc_text (PAGE, vJoyEvtDevicePnpStateChange)
 #endif
 
 // Global handle to the Control Device used for sideband communication
@@ -63,12 +63,12 @@ vJoyEvtInternalDeviceControl(
     IN size_t       OutputBufferLength,
     IN size_t       InputBufferLength,
     IN ULONG        IoControlCode
-    )
+)
 /*++
 
 Routine Description:
 
-    This event is called when the framework receives 
+    This event is called when the framework receives
     IRP_MJ_INTERNAL DEVICE_CONTROL requests from the system.
 
 Arguments:
@@ -99,7 +99,7 @@ Return Value:
     //size_t				NumBytesTransferred;
     //PUCHAR				switchState = NULL;
     //UCHAR				eb;
-    int					id=0;
+    int					id = 0;
 
     UNREFERENCED_PARAMETER(OutputBufferLength);
     UNREFERENCED_PARAMETER(InputBufferLength);
@@ -116,7 +116,7 @@ Return Value:
     // use retreive function or escape to WDM to get the UserBuffer.
     //
 
-    switch(IoControlCode) {
+    switch (IoControlCode) {
 
     case IOCTL_HID_GET_DEVICE_DESCRIPTOR:
         //
@@ -137,7 +137,7 @@ Return Value:
         //
         status = vJoyGetReportDescriptor(device, Request);
         break;
-        
+
 
     case IOCTL_HID_READ_REPORT:
 
@@ -149,19 +149,19 @@ Return Value:
         //
         status = WdfRequestForwardToIoQueue(Request, devContext->ReadReportMsgQueue);
 
-        if(!NT_SUCCESS(status)){
+        if (!NT_SUCCESS(status)) {
             TraceEvents(TRACE_LEVEL_ERROR, DBG_IOCTL,
                 "WdfRequestForwardToIoQueue failed with status: 0x%x\n", status);
-            
+
             WdfRequestComplete(Request, status);
         }
 
         return;
 
-//
-// This feature is only supported on WinXp and later. Compiling in W2K 
-// build environment will fail without this conditional preprocessor statement.
-//
+        //
+        // This feature is only supported on WinXp and later. Compiling in W2K 
+        // build environment will fail without this conditional preprocessor statement.
+        //
 #if (OSVER(NTDDI_VERSION) > NTDDI_WIN2K)
 
     case IOCTL_HID_SEND_IDLE_NOTIFICATION_REQUEST:
@@ -189,7 +189,7 @@ Return Value:
 
 #endif // (OSVER(NTDDI_VERSION) > NTDDI_WIN2K)
 
-        
+
     case IOCTL_HID_GET_FEATURE:
         //
         // returns a feature report associated with a top-level collection
@@ -206,20 +206,19 @@ Return Value:
         //
 
     case IOCTL_HID_WRITE_REPORT:
-        
+
         // Extracting the ID from the request
         id = FfbGetDevIDfromFfbRequest(Request);
 
         // If FFB is not active then just reject this request
-        if (!devContext->FfbEnable[id-1])
-        {
+        if (!devContext->FfbEnable[id-1]) {
             WdfRequestComplete(Request, STATUS_SUCCESS);
             return;
         };
 
         // If FFB is active then forward this request to the WriteQ and return
         status = WdfRequestForwardToIoQueue(Request, devContext->FfbWriteQ[id-1]);
-        if(!NT_SUCCESS(status)){
+        if (!NT_SUCCESS(status)) {
             TraceEvents(TRACE_LEVEL_ERROR, DBG_IOCTL,
                 "WdfRequestForwardToIoQueue (FfbWriteQ[%d]) failed with status: 0x%x\n", id - 1, status);
             WdfRequestComplete(Request, status);
@@ -241,7 +240,7 @@ Return Value:
         // sends a HID class output report to a top-level collection of a HID
         // class device.
         //
-        TraceEvents(TRACE_LEVEL_ERROR, DBG_IOCTL,   "IOCTL_HID_SET_OUTPUT_REPORT\n");
+        TraceEvents(TRACE_LEVEL_ERROR, DBG_IOCTL, "IOCTL_HID_SET_OUTPUT_REPORT\n");
         status = STATUS_NOT_SUPPORTED;
         break;
 
@@ -268,7 +267,7 @@ Return Value:
         //
         // Makes the device ready for I/O operations.
         //
-        TraceEvents(TRACE_LEVEL_ERROR, DBG_IOCTL,   "IOCTL_HID_ACTIVATE_DEVICE\n");
+        TraceEvents(TRACE_LEVEL_ERROR, DBG_IOCTL, "IOCTL_HID_ACTIVATE_DEVICE\n");
         status = STATUS_NOT_SUPPORTED;
         break;
     case IOCTL_HID_DEACTIVATE_DEVICE:
@@ -276,11 +275,11 @@ Return Value:
         // Causes the device to cease operations and terminate all outstanding
         // I/O requests.
         //
-        TraceEvents(TRACE_LEVEL_ERROR, DBG_IOCTL,   "IOCTL_HID_DEACTIVATE_DEVICE\n");
+        TraceEvents(TRACE_LEVEL_ERROR, DBG_IOCTL, "IOCTL_HID_DEACTIVATE_DEVICE\n");
         status = STATUS_NOT_SUPPORTED;
         break;
-        
-        default:
+
+    default:
         status = STATUS_NOT_SUPPORTED;
         break;
     }
@@ -294,7 +293,7 @@ Return Value:
 NTSTATUS
 vJoyGetFeature(
     IN WDFREQUEST Request
-    )
+)
 {
     NTSTATUS				status = STATUS_SUCCESS;
     WDF_REQUEST_PARAMETERS	params;
@@ -304,22 +303,20 @@ vJoyGetFeature(
     WDFQUEUE				ParentQueue = NULL;
     WDFDEVICE				device;
     PDEVICE_EXTENSION		devContext = NULL;
-    int						id=0;
+    int						id = 0;
 
 
     // Get request parameters
     WDF_REQUEST_PARAMETERS_INIT(&params);
     WdfRequestGetParameters(Request, &params);
-    if (params.Parameters.DeviceIoControl.OutputBufferLength < sizeof(HID_XFER_PACKET))
-    {
+    if (params.Parameters.DeviceIoControl.OutputBufferLength < sizeof(HID_XFER_PACKET)) {
         status = STATUS_BUFFER_TOO_SMALL;
         return status;
     };
 
     // Get transfer packet
-    transferPacket = (PHID_XFER_PACKET) WdfRequestWdmGetIrp(Request)->UserBuffer;
-    if (transferPacket == NULL)
-    {
+    transferPacket = (PHID_XFER_PACKET)WdfRequestWdmGetIrp(Request)->UserBuffer;
+    if (transferPacket == NULL) {
         status = STATUS_INVALID_DEVICE_REQUEST;
         return status;
     }
@@ -330,9 +327,8 @@ vJoyGetFeature(
     devContext = GetDeviceContext(device);
 
     id = FfbGetDevIDfromFfbRequest(Request);
-    if (!id)
-    {
-        status =  STATUS_NO_SUCH_DEVICE;;
+    if (!id) {
+        status = STATUS_NO_SUCH_DEVICE;;
         return status;
     }
 
@@ -352,7 +348,7 @@ vJoyGetFeature(
         ucTmp[1] = (UCHAR)((devContext->FfbPIDData[id-1].PIDBlockLoad.EffectBlockIndex)&0xFF);
         if (devContext->FfbEnable[id-1]) {
             ucTmp[2] = (UCHAR)((devContext->FfbPIDData[id-1].PIDBlockLoad.LoadStatus)&0xFF);
-            ucTmp[3] = (UCHAR)((devContext->FfbPIDData[id-1].PIDBlockLoad.RAMPoolAvailable)&0xFF); 
+            ucTmp[3] = (UCHAR)((devContext->FfbPIDData[id-1].PIDBlockLoad.RAMPoolAvailable)&0xFF);
             ucTmp[4] = (UCHAR)((devContext->FfbPIDData[id-1].PIDBlockLoad.RAMPoolAvailable>>8)&0xFF);; // Load Error =0
         } else {
             ucTmp[2] = 0; // Load Success = 0
@@ -374,7 +370,7 @@ vJoyGetFeature(
 NTSTATUS
 vJoySetFeature(
     IN WDFREQUEST Request
-    )
+)
 /*++
 
 Routine Description
@@ -384,7 +380,7 @@ Routine Description
 
 Arguments:
 
-    Request - Wdf Request 
+    Request - Wdf Request
 
 Return Value:
 
@@ -415,7 +411,7 @@ Return Value:
     //
     if (params.Parameters.DeviceIoControl.InputBufferLength < sizeof(HID_XFER_PACKET)) {
         status = STATUS_BUFFER_TOO_SMALL;
-        TraceEvents(TRACE_LEVEL_ERROR, DBG_IOCTL,"Userbuffer is small 0x%x\n", status);
+        TraceEvents(TRACE_LEVEL_ERROR, DBG_IOCTL, "Userbuffer is small 0x%x\n", status);
         return status;
     }
 
@@ -423,20 +419,20 @@ Return Value:
     // This is a kernel buffer so no need for try/except block when accesssing
     // Irp->UserBuffer.
     //
-    transferPacket = (PHID_XFER_PACKET) WdfRequestWdmGetIrp(Request)->UserBuffer;
+    transferPacket = (PHID_XFER_PACKET)WdfRequestWdmGetIrp(Request)->UserBuffer;
     if (transferPacket == NULL) {
         status = STATUS_INVALID_DEVICE_REQUEST;
         TraceEvents(TRACE_LEVEL_ERROR, DBG_IOCTL, "Irp->UserBuffer is NULL 0x%x\n", status);
         return status;
     }
 
-    if (transferPacket->reportBufferLen == 0){
+    if (transferPacket->reportBufferLen == 0) {
         status = STATUS_BUFFER_TOO_SMALL;
         TraceEvents(TRACE_LEVEL_ERROR, DBG_IOCTL, "HID_XFER_PACKET->reportBufferLen is 0, 0x%x\n", status);
         return status;
     }
 
-    if (transferPacket->reportBufferLen < sizeof(UCHAR)){
+    if (transferPacket->reportBufferLen < sizeof(UCHAR)) {
         status = STATUS_BUFFER_TOO_SMALL;
         TraceEvents(TRACE_LEVEL_ERROR, DBG_IOCTL, "HID_XFER_PACKET->reportBufferLen is too small, 0x%x\n", status);
         return status;
@@ -450,8 +446,8 @@ Return Value:
     //        "Incorrect report ID, 0x%x\n", status);
     //    return status;
     //}
-    
-    TmpBfr = (UCHAR *)transferPacket->reportBuffer;
+
+    TmpBfr = (UCHAR*)transferPacket->reportBuffer;
     //featureUsage = featureReport->FeatureData;
 
     //if ((featureUsage >= sizeof(UsageToCommandDataMappingTable)) ||
@@ -492,12 +488,12 @@ NTSTATUS
 vJoyGetHidDescriptor(
     IN WDFDEVICE Device,
     IN WDFREQUEST Request
-    )
+)
 /*++
 
 Routine Description:
 
-    Finds the HID descriptor and copies it into the buffer provided by the 
+    Finds the HID descriptor and copies it into the buffer provided by the
     Request.
 
 Arguments:
@@ -530,7 +526,7 @@ Return Value:
     status = WdfRequestRetrieveOutputMemory(Request, &memory);
     if (!NT_SUCCESS(status)) {
         TraceEvents(TRACE_LEVEL_ERROR, DBG_IOCTL, "WdfRequestRetrieveOutputMemory failed 0x%x\n", status);
-        LogEventWithStatus(ERRLOG_HID_DESC_FAILED ,L"WdfRequestRetrieveOutputMemory", WdfDeviceWdmGetDeviceObject(Device), status);
+        LogEventWithStatus(ERRLOG_HID_DESC_FAILED, L"WdfRequestRetrieveOutputMemory", WdfDeviceWdmGetDeviceObject(Device), status);
         return status;
     }
 
@@ -541,13 +537,13 @@ Return Value:
         status = STATUS_INVALID_DEVICE_STATE;
         TraceEvents(TRACE_LEVEL_ERROR, DBG_IOCTL, "G_DefaultHidDescriptor is zero, 0x%x\n", status);
         LogEvent(ERRLOG_HID_DESC_FAILED1, NULL, WdfDeviceWdmGetDeviceObject(Device));
-        return status;        
+        return status;
     }
-    
-    status = WdfMemoryCopyFromBuffer(memory, 0, (PVOID) &G_DefaultHidDescriptor, bytesToCopy);
+
+    status = WdfMemoryCopyFromBuffer(memory, 0, (PVOID)&G_DefaultHidDescriptor, bytesToCopy);
     if (!NT_SUCCESS(status)) {
         TraceEvents(TRACE_LEVEL_ERROR, DBG_IOCTL, "WdfMemoryCopyFromBuffer failed 0x%x\n", status);
-        LogEventWithStatus(ERRLOG_HID_DESC_FAILED ,L"WdfMemoryCopyFromBuffer", WdfDeviceWdmGetDeviceObject(Device), status);
+        LogEventWithStatus(ERRLOG_HID_DESC_FAILED, L"WdfMemoryCopyFromBuffer", WdfDeviceWdmGetDeviceObject(Device), status);
         return status;
     }
 
@@ -563,7 +559,7 @@ Return Value:
 NTSTATUS
 vJoyGetHidString(
     IN WDFREQUEST Request
-    )
+)
 /*++
 
 Routine Description:
@@ -591,51 +587,50 @@ Return Value:
     NTSTATUS			status = STATUS_SUCCESS;
     PWSTR				pwstrID;
     WDFMEMORY           memory;
-    size_t				bytesToCopy=0;
-    size_t				NumBytesTransferred=0;
+    size_t				bytesToCopy = 0;
+    size_t				NumBytesTransferred = 0;
     WDF_REQUEST_PARAMETERS Parameters;
 
     WDF_REQUEST_PARAMETERS_INIT(&Parameters);
     WdfRequestGetParameters(Request, &Parameters);
 
-    switch ((ULONGLONG)Parameters.Parameters.DeviceIoControl.Type3InputBuffer & 0xffff)
-    {
-        case HID_STRING_ID_IMANUFACTURER:
-            pwstrID = VENDOR_STR_ID;
-            break;
+    switch ((ULONGLONG)Parameters.Parameters.DeviceIoControl.Type3InputBuffer & 0xffff) {
+    case HID_STRING_ID_IMANUFACTURER:
+        pwstrID = VENDOR_STR_ID;
+        break;
 
-        case HID_STRING_ID_IPRODUCT:
-            pwstrID = PRODUCT_STR_ID;
-            break;
+    case HID_STRING_ID_IPRODUCT:
+        pwstrID = PRODUCT_STR_ID;
+        break;
 
-        case HID_STRING_ID_ISERIALNUMBER:
-            pwstrID = SERIALNUMBER_STR;
-            break;
+    case HID_STRING_ID_ISERIALNUMBER:
+        pwstrID = SERIALNUMBER_STR;
+        break;
 
-        default:
-            pwstrID = NULL;
-            break;
+    default:
+        pwstrID = NULL;
+        break;
     }
 
     status = WdfRequestRetrieveOutputMemory(Request, &memory);
     if (!NT_SUCCESS(status)) {
         TraceEvents(TRACE_LEVEL_ERROR, DBG_IOCTL, "WdfRequestRetrieveOutputMemory failed 0x%x\n", status);
-        LogEventWithStatus(ERRLOG_HID_STRING_FAILED ,L"WdfRequestRetrieveOutputMemory", WdfDriverWdmGetDriverObject(WdfGetDriver()), status);
+        LogEventWithStatus(ERRLOG_HID_STRING_FAILED, L"WdfRequestRetrieveOutputMemory", WdfDriverWdmGetDriverObject(WdfGetDriver()), status);
         return status;
     }
 
-    bytesToCopy = pwstrID? wcslen(pwstrID)*sizeof(WCHAR) + sizeof(UNICODE_NULL): 0;
+    bytesToCopy = pwstrID ? wcslen(pwstrID)*sizeof(WCHAR) + sizeof(UNICODE_NULL) : 0;
     if (bytesToCopy == 0) {
         status = STATUS_INVALID_DEVICE_STATE;
         LogEvent(ERRLOG_HID_STRING_FAILED1, NULL, WdfDriverWdmGetDriverObject(WdfGetDriver()));
-        return status;        
+        return status;
     };
 
-    status = WdfMemoryCopyFromBuffer(memory, 0,  pwstrID, bytesToCopy);
+    status = WdfMemoryCopyFromBuffer(memory, 0, pwstrID, bytesToCopy);
     WdfMemoryGetBuffer(memory, &NumBytesTransferred);
     if (!NT_SUCCESS(status)) {
         TraceEvents(TRACE_LEVEL_ERROR, DBG_IOCTL, "WdfMemoryCopyFromBuffer failed 0x%x\n", status);
-        LogEventWithStatus(ERRLOG_HID_STRING_FAILED ,L"WdfMemoryCopyFromBuffer", WdfDriverWdmGetDriverObject(WdfGetDriver()), status);
+        LogEventWithStatus(ERRLOG_HID_STRING_FAILED, L"WdfMemoryCopyFromBuffer", WdfDriverWdmGetDriverObject(WdfGetDriver()), status);
         return status;
     }
 
@@ -651,7 +646,7 @@ NTSTATUS
 vJoyGetReportDescriptor(
     IN WDFDEVICE Device,
     IN WDFREQUEST Request
-    )
+)
 /*++
 
 Routine Description:
@@ -672,9 +667,9 @@ Return Value:
 --*/
 {
     NTSTATUS            status = STATUS_SUCCESS;
-    size_t				bytesToCopy=0;
+    size_t				bytesToCopy = 0;
     WDFMEMORY           memory;
-    size_t				NumBytesTransferred=0;
+    size_t				NumBytesTransferred = 0;
     PUCHAR				switchState = NULL;
     PDEVICE_EXTENSION   pDeviceContext = NULL;
 
@@ -693,7 +688,7 @@ Return Value:
     status = WdfRequestRetrieveOutputMemory(Request, &memory);
     if (!NT_SUCCESS(status)) {
         TraceEvents(TRACE_LEVEL_ERROR, DBG_IOCTL, "WdfRequestRetrieveOutputMemory failed 0x%x\n", status);
-        LogEventWithStatus(ERRLOG_REPORT_DESC_FAILED ,L"WdfRequestRetrieveOutputMemory", WdfDeviceWdmGetDeviceObject(Device), status);
+        LogEventWithStatus(ERRLOG_REPORT_DESC_FAILED, L"WdfRequestRetrieveOutputMemory", WdfDeviceWdmGetDeviceObject(Device), status);
         return status;
     }
 
@@ -705,22 +700,22 @@ Return Value:
         status = STATUS_INVALID_DEVICE_STATE;
         TraceEvents(TRACE_LEVEL_ERROR, DBG_IOCTL, "G_DefaultHidDescriptor's reportLenght is zero, 0x%x\n", status);
         LogEvent(ERRLOG_REPORT_DESC_FAILED1, NULL, WdfDeviceWdmGetDeviceObject(Device));
-        return status;        
+        return status;
     };
 
     pDeviceContext = GetDeviceContext(Device);
-	if (!pDeviceContext || !pDeviceContext->ReportDescriptor) {
-		status = STATUS_INVALID_DEVICE_STATE;
-		TraceEvents(TRACE_LEVEL_ERROR, DBG_IOCTL, "ReportDescriptor == NULL 0x%x\n", status);
-		LogEvent(ERRLOG_REPORT_DESC_FAILED1, NULL, WdfDeviceWdmGetDeviceObject(Device));
-		return status;
-	};
+    if (!pDeviceContext || !pDeviceContext->ReportDescriptor) {
+        status = STATUS_INVALID_DEVICE_STATE;
+        TraceEvents(TRACE_LEVEL_ERROR, DBG_IOCTL, "ReportDescriptor == NULL 0x%x\n", status);
+        LogEvent(ERRLOG_REPORT_DESC_FAILED1, NULL, WdfDeviceWdmGetDeviceObject(Device));
+        return status;
+    };
 
-    status = WdfMemoryCopyFromBuffer(memory, 0,  pDeviceContext->ReportDescriptor, bytesToCopy);
+    status = WdfMemoryCopyFromBuffer(memory, 0, pDeviceContext->ReportDescriptor, bytesToCopy);
     switchState = WdfMemoryGetBuffer(memory, &NumBytesTransferred);
     if (!NT_SUCCESS(status)) {
         TraceEvents(TRACE_LEVEL_ERROR, DBG_IOCTL, "WdfMemoryCopyFromBuffer failed 0x%x\n", status);
-        LogEventWithStatus(ERRLOG_REPORT_DESC_FAILED ,L"WdfMemoryCopyFromBuffer", WdfDeviceWdmGetDeviceObject(Device), status);
+        LogEventWithStatus(ERRLOG_REPORT_DESC_FAILED, L"WdfMemoryCopyFromBuffer", WdfDeviceWdmGetDeviceObject(Device), status);
         return status;
     }
 
@@ -737,7 +732,7 @@ Return Value:
 NTSTATUS
 vJoyGetDeviceAttributes(
     IN WDFREQUEST Request
-    )
+)
 /*++
 
 Routine Description:
@@ -771,21 +766,21 @@ Return Value:
     // WdfRequestRetrieveOutputMemory if the ioctl is not a METHOD_NEITHER
     // internal ioctl.
     //
-    status = WdfRequestRetrieveOutputBuffer(Request, sizeof (HID_DEVICE_ATTRIBUTES), &deviceAttributes, NULL);
+    status = WdfRequestRetrieveOutputBuffer(Request, sizeof(HID_DEVICE_ATTRIBUTES), &deviceAttributes, NULL);
     if (!NT_SUCCESS(status)) {
         TraceEvents(TRACE_LEVEL_ERROR, DBG_IOCTL, "WdfRequestRetrieveOutputBuffer failed 0x%x\n", status);
-        LogEventWithStatus(ERRLOG_DEVICE_ATTR_FAILED ,L"WdfRequestRetrieveOutputBuffer", WdfDeviceWdmGetDeviceObject(WdfIoQueueGetDevice(WdfRequestGetIoQueue(Request))), status);
+        LogEventWithStatus(ERRLOG_DEVICE_ATTR_FAILED, L"WdfRequestRetrieveOutputBuffer", WdfDeviceWdmGetDeviceObject(WdfIoQueueGetDevice(WdfRequestGetIoQueue(Request))), status);
         return status;
     }
 
-    deviceAttributes->VendorID		= VENDOR_N_ID;
-    deviceAttributes->ProductID		= PRODUCT_N_ID;
+    deviceAttributes->VendorID = VENDOR_N_ID;
+    deviceAttributes->ProductID = PRODUCT_N_ID;
     deviceAttributes->VersionNumber = VERSION_N;
 
     //
     // Report how many bytes were copied
     //
-    WdfRequestSetInformation(Request, sizeof (HID_DEVICE_ATTRIBUTES));
+    WdfRequestSetInformation(Request, sizeof(HID_DEVICE_ATTRIBUTES));
 
     TraceEvents(TRACE_LEVEL_VERBOSE, DBG_IOCTL, "vJoyGetDeviceAttributes Exit = 0x%x\n", status);
     return status;
@@ -795,7 +790,7 @@ Return Value:
 PCHAR
 DbgHidInternalIoctlString(
     IN ULONG        IoControlCode
-    )
+)
 /*++
 
 Routine Description:
@@ -812,8 +807,7 @@ Return Value:
 
 --*/
 {
-    switch (IoControlCode)
-    {
+    switch (IoControlCode) {
     case IOCTL_HID_GET_DEVICE_DESCRIPTOR:
         return "IOCTL_HID_GET_DEVICE_DESCRIPTOR";
     case IOCTL_HID_GET_REPORT_DESCRIPTOR:
@@ -852,7 +846,7 @@ vJoyEvtIoDeviceControl(
     IN size_t       OutputBufferLength,
     IN size_t       InputBufferLength,
     IN ULONG        IoControlCode
-    )
+)
 /*++
 Routine Description:
 
@@ -879,7 +873,7 @@ Return Value:
 
 --*/
 {
-    NTSTATUS             status= STATUS_SUCCESS;
+    NTSTATUS             status = STATUS_SUCCESS;
     //WDF_DEVICE_STATE     deviceState;
     WDFDEVICE            hDevice = WdfIoQueueGetDevice(Queue);
     PCONTROL_DEVICE_EXTENSION			 ControlDevContext = ControlGetData(hDevice);
@@ -888,7 +882,7 @@ Return Value:
     //WDFMEMORY  reqMemory;
     PVOID  buffer;
     size_t  bufSize;
-    JOYSTICK_POSITION_V2 * iReport;
+    JOYSTICK_POSITION* iReport;
     //JOYSTICK_POSITION_V2   icReport;
     //PHID_DEVICE_ATTRIBUTES   deviceAttributes = NULL;
     size_t	bytesReturned = 0;
@@ -907,8 +901,8 @@ Return Value:
 
     case 0x910: // Backward compatibility value of 	LOAD_POSITIONS
     case LOAD_POSITIONS:
-        status = WdfRequestRetrieveInputBuffer( Request, sizeof(PJOYSTICK_POSITION_V2), &buffer, &bufSize);
-        if(!NT_SUCCESS(status)) break;
+        status = WdfRequestRetrieveInputBuffer(Request, sizeof(PJOYSTICK_POSITION), &buffer, &bufSize);
+        if (!NT_SUCCESS(status)) break;
 
         iReport = buffer;
         pDevContext = GetDeviceContext(ControlDevContext->hParentDevice);
@@ -931,7 +925,7 @@ Return Value:
 NTSTATUS
 vJoyCreateControlDevice(
     WDFDEVICE Device
-    )
+)
 /*++
 
 Routine Description:
@@ -982,13 +976,13 @@ Return Value:
     //
     WdfWaitLockAcquire(vJoyDeviceCollectionLock, NULL);
 
-    if(WdfCollectionGetCount(vJoyDeviceCollection) == 1) {
+    if (WdfCollectionGetCount(vJoyDeviceCollection) == 1) {
         bCreate = TRUE;
     }
 
     WdfWaitLockRelease(vJoyDeviceCollectionLock);
 
-    if(!bCreate) {
+    if (!bCreate) {
         //
         // Control device is already created. So return success.
         //
@@ -1002,10 +996,10 @@ Return Value:
     // In order to create a control device, we first need to allocate a
     // WDFDEVICE_INIT structure and set all properties.
     //
-        
+
 
     TraceEvents(TRACE_LEVEL_INFORMATION, DBG_INIT, "vJoyCreateControlDevice: Calling WdfControlDeviceInitAllocate\n");
-    pInit = WdfControlDeviceInitAllocate( WdfDeviceGetDriver(Device), &__SDDL_DEVOBJ_SYS_ALL_ADM_RWX_WORLD_RW_RES_R);
+    pInit = WdfControlDeviceInitAllocate(WdfDeviceGetDriver(Device), &__SDDL_DEVOBJ_SYS_ALL_ADM_RWX_WORLD_RW_RES_R);
 
     if (pInit == NULL) {
         status = STATUS_INSUFFICIENT_RESOURCES;
@@ -1024,11 +1018,11 @@ Return Value:
     //
     RtlInitAnsiString(&ntDeviceNameA, TEXT(NTDEVICE_NAME_STRING));
     status = RtlAnsiStringToUnicodeString(&ntDeviceName, &ntDeviceNameA, TRUE);
-    if (!NT_SUCCESS(status)) 
+    if (!NT_SUCCESS(status))
         goto Error;
     TraceEvents(TRACE_LEVEL_INFORMATION, DBG_INIT, "vJoyCreateControlDevice: Calling WdfDeviceInitAssignName\n");
     status = WdfDeviceInitAssignName(pInit, &ntDeviceName);
-    if (!NT_SUCCESS(status)) 
+    if (!NT_SUCCESS(status))
         goto Error;
     RtlFreeUnicodeString(&ntDeviceName);
 
@@ -1050,11 +1044,10 @@ Return Value:
     //
     RtlInitAnsiString(&symbolicLinkNameA, TEXT(SYMBOLIC_NAME_STRING));
     status = RtlAnsiStringToUnicodeString(&symbolicLinkName, &symbolicLinkNameA, TRUE);
-    if (!NT_SUCCESS(status)) 
+    if (!NT_SUCCESS(status))
         goto Error;
     status = WdfDeviceCreateSymbolicLink(g_ControlDevice, &symbolicLinkName);
-    if (!NT_SUCCESS(status))
-    {
+    if (!NT_SUCCESS(status)) {
         TraceEvents(TRACE_LEVEL_ERROR, DBG_IOCTL, "Failed to create symbolic link (Native)\n");
         goto Error;
     }
@@ -1115,7 +1108,7 @@ Error:
 VOID
 vJoyDeleteControlDevice(
     WDFDEVICE Device
-    )
+)
 /*++
 
 Routine Description:
@@ -1137,8 +1130,7 @@ Return Value:
     PAGED_CODE();
 
     TraceEvents(TRACE_LEVEL_INFORMATION, DBG_INIT, "Control Device: Start deleting\n");
-    if (!g_ControlDevice)
-    {
+    if (!g_ControlDevice) {
         TraceEvents(TRACE_LEVEL_ERROR, DBG_IOCTL, "No Control Device to delete\n");
         return;
     }
@@ -1154,7 +1146,7 @@ Return Value:
         WdfObjectDelete(g_ControlDevice);
         //WdfObjectDelete(Device);
         TraceEvents(TRACE_LEVEL_INFORMATION, DBG_INIT, "Control Device: Deleting (Just after WdfObjectDelete)\n");
-       g_ControlDevice = NULL;
+        g_ControlDevice = NULL;
     }
 }
 
@@ -1164,7 +1156,7 @@ _IRQL_requires_max_(PASSIVE_LEVEL)
 VOID
 vJoyEvtDeviceContextCleanup(
     _In_ WDFDEVICE Device
-    )
+)
 /*++
 
 Routine Description:
@@ -1184,8 +1176,8 @@ Return Value:
 
 --*/
 {
- // 	_IRQL_requires_max_(DISPATCH_LEVEL);
-	PAGED_CODE();
+    // 	_IRQL_requires_max_(DISPATCH_LEVEL);
+    PAGED_CODE();
 
 
     int   nDevices = 0;
@@ -1200,24 +1192,23 @@ Return Value:
 
     nDevices = WdfCollectionGetCount(vJoyDeviceCollection);
 
-    if(nDevices == 1)
-    {
-         //
-         // We are the last instance. So let us delete the control-device
-         // so that driver can unload when the FilterDevice is deleted.
-         // We absolutely have to do the deletion of control device with
-         // the collection lock acquired because we implicitly use this
-         // lock to protect g_ControlDevice global variable. We need to make
-         // sure another thread doesn't attempt to create while we are
-         // deleting the device.
-         //
-         vJoyDeleteControlDevice(Device);
-     }
+    if (nDevices == 1) {
+        //
+        // We are the last instance. So let us delete the control-device
+        // so that driver can unload when the FilterDevice is deleted.
+        // We absolutely have to do the deletion of control device with
+        // the collection lock acquired because we implicitly use this
+        // lock to protect g_ControlDevice global variable. We need to make
+        // sure another thread doesn't attempt to create while we are
+        // deleting the device.
+        //
+        vJoyDeleteControlDevice(Device);
+    }
 
     devContext = GetDeviceContext(Device);
     CleanUpDev(devContext);
 
-	TraceEvents(TRACE_LEVEL_INFORMATION, DBG_INIT, "Device Count after decrementing is %d\n", DeviceCount(TRUE, 0));
+    TraceEvents(TRACE_LEVEL_INFORMATION, DBG_INIT, "Device Count after decrementing is %d\n", DeviceCount(TRUE, 0));
 
     //WdfCollectionRemove(vJoyDeviceCollection, Device);
     WdfWaitLockRelease(vJoyDeviceCollectionLock);
@@ -1226,8 +1217,8 @@ Return Value:
 NTSTATUS vJoyEvtDeviceReleaseHardware(
     IN  WDFDEVICE    Device,
     IN  WDFCMRESLIST ResourcesTranslated
-    )
-    // Test Only
+)
+// Test Only
 {
     PAGED_CODE();
     UNREFERENCED_PARAMETER(Device);
@@ -1241,8 +1232,8 @@ NTSTATUS vJoyEvtDevicePrepareHardware(
     IN  WDFDEVICE    Device,
     IN  WDFCMRESLIST ResourcesRaw,
     IN  WDFCMRESLIST ResourcesTranslated
-    )
-    // Test Only
+)
+// Test Only
 {
     PAGED_CODE();
     UNREFERENCED_PARAMETER(Device);
@@ -1255,8 +1246,8 @@ NTSTATUS vJoyEvtDevicePrepareHardware(
 
 VOID vJoyEvtDeviceSelfManagedIoFlush(
     IN  WDFDEVICE    Device
-    )
-    // Test Only
+)
+// Test Only
 {
     PAGED_CODE();
     UNREFERENCED_PARAMETER(Device);
@@ -1267,7 +1258,7 @@ VOID vJoyEvtDeviceSelfManagedIoFlush(
 VOID vJoyEvtDevicePnpStateChange(
     IN  WDFDEVICE                          Device,
     IN  PCWDF_DEVICE_PNP_NOTIFICATION_DATA NotificationData
-    )
+)
 {
     PAGED_CODE();
     UNREFERENCED_PARAMETER(Device);
@@ -1278,7 +1269,7 @@ VOID vJoyEvtDevicePnpStateChange(
 
 
 VOID
-LoadPositions(PJOYSTICK_POSITION_V2 pPosition, PDEVICE_EXTENSION pDevContext, size_t buffsize)
+LoadPositions(PJOYSTICK_POSITION pPosition, PDEVICE_EXTENSION pDevContext, size_t buffsize)
 {
     int i;
 
@@ -1286,66 +1277,84 @@ LoadPositions(PJOYSTICK_POSITION_V2 pPosition, PDEVICE_EXTENSION pDevContext, si
 
     WdfWaitLockAcquire(pDevContext->positionLock, NULL);
 
-	// Clear 'dearty bit'
-	// This means that the position data should not be read (It is not ready)
-	pDevContext->PositionReady[i] = FALSE;
+    // Clear 'dearty bit'
+    // This means that the position data should not be read (It is not ready)
+    pDevContext->PositionReady[i] = FALSE;
 
-	// Copy position to context area
-    pDevContext->positions[i]->ValX			= pPosition->wAxisX;
-    pDevContext->positions[i]->ValY			= pPosition->wAxisY;
-    pDevContext->positions[i]->ValZ			= pPosition->wAxisZ;
-    pDevContext->positions[i]->ValRX			= pPosition->wAxisXRot;
-    pDevContext->positions[i]->ValRY			= pPosition->wAxisYRot;
-    pDevContext->positions[i]->ValRZ			= pPosition->wAxisZRot;
-    pDevContext->positions[i]->ValSlider		= pPosition->wSlider;
-    pDevContext->positions[i]->ValDial			= pPosition->wDial;
-    pDevContext->positions[i]->ValButtons		= pPosition->lButtons;
-    pDevContext->positions[i]->ValHats			= pPosition->bHats;
-    pDevContext->positions[i]->ValHatsEx1		= pPosition->bHatsEx1; 
-    pDevContext->positions[i]->ValHatsEx2		= pPosition->bHatsEx2;
-    pDevContext->positions[i]->ValHatsEx3		= pPosition->bHatsEx3;
-    
-    // Supporting 128 buttons: Upper buttons
-    if (buffsize >= sizeof(JOYSTICK_POSITION_V2))
-    {
-        pDevContext->positions[i]->ValButtonsEx1		= pPosition->lButtonsEx1;
-        pDevContext->positions[i]->ValButtonsEx2		= pPosition->lButtonsEx2;
-        pDevContext->positions[i]->ValButtonsEx3		= pPosition->lButtonsEx3;
-    };
+    // Copy position to context area
+    pDevContext->positions[i]->ValX = pPosition->wAxisX;
+    pDevContext->positions[i]->ValY = pPosition->wAxisY;
+    pDevContext->positions[i]->ValZ = pPosition->wAxisZ;
+    pDevContext->positions[i]->ValRX = pPosition->wAxisXRot;
+    pDevContext->positions[i]->ValRY = pPosition->wAxisYRot;
+    pDevContext->positions[i]->ValRZ = pPosition->wAxisZRot;
+    pDevContext->positions[i]->ValSlider = pPosition->wSlider;
+    pDevContext->positions[i]->ValDial = pPosition->wDial;
 
-	// Set 'dearty bit'
-	// This means that the position data is ready to be read
-	pDevContext->PositionReady[i] = TRUE;
+    pDevContext->positions[i]->ValWheel = pPosition->wWheel;
+    pDevContext->positions[i]->ValAccelerator = pPosition->wAccelerator;
+    pDevContext->positions[i]->ValBrake = pPosition->wBrake;
+    pDevContext->positions[i]->ValClutch = pPosition->wClutch;
+    pDevContext->positions[i]->ValSteering = pPosition->wSteering;
+    pDevContext->positions[i]->ValThrottle = pPosition->wThrottle;
+    pDevContext->positions[i]->ValRudder = pPosition->wRudder;
+    pDevContext->positions[i]->ValAileron = pPosition->wAileron;
+
+    pDevContext->positions[i]->ValButtons = pPosition->lButtons;
+    pDevContext->positions[i]->ValButtonsEx1 = pPosition->lButtonsEx1;
+    pDevContext->positions[i]->ValButtonsEx2 = pPosition->lButtonsEx2;
+    pDevContext->positions[i]->ValButtonsEx3 = pPosition->lButtonsEx3;
+
+    pDevContext->positions[i]->ValHats = pPosition->bHats;
+    pDevContext->positions[i]->ValHatsEx1 = pPosition->bHatsEx1;
+    pDevContext->positions[i]->ValHatsEx2 = pPosition->bHatsEx2;
+    pDevContext->positions[i]->ValHatsEx3 = pPosition->bHatsEx3;
+
+    // Set 'dearty bit'
+    // This means that the position data is ready to be read
+    pDevContext->PositionReady[i] = TRUE;
 
     WdfWaitLockRelease(pDevContext->positionLock);
 }
 
-VOID GetPositions(PJOYSTICK_POSITION_V2 pPosition, PDEVICE_EXTENSION pDevContext, UCHAR id, size_t buffsize)
+VOID GetPositions(PJOYSTICK_POSITION pPosition, PDEVICE_EXTENSION pDevContext, UCHAR id, size_t buffsize)
 {
-	UNREFERENCED_PARAMETER(buffsize);
+    UNREFERENCED_PARAMETER(buffsize);
 
-	int i;
+    int i;
 
-	i = id - 1; // Index is zero-based
+    i = id - 1; // Index is zero-based
 
-	WdfWaitLockAcquire(pDevContext->positionLock, NULL);
-	pPosition->wAxisX		= pDevContext->positions[i]->ValX;
-	pPosition->wAxisY		= pDevContext->positions[i]->ValY;
-	pPosition->wAxisZ		= pDevContext->positions[i]->ValZ;
-	pPosition->wAxisXRot	= pDevContext->positions[i]->ValRX;
-	pPosition->wAxisYRot	= pDevContext->positions[i]->ValRY;
-	pPosition->wAxisZRot	= pDevContext->positions[i]->ValRZ;
-	pPosition->wSlider		= pDevContext->positions[i]->ValSlider;
-	pPosition->wDial		= pDevContext->positions[i]->ValDial;
-	pPosition->lButtons		= pDevContext->positions[i]->ValButtons;
-	pPosition->bHats		= pDevContext->positions[i]->ValHats;
-	pPosition->bHatsEx1		= pDevContext->positions[i]->ValHatsEx1;
-	pPosition->bHatsEx2		= pDevContext->positions[i]->ValHatsEx2;
-	pPosition->bHatsEx3		= pDevContext->positions[i]->ValHatsEx3;
-	pPosition->lButtonsEx1	= pDevContext->positions[i]->ValButtonsEx1;
-	pPosition->lButtonsEx2	= pDevContext->positions[i]->ValButtonsEx2;
-	pPosition->lButtonsEx3	= pDevContext->positions[i]->ValButtonsEx3;
-	WdfWaitLockRelease(pDevContext->positionLock);
+    WdfWaitLockAcquire(pDevContext->positionLock, NULL);
+    pPosition->wAxisX = pDevContext->positions[i]->ValX;
+    pPosition->wAxisY = pDevContext->positions[i]->ValY;
+    pPosition->wAxisZ = pDevContext->positions[i]->ValZ;
+    pPosition->wAxisXRot = pDevContext->positions[i]->ValRX;
+    pPosition->wAxisYRot = pDevContext->positions[i]->ValRY;
+    pPosition->wAxisZRot = pDevContext->positions[i]->ValRZ;
+    pPosition->wSlider = pDevContext->positions[i]->ValSlider;
+    pPosition->wDial = pDevContext->positions[i]->ValDial;
+
+    pPosition->wWheel = pDevContext->positions[i]->ValWheel;
+    pPosition->wAccelerator = pDevContext->positions[i]->ValAccelerator;
+    pPosition->wBrake = pDevContext->positions[i]->ValBrake;
+    pPosition->wClutch = pDevContext->positions[i]->ValClutch;
+    pPosition->wSteering = pDevContext->positions[i]->ValSteering;
+    pPosition->wThrottle = pDevContext->positions[i]->ValThrottle;
+    pPosition->wRudder = pDevContext->positions[i]->ValRudder;
+    pPosition->wAileron = pDevContext->positions[i]->ValAileron;
+
+    pPosition->lButtons = pDevContext->positions[i]->ValButtons;
+    pPosition->lButtonsEx1 = pDevContext->positions[i]->ValButtonsEx1;
+    pPosition->lButtonsEx2 = pDevContext->positions[i]->ValButtonsEx2;
+    pPosition->lButtonsEx3 = pDevContext->positions[i]->ValButtonsEx3;
+
+    pPosition->bHats = pDevContext->positions[i]->ValHats;
+    pPosition->bHatsEx1 = pDevContext->positions[i]->ValHatsEx1;
+    pPosition->bHatsEx2 = pDevContext->positions[i]->ValHatsEx2;
+    pPosition->bHatsEx3 = pDevContext->positions[i]->ValHatsEx3;
+
+    WdfWaitLockRelease(pDevContext->positionLock);
 }
 
 
@@ -1364,40 +1373,38 @@ Routine Description:
                     If bit n is set then Report ID n+1 is valid.
 
 --*/
-PVOID GetReportDescriptorFromRegistry(USHORT * Size, USHORT * IdMask)
+PVOID GetReportDescriptorFromRegistry(USHORT* Size, USHORT* IdMask)
 {
 
     NTSTATUS				status = STATUS_SUCCESS;
     WDFKEY					KeyDevice, KeyParameters;
     UNICODE_STRING			strDev, strDescName, strDescSize;
     ULONG					ValueLengthQueried;
-	USHORT					dDescSize=0, dDescSizePrev=0;
-    PVOID					out=NULL;
-    HANDLE					hKeyParameters=NULL;
-    int						iDevice=0;
-    PKEY_BASIC_INFORMATION 	pDeviceBasicInfo=NULL;
+    USHORT					dDescSize = 0, dDescSizePrev = 0;
+    PVOID					out = NULL;
+    HANDLE					hKeyParameters = NULL;
+    int						iDevice = 0;
+    PKEY_BASIC_INFORMATION 	pDeviceBasicInfo = NULL;
     ULONG					ResultLength;
     ULONG					nameLength;
     WCHAR					DeviceKeyName[NameSize];
-    size_t					pcb=0;
-    USHORT					id=0;
+    size_t					pcb = 0;
+    USHORT					id = 0;
 
     PAGED_CODE();
 
     *Size = 0;
     // Get the key of the Parameters key under "SYSTEM\\CurrentControlSet\\services\\vjoy"
-    status =  WdfDriverOpenParametersRegistryKey(WdfGetDriver(), WRITE_DAC, WDF_NO_OBJECT_ATTRIBUTES, &KeyParameters);
-    if (!NT_SUCCESS(status))
-    {
-        LogEventWithStatus(ERRLOG_REP_REG_FAILED ,L"WdfDriverOpenParametersRegistryKey", WdfDriverWdmGetDriverObject(WdfGetDriver()), status);
+    status = WdfDriverOpenParametersRegistryKey(WdfGetDriver(), WRITE_DAC, WDF_NO_OBJECT_ATTRIBUTES, &KeyParameters);
+    if (!NT_SUCCESS(status)) {
+        LogEventWithStatus(ERRLOG_REP_REG_FAILED, L"WdfDriverOpenParametersRegistryKey", WdfDriverWdmGetDriverObject(WdfGetDriver()), status);
         return NULL;
     };
 
 
     // Enumerate Subkeys holding the configuration data
     status = STATUS_SUCCESS;
-    while (status != STATUS_NO_MORE_ENTRIES)
-    { // Loop on all sub-keys
+    while (status != STATUS_NO_MORE_ENTRIES) { // Loop on all sub-keys
         // Prepare buffer to receive data and get the name of the next sub-key
         // 1. Enumerate once with zero size just to get the required sizw
         // 2. Alocate the correct size to hold the output struct
@@ -1406,8 +1413,7 @@ PVOID GetReportDescriptorFromRegistry(USHORT * Size, USHORT * IdMask)
         hKeyParameters = WdfRegistryWdmGetHandle(KeyParameters);
         // 1.
         status = ZwEnumerateKey(hKeyParameters, iDevice, KeyBasicInformation, NULL, ResultLength, &ResultLength);
-        if (status == STATUS_BUFFER_OVERFLOW || status == STATUS_BUFFER_TOO_SMALL)
-        {
+        if (status == STATUS_BUFFER_OVERFLOW || status == STATUS_BUFFER_TOO_SMALL) {
             // 2.
             pDeviceBasicInfo = (PKEY_BASIC_INFORMATION)ExAllocatePoolWithTag(NonPagedPool, ResultLength, 'fnIb');
             if (!pDeviceBasicInfo)
@@ -1418,9 +1424,8 @@ PVOID GetReportDescriptorFromRegistry(USHORT * Size, USHORT * IdMask)
         };
         if (status == STATUS_NO_MORE_ENTRIES)
             break;
-        if (!NT_SUCCESS(status))
-        {
-            LogEventWithStatus(ERRLOG_REP_REG_FAILED ,L"ZwEnumerateKey", WdfDriverWdmGetDriverObject(WdfGetDriver()), status);
+        if (!NT_SUCCESS(status)) {
+            LogEventWithStatus(ERRLOG_REP_REG_FAILED, L"ZwEnumerateKey", WdfDriverWdmGetDriverObject(WdfGetDriver()), status);
             //ExFreePoolWithTag(pDeviceBasicInfo, 'fnIb');
             return NULL;
         };
@@ -1432,8 +1437,7 @@ PVOID GetReportDescriptorFromRegistry(USHORT * Size, USHORT * IdMask)
         nameLength = pDeviceBasicInfo->NameLength;
         RtlZeroMemory(DeviceKeyName, NameSize);
         status = RtlStringCbCopyNW(DeviceKeyName, NameSize *sizeof(WCHAR), pDeviceBasicInfo->Name, nameLength);
-        if (!NT_SUCCESS(status))
-        {
+        if (!NT_SUCCESS(status)) {
             LogEventWithStatus(ERRLOG_REP_REG_FAILED, L"RtlStringCbCopyNW", WdfDriverWdmGetDriverObject(WdfGetDriver()), status);
             ExFreePoolWithTag(pDeviceBasicInfo, 'fnIb');
             return NULL;
@@ -1442,16 +1446,15 @@ PVOID GetReportDescriptorFromRegistry(USHORT * Size, USHORT * IdMask)
         ExFreePoolWithTag(pDeviceBasicInfo, 'fnIb');
 
         // The sub-key name should range from "Device01" to "Device16"
-        status =   RtlStringCbLengthW(REG_DEVICE, NameSize, &pcb);
-		if (!NT_SUCCESS(status))
-			continue;
-		if (!RtlEqualMemory(DeviceKeyName, REG_DEVICE, pcb))
+        status = RtlStringCbLengthW(REG_DEVICE, NameSize, &pcb);
+        if (!NT_SUCCESS(status))
+            continue;
+        if (!RtlEqualMemory(DeviceKeyName, REG_DEVICE, pcb))
             continue;
 
         // Get the Subkey holding the configuration data
-        status =   WdfRegistryOpenKey(KeyParameters, &strDev, GENERIC_READ, WDF_NO_OBJECT_ATTRIBUTES, &KeyDevice);
-        if (!NT_SUCCESS(status))
-        {
+        status = WdfRegistryOpenKey(KeyParameters, &strDev, GENERIC_READ, WDF_NO_OBJECT_ATTRIBUTES, &KeyDevice);
+        if (!NT_SUCCESS(status)) {
             //WdfRegistryClose(KeyParameters);
             continue;
         };
@@ -1461,24 +1464,21 @@ PVOID GetReportDescriptorFromRegistry(USHORT * Size, USHORT * IdMask)
         // Then compare this value to the one in value 'HidReportDesctiptorSize'. 
         // If they are identical create a buffer and get the data in value 'HidReportDesctiptor'
         RtlInitUnicodeString(&strDescName, DESC_NAME);
-        status =   WdfRegistryQueryValue(KeyDevice, &strDescName, 0, NULL, &ValueLengthQueried, NULL);
-        if (status != STATUS_BUFFER_OVERFLOW)
-        {
+        status = WdfRegistryQueryValue(KeyDevice, &strDescName, 0, NULL, &ValueLengthQueried, NULL);
+        if (status != STATUS_BUFFER_OVERFLOW) {
             //WdfRegistryClose(KeyParameters);
             WdfRegistryClose(KeyDevice);
             continue;
         };
         RtlInitUnicodeString(&strDescSize, DESC_SIZE);
-        status =   WdfRegistryQueryValue(KeyDevice, &strDescSize, 4, &dDescSize, NULL, NULL);
-        if (!NT_SUCCESS(status))
-        {
+        status = WdfRegistryQueryValue(KeyDevice, &strDescSize, 4, &dDescSize, NULL, NULL);
+        if (!NT_SUCCESS(status)) {
             //WdfRegistryClose(KeyParameters);
             WdfRegistryClose(KeyDevice);
             continue;
         };
 
-        if ((dDescSize != ValueLengthQueried) | !dDescSize)
-        {
+        if ((dDescSize != ValueLengthQueried) | !dDescSize) {
             //WdfRegistryClose(KeyParameters);
             WdfRegistryClose(KeyDevice);
             continue;
@@ -1486,17 +1486,15 @@ PVOID GetReportDescriptorFromRegistry(USHORT * Size, USHORT * IdMask)
 
         // The size of the descriptor was verified - Allocate memory and read it
         out = ReAllocatePoolWithTag(out, dDescSizePrev, PagedPool, dDescSizePrev+dDescSize, MEM_TAG_HIDRPRT);
-        if (!out)
-        {
+        if (!out) {
             WdfRegistryClose(KeyParameters);
             WdfRegistryClose(KeyDevice);
             LogEvent(ERRLOG_REP_REG_FAILED1, NULL, WdfDriverWdmGetDriverObject(WdfGetDriver()));
             return NULL;
         };
 
-        status =   WdfRegistryQueryValue(KeyDevice, &strDescName, dDescSize, (BYTE*)out+dDescSizePrev, NULL, NULL);
-        if (!NT_SUCCESS(status))
-        {
+        status = WdfRegistryQueryValue(KeyDevice, &strDescName, dDescSize, (BYTE*)out+dDescSizePrev, NULL, NULL);
+        if (!NT_SUCCESS(status)) {
             WdfRegistryClose(KeyDevice);
             //ExFreePoolWithTag(out, MEM_TAG_HIDRPRT);
             continue;
@@ -1508,8 +1506,7 @@ PVOID GetReportDescriptorFromRegistry(USHORT * Size, USHORT * IdMask)
         // Get the Report ID from the buffer
         // Byte 10 should be 0x85
 #if 0
-        if ((*((BYTE*)out + dDescSizePrev + 10) != 0x85))
-        {
+        if ((*((BYTE*)out + dDescSizePrev + 10) != 0x85)) {
             //WdfRegistryClose(KeyParameters);
             WdfRegistryClose(KeyDevice);
             //ExFreePoolWithTag(out, MEM_TAG_HIDRPRT);
@@ -1521,12 +1518,11 @@ PVOID GetReportDescriptorFromRegistry(USHORT * Size, USHORT * IdMask)
 #endif // 0
 
         id = ParseIdInDescriptor(
-            (BYTE*)out + dDescSizePrev, 
+            (BYTE*)out + dDescSizePrev,
             dDescSize);
 
         // Check if this is a unique ID
-        if ((*IdMask) & (1<<(id-1)))
-        {
+        if ((*IdMask) & (1<<(id-1))) {
             WdfRegistryClose(KeyDevice);
             continue;
         };
@@ -1534,7 +1530,7 @@ PVOID GetReportDescriptorFromRegistry(USHORT * Size, USHORT * IdMask)
         // Update ID mask
         *IdMask |= 1<<(id-1);
         //////////////////////////////////////////////////////////////////////////////
-        
+
         dDescSizePrev += dDescSize;
         WdfRegistryClose(KeyDevice);
 
@@ -1550,7 +1546,7 @@ PVOID GetReportDescriptorFromRegistry(USHORT * Size, USHORT * IdMask)
 Routine Description:
 
     GetInitValueFromRegistry helper function reads the initialization values for the controls of a device.
-    
+
     Returns:
     Bit-Mask where every bit refers to an entry in the output buffer.
     If a bit is set the the entry (Axis, POV or the button mask) is valid.
@@ -1568,18 +1564,17 @@ unsigned int GetInitValueFromRegistry(USHORT		id, PDEVICE_INIT_VALS data_buf)
     WDFKEY					KeyDevice, KeyParameters;
     WCHAR					DeviceKeyName[NameSize] = { 0 };
     UNICODE_STRING			strDev, strControl;
-    PCWSTR					Axes[] = { L"X", L"Y", L"Z", L"RX", L"RY", L"RZ", L"SL1", L"SL2", L"POV1", L"POV2", L"POV3", L"POV4" };
+    PCWSTR					Axes[VJOY_NUMBER_OF_AXES] = { L"X", L"Y", L"Z", L"RX", L"RY", L"RZ", L"SL1", L"SL2", L"POV1", L"POV2", L"POV3", L"POV4" };
     UCHAR					nAxes = 0;
     int						iAxis;
-    unsigned int			Mask=0;
-    const int				nButtons = 128;
+    unsigned int			Mask = 0;
+    const int				nButtons = VJOY_NUMBER_OF_BUTTONS;
 
     PAGED_CODE();
 
     // Check that buffer size is sufficient
     nAxes = sizeof(Axes) / sizeof(PCWSTR);
-    if (data_buf->cb < (2 + nAxes + sizeof(nButtons) / 8))
-    {
+    if (data_buf->cb < (2 + nAxes + (nButtons/8))) {
         LogEventWithStatus(ERRLOG_REP_REG_FAILED, L"GetInitValueFromRegistry: Buffer size too small", WdfDriverWdmGetDriverObject(WdfGetDriver()), status);
         return 0;
     };
@@ -1587,8 +1582,7 @@ unsigned int GetInitValueFromRegistry(USHORT		id, PDEVICE_INIT_VALS data_buf)
 
     // Get the key of the Parameters key under "SYSTEM\\CurrentControlSet\\services\\vjoy"
     status = WdfDriverOpenParametersRegistryKey(WdfGetDriver(), WRITE_DAC, WDF_NO_OBJECT_ATTRIBUTES, &KeyParameters);
-    if (!NT_SUCCESS(status))
-    {
+    if (!NT_SUCCESS(status)) {
         LogEventWithStatus(ERRLOG_REP_REG_FAILED, L"WdfDriverOpenParametersRegistryKey", WdfDriverWdmGetDriverObject(WdfGetDriver()), status);
         return 0;
     };
@@ -1596,8 +1590,7 @@ unsigned int GetInitValueFromRegistry(USHORT		id, PDEVICE_INIT_VALS data_buf)
 
     // Calculate the string of the registry key
     status = RtlStringCchPrintfExW(DeviceKeyName, sizeof(DeviceKeyName) / sizeof(WCHAR), NULL, NULL, STRSAFE_NO_TRUNCATION, REG_DEVICE L"%02d\\" REG_INIT, id);
-    if (!NT_SUCCESS(status))
-    {
+    if (!NT_SUCCESS(status)) {
         LogEventWithStatus(ERRLOG_REP_REG_FAILED, L"RtlStringCchPrintfExW", WdfDriverWdmGetDriverObject(WdfGetDriver()), status);
         return 0;
     };
@@ -1606,17 +1599,15 @@ unsigned int GetInitValueFromRegistry(USHORT		id, PDEVICE_INIT_VALS data_buf)
 
     // Open a handle to the key
     status = WdfRegistryOpenKey(KeyParameters, &strDev, GENERIC_READ, WDF_NO_OBJECT_ATTRIBUTES, &KeyDevice);
-    if (!NT_SUCCESS(status))
-    {
-		if (STATUS_OBJECT_NAME_NOT_FOUND != status)
-			LogEventWithStatus(ERRLOG_REP_REG_FAILED, L"WdfRegistryOpenKey", WdfDriverWdmGetDriverObject(WdfGetDriver()), status);
+    if (!NT_SUCCESS(status)) {
+        if (STATUS_OBJECT_NAME_NOT_FOUND != status)
+            LogEventWithStatus(ERRLOG_REP_REG_FAILED, L"WdfRegistryOpenKey", WdfDriverWdmGetDriverObject(WdfGetDriver()), status);
         WdfRegistryClose(KeyParameters);
         return 0;
     };
 
     // Analyze axes	& POVs
-    for (iAxis = 0; iAxis < nAxes; iAxis++)
-    {
+    for (iAxis = 0; iAxis < nAxes; iAxis++) {
         RtlUnicodeStringInit(&strControl, Axes[iAxis]);
         status = WdfRegistryQueryValue(KeyDevice, &strControl, 1, &(data_buf->InitValAxis[iAxis]), NULL, NULL); //val
         if (status == STATUS_SUCCESS)
@@ -1641,7 +1632,7 @@ unsigned int GetInitValueFromRegistry(USHORT		id, PDEVICE_INIT_VALS data_buf)
 
     1.	Calls GetInitValueFromRegistry() for device #n.
     2.	If returns all-valid (13 lower bits are set = 0x1FFF) then use the buffer for initialization.
-    3.	Otherwise store the buffer (Device Data) and the returned value (Device Validity mask) 
+    3.	Otherwise store the buffer (Device Data) and the returned value (Device Validity mask)
         and call GetInitValueFromRegistry() for device #0.
     4.	Store device #0 buffer (Master Data) and  returned value (Master Validity mask).
     5.	For every bit that is 0 in Device Validity mask and 1 in Master Validity mask:
@@ -1662,8 +1653,8 @@ void   CalcInitValue(USHORT		id, PDEVICE_INIT_VALS data_buf)
 
     // Hardcoded values
     DEVICE_INIT_VALS  init_master;
-    unsigned int mask_device=0, mask_master=0;
-    int i,j, k;
+    unsigned int mask_device = 0, mask_master = 0;
+    int i, j, k;
     UCHAR InitValAxis[8] = { 50, 50, 50, 0, 0, 0, 0, 0 };
     UCHAR InitValPov[4] = { (UCHAR)-1, (UCHAR)-1, (UCHAR)-1, (UCHAR)-1 };
     UCHAR ButtonMask[16] = { 0 };
@@ -1673,12 +1664,11 @@ void   CalcInitValue(USHORT		id, PDEVICE_INIT_VALS data_buf)
 
     // Prepare buffer and get init data for device from registry
     data_buf->cb = sizeof(DEVICE_INIT_VALS);
-    data_buf->id = id;	
+    data_buf->id = id;
 
     // First, get initialization values for device.
     // Special case: default (hardcoded device) - skip this stage.
-    if (id)
-    {
+    if (id) {
         mask_device = GetInitValueFromRegistry(id, data_buf);
         if (mask_device == 0x1FFF) // all data taken from registry?
             return;
@@ -1692,11 +1682,9 @@ void   CalcInitValue(USHORT		id, PDEVICE_INIT_VALS data_buf)
     // Merge Axes
     nAxes = (sizeof(data_buf->InitValAxis) / sizeof(data_buf->InitValAxis[0]));
     nPovs = (sizeof(data_buf->InitValPov) / sizeof(data_buf->InitValPov[0]));
-    for (i = 0; i <nAxes ; i++)
-    {
+    for (i = 0; i <nAxes; i++) {
         offset = nAxes + nPovs- i;
-        if (!(mask_device & (1 << offset)))
-        {
+        if (!(mask_device & (1 << offset))) {
             if (mask_master & (1 << offset))
                 data_buf->InitValAxis[i] = init_master.InitValAxis[i];
             else
@@ -1705,11 +1693,9 @@ void   CalcInitValue(USHORT		id, PDEVICE_INIT_VALS data_buf)
     };
 
     // Merge POVs
-    for (j = 0; j < nPovs; i++, j++)
-    {
+    for (j = 0; j < nPovs; i++, j++) {
         offset = nAxes + nPovs - i;
-        if (!(mask_device & (1 << offset)))
-        {
+        if (!(mask_device & (1 << offset))) {
             if (mask_master & (1 << offset))
                 data_buf->InitValPov[j] = init_master.InitValPov[j];
             else
@@ -1718,8 +1704,7 @@ void   CalcInitValue(USHORT		id, PDEVICE_INIT_VALS data_buf)
     };
 
     // Buttons
-    if (!(mask_device & 1))
-    {
+    if (!(mask_device & 1)) {
         if (mask_master & 1)
             for (k = 0; k < (sizeof(data_buf->ButtonMask) / sizeof(data_buf->ButtonMask[0])); k++)
                 data_buf->ButtonMask[k] = init_master.ButtonMask[k];
@@ -1735,24 +1720,22 @@ void   CalcInitValue(USHORT		id, PDEVICE_INIT_VALS data_buf)
 */
 void UpdateHidDescriptor(void)
 {
-    USHORT	Size = 0, Mask=0;
+    USHORT	Size = 0, Mask = 0;
     PVOID	out;
 
     // Get the size from the registry
     out = GetReportDescriptorFromRegistry(&Size, &Mask);
 
-    if (Size)
-    {
+    if (Size) {
         ExFreePoolWithTag(out, MEM_TAG_HIDRPRT);
         G_DefaultHidDescriptor.DescriptorList[0].wReportLength = Size;
-    }
-    else
+    } else
         G_DefaultHidDescriptor.DescriptorList[0].wReportLength = sizeof(G_DefaultReportDescriptor);
 
 }
 
 /*
-    This function determines the number of collections (virtual joystick devices) 
+    This function determines the number of collections (virtual joystick devices)
     attached to this device and the features of each collection (device).
     The data comes from the registry.
     If the registry does not hold valid data then the data is taken from the hard-coded defaults.
@@ -1764,7 +1747,7 @@ void UpdateHidDescriptor(void)
 */
 void UpdateCollections(WDFDEVICE Device)
 {
-    USHORT	Size = 0, Mask=0;
+    USHORT	Size = 0, Mask = 0;
     PVOID	out;
     PDEVICE_EXTENSION   devContext = NULL;
 
@@ -1774,21 +1757,17 @@ void UpdateCollections(WDFDEVICE Device)
 
     // Get the data, size and IDs from the registry
     out = GetReportDescriptorFromRegistry(&Size, &Mask);
-    if (out && Mask && Size)
-    {	/* Registry holds valid data */
+    if (out && Mask && Size) {	/* Registry holds valid data */
         InitializeDev(devContext, Mask, FALSE);
         devContext->isHardcodedDevice = FALSE;
         // Free HID Report Descriptor
-        if (devContext->ReportDescriptor)
-        {
+        if (devContext->ReportDescriptor) {
             ExFreePoolWithTag(devContext->ReportDescriptor, MEM_TAG_HIDRPRT);
             devContext->ReportDescriptor = NULL;
         };
         devContext->ReportDescriptor = out;
         G_DefaultHidDescriptor.DescriptorList[0].wReportLength = Size;
-    }
-    else
-    {	/* Use default (hard-coded) data */
+    } else {	/* Use default (hard-coded) data */
         InitializeDefaultDev(devContext);
         devContext->isHardcodedDevice = TRUE;
     };
@@ -1803,7 +1782,7 @@ void InitializeDeviceContext(PDEVICE_EXTENSION   devContext)
     int i/*, j*/;
 
     // Init array of pointers to reports
-    for (i=0; i<MAX_N_DEVICES; i++)
+    for (i = 0; i<VJOY_MAX_N_DEVICES; i++)
         devContext->positions[i] = NULL;
 
     devContext->nDevices = 0;
@@ -1811,7 +1790,7 @@ void InitializeDeviceContext(PDEVICE_EXTENSION   devContext)
     devContext->positionLock = NULL;
 
     // Default lastly created BlockIndex is 0 (not created)
-    for (i=0; i<MAX_N_DEVICES; i++) {
+    for (i = 0; i<VJOY_MAX_N_DEVICES; i++) {
         PFFB_DEVICE_PID pid = &(devContext->FfbPIDData[i]);
         pid->PIDPool.MaxSimultaneousEffects = 10;
         pid->PIDPool.MemoryManagement = 0;
@@ -1821,7 +1800,7 @@ void InitializeDeviceContext(PDEVICE_EXTENSION   devContext)
         pid->PIDBlockLoad.LoadStatus = 0;
         pid->PIDBlockLoad.RAMPoolAvailable = 0xFFFF;
 
-        for (int j=0; j<MAX_FFB_EFFECTS_BLOCK_INDEX; j++) {
+        for (int j = 0; j<MAX_FFB_EFFECTS_BLOCK_INDEX; j++) {
             pid->EffectStates[j].EffectState = 0;
         }
     }
@@ -1835,28 +1814,27 @@ void InitializeDeviceContext(PDEVICE_EXTENSION   devContext)
 void InitializeDefaultDev(PDEVICE_EXTENSION   devContext)
 {
     int index, n;
-    UCHAR * cTag;
+    UCHAR* cTag;
     ULONG	Tag = '00DI';
-    const UCHAR	SerialL[16] = {'1', '2', '3', '4', '5', '6', '7', '8', '9', '0', '1', '2', '3', '4', '5', '6'};
-    const UCHAR	SerialH[16] = {'0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '1', '1', '1', '1', '1', '1'};
+    const UCHAR	SerialL[16] = { '1', '2', '3', '4', '5', '6', '7', '8', '9', '0', '1', '2', '3', '4', '5', '6' };
+    const UCHAR	SerialH[16] = { '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '1', '1', '1', '1', '1', '1' };
     DEVICE_INIT_VALS data_buf;
 
-    cTag = (UCHAR *)&Tag;
+    cTag = (UCHAR*)&Tag;
     n = devContext->nDevices = N_COLLECTIONS;
 
     if (devContext->positionLock)
         WdfWaitLockAcquire(devContext->positionLock, NULL);
     // Create a DEVICE_POSITION structure for each hard-coded top-level collection
-    for (index=0; index<n; index++)
-    {
+    for (index = 0; index<n; index++) {
 
         // Mark default device(s) as implemented
         devContext->DeviceImplemented[index] = TRUE;
-        
+
         //id = index+1;
         cTag[3] = SerialL[index];
         cTag[2] = SerialH[index];
-        devContext->positions[index]  = ExAllocatePoolWithTag(NonPagedPool, sizeof(DEVICE_POSITION_V2),Tag);
+        devContext->positions[index] = ExAllocatePoolWithTag(NonPagedPool, sizeof(DEVICE_POSITION), Tag);
         if (!devContext->positions[index])
             break;
 
@@ -1864,18 +1842,23 @@ void InitializeDefaultDev(PDEVICE_EXTENSION   devContext)
         CalcInitValue(0, &data_buf);
 
         // Initialize all fields
-        devContext->positions[index]->ValThrottle = 0;
-        devContext->positions[index]->ValRudder = 0;
-        devContext->positions[index]->ValAileron = 0;
-        devContext->positions[index]->ValX = data_buf.InitValAxis[0] * 0x7FFF / 100 + 1;//0x7FFF/2+1;
-        devContext->positions[index]->ValY = data_buf.InitValAxis[1] * 0x7FFF / 100 + 1;//0x7FFF/2+1;
-        devContext->positions[index]->ValZ = data_buf.InitValAxis[2] * 0x7FFF / 100 + 1;//0x7FFF/2+1;
-        devContext->positions[index]->ValRX = data_buf.InitValAxis[3] * 0x7FFF / 100 + 1;
-        devContext->positions[index]->ValRY = data_buf.InitValAxis[4] * 0x7FFF / 100 + 1;
-        devContext->positions[index]->ValRZ = data_buf.InitValAxis[5] * 0x7FFF / 100 + 1;
-        devContext->positions[index]->ValSlider = data_buf.InitValAxis[6] * 0x7FFF / 100 + 1;
-        devContext->positions[index]->ValDial = data_buf.InitValAxis[7] * 0x7FFF / 100 + 1;
-        devContext->positions[index]->ValWheel = 0;
+        devContext->positions[index]->ValX = data_buf.InitValAxis[0] * VJOY_AXIS_MAX_VALUE / 100 + 1;//0x7FFF/2+1;
+        devContext->positions[index]->ValY = data_buf.InitValAxis[1] * VJOY_AXIS_MAX_VALUE / 100 + 1;//0x7FFF/2+1;
+        devContext->positions[index]->ValZ = data_buf.InitValAxis[2] * VJOY_AXIS_MAX_VALUE / 100 + 1;//0x7FFF/2+1;
+        devContext->positions[index]->ValRX = data_buf.InitValAxis[3] * VJOY_AXIS_MAX_VALUE / 100 + 1;
+        devContext->positions[index]->ValRY = data_buf.InitValAxis[4] * VJOY_AXIS_MAX_VALUE / 100 + 1;
+        devContext->positions[index]->ValRZ = data_buf.InitValAxis[5] * VJOY_AXIS_MAX_VALUE / 100 + 1;
+        devContext->positions[index]->ValSlider = data_buf.InitValAxis[6] * VJOY_AXIS_MAX_VALUE / 100 + 1;
+        devContext->positions[index]->ValDial = data_buf.InitValAxis[7] * VJOY_AXIS_MAX_VALUE / 100 + 1;
+        
+        devContext->positions[index]->ValWheel = data_buf.InitValAxis[8] * VJOY_AXIS_MAX_VALUE / 100 + 1;
+        devContext->positions[index]->ValAccelerator = data_buf.InitValAxis[9] * VJOY_AXIS_MAX_VALUE / 100 + 1;
+        devContext->positions[index]->ValBrake = data_buf.InitValAxis[10] * VJOY_AXIS_MAX_VALUE / 100 + 1;
+        devContext->positions[index]->ValClutch = data_buf.InitValAxis[11] * VJOY_AXIS_MAX_VALUE / 100 + 1;
+        devContext->positions[index]->ValSteering = data_buf.InitValAxis[12] * VJOY_AXIS_MAX_VALUE / 100 + 1;
+        devContext->positions[index]->ValThrottle = data_buf.InitValAxis[13] * VJOY_AXIS_MAX_VALUE / 100 + 1;
+        devContext->positions[index]->ValRudder = data_buf.InitValAxis[14] * VJOY_AXIS_MAX_VALUE / 100 + 1;
+        devContext->positions[index]->ValAileron = data_buf.InitValAxis[15] * VJOY_AXIS_MAX_VALUE / 100 + 1;
 
         if (data_buf.InitValPov[0] == -1)
             devContext->positions[index]->ValHats = (DWORD)-1;
@@ -1897,19 +1880,19 @@ void InitializeDefaultDev(PDEVICE_EXTENSION   devContext)
         else
             devContext->positions[index]->ValHatsEx3 = data_buf.InitValPov[3] * 0x7FFF / 100 + 1;
 
-        devContext->positions[index]->ValButtons = ((DWORD *)(data_buf.ButtonMask))[0];
-        devContext->positions[index]->ValButtonsEx1 = ((DWORD *)(data_buf.ButtonMask))[1];
-        devContext->positions[index]->ValButtonsEx2 = ((DWORD *)(data_buf.ButtonMask))[2];
-        devContext->positions[index]->ValButtonsEx3 = ((DWORD *)(data_buf.ButtonMask))[3];
+        devContext->positions[index]->ValButtons = ((DWORD*)(data_buf.ButtonMask))[0];
+        devContext->positions[index]->ValButtonsEx1 = ((DWORD*)(data_buf.ButtonMask))[1];
+        devContext->positions[index]->ValButtonsEx2 = ((DWORD*)(data_buf.ButtonMask))[2];
+        devContext->positions[index]->ValButtonsEx3 = ((DWORD*)(data_buf.ButtonMask))[3];
     };
 
     if (devContext->positionLock)
         WdfWaitLockRelease(devContext->positionLock);
 
     // Copy HID Report Descriptor
-    devContext->ReportDescriptor = ExAllocatePoolWithTag(PagedPool, sizeof(G_DefaultReportDescriptor),MEM_TAG_HIDRPRT);
-	if (!devContext->ReportDescriptor)
-		return;
+    devContext->ReportDescriptor = ExAllocatePoolWithTag(PagedPool, sizeof(G_DefaultReportDescriptor), MEM_TAG_HIDRPRT);
+    if (!devContext->ReportDescriptor)
+        return;
     RtlCopyMemory(devContext->ReportDescriptor, G_DefaultReportDescriptor, sizeof(G_DefaultReportDescriptor));
 
     // Init HID Descriptor
@@ -1927,7 +1910,7 @@ void ResetDeviceControls(int id, PDEVICE_EXTENSION devContext, PDEVICE_INIT_VALS
     TraceEvents(TRACE_LEVEL_INFORMATION, DBG_INIT, "ResetDeviceControls: Resetting device:%d [requested]\n", id);
 
     // Sanity check
-    if (!devContext || id < 1 || id > MAX_N_DEVICES || !devContext->positions[index] || !pdata_buf)
+    if (!devContext || id < 1 || id > VJOY_MAX_N_DEVICES || !devContext->positions[index] || !pdata_buf)
         return;
 
     // Device exists?
@@ -1940,15 +1923,23 @@ void ResetDeviceControls(int id, PDEVICE_EXTENSION devContext, PDEVICE_INIT_VALS
     devContext->positions[index]->ValThrottle = 0;
     devContext->positions[index]->ValRudder = 0;
     devContext->positions[index]->ValAileron = 0;
-    devContext->positions[index]->ValX = pdata_buf->InitValAxis[0] * 0x7FFF / 100 + 1;//0x7FFF/2+1;
-    devContext->positions[index]->ValY = pdata_buf->InitValAxis[1] * 0x7FFF / 100 + 1;//0x7FFF/2+1;
-    devContext->positions[index]->ValZ = pdata_buf->InitValAxis[2] * 0x7FFF / 100 + 1;//0x7FFF/2+1;
-    devContext->positions[index]->ValRX = pdata_buf->InitValAxis[3] * 0x7FFF / 100 + 1;
-    devContext->positions[index]->ValRY = pdata_buf->InitValAxis[4] * 0x7FFF / 100 + 1;
-    devContext->positions[index]->ValRZ = pdata_buf->InitValAxis[5] * 0x7FFF / 100 + 1;
-    devContext->positions[index]->ValSlider = pdata_buf->InitValAxis[6] * 0x7FFF / 100 + 1;
-    devContext->positions[index]->ValDial = pdata_buf->InitValAxis[7] * 0x7FFF / 100 + 1;
-    devContext->positions[index]->ValWheel = 0;
+    devContext->positions[index]->ValX = pdata_buf->InitValAxis[0] * VJOY_AXIS_MAX_VALUE / 100 + 1;//0x7FFF/2+1;
+    devContext->positions[index]->ValY = pdata_buf->InitValAxis[1] * VJOY_AXIS_MAX_VALUE / 100 + 1;//0x7FFF/2+1;
+    devContext->positions[index]->ValZ = pdata_buf->InitValAxis[2] * VJOY_AXIS_MAX_VALUE / 100 + 1;//0x7FFF/2+1;
+    devContext->positions[index]->ValRX = pdata_buf->InitValAxis[3] * VJOY_AXIS_MAX_VALUE / 100 + 1;
+    devContext->positions[index]->ValRY = pdata_buf->InitValAxis[4] * VJOY_AXIS_MAX_VALUE / 100 + 1;
+    devContext->positions[index]->ValRZ = pdata_buf->InitValAxis[5] * VJOY_AXIS_MAX_VALUE / 100 + 1;
+    devContext->positions[index]->ValSlider = pdata_buf->InitValAxis[6] * VJOY_AXIS_MAX_VALUE / 100 + 1;
+    devContext->positions[index]->ValDial = pdata_buf->InitValAxis[7] * VJOY_AXIS_MAX_VALUE / 100 + 1;
+
+    devContext->positions[index]->ValWheel = pdata_buf->InitValAxis[8] * VJOY_AXIS_MAX_VALUE / 100 + 1;
+    devContext->positions[index]->ValAccelerator = pdata_buf->InitValAxis[9] * VJOY_AXIS_MAX_VALUE / 100 + 1;
+    devContext->positions[index]->ValBrake = pdata_buf->InitValAxis[10] * VJOY_AXIS_MAX_VALUE / 100 + 1;
+    devContext->positions[index]->ValClutch = pdata_buf->InitValAxis[11] * VJOY_AXIS_MAX_VALUE / 100 + 1;
+    devContext->positions[index]->ValSteering = pdata_buf->InitValAxis[12] * VJOY_AXIS_MAX_VALUE / 100 + 1;
+    devContext->positions[index]->ValThrottle = pdata_buf->InitValAxis[13] * VJOY_AXIS_MAX_VALUE / 100 + 1;
+    devContext->positions[index]->ValRudder = pdata_buf->InitValAxis[14] * VJOY_AXIS_MAX_VALUE / 100 + 1;
+    devContext->positions[index]->ValAileron = pdata_buf->InitValAxis[15] * VJOY_AXIS_MAX_VALUE / 100 + 1;
 
     if (pdata_buf->InitValPov[0] == -1)
         devContext->positions[index]->ValHats = (DWORD)-1;
@@ -1970,10 +1961,10 @@ void ResetDeviceControls(int id, PDEVICE_EXTENSION devContext, PDEVICE_INIT_VALS
     else
         devContext->positions[index]->ValHatsEx3 = pdata_buf->InitValPov[3] * 35999 / 100;
 
-    devContext->positions[index]->ValButtons = ((DWORD *)(pdata_buf->ButtonMask))[0];
-    devContext->positions[index]->ValButtonsEx1 = ((DWORD *)(pdata_buf->ButtonMask))[1];
-    devContext->positions[index]->ValButtonsEx2 = ((DWORD *)(pdata_buf->ButtonMask))[2];
-    devContext->positions[index]->ValButtonsEx3 = ((DWORD *)(pdata_buf->ButtonMask))[3];
+    devContext->positions[index]->ValButtons = ((DWORD*)(pdata_buf->ButtonMask))[0];
+    devContext->positions[index]->ValButtonsEx1 = ((DWORD*)(pdata_buf->ButtonMask))[1];
+    devContext->positions[index]->ValButtonsEx2 = ((DWORD*)(pdata_buf->ButtonMask))[2];
+    devContext->positions[index]->ValButtonsEx3 = ((DWORD*)(pdata_buf->ButtonMask))[3];
 }
 
 /*
@@ -1982,22 +1973,20 @@ void ResetDeviceControls(int id, PDEVICE_EXTENSION devContext, PDEVICE_INIT_VALS
 void InitializeDev(PDEVICE_EXTENSION   devContext, USHORT Mask, BOOLEAN ResetOnly)
 {
     int index;
-    UCHAR * cTag;
+    UCHAR* cTag;
     ULONG	Tag = '00DI';
-    const UCHAR	SerialL[16] = {'1', '2', '3', '4', '5', '6', '7', '8', '9', '0', '1', '2', '3', '4', '5', '6'};
-    const UCHAR	SerialH[16] = {'0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '1', '1', '1', '1', '1', '1'};
+    const UCHAR	SerialL[16] = { '1', '2', '3', '4', '5', '6', '7', '8', '9', '0', '1', '2', '3', '4', '5', '6' };
+    const UCHAR	SerialH[16] = { '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '1', '1', '1', '1', '1', '1' };
     DEVICE_INIT_VALS data_buf;
 
-    cTag = (UCHAR *)&Tag;
+    cTag = (UCHAR*)&Tag;
     devContext->nDevices = 0;
 
     if (devContext->positionLock)
         WdfWaitLockAcquire(devContext->positionLock, NULL);
     // Create a DEVICE_POSITION structure for each hard-coded top-level collection
-    for (index=0; index<MAX_N_DEVICES; index++)
-    {
-        if (!((Mask >> index) & 1))
-        {
+    for (index = 0; index<VJOY_MAX_N_DEVICES; index++) {
+        if (!((Mask >> index) & 1)) {
             if (!ResetOnly)
                 devContext->DeviceImplemented[index] = FALSE;
             continue;
@@ -2011,7 +2000,7 @@ void InitializeDev(PDEVICE_EXTENSION   devContext, USHORT Mask, BOOLEAN ResetOnl
 
         cTag[3] = SerialL[index];
         cTag[2] = SerialH[index];
-        devContext->positions[index]  = ExAllocatePoolWithTag(NonPagedPool, sizeof(DEVICE_POSITION_V2),Tag);
+        devContext->positions[index] = ExAllocatePoolWithTag(NonPagedPool, sizeof(DEVICE_POSITION), Tag);
         if (!devContext->positions[index])
             break;
 
@@ -2022,63 +2011,70 @@ void InitializeDev(PDEVICE_EXTENSION   devContext, USHORT Mask, BOOLEAN ResetOnl
         devContext->positions[index]->ValThrottle = 0;
         devContext->positions[index]->ValRudder = 0;
         devContext->positions[index]->ValAileron = 0;
-        devContext->positions[index]->ValX = data_buf.InitValAxis[0] * 0x7FFF / 100 +1;//0x7FFF/2+1;
-        devContext->positions[index]->ValY = data_buf.InitValAxis[1] * 0x7FFF / 100 + 1;//0x7FFF/2+1;
-        devContext->positions[index]->ValZ = data_buf.InitValAxis[2] * 0x7FFF / 100 + 1;//0x7FFF/2+1;
-        devContext->positions[index]->ValRX = data_buf.InitValAxis[3] * 0x7FFF / 100 + 1;
-        devContext->positions[index]->ValRY = data_buf.InitValAxis[4] * 0x7FFF / 100 + 1;
-        devContext->positions[index]->ValRZ = data_buf.InitValAxis[5] * 0x7FFF / 100 + 1;
-        devContext->positions[index]->ValSlider = data_buf.InitValAxis[6] * 0x7FFF / 100 + 1;
-        devContext->positions[index]->ValDial = data_buf.InitValAxis[7] * 0x7FFF / 100 + 1;
-        devContext->positions[index]->ValWheel = 0;
+        devContext->positions[index]->ValX = data_buf.InitValAxis[0] * VJOY_AXIS_MAX_VALUE / 100 +1;//0x7FFF/2+1;
+        devContext->positions[index]->ValY = data_buf.InitValAxis[1] * VJOY_AXIS_MAX_VALUE / 100 + 1;//0x7FFF/2+1;
+        devContext->positions[index]->ValZ = data_buf.InitValAxis[2] * VJOY_AXIS_MAX_VALUE / 100 + 1;//0x7FFF/2+1;
+        devContext->positions[index]->ValRX = data_buf.InitValAxis[3] * VJOY_AXIS_MAX_VALUE / 100 + 1;
+        devContext->positions[index]->ValRY = data_buf.InitValAxis[4] * VJOY_AXIS_MAX_VALUE / 100 + 1;
+        devContext->positions[index]->ValRZ = data_buf.InitValAxis[5] * VJOY_AXIS_MAX_VALUE / 100 + 1;
+        devContext->positions[index]->ValSlider = data_buf.InitValAxis[6] * VJOY_AXIS_MAX_VALUE / 100 + 1;
+        devContext->positions[index]->ValDial = data_buf.InitValAxis[7] * VJOY_AXIS_MAX_VALUE / 100 + 1;
+        // Should be 0?
+        devContext->positions[index]->ValWheel = data_buf.InitValAxis[8] * VJOY_AXIS_MAX_VALUE / 100 + 1;
+        devContext->positions[index]->ValAccelerator = data_buf.InitValAxis[9] * VJOY_AXIS_MAX_VALUE / 100 + 1;
+        devContext->positions[index]->ValBrake = data_buf.InitValAxis[10] * VJOY_AXIS_MAX_VALUE / 100 + 1;
+        devContext->positions[index]->ValClutch = data_buf.InitValAxis[11] * VJOY_AXIS_MAX_VALUE / 100 + 1;
+        devContext->positions[index]->ValSteering = data_buf.InitValAxis[12] * VJOY_AXIS_MAX_VALUE / 100 + 1;
+        devContext->positions[index]->ValThrottle = data_buf.InitValAxis[13] * VJOY_AXIS_MAX_VALUE / 100 + 1;
+        devContext->positions[index]->ValRudder = data_buf.InitValAxis[14] * VJOY_AXIS_MAX_VALUE / 100 + 1;
+        devContext->positions[index]->ValAileron = data_buf.InitValAxis[15] * VJOY_AXIS_MAX_VALUE / 100 + 1;
 
-		// Mark position data as ready to be read
-		devContext->PositionReady[index] = TRUE;
+        // Mark position data as ready to be read
+        devContext->PositionReady[index] = TRUE;
 
-		// Test if the initialization values refer to Discrete POVs
-		// The sign of Discrete POV initialization is value in the range 0x80-0x8F
-		// If one or more values are in the range it is adssumed the POVs are Discrete
-		if (
-			((data_buf.InitValPov[0] >> 4) == 8) ||
-			((data_buf.InitValPov[1] >> 4) == 8) ||
-			((data_buf.InitValPov[2] >> 4) == 8) ||
-			((data_buf.InitValPov[3] >> 4) == 8)
-			)
-			devContext->positions[index]->ValHats =
-			((data_buf.InitValPov[0] & 0xF) << 0) +
-			((data_buf.InitValPov[1] & 0xF) << 4) +
-			((data_buf.InitValPov[2] & 0xF) << 8) +
-			((data_buf.InitValPov[3] & 0xF) << 12);
+        // Test if the initialization values refer to Discrete POVs
+        // The sign of Discrete POV initialization is value in the range 0x80-0x8F
+        // If one or more values are in the range it is adssumed the POVs are Discrete
+        if (
+            ((data_buf.InitValPov[0] >> 4) == 8) ||
+            ((data_buf.InitValPov[1] >> 4) == 8) ||
+            ((data_buf.InitValPov[2] >> 4) == 8) ||
+            ((data_buf.InitValPov[3] >> 4) == 8)
+            )
+            devContext->positions[index]->ValHats =
+            ((data_buf.InitValPov[0] & 0xF) << 0) +
+            ((data_buf.InitValPov[1] & 0xF) << 4) +
+            ((data_buf.InitValPov[2] & 0xF) << 8) +
+            ((data_buf.InitValPov[3] & 0xF) << 12);
 
 
-		// These are Continuous POVs
-		else
-		{
-			if (data_buf.InitValPov[0] == -1)
-				devContext->positions[index]->ValHats = (DWORD)-1;
-			else
-				devContext->positions[index]->ValHats = data_buf.InitValPov[0] * 35999 / 100;
+        // These are Continuous POVs
+        else {
+            if (data_buf.InitValPov[0] == -1)
+                devContext->positions[index]->ValHats = (DWORD)-1;
+            else
+                devContext->positions[index]->ValHats = data_buf.InitValPov[0] * 35999 / 100;
 
-			if (data_buf.InitValPov[1] == -1)
-				devContext->positions[index]->ValHatsEx1 = (DWORD)-1;
-			else
-				devContext->positions[index]->ValHatsEx1 = data_buf.InitValPov[1] * 35999 / 100;
+            if (data_buf.InitValPov[1] == -1)
+                devContext->positions[index]->ValHatsEx1 = (DWORD)-1;
+            else
+                devContext->positions[index]->ValHatsEx1 = data_buf.InitValPov[1] * 35999 / 100;
 
-			if (data_buf.InitValPov[2] == -1)
-				devContext->positions[index]->ValHatsEx2 = (DWORD)-1;
-			else
-				devContext->positions[index]->ValHatsEx2 = data_buf.InitValPov[2] * 35999 / 100;
+            if (data_buf.InitValPov[2] == -1)
+                devContext->positions[index]->ValHatsEx2 = (DWORD)-1;
+            else
+                devContext->positions[index]->ValHatsEx2 = data_buf.InitValPov[2] * 35999 / 100;
 
-			if (data_buf.InitValPov[3] == -1)
-				devContext->positions[index]->ValHatsEx3 = (DWORD)-1;
-			else
-				devContext->positions[index]->ValHatsEx3 = data_buf.InitValPov[3] * 35999 / 100;
-		};
+            if (data_buf.InitValPov[3] == -1)
+                devContext->positions[index]->ValHatsEx3 = (DWORD)-1;
+            else
+                devContext->positions[index]->ValHatsEx3 = data_buf.InitValPov[3] * 35999 / 100;
+        };
 
-        devContext->positions[index]->ValButtons = ((DWORD *)(data_buf.ButtonMask))[0];
-        devContext->positions[index]->ValButtonsEx1 = ((DWORD *)(data_buf.ButtonMask))[1];
-        devContext->positions[index]->ValButtonsEx2 = ((DWORD *)(data_buf.ButtonMask))[2];
-        devContext->positions[index]->ValButtonsEx3 = ((DWORD *)(data_buf.ButtonMask))[3];
+        devContext->positions[index]->ValButtons = ((DWORD*)(data_buf.ButtonMask))[0];
+        devContext->positions[index]->ValButtonsEx1 = ((DWORD*)(data_buf.ButtonMask))[1];
+        devContext->positions[index]->ValButtonsEx2 = ((DWORD*)(data_buf.ButtonMask))[2];
+        devContext->positions[index]->ValButtonsEx3 = ((DWORD*)(data_buf.ButtonMask))[3];
     }
     if (devContext->positionLock)
         WdfWaitLockRelease(devContext->positionLock);
@@ -2093,22 +2089,19 @@ void InitializeDev(PDEVICE_EXTENSION   devContext, USHORT Mask, BOOLEAN ResetOnl
 void CleanUpDev(PDEVICE_EXTENSION   devContext)
 {
     int index;
-    UCHAR * cTag;
+    UCHAR* cTag;
     ULONG	Tag = '00DI';
-    const UCHAR	SerialL[16] = {'1', '2', '3', '4', '5', '6', '7', '8', '9', '0', '1', '2', '3', '4', '5', '6'};
-    const UCHAR	SerialH[16] = {'0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '1', '1', '1', '1', '1', '1'};
+    const UCHAR	SerialL[16] = { '1', '2', '3', '4', '5', '6', '7', '8', '9', '0', '1', '2', '3', '4', '5', '6' };
+    const UCHAR	SerialH[16] = { '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '1', '1', '1', '1', '1', '1' };
     LONGLONG timeout = 0;
 
-    cTag = (UCHAR *)&Tag;
+    cTag = (UCHAR*)&Tag;
 
 
     // Destroy and init DEVICE_POSITION structure for each hard-coded top-level collection
-    if (STATUS_SUCCESS == WdfWaitLockAcquire(devContext->positionLock, &timeout))
-    {
-        for (index = 0; index<MAX_N_DEVICES; index++)
-        {
-            if (devContext->positions[index])
-            {
+    if (STATUS_SUCCESS == WdfWaitLockAcquire(devContext->positionLock, &timeout)) {
+        for (index = 0; index<VJOY_MAX_N_DEVICES; index++) {
+            if (devContext->positions[index]) {
                 cTag[3] = SerialL[index];
                 cTag[2] = SerialH[index];
                 ExFreePoolWithTag(devContext->positions[index], Tag);
@@ -2121,9 +2114,8 @@ void CleanUpDev(PDEVICE_EXTENSION   devContext)
 
 
     // Free HID Report Descriptor
-    if (devContext->ReportDescriptor)
-    {
-		G_DefaultHidDescriptor.DescriptorList[0].wReportLength = 0;
+    if (devContext->ReportDescriptor) {
+        G_DefaultHidDescriptor.DescriptorList[0].wReportLength = 0;
         ExFreePoolWithTag(devContext->ReportDescriptor, MEM_TAG_HIDRPRT);
         devContext->ReportDescriptor = NULL;
     };
@@ -2136,16 +2128,15 @@ PVOID ReAllocatePoolWithTag(PVOID orig, SIZE_T prevSize, POOL_TYPE PoolType, SIZ
     PVOID tmpPool, out;
     ULONG tmpTag = 'pmeT'; // 'Temp'
 
-	if ((PoolType & NonPagedPoolMustSucceed) != 0)
-		return NULL;
+    if ((PoolType & NonPagedPoolMustSucceed) != 0)
+        return NULL;
 
-    if (!orig || !prevSize)
-	{ 
+    if (!orig || !prevSize) {
         out = ExAllocatePoolWithTag(PoolType, NumberOfBytes, Tag);
-		if (out)
-			return out;
-		return NULL;
-	}
+        if (out)
+            return out;
+        return NULL;
+    }
 
     tmpPool = ExAllocatePoolWithTag(PoolType, prevSize, tmpTag);
     if (!tmpPool)
@@ -2155,14 +2146,13 @@ PVOID ReAllocatePoolWithTag(PVOID orig, SIZE_T prevSize, POOL_TYPE PoolType, SIZ
     RtlCopyMemory(tmpPool, orig, prevSize);
 
     ExFreePoolWithTag(orig, Tag);
-    orig=NULL;
+    orig = NULL;
 
     out = ExAllocatePoolWithTag(PoolType, NumberOfBytes, Tag);
-	if (!out)
-	{
-		ExFreePoolWithTag(tmpPool, tmpTag);
+    if (!out) {
+        ExFreePoolWithTag(tmpPool, tmpTag);
         return NULL;
-	}
+    }
     RtlZeroMemory(out, prevSize);
     RtlCopyMemory(out, tmpPool, prevSize);
     ExFreePoolWithTag(tmpPool, tmpTag);
@@ -2170,7 +2160,7 @@ PVOID ReAllocatePoolWithTag(PVOID orig, SIZE_T prevSize, POOL_TYPE PoolType, SIZ
     return out;
 }
 
-USHORT ParseIdInDescriptor(BYTE * desc, DWORD dDescSize)
+USHORT ParseIdInDescriptor(BYTE* desc, DWORD dDescSize)
 // Parse descriptor (read from the registry)
 // Look for 0x85 in the descriptor
 // then read the next byte - this is the id
@@ -2180,16 +2170,14 @@ USHORT ParseIdInDescriptor(BYTE * desc, DWORD dDescSize)
     DWORD i;
     USHORT id = 0;
 
-    for (i = 0; i < dDescSize-1; i++)
-    {
-        if (*desc == 0x85)
-        { 
+    for (i = 0; i < dDescSize-1; i++) {
+        if (*desc == 0x85) {
             id = *(desc + 1);
             break;
         }
         desc++;
     }
-    if (id < 1 || id>MAX_N_DEVICES)
+    if (id < 1 || id>VJOY_MAX_N_DEVICES)
         id = 0;
 
     return id;
@@ -2198,7 +2186,7 @@ USHORT ParseIdInDescriptor(BYTE * desc, DWORD dDescSize)
 VOID  FfbNotifyWrite(
     WDFQUEUE Queue,
     WDFCONTEXT Context
-    )
+)
 // Called whenever the WriteQ (FfbWriteQ[]) is ready.
 // (Ready means that a first request has arrived)
 // This function tests that the ReadQ (FfbReadQ[]) has a pending request.
@@ -2218,7 +2206,7 @@ VOID  FfbNotifyWrite(
     id = queueContext->DeviceID;
     if (id<1 || id>16)
         return;
-    
+
 #if 0
     // FFB Active?
     if (!devContext->FfbActive)
@@ -2227,7 +2215,7 @@ VOID  FfbNotifyWrite(
 #endif // 0
 
     // Other queue has a pending request?
-    WdfIoQueueGetState(devContext->FfbReadQ[id-1],&QueueRequests, NULL);
+    WdfIoQueueGetState(devContext->FfbReadQ[id-1], &QueueRequests, NULL);
     if (!QueueRequests)
         return;
 
@@ -2241,7 +2229,7 @@ VOID  FfbNotifyWrite(
 VOID FfbNotifyRead(
     WDFQUEUE Queue,
     WDFCONTEXT Context
-    )
+)
 // Called whenever the ReadQ (FfbReadQ[]) is ready.
 // (Ready means that a first request has arrived)
 // This function tests that the WriteQ (FfbWriteQ[]) has a pending request.
@@ -2270,7 +2258,7 @@ VOID FfbNotifyRead(
 #endif // 0
 
     // Other queue has a pending request?
-    WdfIoQueueGetState(devContext->FfbReadQ[id-1],&QueueRequests, NULL);
+    WdfIoQueueGetState(devContext->FfbReadQ[id-1], &QueueRequests, NULL);
     if (!QueueRequests)
         return;
 
@@ -2283,11 +2271,11 @@ VOID FfbNotifyRead(
 VOID FfbTransferData(
     PDEVICE_EXTENSION devContext,
     int 			  id
-    )
+)
 // This is where the WriteQ to ReadQ data transfer occurs.
 // The transfer continues until one of the queues is empty.
 {
-    BOOLEAN					DataExist=FALSE;
+    BOOLEAN					DataExist = FALSE;
     NTSTATUS				status = STATUS_SUCCESS;
     WDFREQUEST				WriteRequest, ReadRequest;
     PHID_XFER_PACKET		transferPacket = NULL;
@@ -2297,96 +2285,92 @@ VOID FfbTransferData(
     unsigned int			bytesToCopy;
     size_t					bytesReturned;
     PUCHAR					ReadBuffer = NULL;
-    BOOLEAN					ReadQueueReady=FALSE, WriteQueueReady=FALSE;
+    BOOLEAN					ReadQueueReady = FALSE, WriteQueueReady = FALSE;
     ULONG					QueueRequests;
 
 
     ///////////  Loop ///////////////////////////////////////
-	do {
-		// Get a Write request
-		status = WdfIoQueueRetrieveNextRequest(devContext->FfbWriteQ[id - 1], &WriteRequest);
-		if (!NT_SUCCESS(status))
-			return;
+    do {
+        // Get a Write request
+        status = WdfIoQueueRetrieveNextRequest(devContext->FfbWriteQ[id - 1], &WriteRequest);
+        if (!NT_SUCCESS(status))
+            return;
 
-		// Get data from the Write request
-		transferPacket = (PHID_XFER_PACKET)WdfRequestWdmGetIrp(WriteRequest)->UserBuffer;
-		if (!transferPacket)
-			return;
+        // Get data from the Write request
+        transferPacket = (PHID_XFER_PACKET)WdfRequestWdmGetIrp(WriteRequest)->UserBuffer;
+        if (!transferPacket)
+            return;
 
-		// Get the command from the Write request
-		WDF_REQUEST_PARAMETERS_INIT(&Params);
-		WdfRequestGetParameters(WriteRequest, &Params);
-		Cmd = Params.Parameters.DeviceIoControl.IoControlCode;
+        // Get the command from the Write request
+        WDF_REQUEST_PARAMETERS_INIT(&Params);
+        WdfRequestGetParameters(WriteRequest, &Params);
+        Cmd = Params.Parameters.DeviceIoControl.IoControlCode;
 
-		// Calculate the size of the Read data packet
-		DataSize += sizeof(ULONG);						// Size of packet
-		DataSize += sizeof(ULONG);						// Cmd
-		DataSize += transferPacket->reportBufferLen;	// Raw data (First byte is report ID)
+        // Calculate the size of the Read data packet
+        DataSize += sizeof(ULONG);						// Size of packet
+        DataSize += sizeof(ULONG);						// Cmd
+        DataSize += transferPacket->reportBufferLen;	// Raw data (First byte is report ID)
 
-		// Get the Read request
-		status = WdfIoQueueRetrieveNextRequest(devContext->FfbReadQ[id - 1], &ReadRequest);
-		if (!NT_SUCCESS(status))
-		{
-			WdfRequestComplete(WriteRequest, status);
-			return;
-		};
+        // Get the Read request
+        status = WdfIoQueueRetrieveNextRequest(devContext->FfbReadQ[id - 1], &ReadRequest);
+        if (!NT_SUCCESS(status)) {
+            WdfRequestComplete(WriteRequest, status);
+            return;
+        };
 
-		// Calculate size of Read data
-		WDF_REQUEST_PARAMETERS_INIT(&Params);
-		WdfRequestGetParameters(ReadRequest, &Params);
-		bytesToCopy = (unsigned int)Params.Parameters.DeviceIoControl.OutputBufferLength;
-		if (bytesToCopy < DataSize)
-		{
-			status = STATUS_BUFFER_TOO_SMALL;
-			WdfRequestComplete(WriteRequest, status);
-			WdfRequestComplete(ReadRequest, status);
-			return;
-		};
+        // Calculate size of Read data
+        WDF_REQUEST_PARAMETERS_INIT(&Params);
+        WdfRequestGetParameters(ReadRequest, &Params);
+        bytesToCopy = (unsigned int)Params.Parameters.DeviceIoControl.OutputBufferLength;
+        if (bytesToCopy < DataSize) {
+            status = STATUS_BUFFER_TOO_SMALL;
+            WdfRequestComplete(WriteRequest, status);
+            WdfRequestComplete(ReadRequest, status);
+            return;
+        };
 
-		// Get Read request output buffer
-		status = WdfRequestRetrieveOutputBuffer(ReadRequest, bytesToCopy, (PVOID)&ReadBuffer, &bytesReturned);
-		if (!NT_SUCCESS(status))
-		{
-			WdfRequestComplete(WriteRequest, status);
-			WdfRequestComplete(ReadRequest, status);
-			return;
-		};
+        // Get Read request output buffer
+        status = WdfRequestRetrieveOutputBuffer(ReadRequest, bytesToCopy, (PVOID)&ReadBuffer, &bytesReturned);
+        if (!NT_SUCCESS(status)) {
+            WdfRequestComplete(WriteRequest, status);
+            WdfRequestComplete(ReadRequest, status);
+            return;
+        };
 
-		// Copy data to Read request output buffer
-		if (bytesReturned >= 4)
-		{
-			memcpy(&(ReadBuffer[0]), &DataSize, sizeof(ULONG));
-			memcpy(&(ReadBuffer[sizeof(ULONG)]), &Cmd, sizeof(ULONG));
-			memcpy(&(ReadBuffer[2 * sizeof(ULONG)]), transferPacket->reportBuffer, transferPacket->reportBufferLen);
-		};
+        // Copy data to Read request output buffer
+        if (bytesReturned >= 4) {
+            memcpy(&(ReadBuffer[0]), &DataSize, sizeof(ULONG));
+            memcpy(&(ReadBuffer[sizeof(ULONG)]), &Cmd, sizeof(ULONG));
+            memcpy(&(ReadBuffer[2 * sizeof(ULONG)]), transferPacket->reportBuffer, transferPacket->reportBufferLen);
+        };
 
-		// Complete Read request
-		WdfRequestCompleteWithInformation(ReadRequest, status, bytesReturned);
+        // Complete Read request
+        WdfRequestCompleteWithInformation(ReadRequest, status, bytesReturned);
 
 
-		// Complete Write Request
-		WdfRequestCompleteWithInformation(WriteRequest, status, transferPacket->reportBufferLen);
+        // Complete Write Request
+        WdfRequestCompleteWithInformation(WriteRequest, status, transferPacket->reportBufferLen);
 
-		// Ready to next transfer?
-		WdfIoQueueGetState(devContext->FfbReadQ[id - 1], &QueueRequests, NULL);
-		if (QueueRequests)
-			ReadQueueReady = TRUE;
-		else
-			ReadQueueReady = FALSE;
-		WdfIoQueueGetState(devContext->FfbWriteQ[id - 1], &QueueRequests, NULL);
-		if (QueueRequests)
-			WriteQueueReady = TRUE;
-		else
-			WriteQueueReady = FALSE;
-		DataExist = ReadQueueReady && WriteQueueReady;
+        // Ready to next transfer?
+        WdfIoQueueGetState(devContext->FfbReadQ[id - 1], &QueueRequests, NULL);
+        if (QueueRequests)
+            ReadQueueReady = TRUE;
+        else
+            ReadQueueReady = FALSE;
+        WdfIoQueueGetState(devContext->FfbWriteQ[id - 1], &QueueRequests, NULL);
+        if (QueueRequests)
+            WriteQueueReady = TRUE;
+        else
+            WriteQueueReady = FALSE;
+        DataExist = ReadQueueReady && WriteQueueReady;
 
-	} while (DataExist);
+    } while (DataExist);
     ///////////  Loop ///////////////////////////////////////
 }
 
 int FfbGetDevIDfromFfbRequest(
     IN WDFREQUEST   Request
-    )
+)
 {
     // Analyse a IOCTL_HID_SET_FEATURE/IOCTL_HID_WRITE_REPORT report
     // Assuming this is an FFB IOCTL and assuming that the report ID:
@@ -2394,12 +2378,12 @@ int FfbGetDevIDfromFfbRequest(
     // 2. ID's upper nibble carries is the Joystick ID
     // 3. Joystick ID may range 0x1-0xF
     // Return Joystick ID or 0 for error
-            
+
     PHID_XFER_PACKET	transferPacket;
     int					id;
 
     // Get data from the Write request
-    transferPacket = (PHID_XFER_PACKET) WdfRequestWdmGetIrp(Request)->UserBuffer;
+    transferPacket = (PHID_XFER_PACKET)WdfRequestWdmGetIrp(Request)->UserBuffer;
 
     // Test transfer packet for validity
     if (!transferPacket || transferPacket->reportBufferLen == 0 || transferPacket->reportBufferLen < sizeof(UCHAR))
