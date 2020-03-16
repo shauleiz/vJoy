@@ -360,7 +360,7 @@ namespace vJoyNS {
     VJOYINTERFACE_API DWORD 	__cdecl	Ffb_h_DeviceID(const FFB_DATA * Packet, int *DeviceID);
     VJOYINTERFACE_API DWORD 	__cdecl Ffb_h_Type(const FFB_DATA * Packet, FFBPType *Type);
     VJOYINTERFACE_API DWORD 	__cdecl Ffb_h_Packet(const FFB_DATA * Packet, WORD *Type, int *DataSize, BYTE *Data[]);
-    VJOYINTERFACE_API DWORD 	__cdecl Ffb_h_EBI(const FFB_DATA * Packet, int *Index);
+    VJOYINTERFACE_API DWORD 	__cdecl Ffb_h_EBI(const FFB_DATA* Packet, int* Index);
     VJOYINTERFACE_API DWORD 	__cdecl Ffb_h_Eff_Report(const FFB_DATA * Packet, FFB_EFF_REPORT*  Effect);
     __declspec(deprecated("** Ffb_h_Eff_Const function was deprecated - Use function Ffb_h_Eff_Report **")) \
     VJOYINTERFACE_API DWORD 	__cdecl Ffb_h_Eff_Const(const FFB_DATA * Packet, FFB_EFF_CONST*  Effect);
@@ -371,14 +371,24 @@ namespace vJoyNS {
     VJOYINTERFACE_API DWORD 	__cdecl Ffb_h_Eff_Cond(const FFB_DATA * Packet, FFB_EFF_COND*  Condition);
     VJOYINTERFACE_API DWORD 	__cdecl Ffb_h_DevGain(const FFB_DATA * Packet, BYTE * Gain);
     VJOYINTERFACE_API DWORD		__cdecl Ffb_h_Eff_Envlp(const FFB_DATA * Packet, FFB_EFF_ENVLP*  Envelope);
-    VJOYINTERFACE_API DWORD		__cdecl Ffb_h_EffNew(const FFB_DATA * Packet, FFBEType * Effect);
+    VJOYINTERFACE_API DWORD		__cdecl Ffb_h_EffNew(const FFB_DATA* Packet, FFBEType* Effect);
 
     // Added in 2.1.6
     VJOYINTERFACE_API DWORD		__cdecl Ffb_h_Eff_Constant(const FFB_DATA * Packet, FFB_EFF_CONSTANT *  ConstantEffect);
-    // Added in 2.2.0
-    VJOYINTERFACE_API BOOL		__cdecl Ffb_h_WritePID(UINT rID, FFB_DEVICE_PID* DevicePID); // Update the Ffb PID of the specified vJoy Device.
-    VJOYINTERFACE_API BOOL		__cdecl Ffb_h_ReadPID(UINT rID, FFB_DEVICE_PID* PIDBlockLoad);// Read the Ffb PID of the specified vJoy Device.
-    VJOYINTERFACE_API BOOL		__cdecl	GetPositionVJD(UINT rID, PVOID pData);	// Read the position data of the specified vJoy Device.
+    
+    // New API added with 2.2.0
+    // Update the Ffb PID of the specified vJoy Device. 
+    // VERY DANGEROUS AS IT CAN SCREW UP EFFECT BLOCK MANAGEMENT IN DRIVER
+    VJOYINTERFACE_API DWORD		__cdecl FfbWritePID(UINT rID, FFB_DEVICE_PID* DevicePID);
+    // Read the Ffb PID of the specified vJoy Device.
+    VJOYINTERFACE_API DWORD		__cdecl FfbReadPID(UINT rID, FFB_DEVICE_PID* PIDBlockLoad);
+    // Update the Ffb state report (bitfield) of the specified effect in given vJoy Device.
+    VJOYINTERFACE_API DWORD		__cdecl FfbUpdateEffectState(UINT rID, BYTE EffectID, BYTE effectState);
+
+    VJOYINTERFACE_API DWORD 	__cdecl Ffb_h_EffectBlockIndex(const FFB_DATA* Packet, BYTE* effectId);
+    VJOYINTERFACE_API DWORD		__cdecl Ffb_h_CreateNewEffect(const FFB_DATA* Packet, FFBEType* Effect, BYTE* effectId);
+    
+    VJOYINTERFACE_API DWORD		__cdecl	GetPosition(UINT rID, PVOID pData);	// Read the position data of the specified vJoy Device.
 
 #pragma endregion
 

@@ -339,7 +339,6 @@ vJoyGetFeature(
     BYTE reportID = transferPacket->reportId&0x0F;
     TraceEvents(TRACE_LEVEL_INFORMATION, DBG_INIT, "vJoyGetFeature: id=%d, xfer=%x reportId=%x\n", id, transferPacket->reportId, reportID);
 
-#if 1
     ////////////////////////////////////////
     // Block Load Report ID 2
     // Byte[1]: Effect Block Index (1-40)
@@ -348,8 +347,6 @@ vJoyGetFeature(
     // Byte[4]: Block Load Error (1-3)
     ////////////////////////////////////////
     if (transferPacket->reportId == (HID_ID_BLKLDREP+0x10)) {
-        TraceEvents(TRACE_LEVEL_INFORMATION, DBG_INIT, "vJoyGetFeature: Block Load ucTmp[1]=%x ucTmp[2]=%x ucTmp[3]=%x ucTmp[4]=%x\n",
-            transferPacket->reportBuffer[1], transferPacket->reportBuffer[2], transferPacket->reportBuffer[3], transferPacket->reportBuffer[4]);
         ucTmp = (PUCHAR)transferPacket->reportBuffer;
         ucTmp[0] = transferPacket->reportId;
         // Lastly created Effect Block Index start at 1. 0 means not yet created
@@ -375,9 +372,6 @@ vJoyGetFeature(
     // Byte[4]: Device Managed Pool (0-1) + Shared Parameter Blocks (0-1)
     ////////////////////////////////////////
     if (transferPacket->reportId == (HID_ID_POOLREP+0x10)) {
-        TraceEvents(TRACE_LEVEL_INFORMATION, DBG_INIT, "vJoyGetFeature: Pool ucTmp[1]=%x ucTmp[2]=%x ucTmp[3]=%x ucTmp[4]=%x\n",
-            transferPacket->reportBuffer[1], transferPacket->reportBuffer[2], transferPacket->reportBuffer[3], transferPacket->reportBuffer[4]);
-
         ucTmp = (PUCHAR)transferPacket->reportBuffer;
         ucTmp[0] = transferPacket->reportId;
         if (devContext->FfbEnable[id-1]) {
@@ -394,32 +388,31 @@ vJoyGetFeature(
         TraceEvents(TRACE_LEVEL_INFORMATION, DBG_INIT, "vJoyGetFeature: Pool ucTmp[1]=%x ucTmp[2]=%x ucTmp[3]=%x ucTmp[4]=%x\n",
             transferPacket->reportBuffer[1], transferPacket->reportBuffer[2], transferPacket->reportBuffer[3], transferPacket->reportBuffer[4]);
     }
-#else
-
-    ////////////////////////////////////////
-    // Report ID 2
-    // Byte[1]: Effect Block Index (1-40)
-    // Byte[2]: Block Load Success (1-3)
-    // Byte[3]: Block Load Full (1-3)
-    // Byte[4]: Block Load Error (1-3)
-    ////////////////////////////////////////
-    if ((transferPacket->reportId&0x0F) == 0x02) {
-        ucTmp = (PUCHAR)transferPacket->reportBuffer;
-        ucTmp[0] = transferPacket->reportId;
-        ucTmp[1] = 1; // Effect Block Index = 1
-        ucTmp[3] = 0; // Load Full = 0
-        if (devContext->FfbEnable[id-1]) {
-            ucTmp[2] = 1; // Load Success = 1
-            ucTmp[4] = 0; // Load Error =0
-        } else {
-            ucTmp[2] = 0; // Load Success = 0
-            ucTmp[4] = 1; // Load Error =1
-        };
-    };
-#endif
     // Report ID 3?
     if ((transferPacket->reportId&0x0F) == 3 && !devContext->FfbEnable[id-1])
         status = STATUS_NO_SUCH_DEVICE;
+
+    ////////////////////////////////////////
+    // State Report ID 4
+    // Byte[1]: Effect Block Index (1-40)
+    // Byte[2]: State Report (bitfield)
+    ////////////////////////////////////////
+    //NO WORKING FOR NOW, AS WE ARE UNABLE TO SEND A HID REPORT BACK TO
+    //DIRECTINPUT
+    if (transferPacket->reportId == (HID_ID_STATEREP+0x10)) {
+        ucTmp = (PUCHAR)transferPacket->reportBuffer;
+        ucTmp[0] = transferPacket->reportId;
+        if (devContext->FfbEnable[id-1]) {
+            ucTmp[1] = (UCHAR)(0);
+            ucTmp[2] = (UCHAR)(0);
+        } else {
+            ucTmp[1] = (UCHAR)(0);
+            ucTmp[2] = (UCHAR)(0);
+        }
+        TraceEvents(TRACE_LEVEL_INFORMATION, DBG_INIT, "vJoyGetFeature: State report ucTmp[1]=%x ucTmp[2]=%x\n",
+            transferPacket->reportBuffer[1], transferPacket->reportBuffer[2]);
+    }
+
 
     return status;
 }
@@ -2507,9 +2500,9 @@ void Ffb_BlockIndexFreeAll(
     TraceEvents(TRACE_LEVEL_INFORMATION, DBG_INIT, "FfbBlockIndexFreeAll: enter\n");
     PFFB_DEVICE_PID pid = &(devContext->FfbPIDData[id-1]);
     pid->LastEID = 0;
-    pid->NextFreeEID = VJOY_FFB_FIRST_EID;
+    pid->NextFreeEID = VJOY_FFB_FIRST_EFFECT_ID;
     for (int j = 0; j<VJOY_FFB_MAX_EFFECTS_BLOCK_INDEX; j++) {
-        pid->EffectStates[j].State = 0;
+        pid->EffectStates[j].InUse = VJOY_FFB_EFFECT_FREE;
         pid->EffectStates[j].PIDEffectStateReport = 0;
     }
 }
@@ -2526,7 +2519,7 @@ void Ffb_BlockIndexFree(
         TraceEvents(TRACE_LEVEL_INFORMATION, DBG_INIT, "FfbBlockIndexFree: wrong id=%d\n", EffectID);
         return;
     }
-    pid->EffectStates[EffectID-1].State = VJOY_FFB_EffectState_Free;
+    pid->EffectStates[EffectID-1].InUse = VJOY_FFB_EFFECT_FREE;
     pid->NextFreeEID = EffectID;
 
     TraceEvents(TRACE_LEVEL_INFORMATION, DBG_INIT, "FfbBlockIndexFree: NextEID=%d\n", pid->NextFreeEID);
@@ -2545,7 +2538,7 @@ BYTE Ffb_GetNextFreeEffect(
         return 0;
     }
     // Check current slot not in use
-    if (pid->EffectStates[pid->NextFreeEID-1].State != VJOY_FFB_EffectState_Free) {
+    if (pid->EffectStates[pid->NextFreeEID-1].InUse != VJOY_FFB_EFFECT_FREE) {
         TraceEvents(TRACE_LEVEL_INFORMATION, DBG_INIT, "FfbGetNextFreeEffect: already used! (NextEID=%d)\n", pid->NextFreeEID);
         return 0;
     }
@@ -2553,14 +2546,14 @@ BYTE Ffb_GetNextFreeEffect(
     // Pick next free slot as new current slot
     pid->LastEID = pid->NextFreeEID;
     BYTE effectId = pid->LastEID;
-    pid->EffectStates[effectId-1].State = VJOY_FFB_EffectState_Allocated;
+    pid->EffectStates[effectId-1].InUse = VJOY_FFB_EFFECT_ALLOCATED;
 
     // Find the next free slot
     do {
         pid->NextFreeEID++;
         if (pid->NextFreeEID > VJOY_FFB_MAX_EFFECTS_BLOCK_INDEX)
             break;  // the last slot was taken
-    } while (pid->EffectStates[pid->NextFreeEID-1].State != VJOY_FFB_EffectState_Free);
+    } while (pid->EffectStates[pid->NextFreeEID-1].InUse != VJOY_FFB_EFFECT_FREE);
 
     TraceEvents(TRACE_LEVEL_INFORMATION, DBG_INIT, "FfbGetNextFreeEffect: took effectId=%d, NextEID=%d)\n", effectId, pid->NextFreeEID);
 

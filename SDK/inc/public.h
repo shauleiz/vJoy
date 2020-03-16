@@ -342,12 +342,12 @@ typedef PJOYSTICK_POSITION_V3 PJOYSTICK_POSITION;
 // FFB Features to be placed in vJoy's driver memory context
 
 // Max 1..40 effect block index. 0x28=40dv
-#define VJOY_FFB_FIRST_EID                  (0x01)
-#define VJOY_FFB_MAX_EFFECTS_BLOCK_INDEX    (0x28) 
-#define VJOY_FFB_MAX_SIMULTANEOUS_EFFECTS   (0x0A) 
-#define VJOY_FFB_EffectState_Free           (0x00)
-#define VJOY_FFB_EffectState_Allocated      (0x01)
-#define VJOY_FFB_EffectState_Playing        (0x02)
+#define VJOY_FFB_FIRST_EFFECT_ID            (0x01)
+#define VJOY_FFB_MAX_EFFECTS_BLOCK_INDEX    (0x28)
+#define VJOY_FFB_MAX_SIMULTANEOUS_EFFECTS   (0x0A)
+
+#define VJOY_FFB_EFFECT_FREE                (0x00)
+#define VJOY_FFB_EFFECT_ALLOCATED           (0x01)
 
 #if 0
 // FFB: Create New Effect Feature Report=1
@@ -393,9 +393,9 @@ typedef struct _FFB_PID_EFFECT_STATE_REPORT
     // 4: Actuator Override Switch
     // 5: Actuator Power
     BYTE    PIDEffectStateReport;
-    // For CreateEffect/GetNextFree()
-    // 0: free, 1 allocated, 2 playing
-    BYTE    State;
+    // For CreateEffect/GetNextFree(), internal to driver side
+    // 0: free, 1 allocated (in use)
+    BYTE    InUse;
 } FFB_PID_EFFECT_STATE_REPORT, * PFFB_PID_EFFECT_STATE_REPORT;
 
 // All FFB PID data, one per device
@@ -405,9 +405,11 @@ typedef struct _FFB_DEVICE_PID
     FFB_PID_BLOCK_LOAD_REPORT   PIDBlockLoad;
     FFB_PID_POOL_REPORT         PIDPool;
     FFB_PID_EFFECT_STATE_REPORT EffectStates[VJOY_FFB_MAX_EFFECTS_BLOCK_INDEX];
-    // Index to next free slot
-    BYTE                        NextEID;
-    // Index to last valid slot that has been used
+    // Index to next free slot, between 1 and VJOY_FFB_MAX_EFFECTS_BLOCK_INDEX+1
+    // If >VJOY_FFB_MAX_EFFECTS_BLOCK_INDEX => full
+    BYTE                        NextFreeEID;
+    // Index to last valid slot that has been used, between 1 to VJOY_FFB_MAX_EFFECTS_BLOCK_INDEX
+    // 0 if no effect yet created/used
     BYTE                        LastEID;
 } FFB_DEVICE_PID, * PFFB_DEVICE_PID;
 

@@ -564,14 +564,16 @@ namespace vJoyNS {
     /*
      Read current positions vJoy device
     */
-    VJOYINTERFACE_API BOOL	__cdecl	GetPositionVJD(UINT rID, PVOID pData)
+    VJOYINTERFACE_API DWORD	__cdecl	GetPosition(UINT rID, PVOID pData)
     {
         // Make sure the the ID is set
         PJOYSTICK_POSITION pPosition = (PJOYSTICK_POSITION)pData;
         pPosition->bDevice = (BYTE)rID;
 
         // Update position
-        return GetDevPosition(rID, pPosition);
+        if (GetDevPosition(rID, pPosition)!=TRUE)
+            return ERROR_DEVICE_NOT_AVAILABLE;
+        return ERROR_SUCCESS;
     }
 
 
@@ -878,39 +880,39 @@ namespace vJoyNS {
             GetControls(rID);
 
         switch (Axis) {
-        case HID_USAGE_X:
-            return vJoyDevices[rID].DeviceControls.AxisX;
-        case HID_USAGE_Y:
-            return vJoyDevices[rID].DeviceControls.AxisY;
-        case HID_USAGE_Z:
-            return vJoyDevices[rID].DeviceControls.AxisZ;
-        case HID_USAGE_RX:
-            return vJoyDevices[rID].DeviceControls.AxisXRot;
-        case HID_USAGE_RY:
-            return vJoyDevices[rID].DeviceControls.AxisYRot;
-        case HID_USAGE_RZ:
-            return vJoyDevices[rID].DeviceControls.AxisZRot;
-        case HID_USAGE_SL0:
-            return vJoyDevices[rID].DeviceControls.Slider;
-        case HID_USAGE_SL1:
-            return vJoyDevices[rID].DeviceControls.Dial;
+            case HID_USAGE_X:
+                return vJoyDevices[rID].DeviceControls.AxisX;
+            case HID_USAGE_Y:
+                return vJoyDevices[rID].DeviceControls.AxisY;
+            case HID_USAGE_Z:
+                return vJoyDevices[rID].DeviceControls.AxisZ;
+            case HID_USAGE_RX:
+                return vJoyDevices[rID].DeviceControls.AxisXRot;
+            case HID_USAGE_RY:
+                return vJoyDevices[rID].DeviceControls.AxisYRot;
+            case HID_USAGE_RZ:
+                return vJoyDevices[rID].DeviceControls.AxisZRot;
+            case HID_USAGE_SL0:
+                return vJoyDevices[rID].DeviceControls.Slider;
+            case HID_USAGE_SL1:
+                return vJoyDevices[rID].DeviceControls.Dial;
 
-        case HID_USAGE_WHL:
-            return vJoyDevices[rID].DeviceControls.Wheel;
-        case HID_USAGE_ACCELERATOR:
-            return vJoyDevices[rID].DeviceControls.Accelerator;
-        case HID_USAGE_BRAKE:
-            return vJoyDevices[rID].DeviceControls.Brake;
-        case HID_USAGE_CLUTCH:
-            return vJoyDevices[rID].DeviceControls.Clutch;
-        case HID_USAGE_STEERING:
-            return vJoyDevices[rID].DeviceControls.Steering;
-        case HID_USAGE_AILERON:
-            return vJoyDevices[rID].DeviceControls.Aileron;
-        case HID_USAGE_RUDDER:
-            return vJoyDevices[rID].DeviceControls.Rudder;
-        case HID_USAGE_THROTTLE:
-            return vJoyDevices[rID].DeviceControls.Throttle;
+            case HID_USAGE_WHL:
+                return vJoyDevices[rID].DeviceControls.Wheel;
+            case HID_USAGE_ACCELERATOR:
+                return vJoyDevices[rID].DeviceControls.Accelerator;
+            case HID_USAGE_BRAKE:
+                return vJoyDevices[rID].DeviceControls.Brake;
+            case HID_USAGE_CLUTCH:
+                return vJoyDevices[rID].DeviceControls.Clutch;
+            case HID_USAGE_STEERING:
+                return vJoyDevices[rID].DeviceControls.Steering;
+            case HID_USAGE_AILERON:
+                return vJoyDevices[rID].DeviceControls.Aileron;
+            case HID_USAGE_RUDDER:
+                return vJoyDevices[rID].DeviceControls.Rudder;
+            case HID_USAGE_THROTTLE:
+                return vJoyDevices[rID].DeviceControls.Throttle;
         };
 
         return FALSE;
@@ -973,75 +975,75 @@ namespace vJoyNS {
                 _ftprintf_s(LogStream, _T("\n[%05u]Error: GetVJDButtonNumber(rID=%u) - HidD_GetPreparsedData() failed"), ProcessId, rID);
             CloseHandle(h);
             return BAD_PREPARSED_DATA;
-    } else
+        } else
             stat = HidP_GetCaps(PreparsedData, &Capabilities);
-    if (stat != HIDP_STATUS_SUCCESS) {
-        if (LogStream)
-            _ftprintf_s(LogStream, _T("\n[%05u]Error: GetVJDButtonNumber(rID=%u) - HidP_GetCaps() failed"), ProcessId, rID);
-        CloseHandle(h);
-        return NO_CAPS;
-    }
+        if (stat != HIDP_STATUS_SUCCESS) {
+            if (LogStream)
+                _ftprintf_s(LogStream, _T("\n[%05u]Error: GetVJDButtonNumber(rID=%u) - HidP_GetCaps() failed"), ProcessId, rID);
+            CloseHandle(h);
+            return NO_CAPS;
+        }
 
-    if (LogStream) {
-        _ftprintf_s(LogStream, _T("\n[%05u]Info: GetVJDButtonNumber(rID=%u) - Capabilities: "), ProcessId, rID);
-        _ftprintf_s(LogStream, _T("\t Usage=0x%x;"), Capabilities.Usage);
-        _ftprintf_s(LogStream, _T("\t UsagePage=0x%x;"), Capabilities.UsagePage);
-        _ftprintf_s(LogStream, _T("\t InputReportByteLength=%u;"), Capabilities.InputReportByteLength);
-        _ftprintf_s(LogStream, _T("\t NumberLinkCollectionNodes=%u;"), Capabilities.NumberLinkCollectionNodes);
-        _ftprintf_s(LogStream, _T("\t NumberInputButtonCaps=%u;"), Capabilities.NumberInputButtonCaps);
-        _ftprintf_s(LogStream, _T("\t NumberInputValueCaps=%u;"), Capabilities.NumberInputValueCaps);
-        _ftprintf_s(LogStream, _T("\t NumberInputDataIndices=%u;"), Capabilities.NumberInputDataIndices);
-    }
+        if (LogStream) {
+            _ftprintf_s(LogStream, _T("\n[%05u]Info: GetVJDButtonNumber(rID=%u) - Capabilities: "), ProcessId, rID);
+            _ftprintf_s(LogStream, _T("\t Usage=0x%x;"), Capabilities.Usage);
+            _ftprintf_s(LogStream, _T("\t UsagePage=0x%x;"), Capabilities.UsagePage);
+            _ftprintf_s(LogStream, _T("\t InputReportByteLength=%u;"), Capabilities.InputReportByteLength);
+            _ftprintf_s(LogStream, _T("\t NumberLinkCollectionNodes=%u;"), Capabilities.NumberLinkCollectionNodes);
+            _ftprintf_s(LogStream, _T("\t NumberInputButtonCaps=%u;"), Capabilities.NumberInputButtonCaps);
+            _ftprintf_s(LogStream, _T("\t NumberInputValueCaps=%u;"), Capabilities.NumberInputValueCaps);
+            _ftprintf_s(LogStream, _T("\t NumberInputDataIndices=%u;"), Capabilities.NumberInputDataIndices);
+        }
 
-    // Get Button data
-    int ButtonBaseIndex, nButtons = 0;
-    USHORT n = Capabilities.NumberInputButtonCaps;
-    if (n < 1) {
-        if (LogStream)
-            _ftprintf_s(LogStream, _T("\n[%05u]Error: GetVJDButtonNumber(rID=%u) - Number of button Caps is %u"), ProcessId, rID, n);
-        CloseHandle(h);
-        return BAD_N_BTN_CAPS;
-    }
-    HIDP_BUTTON_CAPS* bCaps = new HIDP_BUTTON_CAPS[n];
-    SecureZeroMemory(bCaps, sizeof(HIDP_BUTTON_CAPS)*n);
-    stat = HidP_GetButtonCaps(HidP_Input, bCaps, &n, PreparsedData);
-    if (stat != HIDP_STATUS_SUCCESS) {
-        if (LogStream)
-            _ftprintf_s(LogStream, _T("\n[%05u]Error: GetVJDButtonNumber(rID=%u) - HidP_GetButtonCaps() failed"), ProcessId, rID);
-        CloseHandle(h);
+        // Get Button data
+        int ButtonBaseIndex, nButtons = 0;
+        USHORT n = Capabilities.NumberInputButtonCaps;
+        if (n < 1) {
+            if (LogStream)
+                _ftprintf_s(LogStream, _T("\n[%05u]Error: GetVJDButtonNumber(rID=%u) - Number of button Caps is %u"), ProcessId, rID, n);
+            CloseHandle(h);
+            return BAD_N_BTN_CAPS;
+        }
+        HIDP_BUTTON_CAPS* bCaps = new HIDP_BUTTON_CAPS[n];
+        SecureZeroMemory(bCaps, sizeof(HIDP_BUTTON_CAPS)*n);
+        stat = HidP_GetButtonCaps(HidP_Input, bCaps, &n, PreparsedData);
+        if (stat != HIDP_STATUS_SUCCESS) {
+            if (LogStream)
+                _ftprintf_s(LogStream, _T("\n[%05u]Error: GetVJDButtonNumber(rID=%u) - HidP_GetButtonCaps() failed"), ProcessId, rID);
+            CloseHandle(h);
+            delete[] 	bCaps;
+            return BAD_BTN_CAPS;
+        }
+
+        if (LogStream) {
+            _ftprintf_s(LogStream, _T("\n[%05u]Info: GetVJDButtonNumber(rID=%u) - Button Capabilities: "), ProcessId, rID);
+            _ftprintf_s(LogStream, _T("\t UsagePage=0x%x;"), bCaps[0].UsagePage);
+            _ftprintf_s(LogStream, _T("\t ReportID=%u;"), bCaps[0].ReportID);
+            _ftprintf_s(LogStream, _T("\t UsageMax=%u;"), (bCaps[0].Range).UsageMax);
+            _ftprintf_s(LogStream, _T("\t UsageMin=%u;"), (bCaps[0].Range).UsageMin);
+            _ftprintf_s(LogStream, _T("\t DataIndexMin=%u;"), (bCaps[0].Range).DataIndexMin);
+        }
+
+        // Assuming one button range, get the number of buttons
+        if (bCaps[0].IsRange) {
+            nButtons += (bCaps[0].Range).UsageMax - (bCaps[0].Range).UsageMin + 1;
+            ButtonBaseIndex = (bCaps[0].Range).DataIndexMin;
+        } else {
+            if (LogStream)
+                _ftprintf_s(LogStream, _T("\n[%05u]Error: GetVJDButtonNumber(rID=%u) - Bad Range"), ProcessId, rID);
+            CloseHandle(h);
+            delete[] 	bCaps;
+            return BAD_BTN_RANGE;
+        }
+
         delete[] 	bCaps;
-        return BAD_BTN_CAPS;
-    }
-
-    if (LogStream) {
-        _ftprintf_s(LogStream, _T("\n[%05u]Info: GetVJDButtonNumber(rID=%u) - Button Capabilities: "), ProcessId, rID);
-        _ftprintf_s(LogStream, _T("\t UsagePage=0x%x;"), bCaps[0].UsagePage);
-        _ftprintf_s(LogStream, _T("\t ReportID=%u;"), bCaps[0].ReportID);
-        _ftprintf_s(LogStream, _T("\t UsageMax=%u;"), (bCaps[0].Range).UsageMax);
-        _ftprintf_s(LogStream, _T("\t UsageMin=%u;"), (bCaps[0].Range).UsageMin);
-        _ftprintf_s(LogStream, _T("\t DataIndexMin=%u;"), (bCaps[0].Range).DataIndexMin);
-    }
-
-    // Assuming one button range, get the number of buttons
-    if (bCaps[0].IsRange) {
-        nButtons += (bCaps[0].Range).UsageMax - (bCaps[0].Range).UsageMin + 1;
-        ButtonBaseIndex = (bCaps[0].Range).DataIndexMin;
-    } else {
-        if (LogStream)
-            _ftprintf_s(LogStream, _T("\n[%05u]Error: GetVJDButtonNumber(rID=%u) - Bad Range"), ProcessId, rID);
+        //	HidD_FreePreparsedData(PreparsedData);
         CloseHandle(h);
-        delete[] 	bCaps;
-        return BAD_BTN_RANGE;
+
+        if (LogStream)
+            _ftprintf_s(LogStream, _T("\n[%05u]Info: GetVJDButtonNumber(rID=%u) - Return(nButtons=%d)"), ProcessId, rID, nButtons);
+        return nButtons;
     }
-
-    delete[] 	bCaps;
-    //	HidD_FreePreparsedData(PreparsedData);
-    CloseHandle(h);
-
-    if (LogStream)
-        _ftprintf_s(LogStream, _T("\n[%05u]Info: GetVJDButtonNumber(rID=%u) - Return(nButtons=%d)"), ProcessId, rID, nButtons);
-    return nButtons;
-}
 
 
     VJOYINTERFACE_API int	__cdecl GetVJDDiscPovNumber(UINT rID)
@@ -1075,7 +1077,7 @@ namespace vJoyNS {
         if (!ok) {
             CloseHandle(h);
             return 0;
-    };
+        };
         stat = HidP_GetCaps(PreparsedData, &Capabilities);
         if (stat != HIDP_STATUS_SUCCESS) {
             CloseHandle(h);
@@ -1140,7 +1142,7 @@ namespace vJoyNS {
         if (!ok) {
             CloseHandle(h);
             return 0;
-    }
+        }
         stat = HidP_GetCaps(PreparsedData, &Capabilities);
         if (stat != HIDP_STATUS_SUCCESS) {
             CloseHandle(h);
@@ -1345,57 +1347,57 @@ namespace vJoyNS {
             return FALSE;
 
         switch (Axis) {
-        case HID_USAGE_X:
-            vJoyDevices[rID].position.wAxisX = Value;
-            break;
-        case HID_USAGE_Y:
-            vJoyDevices[rID].position.wAxisY = Value;
-            break;
-        case HID_USAGE_Z:
-            vJoyDevices[rID].position.wAxisZ = Value;
-            break;
-        case HID_USAGE_RX:
-            vJoyDevices[rID].position.wAxisXRot = Value;
-            break;
-        case HID_USAGE_RY:
-            vJoyDevices[rID].position.wAxisYRot = Value;
-            break;
-        case HID_USAGE_RZ:
-            vJoyDevices[rID].position.wAxisZRot = Value;
-            break;
-        case HID_USAGE_SL0:
-            vJoyDevices[rID].position.wSlider = Value;
-            break;
-        case HID_USAGE_SL1:
-            vJoyDevices[rID].position.wDial = Value;
-            break;
+            case HID_USAGE_X:
+                vJoyDevices[rID].position.wAxisX = Value;
+                break;
+            case HID_USAGE_Y:
+                vJoyDevices[rID].position.wAxisY = Value;
+                break;
+            case HID_USAGE_Z:
+                vJoyDevices[rID].position.wAxisZ = Value;
+                break;
+            case HID_USAGE_RX:
+                vJoyDevices[rID].position.wAxisXRot = Value;
+                break;
+            case HID_USAGE_RY:
+                vJoyDevices[rID].position.wAxisYRot = Value;
+                break;
+            case HID_USAGE_RZ:
+                vJoyDevices[rID].position.wAxisZRot = Value;
+                break;
+            case HID_USAGE_SL0:
+                vJoyDevices[rID].position.wSlider = Value;
+                break;
+            case HID_USAGE_SL1:
+                vJoyDevices[rID].position.wDial = Value;
+                break;
 
-        case HID_USAGE_WHL:
-            vJoyDevices[rID].position.wWheel = Value;
-            break;
-        case HID_USAGE_ACCELERATOR:
-            vJoyDevices[rID].position.wAccelerator = Value;
-            break;
-        case HID_USAGE_BRAKE:
-            vJoyDevices[rID].position.wBrake = Value;
-            break;
-        case HID_USAGE_CLUTCH:
-            vJoyDevices[rID].position.wClutch = Value;
-            break;
-        case HID_USAGE_STEERING:
-            vJoyDevices[rID].position.wSteering = Value;
-            break;
-        case HID_USAGE_THROTTLE:
-            vJoyDevices[rID].position.wThrottle = Value;
-            break;
-        case HID_USAGE_RUDDER:
-            vJoyDevices[rID].position.wRudder = Value;
-            break;
-        case HID_USAGE_AILERON:
-            vJoyDevices[rID].position.wAileron = Value;
-            break;
-        default:
-            return FALSE;
+            case HID_USAGE_WHL:
+                vJoyDevices[rID].position.wWheel = Value;
+                break;
+            case HID_USAGE_ACCELERATOR:
+                vJoyDevices[rID].position.wAccelerator = Value;
+                break;
+            case HID_USAGE_BRAKE:
+                vJoyDevices[rID].position.wBrake = Value;
+                break;
+            case HID_USAGE_CLUTCH:
+                vJoyDevices[rID].position.wClutch = Value;
+                break;
+            case HID_USAGE_STEERING:
+                vJoyDevices[rID].position.wSteering = Value;
+                break;
+            case HID_USAGE_THROTTLE:
+                vJoyDevices[rID].position.wThrottle = Value;
+                break;
+            case HID_USAGE_RUDDER:
+                vJoyDevices[rID].position.wRudder = Value;
+                break;
+            case HID_USAGE_AILERON:
+                vJoyDevices[rID].position.wAileron = Value;
+                break;
+            default:
+                return FALSE;
         }
 
         return UpdateVJD(rID, &(vJoyDevices[rID].position));
@@ -1413,21 +1415,21 @@ namespace vJoyNS {
         int Shift = (nBtn - 1) % 32;
 
         switch ((nBtn - 1) / 32) {
-        case 0:
-            Target = &(vJoyDevices[rID].position.lButtons);
-            break;
-        case 1:
-            Target = &(vJoyDevices[rID].position.lButtonsEx1);
-            break;
-        case 2:
-            Target = &(vJoyDevices[rID].position.lButtonsEx2);
-            break;
-        case 3:
-            Target = &(vJoyDevices[rID].position.lButtonsEx3);
-            break;
-        default:
-            Target = &(vJoyDevices[rID].position.lButtons);
-            break;
+            case 0:
+                Target = &(vJoyDevices[rID].position.lButtons);
+                break;
+            case 1:
+                Target = &(vJoyDevices[rID].position.lButtonsEx1);
+                break;
+            case 2:
+                Target = &(vJoyDevices[rID].position.lButtonsEx2);
+                break;
+            case 3:
+                Target = &(vJoyDevices[rID].position.lButtonsEx3);
+                break;
+            default:
+                Target = &(vJoyDevices[rID].position.lButtons);
+                break;
         };
 
 
@@ -1479,20 +1481,20 @@ namespace vJoyNS {
             return FALSE;
 
         switch (nPov) {
-        case 1:
-            vJoyDevices[rID].position.bHats = Value;
-            return UpdateVJD(rID, &(vJoyDevices[rID].position));
-        case 2:
-            vJoyDevices[rID].position.bHatsEx1 = Value;
-            return UpdateVJD(rID, &(vJoyDevices[rID].position));
-        case 3:
-            vJoyDevices[rID].position.bHatsEx2 = Value;
-            return UpdateVJD(rID, &(vJoyDevices[rID].position));
-        case 4:
-            vJoyDevices[rID].position.bHatsEx3 = Value;
-            return UpdateVJD(rID, &(vJoyDevices[rID].position));
-        default:
-            break;
+            case 1:
+                vJoyDevices[rID].position.bHats = Value;
+                return UpdateVJD(rID, &(vJoyDevices[rID].position));
+            case 2:
+                vJoyDevices[rID].position.bHatsEx1 = Value;
+                return UpdateVJD(rID, &(vJoyDevices[rID].position));
+            case 3:
+                vJoyDevices[rID].position.bHatsEx2 = Value;
+                return UpdateVJD(rID, &(vJoyDevices[rID].position));
+            case 4:
+                vJoyDevices[rID].position.bHatsEx3 = Value;
+                return UpdateVJD(rID, &(vJoyDevices[rID].position));
+            default:
+                break;
         };
 
         return FALSE;
@@ -1536,7 +1538,7 @@ namespace vJoyNS {
             //HidD_FreePreparsedData(PreparsedData);
             CloseHandle(h);
             return FALSE;
-    }
+        }
 
         // returns a top-level collection's HIDP_CAPS structure.
         stat = HidP_GetCaps(PreparsedData, &Capabilities);
@@ -1723,7 +1725,7 @@ namespace vJoyNS {
             //HidD_FreePreparsedData(PreparsedData);
             CloseHandle(h);
             return FALSE;
-    }
+        }
 
         // returns a top-level collection's HIDP_CAPS structure.
         stat = HidP_GetCaps(PreparsedData, &Capabilities);
@@ -1836,7 +1838,7 @@ namespace vJoyNS {
         return ERROR_SUCCESS;
     }
 
-    VJOYINTERFACE_API DWORD __cdecl Ffb_h_EBI(const FFB_DATA* Packet, int* Index)
+    VJOYINTERFACE_API DWORD __cdecl Ffb_h_EffectBlockIndex(const FFB_DATA* Packet, BYTE* Index)
         //If valid Packet was found then returns ERROR_SUCCESS and sets Index to the value of Effect Block Index (if applicable). Expected value is '1'.
         //If Packet is NULL then returns ERROR_INVALID_PARAMETER. Output parameters are undefined.
         //If Packet is malformed or does not contain an Effect Block Index then returns ERROR_INVALID_DATA. Output parameters are undefined.
@@ -1851,17 +1853,28 @@ namespace vJoyNS {
         FFBPType Type;
         if (Ffb_h_Type(Packet, &Type) != ERROR_SUCCESS)
             return ERROR_INVALID_DATA;
-        if (Type == PT_CTRLREP || 
-            Type == PT_SMPLREP || 
-            Type == PT_GAINREP || 
-            Type == PT_POOLREP || 
-            Type == PT_NEWEFREP ||
+        if (Type == PT_CTRLREP ||
+            Type == PT_SMPLREP ||
+            Type == PT_GAINREP ||
+            Type == PT_POOLREP ||
             Type == PT_STATEREP)
             return ERROR_INVALID_DATA;
 
+        if (Type == PT_NEWEFREP) {
+            // Special case for new effect, ID is third byte
+            *Index = Packet->data[2];
+            return ERROR_SUCCESS;
+        }
         // The Effect Block Index is the second byte (After the Report ID)
         *Index = Packet->data[1];
         return ERROR_SUCCESS;
+    }
+    VJOYINTERFACE_API DWORD __cdecl Ffb_h_EBI(const FFB_DATA* Packet, int* Index)
+        //If valid Packet was found then returns ERROR_SUCCESS and sets Index to the value of Effect Block Index (if applicable). Expected value is '1'.
+        //If Packet is NULL then returns ERROR_INVALID_PARAMETER. Output parameters are undefined.
+        //If Packet is malformed or does not contain an Effect Block Index then returns ERROR_INVALID_DATA. Output parameters are undefined.
+    {
+        return Ffb_h_EffectBlockIndex(Packet, (PBYTE)Index);
     }
 
     VJOYINTERFACE_API DWORD __cdecl Ffb_h_Eff_Report(const FFB_DATA* Packet, FFB_EFF_REPORT* Effect)
@@ -1972,7 +1985,7 @@ namespace vJoyNS {
         return ERROR_SUCCESS;
     }
 
-    VJOYINTERFACE_API DWORD __cdecl Ffb_h_EffNew(const FFB_DATA* Packet, FFBEType* Effect)
+    VJOYINTERFACE_API DWORD __cdecl Ffb_h_CreateNewEffect(const FFB_DATA* Packet, FFBEType* Effect, BYTE* EffectID)
         //If valid Packet was found then returns ERROR_SUCCESS and sets the new Effect type
         //If Packet is NULL then returns ERROR_INVALID_PARAMETER. Output parameters are undefined.
         //If Packet is malformed  then returns ERROR_INVALID_DATA. Output parameters are undefined.
@@ -1990,8 +2003,20 @@ namespace vJoyNS {
         if (Type != PT_NEWEFREP)
             return ERROR_INVALID_DATA;
 
-        *Effect = static_cast <FFBEType>(Packet->data[1]);
+        if (Effect!=nullptr) {
+            *Effect = static_cast <FFBEType>(Packet->data[1]);
+        }
+        if (EffectID!=nullptr) {
+            *EffectID = static_cast <BYTE>(Packet->data[2]);
+        }
         return ERROR_SUCCESS;
+    }
+    VJOYINTERFACE_API DWORD __cdecl Ffb_h_EffNew(const FFB_DATA* Packet, FFBEType* Effect)
+        //If valid Packet was found then returns ERROR_SUCCESS and sets the new Effect type
+        //If Packet is NULL then returns ERROR_INVALID_PARAMETER. Output parameters are undefined.
+        //If Packet is malformed  then returns ERROR_INVALID_DATA. Output parameters are undefined.
+    {
+        return Ffb_h_CreateNewEffect(Packet, Effect, nullptr);
     }
 
     VJOYINTERFACE_API DWORD __cdecl Ffb_h_DevCtrl(const FFB_DATA* Packet, FFB_CTRL* Control)
@@ -2120,7 +2145,7 @@ namespace vJoyNS {
         return ERROR_SUCCESS;
     }
 
-    VJOYINTERFACE_API BOOL		__cdecl Ffb_h_WritePID(UINT rID, FFB_DEVICE_PID* PIDBlockLoad)
+    VJOYINTERFACE_API DWORD		__cdecl FfbWritePID(UINT rID, FFB_DEVICE_PID* PIDBlockLoad)
         // Update the PID Block load of the specified vJoy Device.
     {
         PVOID pData = PIDBlockLoad;
@@ -2160,7 +2185,7 @@ namespace vJoyNS {
         return res;
     }
 
-    VJOYINTERFACE_API BOOL		__cdecl Ffb_h_ReadPID(UINT rID, FFB_DEVICE_PID* PIDBlockLoad)
+    VJOYINTERFACE_API DWORD		__cdecl FfbReadPID(UINT rID, FFB_DEVICE_PID* PIDBlockLoad)
         // Update the PID Block load of the specified vJoy Device.
     {
         PVOID pData = PIDBlockLoad;
@@ -2223,6 +2248,24 @@ namespace vJoyNS {
         }
 
         return res;
+    }
+
+    VJOYINTERFACE_API DWORD __cdecl FfbUpdateEffectState(UINT rID, BYTE EffectID, BYTE effectState)
+    // Update the Ffb state report (bitfield) of the specified effect in given vJoy Device.
+    {
+        FFB_DEVICE_PID PIDBlockLoad;
+        if (EffectID<VJOY_FFB_FIRST_EFFECT_ID || EffectID>VJOY_FFB_MAX_EFFECTS_BLOCK_INDEX)
+            return ERROR_INVALID_PARAMETER;
+
+        DWORD stt = FfbReadPID(rID, &PIDBlockLoad);
+        if (stt != ERROR_SUCCESS) return stt;
+
+        PIDBlockLoad.EffectStates[EffectID-1].PIDEffectStateReport = effectState;
+        
+        stt = FfbWritePID(rID, &PIDBlockLoad);
+        if (stt != ERROR_SUCCESS) return stt;
+
+        return ERROR_SUCCESS;
     }
 
 #pragma endregion
@@ -2345,7 +2388,7 @@ HANDLE	GetHandleByIndex(int index)
     if (functionClassDeviceData) {
         functionClassDeviceData->cbSize = sizeof(SP_DEVICE_INTERFACE_DETAIL_DATA);
         ZeroMemory(functionClassDeviceData->DevicePath, sizeof(functionClassDeviceData->DevicePath));
-} else {
+    } else {
         if (LogStream)
             _ftprintf_s(LogStream, _T("\n[%05u]Error: GetHandleByIndex(index=%d) - Failed to allocate functionClassDeviceData"), ProcessId, index);
         LocalFree(functionClassDeviceData);
@@ -2787,7 +2830,7 @@ BOOL	GetDeviceNameSpace(char** NameSpace, int* Size, BOOL Refresh, DWORD* error)
         if (deviceInterfaceDetailData) {
             deviceInterfaceDetailData->cbSize = sizeof(SP_DEVICE_INTERFACE_DETAIL_DATA);
             ZeroMemory(deviceInterfaceDetailData->DevicePath, sizeof(deviceInterfaceDetailData->DevicePath));
-    } else {
+        } else {
             if (error)
                 *error = GetLastError();
             if (LogStream)
@@ -2840,7 +2883,7 @@ BOOL	GetDeviceNameSpace(char** NameSpace, int* Size, BOOL Refresh, DWORD* error)
         } else
             return FALSE;
 
-} //  SetupDiEnumDeviceInterfaces <<
+    } //  SetupDiEnumDeviceInterfaces <<
     else {
         if (error)
             *error = GetLastError();
@@ -3368,22 +3411,22 @@ LRESULT CALLBACK WndProc(HWND hWind, UINT message, WPARAM wParam, LPARAM lParam)
     HDC hdc;
 
     switch (message) {
-    case WM_PAINT:
-        hdc = BeginPaint(hWind, &ps);
-        EndPaint(hWind, &ps);
-        break;
-    case WM_DESTROY:
-        PostQuitMessage(0);
-        break;
-    case WM_DEVICECHANGE:
-        DeviceChange(wParam, lParam);
-        return TRUE;
-    case FFB_DATA_READY:
-        FfbProcessData(wParam, lParam);
-        break;
-    default:
-        return DefWindowProc(hWind, message, wParam, lParam);
-        break;
+        case WM_PAINT:
+            hdc = BeginPaint(hWind, &ps);
+            EndPaint(hWind, &ps);
+            break;
+        case WM_DESTROY:
+            PostQuitMessage(0);
+            break;
+        case WM_DEVICECHANGE:
+            DeviceChange(wParam, lParam);
+            return TRUE;
+        case FFB_DATA_READY:
+            FfbProcessData(wParam, lParam);
+            break;
+        default:
+            return DefWindowProc(hWind, message, wParam, lParam);
+            break;
     }
 
     return 0;
@@ -3667,7 +3710,7 @@ void	CalcInitValue(USHORT id, struct DEVICE_INIT_VALS* data_buf)
 UINT	GetInitValueFromRegistry(USHORT id, struct DEVICE_INIT_VALS* data_buf)
 {
     PCWSTR	Axes[VJOY_NUMBER_OF_AXES] = {
-        L"X", L"Y", L"Z", L"RX", L"RY", L"RZ", L"SL1", L"SL2", 
+        L"X", L"Y", L"Z", L"RX", L"RY", L"RZ", L"SL1", L"SL2",
         L"WHL", L"ACC", L"BRK", L"CLU", L"STE", L"AIL", L"RUD", L"THR" };
     UCHAR	nAxes = 0;
     PCWSTR	Povs[VJOY_NUMBER_OF_HAT] = { L"POV1", L"POV2", L"POV3", L"POV4" };
@@ -3681,7 +3724,7 @@ UINT	GetInitValueFromRegistry(USHORT id, struct DEVICE_INIT_VALS* data_buf)
     nPovs = sizeof(Povs) / sizeof(PCWSTR);
     // BM was sizeof(nButtons) / 8
     // Size in bytes, axes include pov (16+4)
-    if (data_buf->cb < (2 + nAxes + nPovs + (sizeof(nButtons)/8) ))
+    if (data_buf->cb < (2 + nAxes + nPovs + (sizeof(nButtons)/8)))
         return 0;
 
 
@@ -3895,7 +3938,7 @@ int	DbgGetCaps(void)
     if (!ok) {
         CloseHandle(h);
         return BAD_PREPARSED_DATA;
-}
+    }
 
     // returns a top-level collection's HIDP_CAPS structure.
     stat = HidP_GetCaps(PreparsedData, &Capabilities);
@@ -4017,7 +4060,7 @@ int	DbgGetCaps(void)
     CloseHandle(h);
 
     return 0;
-    }
+}
 
 // Update control structure of the given vJoy Device
 // Use this function to detect which axes exist, the number of POVs and the number of buttons
@@ -4044,7 +4087,7 @@ INT		GetControls(UINT rID)
     if (!ok) {
         CloseHandle(h);
         return BAD_PREPARSED_DATA;
-}
+    }
 
     // Get device's capabilities
     stat = HidP_GetCaps(PreparsedData, &Capabilities);
@@ -4100,41 +4143,41 @@ INT		GetControls(UINT rID)
         {
             Usage = ((vCaps[i]).NotRange).Usage; // Usage is the code of the axis (0x30="X", 0x39="POV1 etc.)
             switch (Usage) {
-            case HID_USAGE_X:
-                vJoyDevices[rID].DeviceControls.AxisX = TRUE;
-                break;
-            case HID_USAGE_Y:
-                vJoyDevices[rID].DeviceControls.AxisY = TRUE;
-                break;
-            case HID_USAGE_Z:
-                vJoyDevices[rID].DeviceControls.AxisZ = TRUE;
-                break;
-            case HID_USAGE_RX:
-                vJoyDevices[rID].DeviceControls.AxisXRot = TRUE;
-                break;
-            case HID_USAGE_RY:
-                vJoyDevices[rID].DeviceControls.AxisYRot = TRUE;
-                break;
-            case HID_USAGE_RZ:
-                vJoyDevices[rID].DeviceControls.AxisZRot = TRUE;
-                break;
-            case HID_USAGE_SL0:
-                vJoyDevices[rID].DeviceControls.Slider = TRUE;
-                break;
-            case HID_USAGE_SL1:
-                vJoyDevices[rID].DeviceControls.Dial = TRUE;
-                break;
-            case HID_USAGE_WHL:
-                vJoyDevices[rID].DeviceControls.Wheel = TRUE;
-                break;
-            case HID_USAGE_POV:
-                if (vCaps[i].LogicalMax == 3)
-                    vJoyDevices[rID].DeviceControls.nDescHats++;
-                else  if (vCaps[i].LogicalMax > 3)
-                    vJoyDevices[rID].DeviceControls.nContHats++;
-                break;
-            default:
-                break;
+                case HID_USAGE_X:
+                    vJoyDevices[rID].DeviceControls.AxisX = TRUE;
+                    break;
+                case HID_USAGE_Y:
+                    vJoyDevices[rID].DeviceControls.AxisY = TRUE;
+                    break;
+                case HID_USAGE_Z:
+                    vJoyDevices[rID].DeviceControls.AxisZ = TRUE;
+                    break;
+                case HID_USAGE_RX:
+                    vJoyDevices[rID].DeviceControls.AxisXRot = TRUE;
+                    break;
+                case HID_USAGE_RY:
+                    vJoyDevices[rID].DeviceControls.AxisYRot = TRUE;
+                    break;
+                case HID_USAGE_RZ:
+                    vJoyDevices[rID].DeviceControls.AxisZRot = TRUE;
+                    break;
+                case HID_USAGE_SL0:
+                    vJoyDevices[rID].DeviceControls.Slider = TRUE;
+                    break;
+                case HID_USAGE_SL1:
+                    vJoyDevices[rID].DeviceControls.Dial = TRUE;
+                    break;
+                case HID_USAGE_WHL:
+                    vJoyDevices[rID].DeviceControls.Wheel = TRUE;
+                    break;
+                case HID_USAGE_POV:
+                    if (vCaps[i].LogicalMax == 3)
+                        vJoyDevices[rID].DeviceControls.nDescHats++;
+                    else  if (vCaps[i].LogicalMax > 3)
+                        vJoyDevices[rID].DeviceControls.nContHats++;
+                    break;
+                default:
+                    break;
             }
         }
     }
@@ -4182,7 +4225,7 @@ BOOL	GetAxisCaps(UINT rID, UINT Axis, HIDP_VALUE_CAPS* ValCaps)
     if (!ok) {
         CloseHandle(h);
         return BAD_PREPARSED_DATA;
-}
+    }
     stat = HidP_GetCaps(PreparsedData, &Capabilities);
     if (stat != HIDP_STATUS_SUCCESS) {
         CloseHandle(h);

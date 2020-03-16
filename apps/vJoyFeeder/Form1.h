@@ -524,7 +524,7 @@ namespace vJoyDemo {
         ReportId = System::Convert::ToInt32(listBoxTarget->SelectedItem->ToString());
 
         // Send info to selected vJoy Device
-        if (!GetPositionVJD(ReportId, (PVOID)&Report))
+        if (!GetPosition(ReportId, (PVOID)&Report))
             return;
         if (ReportId!=Report.bDevice)
             return;
@@ -2290,9 +2290,10 @@ namespace vJoyDemo {
                     first_free = listBoxTarget->Items->Count - 1;
             }
         }
-        if (exist)
-            listBoxTarget->SelectedIndex = first_free;
-
+        if (exist) {
+            //listBoxTarget->SelectedIndex = first_free;
+            listBoxTarget->SelectedIndex = 0;
+        }
 
         return exist;
     }
