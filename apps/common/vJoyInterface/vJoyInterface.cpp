@@ -1851,7 +1851,12 @@ namespace vJoyNS {
         FFBPType Type;
         if (Ffb_h_Type(Packet, &Type) != ERROR_SUCCESS)
             return ERROR_INVALID_DATA;
-        if (Type == PT_CTRLREP || Type == PT_SMPLREP || Type == PT_GAINREP || Type == PT_POOLREP || Type == PT_NEWEFREP)
+        if (Type == PT_CTRLREP || 
+            Type == PT_SMPLREP || 
+            Type == PT_GAINREP || 
+            Type == PT_POOLREP || 
+            Type == PT_NEWEFREP ||
+            Type == PT_STATEREP)
             return ERROR_INVALID_DATA;
 
         // The Effect Block Index is the second byte (After the Report ID)
@@ -2115,14 +2120,14 @@ namespace vJoyNS {
         return ERROR_SUCCESS;
     }
 
-    VJOYINTERFACE_API BOOL		__cdecl Ffb_h_UpdatePID(UINT rID, FFB_DEVICE_PID* PIDBlockLoad)
+    VJOYINTERFACE_API BOOL		__cdecl Ffb_h_WritePID(UINT rID, FFB_DEVICE_PID* PIDBlockLoad)
         // Update the PID Block load of the specified vJoy Device.
     {
         PVOID pData = PIDBlockLoad;
         if (!pData || (vJoyDevices.find(rID) == vJoyDevices.end()) || Get_h(rID) == INVALID_HANDLE_VALUE || Get_stat(rID) != VJD_STAT_OWN)
             return FALSE;
 
-        UINT	IoCode = SET_FFB_DATA;
+        UINT	IoCode = SET_FFB_PID_DATA;
         UINT	IoSize = sizeof(FFB_DEVICE_PID);
         ULONG	bytes;
         HANDLE	hIoctlEvent;
@@ -2133,7 +2138,7 @@ namespace vJoyNS {
         memset(&OverLapped, 0, sizeof(OVERLAPPED));
         OverLapped.hEvent = hIoctlEvent;
 
-        // Send joystick position structure to vJoy device
+        // Send FFB_DEVICE_PID structure to vJoy device
         BOOL res = DeviceIoControl(Get_h(rID), IoCode, pData, IoSize, NULL, 0, &bytes, &OverLapped);
 
         // Test Results
@@ -2152,6 +2157,71 @@ namespace vJoyNS {
             }
         }
         CloseHandle(OverLapped.hEvent);
+        return res;
+    }
+
+    VJOYINTERFACE_API BOOL		__cdecl Ffb_h_ReadPID(UINT rID, FFB_DEVICE_PID* PIDBlockLoad)
+        // Update the PID Block load of the specified vJoy Device.
+    {
+        PVOID pData = PIDBlockLoad;
+        if (!pData || (vJoyDevices.find(rID) == vJoyDevices.end()) || Get_h(rID) == INVALID_HANDLE_VALUE || Get_stat(rID) != VJD_STAT_OWN)
+            return FALSE;
+
+        UINT	IoCode = GET_FFB_PID_DATA;
+        UINT	IoSize = sizeof(FFB_DEVICE_PID);
+        ULONG	bytes;
+        HANDLE	hIoctlEvent;
+        OVERLAPPED OverLapped = { 0 };
+
+        // Preparing
+        hIoctlEvent = CreateEvent(NULL, TRUE, TRUE, NULL);
+        memset(&OverLapped, 0, sizeof(OVERLAPPED));
+        OverLapped.hEvent = hIoctlEvent;
+
+        // Get FFB_DEVICE_PID structure from vJoy device
+        BOOL res = DeviceIoControl(Get_h(rID), IoCode, NULL, 0, (PVOID)PIDBlockLoad, IoSize, &bytes, &OverLapped);
+        // immediate Return
+        if (res) {
+            CloseHandle(OverLapped.hEvent);
+            if (bytes) {
+                if (LogStream)
+                    _ftprintf_s(LogStream, _T("\n[%05u]Info: Ffb_h_ReadPID() - Returns (Immediatly) TRUE"), ProcessId);
+                return TRUE;
+            } else {
+                if (LogStream)
+                    _ftprintf_s(LogStream, _T("\n[%05u]Error: Ffb_h_ReadPID() - Returns (Immediatly) FALSE"), ProcessId);
+                return FALSE;
+            }
+        }
+
+        // Delayed/Error
+        else {
+            // Error getting the data
+            DWORD err = GetLastError();
+            if (err != ERROR_IO_PENDING) {
+                if (LogStream)
+                    _ftprintf_s(LogStream, _T("\n[%05u]Error: Ffb_h_ReadPID() - error (0x%X) Returns FALSE"), ProcessId, err);
+                CloseHandle(OverLapped.hEvent);
+                return FALSE;
+            }
+
+            // Wait until data ready
+            DWORD nBytesTranss = 0;
+            BOOL gotdata = GetOverlappedResult(Get_h(rID), &OverLapped, &nBytesTranss, TRUE);
+            CloseHandle(OverLapped.hEvent);
+
+            // Data received and it is not empty
+            if (gotdata && nBytesTranss) {
+                if (LogStream)
+                    _ftprintf_s(LogStream, _T("\n[%05u]Info: Ffb_h_ReadPID() - gotdata=%d nBytesTranss=%u  Returns TRUE"), ProcessId, gotdata, nBytesTranss);
+                return TRUE;
+            } else {
+                if (LogStream)
+                    _ftprintf_s(LogStream, _T("\n[%05u]Info: Ffb_h_ReadPID() - gotdata=%d nBytesTranss=%u  Returns FALSE"), ProcessId, gotdata, nBytesTranss);
+                return FALSE;
+            }
+        }
+
         return res;
     }
 

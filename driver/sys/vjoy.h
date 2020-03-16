@@ -1791,6 +1791,19 @@ int FfbGetDevIDfromFfbRequest(
     IN WDFREQUEST   Request
 );
 
+BOOLEAN Ffb_ProcessPacket(
+    PDEVICE_EXTENSION   devContext,
+    int                 id,
+    PUCHAR               buffer);
+
+void Ffb_ResetPIDData(
+    PDEVICE_EXTENSION   devContext,
+    int                 id);
+
+void Ffb_BlockIndexFreeAll(
+    PDEVICE_EXTENSION   devContext,
+    int                 id);
+
 USHORT GetIdFromRawPdoRequest(
     WDFREQUEST    Request,
     PVOID pExtension

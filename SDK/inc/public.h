@@ -108,8 +108,9 @@ DEFINE_GUID(GUID_DEVINTERFACE_VJOY, 0x781EF630, 0x72B2, 0x11d2, 0xB8, 0x52, 0x00
 #define F_LOAD_POSITIONS	0x910
 #define F_GETATTRIB			0x911
 #define F_GET_FFB_DATA		0x912
-#define F_SET_FFB_DATA		0x914
 #define F_SET_FFB_STAT		0x913
+#define F_GET_FFB_PID_DATA	0x914
+#define F_SET_FFB_PID_DATA	0x915
 #define F_GET_FFB_STAT		0x916
 #define F_GET_DEV_INFO      0x917
 #define F_IS_DRV_FFB_CAP	0x918
@@ -123,22 +124,23 @@ DEFINE_GUID(GUID_DEVINTERFACE_VJOY, 0x781EF630, 0x72B2, 0x11d2, 0xB8, 0x52, 0x00
 #define F_GET_POSITIONS		0x920
 
 // IO Device Control codes;
-#define IOCTL_VJOY_GET_ATTRIB		CTL_CODE (FILE_DEVICE_UNKNOWN, GETATTRIB, METHOD_BUFFERED, FILE_WRITE_ACCESS)
-#define LOAD_POSITIONS	            CTL_CODE (FILE_DEVICE_UNKNOWN, F_LOAD_POSITIONS, METHOD_BUFFERED, FILE_WRITE_ACCESS)
-#define GET_POSITIONS	            CTL_CODE (FILE_DEVICE_UNKNOWN, F_GET_POSITIONS, METHOD_BUFFERED, FILE_READ_ACCESS)
-#define GET_FFB_DATA	            CTL_CODE (FILE_DEVICE_UNKNOWN, F_GET_FFB_DATA, METHOD_OUT_DIRECT, FILE_ANY_ACCESS)
-#define SET_FFB_DATA	            CTL_CODE (FILE_DEVICE_UNKNOWN, F_SET_FFB_DATA, METHOD_BUFFERED, FILE_ANY_ACCESS)
-#define SET_FFB_STAT	            CTL_CODE (FILE_DEVICE_UNKNOWN, F_SET_FFB_STAT, METHOD_NEITHER, FILE_ANY_ACCESS)
-#define GET_FFB_STAT	            CTL_CODE (FILE_DEVICE_UNKNOWN, F_GET_FFB_STAT, METHOD_BUFFERED, FILE_ANY_ACCESS)
-#define GET_DEV_INFO			    CTL_CODE (FILE_DEVICE_UNKNOWN, F_GET_DEV_INFO, METHOD_BUFFERED, FILE_ANY_ACCESS)
-#define IS_DRV_FFB_CAP			    CTL_CODE (FILE_DEVICE_UNKNOWN, F_IS_DRV_FFB_CAP, METHOD_BUFFERED, FILE_ANY_ACCESS)
-#define IS_DRV_FFB_EN			    CTL_CODE (FILE_DEVICE_UNKNOWN, F_IS_DRV_FFB_EN, METHOD_BUFFERED, FILE_ANY_ACCESS)
-#define GET_DRV_DEV_MAX			    CTL_CODE (FILE_DEVICE_UNKNOWN, F_GET_DRV_DEV_MAX, METHOD_BUFFERED, FILE_ANY_ACCESS)
-#define GET_DRV_DEV_EN			    CTL_CODE (FILE_DEVICE_UNKNOWN, F_GET_DRV_DEV_EN, METHOD_BUFFERED, FILE_ANY_ACCESS)
-#define IS_DEV_FFB_START			CTL_CODE (FILE_DEVICE_UNKNOWN, F_IS_DEV_FFB_START, METHOD_BUFFERED, FILE_ANY_ACCESS)
-#define GET_DEV_STAT				CTL_CODE (FILE_DEVICE_UNKNOWN, F_GET_DEV_STAT, METHOD_BUFFERED, FILE_ANY_ACCESS)
-#define GET_DRV_INFO				CTL_CODE (FILE_DEVICE_UNKNOWN, F_GET_DRV_INFO, METHOD_BUFFERED, FILE_ANY_ACCESS)
-#define RESET_DEV					CTL_CODE (FILE_DEVICE_UNKNOWN, F_RESET_DEV, METHOD_BUFFERED, FILE_WRITE_ACCESS)
+#define IOCTL_VJOY_GET_ATTRIB       CTL_CODE (FILE_DEVICE_UNKNOWN, GETATTRIB, METHOD_BUFFERED, FILE_WRITE_ACCESS)
+#define LOAD_POSITIONS              CTL_CODE (FILE_DEVICE_UNKNOWN, F_LOAD_POSITIONS, METHOD_BUFFERED, FILE_WRITE_ACCESS)
+#define GET_POSITIONS               CTL_CODE (FILE_DEVICE_UNKNOWN, F_GET_POSITIONS, METHOD_BUFFERED, FILE_READ_ACCESS)
+#define GET_FFB_DATA                CTL_CODE (FILE_DEVICE_UNKNOWN, F_GET_FFB_DATA, METHOD_OUT_DIRECT, FILE_ANY_ACCESS)
+#define GET_FFB_PID_DATA            CTL_CODE (FILE_DEVICE_UNKNOWN, F_GET_FFB_PID_DATA, METHOD_BUFFERED, FILE_ANY_ACCESS)
+#define SET_FFB_PID_DATA            CTL_CODE (FILE_DEVICE_UNKNOWN, F_SET_FFB_PID_DATA, METHOD_BUFFERED, FILE_ANY_ACCESS)
+#define SET_FFB_STAT                CTL_CODE (FILE_DEVICE_UNKNOWN, F_SET_FFB_STAT, METHOD_NEITHER, FILE_ANY_ACCESS)
+#define GET_FFB_STAT                CTL_CODE (FILE_DEVICE_UNKNOWN, F_GET_FFB_STAT, METHOD_BUFFERED, FILE_ANY_ACCESS)
+#define GET_DEV_INFO                CTL_CODE (FILE_DEVICE_UNKNOWN, F_GET_DEV_INFO, METHOD_BUFFERED, FILE_ANY_ACCESS)
+#define IS_DRV_FFB_CAP              CTL_CODE (FILE_DEVICE_UNKNOWN, F_IS_DRV_FFB_CAP, METHOD_BUFFERED, FILE_ANY_ACCESS)
+#define IS_DRV_FFB_EN               CTL_CODE (FILE_DEVICE_UNKNOWN, F_IS_DRV_FFB_EN, METHOD_BUFFERED, FILE_ANY_ACCESS)
+#define GET_DRV_DEV_MAX             CTL_CODE (FILE_DEVICE_UNKNOWN, F_GET_DRV_DEV_MAX, METHOD_BUFFERED, FILE_ANY_ACCESS)
+#define GET_DRV_DEV_EN              CTL_CODE (FILE_DEVICE_UNKNOWN, F_GET_DRV_DEV_EN, METHOD_BUFFERED, FILE_ANY_ACCESS)
+#define IS_DEV_FFB_START            CTL_CODE (FILE_DEVICE_UNKNOWN, F_IS_DEV_FFB_START, METHOD_BUFFERED, FILE_ANY_ACCESS)
+#define GET_DEV_STAT                CTL_CODE (FILE_DEVICE_UNKNOWN, F_GET_DEV_STAT, METHOD_BUFFERED, FILE_ANY_ACCESS)
+#define GET_DRV_INFO                CTL_CODE (FILE_DEVICE_UNKNOWN, F_GET_DRV_INFO, METHOD_BUFFERED, FILE_ANY_ACCESS)
+#define RESET_DEV                   CTL_CODE (FILE_DEVICE_UNKNOWN, F_RESET_DEV, METHOD_BUFFERED, FILE_WRITE_ACCESS)
 
 #ifndef __HIDPORT_H__
 // Copied from hidport.h
@@ -186,6 +188,10 @@ typedef BOOL(WINAPI* StatusMessageFunc)(void* output, TCHAR* buffer, enum ERRLEV
 //	JOYSTICK_POSITION iReport;
 //	:
 //	DeviceIoControl (hDevice, 100, &iReport, sizeof(HID_INPUT_REPORT), NULL, 0, &bytes, NULL)
+
+
+// Turn on 1 byte packing of struct
+#include <pshpack1.h>
 
 #if USE_JOYSTICK_API_VERSION == 1
 
@@ -332,11 +338,16 @@ typedef PJOYSTICK_POSITION_V3 PJOYSTICK_POSITION;
 #endif
 
 
-//-------------
+//----------------------------------------------------------
 // FFB Features to be placed in vJoy's driver memory context
 
 // Max 1..40 effect block index. 0x28=40dv
-#define MAX_FFB_EFFECTS_BLOCK_INDEX (0x28) 
+#define VJOY_FFB_FIRST_EID                  (0x01)
+#define VJOY_FFB_MAX_EFFECTS_BLOCK_INDEX    (0x28) 
+#define VJOY_FFB_MAX_SIMULTANEOUS_EFFECTS   (0x0A) 
+#define VJOY_FFB_EffectState_Free           (0x00)
+#define VJOY_FFB_EffectState_Allocated      (0x01)
+#define VJOY_FFB_EffectState_Playing        (0x02)
 
 #if 0
 // FFB: Create New Effect Feature Report=1
@@ -351,25 +362,40 @@ typedef struct _FFB_NEW_EFFECT_REPORT
 // Only one per device
 typedef struct _FFB_PID_BLOCK_LOAD_REPORT
 {
-    BYTE    EffectBlockIndex;	// 1..40
-    BYTE	LoadStatus;	        // 0 ongoing, 1=Success,2=Full,3=Error
-    USHORT	RAMPoolAvailable;	// =0 if full, or sizeof(FFB_PID_EFFECT_STATE_REPORT) * (40 - created) 
+    // 1..40. If 0, then error (below value is 2 or 3)
+    BYTE    EffectBlockIndex;
+    // 0 ongoing, 1=Success,2=Full,3=Error
+    BYTE	LoadStatus;
+    // =0 if full, or sizeof(FFB_PID_EFFECT_STATE_REPORT) * (40 - created) 
+    USHORT	RAMPoolAvailable;
 } FFB_PID_BLOCK_LOAD_REPORT, * PFFB_PID_BLOCK_LOAD_REPORT;
 
 // FFB: PID Pool Feature Report=3
 typedef struct _FFB_PID_POOL_REPORT
 {
-    USHORT	RAMPoolSize;	// 0xFFFF
-    BYTE	MaxSimultaneousEffects;	// 10
-    BYTE	MemoryManagement;	// Bits: 0=DeviceManagedPool, 1=SharedParameterBlocks
+    // 0xFFFF
+    USHORT	RAMPoolSize;
+    // 0..10
+    BYTE	MaxSimultaneousEffects;
+    // Bit 0=DeviceManagedPool, bit 1=SharedParameterBlocks
+    BYTE	MemoryManagement;
 } FFB_PID_POOL_REPORT, * PFFB_PID_POOL_REPORT;
 
 // FFB: PID Effect State Report
 // Up to MAX_FFB_EFFECTS_BLOCK_INDEX per device
 typedef struct _FFB_PID_EFFECT_STATE_REPORT
 {
-    BYTE	IsUsed;         // For CreateEffect/GetNextFree()
-    BYTE	EffectState;    // 0: not def, 1 runnning, 2 stopped
+    // Bitfield for PID Effect State Report, bit:
+    // 0: Effect Playing
+    // 1: Device Paused
+    // 2: Actuators Enabled
+    // 3: Safety Switch
+    // 4: Actuator Override Switch
+    // 5: Actuator Power
+    BYTE    PIDEffectStateReport;
+    // For CreateEffect/GetNextFree()
+    // 0: free, 1 allocated, 2 playing
+    BYTE    State;
 } FFB_PID_EFFECT_STATE_REPORT, * PFFB_PID_EFFECT_STATE_REPORT;
 
 // All FFB PID data, one per device
@@ -378,10 +404,15 @@ typedef struct _FFB_DEVICE_PID
 {
     FFB_PID_BLOCK_LOAD_REPORT   PIDBlockLoad;
     FFB_PID_POOL_REPORT         PIDPool;
-    FFB_PID_EFFECT_STATE_REPORT EffectStates[MAX_FFB_EFFECTS_BLOCK_INDEX];
+    FFB_PID_EFFECT_STATE_REPORT EffectStates[VJOY_FFB_MAX_EFFECTS_BLOCK_INDEX];
+    // Index to next free slot
+    BYTE                        NextEID;
+    // Index to last valid slot that has been used
+    BYTE                        LastEID;
 } FFB_DEVICE_PID, * PFFB_DEVICE_PID;
 
-
+// Turn off 1-byte packing of struct
+#include <poppack.h>
 
 // HID Descriptor definitions - Axes
 #define HID_USAGE_X             0x30
@@ -417,8 +448,11 @@ typedef struct _FFB_DEVICE_PID
 #define HID_USAGE_INRT      0x42    //    Usage ET Inertia
 #define HID_USAGE_FRIC      0x43    //    Usage ET Friction
 #define HID_USAGE_CUSTM     0x28    //    Usage ET Custom Force Data
-#define HID_USAGE_RESERVD   0x29  //    Usage ET Reserved (unused)
+#define HID_USAGE_RESERVD   0x29    //    Usage ET Reserved (unused)
 
+#define HID_USAGE_BLKLD_SUCCESS 0x8C // Usage Block Load Success
+#define HID_USAGE_BLKLD_FULL    0x8D // Usage Block Load Full
+#define HID_USAGE_BLKLD_ERROR   0x8E // Usage Block Load Error
 
 // HID Descriptor definitions - FFB Report IDs
 #define HID_ID_STATE        0x02	// Usage PID State report
@@ -438,5 +472,6 @@ typedef struct _FFB_DEVICE_PID
 #define HID_ID_NEWEFREP     0x01	// Usage Create New Effect Report
 #define HID_ID_BLKLDREP     0x02	// Usage Block Load Report
 #define HID_ID_POOLREP      0x03	// Usage PID Pool Report
+#define HID_ID_STATEREP     0x04	// Usage PID State Report
 
 #endif

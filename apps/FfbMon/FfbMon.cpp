@@ -375,6 +375,10 @@ BOOL PacketType2Str(FFBPType Type, LPTSTR OutStr)
     case PT_POOLREP:
         Str = L"PID Pool Report";
         break;
+    case PT_STATEREP:
+        Str = L"PID State Report";
+        break;
+
     default:
         stat = FALSE;
         break;

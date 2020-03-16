@@ -351,23 +351,24 @@ void CreateFfbDesc(std::vector<BYTE>* buffer, BYTE ReportId)
     // Vector of bytes depending on the ID
     std::vector<BYTE> vars
     {
-        static_cast<BYTE>(HID_ID_STATE + 0x10 * ReportId),    //    Report ID 2
-        static_cast<BYTE>(HID_ID_EFFREP + 0x10 * ReportId),    //    Report ID 1
-        static_cast<BYTE>(HID_ID_ENVREP + 0x10 * ReportId),         //    Report ID 2
+        static_cast<BYTE>(HID_ID_STATE + 0x10 * ReportId),      //    Report ID 2
+        static_cast<BYTE>(HID_ID_EFFREP + 0x10 * ReportId),     //    Report ID 1
+        static_cast<BYTE>(HID_ID_ENVREP + 0x10 * ReportId),     //    Report ID 2
         static_cast<BYTE>(HID_ID_CONDREP + 0x10 * ReportId),    //    Report ID 3
-        static_cast<BYTE>(HID_ID_PRIDREP + 0x10 * ReportId),                   //    Report ID 4
-        static_cast<BYTE>(HID_ID_CONSTREP + 0x10 * ReportId),         //    Report ID 5
-        static_cast<BYTE>(HID_ID_RAMPREP + 0x10 * ReportId),         //    Report ID 6
-        static_cast<BYTE>(HID_ID_CSTMREP + 0x10 * ReportId),         //    Report ID 7
-        static_cast<BYTE>(HID_ID_SMPLREP + 0x10 * ReportId),         //    Report ID 8
+        static_cast<BYTE>(HID_ID_PRIDREP + 0x10 * ReportId),    //    Report ID 4
+        static_cast<BYTE>(HID_ID_CONSTREP + 0x10 * ReportId),   //    Report ID 5
+        static_cast<BYTE>(HID_ID_RAMPREP + 0x10 * ReportId),    //    Report ID 6
+        static_cast<BYTE>(HID_ID_CSTMREP + 0x10 * ReportId),    //    Report ID 7
+        static_cast<BYTE>(HID_ID_SMPLREP + 0x10 * ReportId),    //    Report ID 8
         static_cast<BYTE>(HID_ID_EFOPREP + 0x10 * ReportId),    //    Report ID Ah (10d)
-        static_cast<BYTE>(HID_ID_BLKFRREP + 0x10 * ReportId),    //    Report ID Bh (11d)
+        static_cast<BYTE>(HID_ID_BLKFRREP + 0x10 * ReportId),   //    Report ID Bh (11d)
         static_cast<BYTE>(HID_ID_CTRLREP + 0x10 * ReportId),    //    Report ID Ch (12d)
-        static_cast<BYTE>(HID_ID_GAINREP + 0x10 * ReportId),         //    Report ID Dh (13d)
-        static_cast<BYTE>(HID_ID_SETCREP + 0x10 * ReportId),         //    Report ID Eh (14d)
-        static_cast<BYTE>(HID_ID_NEWEFREP + 0x10 * ReportId),    //    Report ID 1
-        static_cast<BYTE>(HID_ID_BLKLDREP + 0x10 * ReportId),    //    Report ID 2
-        static_cast<BYTE>(HID_ID_POOLREP + 0x10 * ReportId),                   //    Report ID 3
+        static_cast<BYTE>(HID_ID_GAINREP + 0x10 * ReportId),    //    Report ID Dh (13d)
+        static_cast<BYTE>(HID_ID_SETCREP + 0x10 * ReportId),    //    Report ID Eh (14d)
+        static_cast<BYTE>(HID_ID_NEWEFREP + 0x10 * ReportId),   //    Report ID 1
+        static_cast<BYTE>(HID_ID_BLKLDREP + 0x10 * ReportId),   //    Report ID 2
+        static_cast<BYTE>(HID_ID_POOLREP + 0x10 * ReportId),    //    Report ID 3
+        static_cast<BYTE>(HID_ID_STATEREP + 0x10 * ReportId),   //    Report ID 4
     };
 
     // Replace the first byte of each sub vector with the corresponding varible (exclude first sub vector)

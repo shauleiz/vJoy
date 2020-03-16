@@ -158,7 +158,8 @@ enum FFBPType // FFB Packet Type
     // Feature
     PT_NEWEFREP	=  HID_ID_NEWEFREP+0x10,	// Usage Create New Effect Report
     PT_BLKLDREP	=  HID_ID_BLKLDREP+0x10,	// Usage Block Load Report
-    PT_POOLREP	=  HID_ID_POOLREP+0x10,		// Usage PID Pool Report
+    PT_POOLREP  =  HID_ID_POOLREP+0x10,		// Usage PID Pool Report
+    PT_STATEREP =  HID_ID_STATEREP+0x10,	// Usage PID State Report
 };
 
 enum FFBOP
@@ -375,7 +376,8 @@ namespace vJoyNS {
     // Added in 2.1.6
     VJOYINTERFACE_API DWORD		__cdecl Ffb_h_Eff_Constant(const FFB_DATA * Packet, FFB_EFF_CONSTANT *  ConstantEffect);
     // Added in 2.2.0
-    VJOYINTERFACE_API BOOL		__cdecl Ffb_h_UpdatePID(UINT rID, FFB_DEVICE_PID* DevicePID); // Update the Ffb PID of the specified vJoy Device.
+    VJOYINTERFACE_API BOOL		__cdecl Ffb_h_WritePID(UINT rID, FFB_DEVICE_PID* DevicePID); // Update the Ffb PID of the specified vJoy Device.
+    VJOYINTERFACE_API BOOL		__cdecl Ffb_h_ReadPID(UINT rID, FFB_DEVICE_PID* PIDBlockLoad);// Read the Ffb PID of the specified vJoy Device.
     VJOYINTERFACE_API BOOL		__cdecl	GetPositionVJD(UINT rID, PVOID pData);	// Read the position data of the specified vJoy Device.
 
 #pragma endregion

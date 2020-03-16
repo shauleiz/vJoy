@@ -24,7 +24,7 @@ public enum VjdStat  /* Declares an enumeration data type called BOOLEAN */
     VJD_STAT_BUSY,	// The  vJoy Device is owned by another application. It cannot be acquired by this application.
     VJD_STAT_MISS,	// The  vJoy Device is missing. It either does not exist or the driver is down.
     VJD_STAT_UNKN	// Unknown
-}; 
+};
 
 
 // FFB Declarations
@@ -33,44 +33,45 @@ public enum VjdStat  /* Declares an enumeration data type called BOOLEAN */
 
 public enum FFBPType // FFB Packet Type
 {
-	// Write
-	PT_EFFREP	=  0x01,	// Usage Set Effect Report
-	PT_ENVREP	=  0x02,	// Usage Set Envelope Report
-	PT_CONDREP	=  0x03,	// Usage Set Condition Report
-	PT_PRIDREP	=  0x04,	// Usage Set Periodic Report
-	PT_CONSTREP	=  0x05,	// Usage Set Constant Force Report
-	PT_RAMPREP	=  0x06,	// Usage Set Ramp Force Report
-	PT_CSTMREP	=  0x07,	// Usage Custom Force Data Report
-	PT_SMPLREP	=  0x08,	// Usage Download Force Sample
-	PT_EFOPREP	=  0x0A,	// Usage Effect Operation Report
-	PT_BLKFRREP	=  0x0B,	// Usage PID Block Free Report
-	PT_CTRLREP	=  0x0C,	// Usage PID Device Control
-	PT_GAINREP	=  0x0D,	// Usage Device Gain Report
-	PT_SETCREP	=  0x0E,	// Usage Set Custom Force Report
+    // Write
+    PT_EFFREP = 0x01,   // Usage Set Effect Report
+    PT_ENVREP = 0x02,   // Usage Set Envelope Report
+    PT_CONDREP = 0x03,  // Usage Set Condition Report
+    PT_PRIDREP = 0x04,  // Usage Set Periodic Report
+    PT_CONSTREP = 0x05, // Usage Set Constant Force Report
+    PT_RAMPREP = 0x06,  // Usage Set Ramp Force Report
+    PT_CSTMREP = 0x07,  // Usage Custom Force Data Report
+    PT_SMPLREP = 0x08,  // Usage Download Force Sample
+    PT_EFOPREP = 0x0A,  // Usage Effect Operation Report
+    PT_BLKFRREP = 0x0B, // Usage PID Block Free Report
+    PT_CTRLREP = 0x0C,  // Usage PID Device Control
+    PT_GAINREP = 0x0D,  // Usage Device Gain Report
+    PT_SETCREP = 0x0E,  // Usage Set Custom Force Report
 
-	// Feature
-	PT_NEWEFREP	=  0x01+0x10,	// Usage Create New Effect Report
-	PT_BLKLDREP	=  0x02+0x10,	// Usage Block Load Report
-	PT_POOLREP	=  0x03+0x10,	// Usage PID Pool Report
+    // Feature
+    PT_NEWEFREP = 0x01+0x10,    // Usage Create New Effect Report
+    PT_BLKLDREP = 0x02+0x10,    // Usage Block Load Report
+    PT_POOLREP = 0x03+0x10,     // Usage PID Pool Report
+    PT_STATEREP = 0x04+0x10,    // Usage PID State Report
 };
 
 public enum FFBEType // FFB Effect Type
 {
 
-	// Effect Type
-	ET_NONE		=	0,	  //    No Force
-	ET_CONST	=	1,    //    Constant Force
-	ET_RAMP		=	2,    //    Ramp
-	ET_SQR		=	3,    //    Square
-	ET_SINE		=	4,    //    Sine
-	ET_TRNGL	=	5,    //    Triangle
-	ET_STUP		=	6,    //    Sawtooth Up
-	ET_STDN		=	7,    //    Sawtooth Down
-	ET_SPRNG	=	8,    //    Spring
-	ET_DMPR		=	9,    //    Damper
-	ET_INRT		=	10,   //    Inertia
-	ET_FRCTN	=	11,   //    Friction
-	ET_CSTM		=	12,   //    Custom Force Data
+    // Effect Type
+    ET_NONE = 0,      //    No Force
+    ET_CONST = 1,    //    Constant Force
+    ET_RAMP = 2,    //    Ramp
+    ET_SQR = 3,    //    Square
+    ET_SINE = 4,    //    Sine
+    ET_TRNGL = 5,    //    Triangle
+    ET_STUP = 6,    //    Sawtooth Up
+    ET_STDN = 7,    //    Sawtooth Down
+    ET_SPRNG = 8,    //    Spring
+    ET_DMPR = 9,    //    Damper
+    ET_INRT = 10,   //    Inertia
+    ET_FRCTN = 11,   //    Friction
+    ET_CSTM = 12,   //    Custom Force Data
 };
 
 public enum FFB_CTRL
@@ -107,7 +108,8 @@ namespace vJoyInterfaceWrap
         private static WrapFfbCbFunc wf;
         private static GCHandle hFfbUserData;
 
-        [StructLayout(LayoutKind.Sequential)] public struct JoystickState
+        [StructLayout(LayoutKind.Sequential)]
+        public struct JoystickState
         {
             public byte bDevice;
             public Int32 Throttle;
@@ -244,7 +246,7 @@ namespace vJoyInterfaceWrap
             public UInt32 NegSatur; // Negative Saturation: Range 0x00­0xFF (0 – 10000)
             [FieldOffset(28)]
             public Int32 DeadBand; // Dead Band: : Range 0x00­0xFF (0 – 10000)
-        } 
+        }
 
         [StructLayout(LayoutKind.Explicit)]
         public struct FFB_EFF_ENVLP
@@ -288,7 +290,12 @@ namespace vJoyInterfaceWrap
         }
 
 
-        public const int MAX_FFB_EFFECTS_BLOCK_INDEX = 0x28;
+        public const int VJOY_FFB_FIRST_EID = (0x01);
+        public const int VJOY_FFB_MAX_EFFECTS_BLOCK_INDEX = (0x28);
+        public const int VJOY_FFB_MAX_SIMULTANEOUS_EFFECTS = (0x0A);
+        public const int VJOY_FFB_EffectState_Free = (0x00);
+        public const int VJOY_FFB_EffectState_Allocated = (0x01);
+        public const int VJOY_FFB_EffectState_Playing = (0x02);
 
         [StructLayout(LayoutKind.Explicit, Size = 4)]
         public struct FFB_PID_BLOCK_LOAD_REPORT
@@ -312,14 +319,16 @@ namespace vJoyInterfaceWrap
             public Byte MemoryManagement;	// Bits: 0=DeviceManagedPool, 1=SharedParameterBlocks
         }
 
-        [StructLayout(LayoutKind.Explicit, Size = 1)]
+        [StructLayout(LayoutKind.Explicit, Size = 2)]
         public struct FFB_PID_EFFECT_STATE_REPORT
         {
             [FieldOffset(0)]
-            public Byte EffectState;
+            public Byte PIDEffectStateReport;
+            [FieldOffset(1)]
+            public Byte State;
         }
 
-        [StructLayout(LayoutKind.Explicit, Size = 48)]
+        [StructLayout(LayoutKind.Explicit, Size = 90)]
         public struct FFB_DEVICE_PID
         {
             [FieldOffset(0)]
@@ -327,8 +336,12 @@ namespace vJoyInterfaceWrap
             [FieldOffset(4)]
             public FFB_PID_POOL_REPORT PIDPool;
             [FieldOffset(8)]
-            [MarshalAs(UnmanagedType.ByValArray, SizeConst = MAX_FFB_EFFECTS_BLOCK_INDEX)]
-            public FFB_PID_EFFECT_STATE_REPORT []EffectStates;
+            [MarshalAs(UnmanagedType.ByValArray, SizeConst = VJOY_FFB_MAX_EFFECTS_BLOCK_INDEX)]
+            public FFB_PID_EFFECT_STATE_REPORT[] EffectStates;
+            [FieldOffset(88)]
+            public Byte NextFreeEID;
+            [FieldOffset(89)]
+            public Byte LastEID;
         }
 
 
@@ -431,31 +444,29 @@ namespace vJoyInterfaceWrap
 
             object obj = null;
 
-            if (userData != IntPtr.Zero)
-            {
+            if (userData != IntPtr.Zero) {
                 // Convert userData from pointer to object
                 GCHandle handle2 = (GCHandle)userData;
                 obj = handle2.Target as object;
             }
 
             // Call user-defined CB function
-            UserRemCB(complete,  First, obj);
+            UserRemCB(complete, First, obj);
         }
 
         // Force Feedback (FFB)
         [DllImport("vJoyInterface.dll", EntryPoint = "FfbRegisterGenCB", CallingConvention = CallingConvention.Cdecl)]
         private extern static void _FfbRegisterGenCB(WrapFfbCbFunc cb, IntPtr data);
 
-        public delegate void FfbCbFunc(IntPtr data,  object userData);
-        public delegate  void WrapFfbCbFunc(IntPtr data, IntPtr userData);
+        public delegate void FfbCbFunc(IntPtr data, object userData);
+        public delegate void WrapFfbCbFunc(IntPtr data, IntPtr userData);
 
-        public static void  WrapperFfbCB(IntPtr data, IntPtr userData)
+        public static void WrapperFfbCB(IntPtr data, IntPtr userData)
         {
 
             object obj = null;
 
-            if (userData != IntPtr.Zero)
-            {
+            if (userData != IntPtr.Zero) {
                 // Convert userData from pointer to object
                 GCHandle handle2 = (GCHandle)userData;
                 obj = handle2.Target as object;
@@ -464,7 +475,7 @@ namespace vJoyInterfaceWrap
             // Call user-defined CB function
             UserFfbCB(data, obj);
         }
-        
+
         [DllImport("vJoyInterface.dll", EntryPoint = "FfbStart")]
         private static extern bool _FfbStart(UInt32 rID);
 
@@ -519,14 +530,17 @@ namespace vJoyInterfaceWrap
         [DllImport("vJoyInterface.dll", EntryPoint = "Ffb_h_EffNew")]
         private static extern UInt32 _Ffb_h_EffNew(IntPtr Packet, ref FFBEType Effect);
 
-         [DllImport("vJoyInterface.dll", EntryPoint = "Ffb_h_Eff_Ramp")]
+        [DllImport("vJoyInterface.dll", EntryPoint = "Ffb_h_Eff_Ramp")]
         private static extern UInt32 _Ffb_h_Eff_Ramp(IntPtr Packet, ref FFB_EFF_RAMP RampEffect);
 
-         [DllImport("vJoyInterface.dll", EntryPoint = "Ffb_h_Eff_Constant")]
-         private static extern UInt32 _Ffb_h_Eff_Constant(IntPtr Packet, ref FFB_EFF_CONSTANT ConstantEffect);
+        [DllImport("vJoyInterface.dll", EntryPoint = "Ffb_h_Eff_Constant")]
+        private static extern UInt32 _Ffb_h_Eff_Constant(IntPtr Packet, ref FFB_EFF_CONSTANT ConstantEffect);
 
-        [DllImport("vJoyInterface.dll", EntryPoint = "Ffb_h_UpdatePID")]
-        private static extern bool _Ffb_h_UpdatePID(UInt32 rID, ref FFB_DEVICE_PID PIDBlockLoad);
+        [DllImport("vJoyInterface.dll", EntryPoint = "Ffb_h_WritePID")]
+        private static extern bool _Ffb_h_WritePID(UInt32 rID, ref FFB_DEVICE_PID PIDBlockLoad);
+
+        [DllImport("vJoyInterface.dll", EntryPoint = "Ffb_h_ReadPID")]
+        private static extern bool _Ffb_h_ReadPID(UInt32 rID, ref FFB_DEVICE_PID PIDBlockLoad);
 
 
 
@@ -557,26 +571,26 @@ namespace vJoyInterfaceWrap
         public bool GetVJDAxisMax(UInt32 rID, HID_USAGES Axis, ref long Max) { return _GetVJDAxisMax(rID, (uint)Axis, ref Max); }
         public bool GetVJDAxisMin(UInt32 rID, HID_USAGES Axis, ref long Min) { return _GetVJDAxisMin(rID, (uint)Axis, ref Min); }
         public bool isVJDExists(UInt32 rID) { return _isVJDExists(rID); }
-        public int  GetOwnerPid(UInt32 rID) { return _GetOwnerPid(rID); }
+        public int GetOwnerPid(UInt32 rID) { return _GetOwnerPid(rID); }
 
         /////	Write access to vJoy Device - Basic
         public bool AcquireVJD(UInt32 rID) { return _AcquireVJD(rID); }
-        public void RelinquishVJD(uint rID) {  _RelinquishVJD(rID); }
-        public bool UpdateVJD(UInt32 rID, ref JoystickState pData) {return _UpdateVJD( rID, ref pData);}
+        public void RelinquishVJD(uint rID) { _RelinquishVJD(rID); }
+        public bool UpdateVJD(UInt32 rID, ref JoystickState pData) { return _UpdateVJD(rID, ref pData); }
         public VjdStat GetVJDStatus(UInt32 rID) { return (VjdStat)_GetVJDStatus(rID); }
 
         //// Reset functions
-        public bool ResetVJD(UInt32 rID){return _ResetVJD(rID);}
-        public bool ResetAll(){return _ResetAll();}
-        public bool ResetButtons(UInt32 rID){return _ResetButtons(rID);}
+        public bool ResetVJD(UInt32 rID) { return _ResetVJD(rID); }
+        public bool ResetAll() { return _ResetAll(); }
+        public bool ResetButtons(UInt32 rID) { return _ResetButtons(rID); }
         public bool ResetPovs(UInt32 rID) { return _ResetPovs(rID); }
 
         ////// Write data
         public bool SetAxis(Int32 Value, UInt32 rID, HID_USAGES Axis) { return _SetAxis(Value, rID, Axis); }
-        public bool SetBtn(bool Value, UInt32 rID, uint nBtn) { return _SetBtn( Value, rID, (Byte)nBtn); }
+        public bool SetBtn(bool Value, UInt32 rID, uint nBtn) { return _SetBtn(Value, rID, (Byte)nBtn); }
         public bool SetDiscPov(Int32 Value, UInt32 rID, uint nPov) { return _SetDiscPov(Value, rID, nPov); }
         public bool SetContPov(Int32 Value, UInt32 rID, uint nPov) { return _SetContPov(Value, rID, nPov); }
-        
+
         // Register CB function that takes a C# object as userdata
         public void RegisterRemovalCB(RemovalCbFunc cb, object data)
         {
@@ -635,12 +649,12 @@ namespace vJoyInterfaceWrap
         public bool FfbStop(UInt32 rID) { return _FfbStop(rID); }
         public bool IsDeviceFfb(UInt32 rID) { return _IsDeviceFfb(rID); }
         public bool IsDeviceFfbEffect(UInt32 rID, UInt32 Effect) { return _IsDeviceFfbEffect(rID, Effect); }
-        public UInt32 Ffb_h_DeviceID(IntPtr  Packet, ref int DeviceID) {return _Ffb_h_DeviceID(Packet, ref DeviceID);}
-        public UInt32 Ffb_h_Type(IntPtr Packet, ref FFBPType Type) { return _Ffb_h_Type(Packet, ref  Type); }
-        public UInt32 Ffb_h_Packet(IntPtr Packet, ref UInt32 Type, ref Int32 DataSize, ref Byte[] Data) 
+        public UInt32 Ffb_h_DeviceID(IntPtr Packet, ref int DeviceID) { return _Ffb_h_DeviceID(Packet, ref DeviceID); }
+        public UInt32 Ffb_h_Type(IntPtr Packet, ref FFBPType Type) { return _Ffb_h_Type(Packet, ref Type); }
+        public UInt32 Ffb_h_Packet(IntPtr Packet, ref UInt32 Type, ref Int32 DataSize, ref Byte[] Data)
         {
             IntPtr buf = IntPtr.Zero;
-            UInt32 res = _Ffb_h_Packet(Packet, ref  Type, ref  DataSize, ref buf);
+            UInt32 res = _Ffb_h_Packet(Packet, ref Type, ref DataSize, ref buf);
             if (res != 0)
                 return res;
 
@@ -649,20 +663,21 @@ namespace vJoyInterfaceWrap
             Marshal.Copy(buf, Data, 0, DataSize);
             return res;
         }
-        public UInt32 Ffb_h_EBI(IntPtr Packet, ref Int32 Index) { return _Ffb_h_EBI( Packet, ref  Index);}
+        public UInt32 Ffb_h_EBI(IntPtr Packet, ref Int32 Index) { return _Ffb_h_EBI(Packet, ref Index); }
         [Obsolete("use Ffb_h_Eff_Report instead")]
-        public UInt32 Ffb_h_Eff_Const(IntPtr Packet, ref FFB_EFF_CONST Effect) { return _Ffb_h_Eff_Const(Packet, ref  Effect); }
-        public UInt32 Ffb_h_Eff_Report(IntPtr Packet, ref FFB_EFF_REPORT Effect) { return _Ffb_h_Eff_Report(Packet, ref  Effect); }
-        public UInt32 Ffb_h_DevCtrl(IntPtr Packet, ref FFB_CTRL Control) { return _Ffb_h_DevCtrl(Packet, ref  Control); }
-        public UInt32 Ffb_h_EffOp(IntPtr Packet, ref FFB_EFF_OP Operation) { return _Ffb_h_EffOp( Packet, ref  Operation);}
-        public UInt32 Ffb_h_DevGain(IntPtr Packet, ref Byte Gain) { return _Ffb_h_DevGain( Packet, ref  Gain);}
-        public UInt32 Ffb_h_Eff_Cond(IntPtr Packet, ref FFB_EFF_COND Condition) { return _Ffb_h_Eff_Cond( Packet, ref  Condition); }
-        public UInt32 Ffb_h_Eff_Envlp(IntPtr Packet, ref FFB_EFF_ENVLP Envelope) { return _Ffb_h_Eff_Envlp( Packet, ref  Envelope); }
-        public UInt32 Ffb_h_Eff_Period(IntPtr Packet, ref FFB_EFF_PERIOD Effect) { return _Ffb_h_Eff_Period( Packet, ref  Effect); }
-        public UInt32 Ffb_h_EffNew(IntPtr Packet, ref FFBEType Effect) { return _Ffb_h_EffNew( Packet, ref  Effect); }
-        public UInt32 Ffb_h_Eff_Ramp(IntPtr Packet, ref FFB_EFF_RAMP RampEffect) { return _Ffb_h_Eff_Ramp( Packet, ref  RampEffect);}
-        public UInt32 Ffb_h_Eff_Constant(IntPtr Packet, ref FFB_EFF_CONSTANT ConstantEffect) { return _Ffb_h_Eff_Constant(Packet, ref  ConstantEffect); }
-        public bool Ffb_h_UpdatePID(UInt32 rID, ref FFB_DEVICE_PID PID) { return _Ffb_h_UpdatePID(rID, ref PID); }
+        public UInt32 Ffb_h_Eff_Const(IntPtr Packet, ref FFB_EFF_CONST Effect) { return _Ffb_h_Eff_Const(Packet, ref Effect); }
+        public UInt32 Ffb_h_Eff_Report(IntPtr Packet, ref FFB_EFF_REPORT Effect) { return _Ffb_h_Eff_Report(Packet, ref Effect); }
+        public UInt32 Ffb_h_DevCtrl(IntPtr Packet, ref FFB_CTRL Control) { return _Ffb_h_DevCtrl(Packet, ref Control); }
+        public UInt32 Ffb_h_EffOp(IntPtr Packet, ref FFB_EFF_OP Operation) { return _Ffb_h_EffOp(Packet, ref Operation); }
+        public UInt32 Ffb_h_DevGain(IntPtr Packet, ref Byte Gain) { return _Ffb_h_DevGain(Packet, ref Gain); }
+        public UInt32 Ffb_h_Eff_Cond(IntPtr Packet, ref FFB_EFF_COND Condition) { return _Ffb_h_Eff_Cond(Packet, ref Condition); }
+        public UInt32 Ffb_h_Eff_Envlp(IntPtr Packet, ref FFB_EFF_ENVLP Envelope) { return _Ffb_h_Eff_Envlp(Packet, ref Envelope); }
+        public UInt32 Ffb_h_Eff_Period(IntPtr Packet, ref FFB_EFF_PERIOD Effect) { return _Ffb_h_Eff_Period(Packet, ref Effect); }
+        public UInt32 Ffb_h_EffNew(IntPtr Packet, ref FFBEType Effect) { return _Ffb_h_EffNew(Packet, ref Effect); }
+        public UInt32 Ffb_h_Eff_Ramp(IntPtr Packet, ref FFB_EFF_RAMP RampEffect) { return _Ffb_h_Eff_Ramp(Packet, ref RampEffect); }
+        public UInt32 Ffb_h_Eff_Constant(IntPtr Packet, ref FFB_EFF_CONSTANT ConstantEffect) { return _Ffb_h_Eff_Constant(Packet, ref ConstantEffect); }
+        public bool Ffb_h_WritePID(UInt32 rID, ref FFB_DEVICE_PID PID) { return _Ffb_h_WritePID(rID, ref PID); }
+        public bool Ffb_h_ReadPID(UInt32 rID, ref FFB_DEVICE_PID PID) { return _Ffb_h_ReadPID(rID, ref PID); }
 
     }
 }

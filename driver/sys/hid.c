@@ -106,6 +106,7 @@ Return Value:
 
     device = WdfIoQueueGetDevice(Queue);
     devContext = GetDeviceContext(device);
+    TraceEvents(TRACE_LEVEL_INFORMATION, DBG_INIT, "vJoyEvtInternalDeviceControl: IoControlCode=%x\n", IoControlCode);
 
     //
     // Please note that HIDCLASS provides the buffer in the Irp->UserBuffer
@@ -118,170 +119,170 @@ Return Value:
 
     switch (IoControlCode) {
 
-    case IOCTL_HID_GET_DEVICE_DESCRIPTOR:
-        //
-        // Retrieves the device's HID descriptor.
-        //
-        status = vJoyGetHidDescriptor(device, Request);
-        break;
-    case IOCTL_HID_GET_DEVICE_ATTRIBUTES:
-        //
-        //Retrieves a device's attributes in a HID_DEVICE_ATTRIBUTES structure.
-        //
-        status = vJoyGetDeviceAttributes(Request);
-        break;
+        case IOCTL_HID_GET_DEVICE_DESCRIPTOR:
+            //
+            // Retrieves the device's HID descriptor.
+            //
+            status = vJoyGetHidDescriptor(device, Request);
+            break;
+        case IOCTL_HID_GET_DEVICE_ATTRIBUTES:
+            //
+            //Retrieves a device's attributes in a HID_DEVICE_ATTRIBUTES structure.
+            //
+            status = vJoyGetDeviceAttributes(Request);
+            break;
 
-    case IOCTL_HID_GET_REPORT_DESCRIPTOR:
-        //
-        //Obtains the report descriptor for the HID device.
-        //
-        status = vJoyGetReportDescriptor(device, Request);
-        break;
+        case IOCTL_HID_GET_REPORT_DESCRIPTOR:
+            //
+            //Obtains the report descriptor for the HID device.
+            //
+            status = vJoyGetReportDescriptor(device, Request);
+            break;
 
 
-    case IOCTL_HID_READ_REPORT:
+        case IOCTL_HID_READ_REPORT:
 
-        //
-        // Returns a report from the device into a class driver-supplied buffer.
-        // For now queue the request to the manual queue. The request will
-        // be retrived and completd when continuous reader reads new data
-        // from the device.
-        //
-        status = WdfRequestForwardToIoQueue(Request, devContext->ReadReportMsgQueue);
+            //
+            // Returns a report from the device into a class driver-supplied buffer.
+            // For now queue the request to the manual queue. The request will
+            // be retrived and completd when continuous reader reads new data
+            // from the device.
+            //
+            status = WdfRequestForwardToIoQueue(Request, devContext->ReadReportMsgQueue);
 
-        if (!NT_SUCCESS(status)) {
-            TraceEvents(TRACE_LEVEL_ERROR, DBG_IOCTL,
-                "WdfRequestForwardToIoQueue failed with status: 0x%x\n", status);
+            if (!NT_SUCCESS(status)) {
+                TraceEvents(TRACE_LEVEL_ERROR, DBG_IOCTL,
+                    "WdfRequestForwardToIoQueue failed with status: 0x%x\n", status);
 
-            WdfRequestComplete(Request, status);
-        }
+                WdfRequestComplete(Request, status);
+            }
 
-        return;
+            return;
 
-        //
-        // This feature is only supported on WinXp and later. Compiling in W2K 
-        // build environment will fail without this conditional preprocessor statement.
-        //
+            //
+            // This feature is only supported on WinXp and later. Compiling in W2K 
+            // build environment will fail without this conditional preprocessor statement.
+            //
 #if (OSVER(NTDDI_VERSION) > NTDDI_WIN2K)
 
-    case IOCTL_HID_SEND_IDLE_NOTIFICATION_REQUEST:
+        case IOCTL_HID_SEND_IDLE_NOTIFICATION_REQUEST:
 
-        //
-        // Hidclass sends this IOCTL for devices that have opted-in for Selective
-        // Suspend feature. This feature is enabled by adding a registry value
-        // "SelectiveSuspendEnabled" = 1 in the hardware key through inf file 
-        // (see hidusbfx2.inf). Since hidclass is the power policy owner for 
-        // this stack, it controls when to send idle notification and when to 
-        // cancel it. This IOCTL is passed to USB stack. USB stack pends it. 
-        // USB stack completes the request when it determines that the device is
-        // idle. Hidclass's idle notification callback get called that requests a 
-        // wait-wake Irp and subsequently powers down the device. 
-        // The device is powered-up either when a handle is opened for the PDOs 
-        // exposed by hidclass, or when usb stack completes wait
-        // wake request. In the first case, hidclass cancels the notification 
-        // request (pended with usb stack), cancels wait-wake Irp and powers up
-        // the device. In the second case, an external wake event triggers completion
-        // of wait-wake irp and powering up of device.
-        //
-        TraceEvents(TRACE_LEVEL_ERROR, DBG_IOCTL, "IOCTL_HID_SEND_IDLE_NOTIFICATION_REQUEST\n");
-        status = STATUS_NOT_SUPPORTED;
-        break;
+            //
+            // Hidclass sends this IOCTL for devices that have opted-in for Selective
+            // Suspend feature. This feature is enabled by adding a registry value
+            // "SelectiveSuspendEnabled" = 1 in the hardware key through inf file 
+            // (see hidusbfx2.inf). Since hidclass is the power policy owner for 
+            // this stack, it controls when to send idle notification and when to 
+            // cancel it. This IOCTL is passed to USB stack. USB stack pends it. 
+            // USB stack completes the request when it determines that the device is
+            // idle. Hidclass's idle notification callback get called that requests a 
+            // wait-wake Irp and subsequently powers down the device. 
+            // The device is powered-up either when a handle is opened for the PDOs 
+            // exposed by hidclass, or when usb stack completes wait
+            // wake request. In the first case, hidclass cancels the notification 
+            // request (pended with usb stack), cancels wait-wake Irp and powers up
+            // the device. In the second case, an external wake event triggers completion
+            // of wait-wake irp and powering up of device.
+            //
+            TraceEvents(TRACE_LEVEL_ERROR, DBG_IOCTL, "IOCTL_HID_SEND_IDLE_NOTIFICATION_REQUEST\n");
+            status = STATUS_NOT_SUPPORTED;
+            break;
 
 #endif // (OSVER(NTDDI_VERSION) > NTDDI_WIN2K)
 
 
-    case IOCTL_HID_GET_FEATURE:
-        //
-        // returns a feature report associated with a top-level collection
-        //
-        TraceEvents(TRACE_LEVEL_ERROR, DBG_IOCTL, "IOCTL_HID_GET_FEATURE\n");
-        status = vJoyGetFeature(Request);
-        WdfRequestComplete(Request, status);
-        return;
-
-    case IOCTL_HID_SET_FEATURE:
-        //
-        // This sends a HID class feature report to a top-level collection of
-        // a HID class device.
-        //
-
-    case IOCTL_HID_WRITE_REPORT:
-
-        // Extracting the ID from the request
-        id = FfbGetDevIDfromFfbRequest(Request);
-
-        // If FFB is not active then just reject this request
-        if (!devContext->FfbEnable[id-1]) {
-            WdfRequestComplete(Request, STATUS_SUCCESS);
-            return;
-        };
-
-        // If FFB is active then forward this request to the WriteQ and return
-        status = WdfRequestForwardToIoQueue(Request, devContext->FfbWriteQ[id-1]);
-        if (!NT_SUCCESS(status)) {
-            TraceEvents(TRACE_LEVEL_ERROR, DBG_IOCTL,
-                "WdfRequestForwardToIoQueue (FfbWriteQ[%d]) failed with status: 0x%x\n", id - 1, status);
+        case IOCTL_HID_GET_FEATURE:
+            //
+            // returns a feature report associated with a top-level collection
+            //
+            TraceEvents(TRACE_LEVEL_ERROR, DBG_IOCTL, "IOCTL_HID_GET_FEATURE\n");
+            status = vJoyGetFeature(Request);
             WdfRequestComplete(Request, status);
-        }
-        return;
+            return;
+
+        case IOCTL_HID_SET_FEATURE:
+            //
+            // This sends a HID class feature report to a top-level collection of
+            // a HID class device.
+            //
+
+        case IOCTL_HID_WRITE_REPORT:
+
+            // Extracting the ID from the request
+            id = FfbGetDevIDfromFfbRequest(Request);
+
+            // If FFB is not active then just reject this request
+            if (!devContext->FfbEnable[id-1]) {
+                WdfRequestComplete(Request, STATUS_SUCCESS);
+                return;
+            };
+
+            // If FFB is active then forward this request to the WriteQ and return
+            status = WdfRequestForwardToIoQueue(Request, devContext->FfbWriteQ[id-1]);
+            if (!NT_SUCCESS(status)) {
+                TraceEvents(TRACE_LEVEL_ERROR, DBG_IOCTL,
+                    "WdfRequestForwardToIoQueue (FfbWriteQ[%d]) failed with status: 0x%x\n", id - 1, status);
+                WdfRequestComplete(Request, status);
+            }
+            return;
 
 
-    case IOCTL_HID_GET_INPUT_REPORT:
-        //
-        // returns a HID class input report associated with a top-level
-        // collection of a HID class device.
-        //
-        TraceEvents(TRACE_LEVEL_ERROR, DBG_IOCTL, "IOCTL_HID_GET_INPUT_REPORT\n");
-        status = STATUS_NOT_SUPPORTED;
-        break;
+        case IOCTL_HID_GET_INPUT_REPORT:
+            //
+            // returns a HID class input report associated with a top-level
+            // collection of a HID class device.
+            //
+            TraceEvents(TRACE_LEVEL_ERROR, DBG_IOCTL, "IOCTL_HID_GET_INPUT_REPORT\n");
+            status = STATUS_NOT_SUPPORTED;
+            break;
 
-    case IOCTL_HID_SET_OUTPUT_REPORT:
-        //
-        // sends a HID class output report to a top-level collection of a HID
-        // class device.
-        //
-        TraceEvents(TRACE_LEVEL_ERROR, DBG_IOCTL, "IOCTL_HID_SET_OUTPUT_REPORT\n");
-        status = STATUS_NOT_SUPPORTED;
-        break;
+        case IOCTL_HID_SET_OUTPUT_REPORT:
+            //
+            // sends a HID class output report to a top-level collection of a HID
+            // class device.
+            //
+            TraceEvents(TRACE_LEVEL_ERROR, DBG_IOCTL, "IOCTL_HID_SET_OUTPUT_REPORT\n");
+            status = STATUS_NOT_SUPPORTED;
+            break;
 
-    case IOCTL_HID_GET_STRING:
-        //
-        // Requests that the HID minidriver retrieve a human-readable string
-        // for either the manufacturer ID, the product ID, or the serial number
-        // from the string descriptor of the device. The minidriver must send
-        // a Get String Descriptor request to the device, in order to retrieve
-        // the string descriptor, then it must extract the string at the
-        // appropriate index from the string descriptor and return it in the
-        // output buffer indicated by the IRP. Before sending the Get String
-        // Descriptor request, the minidriver must retrieve the appropriate
-        // index for the manufacturer ID, the product ID or the serial number
-        // from the device extension of a top level collection associated with
-        // the device.
-        //
-        status = vJoyGetHidString(Request);
-        //TraceEvents(TRACE_LEVEL_ERROR, DBG_IOCTL,   "IOCTL_HID_GET_STRING\n");
-        //status = STATUS_NOT_SUPPORTED;
-        break;
+        case IOCTL_HID_GET_STRING:
+            //
+            // Requests that the HID minidriver retrieve a human-readable string
+            // for either the manufacturer ID, the product ID, or the serial number
+            // from the string descriptor of the device. The minidriver must send
+            // a Get String Descriptor request to the device, in order to retrieve
+            // the string descriptor, then it must extract the string at the
+            // appropriate index from the string descriptor and return it in the
+            // output buffer indicated by the IRP. Before sending the Get String
+            // Descriptor request, the minidriver must retrieve the appropriate
+            // index for the manufacturer ID, the product ID or the serial number
+            // from the device extension of a top level collection associated with
+            // the device.
+            //
+            status = vJoyGetHidString(Request);
+            //TraceEvents(TRACE_LEVEL_ERROR, DBG_IOCTL,   "IOCTL_HID_GET_STRING\n");
+            //status = STATUS_NOT_SUPPORTED;
+            break;
 
-    case IOCTL_HID_ACTIVATE_DEVICE:
-        //
-        // Makes the device ready for I/O operations.
-        //
-        TraceEvents(TRACE_LEVEL_ERROR, DBG_IOCTL, "IOCTL_HID_ACTIVATE_DEVICE\n");
-        status = STATUS_NOT_SUPPORTED;
-        break;
-    case IOCTL_HID_DEACTIVATE_DEVICE:
-        //
-        // Causes the device to cease operations and terminate all outstanding
-        // I/O requests.
-        //
-        TraceEvents(TRACE_LEVEL_ERROR, DBG_IOCTL, "IOCTL_HID_DEACTIVATE_DEVICE\n");
-        status = STATUS_NOT_SUPPORTED;
-        break;
+        case IOCTL_HID_ACTIVATE_DEVICE:
+            //
+            // Makes the device ready for I/O operations.
+            //
+            TraceEvents(TRACE_LEVEL_ERROR, DBG_IOCTL, "IOCTL_HID_ACTIVATE_DEVICE\n");
+            status = STATUS_NOT_SUPPORTED;
+            break;
+        case IOCTL_HID_DEACTIVATE_DEVICE:
+            //
+            // Causes the device to cease operations and terminate all outstanding
+            // I/O requests.
+            //
+            TraceEvents(TRACE_LEVEL_ERROR, DBG_IOCTL, "IOCTL_HID_DEACTIVATE_DEVICE\n");
+            status = STATUS_NOT_SUPPORTED;
+            break;
 
-    default:
-        status = STATUS_NOT_SUPPORTED;
-        break;
+        default:
+            status = STATUS_NOT_SUPPORTED;
+            break;
     }
 
     WdfRequestComplete(Request, status);
@@ -309,6 +310,9 @@ vJoyGetFeature(
     // Get request parameters
     WDF_REQUEST_PARAMETERS_INIT(&params);
     WdfRequestGetParameters(Request, &params);
+
+    TraceEvents(TRACE_LEVEL_INFORMATION, DBG_INIT, "vJoyGetFeature: controlcode=%x\n", params.Parameters.DeviceIoControl.IoControlCode);
+
     if (params.Parameters.DeviceIoControl.OutputBufferLength < sizeof(HID_XFER_PACKET)) {
         status = STATUS_BUFFER_TOO_SMALL;
         return status;
@@ -332,16 +336,20 @@ vJoyGetFeature(
         return status;
     }
 
-    TraceEvents(TRACE_LEVEL_INFORMATION, DBG_INIT, "vJoyGetFeature: id=%d, reportId=%x\n", id, (transferPacket->reportId&0x0F));
+    BYTE reportID = transferPacket->reportId&0x0F;
+    TraceEvents(TRACE_LEVEL_INFORMATION, DBG_INIT, "vJoyGetFeature: id=%d, xfer=%x reportId=%x\n", id, transferPacket->reportId, reportID);
 
+#if 1
     ////////////////////////////////////////
-    // Report ID 2
+    // Block Load Report ID 2
     // Byte[1]: Effect Block Index (1-40)
     // Byte[2]: Block Load Success (1-3)
     // Byte[3]: Block Load Full (1-3)
     // Byte[4]: Block Load Error (1-3)
     ////////////////////////////////////////
-    if ((transferPacket->reportId&0x0F) == 0x02) {
+    if (transferPacket->reportId == (HID_ID_BLKLDREP+0x10)) {
+        TraceEvents(TRACE_LEVEL_INFORMATION, DBG_INIT, "vJoyGetFeature: Block Load ucTmp[1]=%x ucTmp[2]=%x ucTmp[3]=%x ucTmp[4]=%x\n",
+            transferPacket->reportBuffer[1], transferPacket->reportBuffer[2], transferPacket->reportBuffer[3], transferPacket->reportBuffer[4]);
         ucTmp = (PUCHAR)transferPacket->reportBuffer;
         ucTmp[0] = transferPacket->reportId;
         // Lastly created Effect Block Index start at 1. 0 means not yet created
@@ -355,9 +363,60 @@ vJoyGetFeature(
             ucTmp[3] = 0; // Load Full = 0
             ucTmp[4] = 1; // Load Error =1
         };
-        TraceEvents(TRACE_LEVEL_INFORMATION, DBG_INIT, "vJoyGetFeature: ucTmp[1]=%d\n", ucTmp[1]);
+        TraceEvents(TRACE_LEVEL_INFORMATION, DBG_INIT, "vJoyGetFeature: Block Load ucTmp[1]=%x ucTmp[2]=%x ucTmp[3]=%x ucTmp[4]=%x\n",
+            transferPacket->reportBuffer[1], transferPacket->reportBuffer[2], transferPacket->reportBuffer[3], transferPacket->reportBuffer[4]);
     };
 
+    ////////////////////////////////////////
+    // Pool Report ID 3
+    // Byte[1]: RAM Pool size
+    // Byte[2]: RAM Pool size
+    // Byte[3]: Simultaneous Effects Max
+    // Byte[4]: Device Managed Pool (0-1) + Shared Parameter Blocks (0-1)
+    ////////////////////////////////////////
+    if (transferPacket->reportId == (HID_ID_POOLREP+0x10)) {
+        TraceEvents(TRACE_LEVEL_INFORMATION, DBG_INIT, "vJoyGetFeature: Pool ucTmp[1]=%x ucTmp[2]=%x ucTmp[3]=%x ucTmp[4]=%x\n",
+            transferPacket->reportBuffer[1], transferPacket->reportBuffer[2], transferPacket->reportBuffer[3], transferPacket->reportBuffer[4]);
+
+        ucTmp = (PUCHAR)transferPacket->reportBuffer;
+        ucTmp[0] = transferPacket->reportId;
+        if (devContext->FfbEnable[id-1]) {
+            ucTmp[1] = (UCHAR)((devContext->FfbPIDData[id-1].PIDPool.RAMPoolSize)&0xFF);
+            ucTmp[2] = (UCHAR)((devContext->FfbPIDData[id-1].PIDPool.RAMPoolSize>>8)&0xFF);
+            ucTmp[3] = (UCHAR)((devContext->FfbPIDData[id-1].PIDPool.MaxSimultaneousEffects)&0xFF);
+            ucTmp[4] = (UCHAR)((devContext->FfbPIDData[id-1].PIDPool.MemoryManagement)&0xFF);
+        } else {
+            ucTmp[1] = (UCHAR)(0);
+            ucTmp[2] = (UCHAR)(0);
+            ucTmp[3] = (UCHAR)(0);
+            ucTmp[4] = (UCHAR)(0);
+        }
+        TraceEvents(TRACE_LEVEL_INFORMATION, DBG_INIT, "vJoyGetFeature: Pool ucTmp[1]=%x ucTmp[2]=%x ucTmp[3]=%x ucTmp[4]=%x\n",
+            transferPacket->reportBuffer[1], transferPacket->reportBuffer[2], transferPacket->reportBuffer[3], transferPacket->reportBuffer[4]);
+    }
+#else
+
+    ////////////////////////////////////////
+    // Report ID 2
+    // Byte[1]: Effect Block Index (1-40)
+    // Byte[2]: Block Load Success (1-3)
+    // Byte[3]: Block Load Full (1-3)
+    // Byte[4]: Block Load Error (1-3)
+    ////////////////////////////////////////
+    if ((transferPacket->reportId&0x0F) == 0x02) {
+        ucTmp = (PUCHAR)transferPacket->reportBuffer;
+        ucTmp[0] = transferPacket->reportId;
+        ucTmp[1] = 1; // Effect Block Index = 1
+        ucTmp[3] = 0; // Load Full = 0
+        if (devContext->FfbEnable[id-1]) {
+            ucTmp[2] = 1; // Load Success = 1
+            ucTmp[4] = 0; // Load Error =0
+        } else {
+            ucTmp[2] = 0; // Load Success = 0
+            ucTmp[4] = 1; // Load Error =1
+        };
+    };
+#endif
     // Report ID 3?
     if ((transferPacket->reportId&0x0F) == 3 && !devContext->FfbEnable[id-1])
         status = STATUS_NO_SUCH_DEVICE;
@@ -402,6 +461,8 @@ Return Value:
 
     WDF_REQUEST_PARAMETERS_INIT(&params);
     WdfRequestGetParameters(Request, &params);
+
+    TraceEvents(TRACE_LEVEL_INFORMATION, DBG_INIT, "vJoySetFeature Enter\n", params.Parameters.DeviceIoControl);
 
     //
     // IOCTL_HID_SET_FEATURE & IOCTL_HID_GET_FEATURE are not METHOD_NIEHTER
@@ -595,21 +656,21 @@ Return Value:
     WdfRequestGetParameters(Request, &Parameters);
 
     switch ((ULONGLONG)Parameters.Parameters.DeviceIoControl.Type3InputBuffer & 0xffff) {
-    case HID_STRING_ID_IMANUFACTURER:
-        pwstrID = VENDOR_STR_ID;
-        break;
+        case HID_STRING_ID_IMANUFACTURER:
+            pwstrID = VENDOR_STR_ID;
+            break;
 
-    case HID_STRING_ID_IPRODUCT:
-        pwstrID = PRODUCT_STR_ID;
-        break;
+        case HID_STRING_ID_IPRODUCT:
+            pwstrID = PRODUCT_STR_ID;
+            break;
 
-    case HID_STRING_ID_ISERIALNUMBER:
-        pwstrID = SERIALNUMBER_STR;
-        break;
+        case HID_STRING_ID_ISERIALNUMBER:
+            pwstrID = SERIALNUMBER_STR;
+            break;
 
-    default:
-        pwstrID = NULL;
-        break;
+        default:
+            pwstrID = NULL;
+            break;
     }
 
     status = WdfRequestRetrieveOutputMemory(Request, &memory);
@@ -808,30 +869,30 @@ Return Value:
 --*/
 {
     switch (IoControlCode) {
-    case IOCTL_HID_GET_DEVICE_DESCRIPTOR:
-        return "IOCTL_HID_GET_DEVICE_DESCRIPTOR";
-    case IOCTL_HID_GET_REPORT_DESCRIPTOR:
-        return "IOCTL_HID_GET_REPORT_DESCRIPTOR";
-    case IOCTL_HID_READ_REPORT:
-        return "IOCTL_HID_READ_REPORT";
-    case IOCTL_HID_GET_DEVICE_ATTRIBUTES:
-        return "IOCTL_HID_GET_DEVICE_ATTRIBUTES";
-    case IOCTL_HID_WRITE_REPORT:
-        return "IOCTL_HID_WRITE_REPORT";
-    case IOCTL_HID_SET_FEATURE:
-        return "IOCTL_HID_SET_FEATURE";
-    case IOCTL_HID_GET_FEATURE:
-        return "IOCTL_HID_GET_FEATURE";
-    case IOCTL_HID_GET_STRING:
-        return "IOCTL_HID_GET_STRING";
-    case IOCTL_HID_ACTIVATE_DEVICE:
-        return "IOCTL_HID_ACTIVATE_DEVICE";
-    case IOCTL_HID_DEACTIVATE_DEVICE:
-        return "IOCTL_HID_DEACTIVATE_DEVICE";
-    case IOCTL_HID_SEND_IDLE_NOTIFICATION_REQUEST:
-        return "IOCTL_HID_SEND_IDLE_NOTIFICATION_REQUEST";
-    default:
-        return "Unknown IOCTL";
+        case IOCTL_HID_GET_DEVICE_DESCRIPTOR:
+            return "IOCTL_HID_GET_DEVICE_DESCRIPTOR";
+        case IOCTL_HID_GET_REPORT_DESCRIPTOR:
+            return "IOCTL_HID_GET_REPORT_DESCRIPTOR";
+        case IOCTL_HID_READ_REPORT:
+            return "IOCTL_HID_READ_REPORT";
+        case IOCTL_HID_GET_DEVICE_ATTRIBUTES:
+            return "IOCTL_HID_GET_DEVICE_ATTRIBUTES";
+        case IOCTL_HID_WRITE_REPORT:
+            return "IOCTL_HID_WRITE_REPORT";
+        case IOCTL_HID_SET_FEATURE:
+            return "IOCTL_HID_SET_FEATURE";
+        case IOCTL_HID_GET_FEATURE:
+            return "IOCTL_HID_GET_FEATURE";
+        case IOCTL_HID_GET_STRING:
+            return "IOCTL_HID_GET_STRING";
+        case IOCTL_HID_ACTIVATE_DEVICE:
+            return "IOCTL_HID_ACTIVATE_DEVICE";
+        case IOCTL_HID_DEACTIVATE_DEVICE:
+            return "IOCTL_HID_DEACTIVATE_DEVICE";
+        case IOCTL_HID_SEND_IDLE_NOTIFICATION_REQUEST:
+            return "IOCTL_HID_SEND_IDLE_NOTIFICATION_REQUEST";
+        default:
+            return "Unknown IOCTL";
     }
 }
 
@@ -894,25 +955,26 @@ Return Value:
     UNREFERENCED_PARAMETER(InputBufferLength);
 
     KdPrint(("vJoyEvtIoDeviceControl called\n"));
+    TraceEvents(TRACE_LEVEL_INFORMATION, DBG_INIT, "vJoyEvtIoDeviceControl: IoControlCode=%x\n", IoControlCode);
 
     PAGED_CODE();
 
     switch (IoControlCode) {
 
-    case 0x910: // Backward compatibility value of 	LOAD_POSITIONS
-    case LOAD_POSITIONS:
-        status = WdfRequestRetrieveInputBuffer(Request, sizeof(PJOYSTICK_POSITION), &buffer, &bufSize);
-        if (!NT_SUCCESS(status)) break;
+        case 0x910: // Backward compatibility value of 	LOAD_POSITIONS
+        case LOAD_POSITIONS:
+            status = WdfRequestRetrieveInputBuffer(Request, sizeof(PJOYSTICK_POSITION), &buffer, &bufSize);
+            if (!NT_SUCCESS(status)) break;
 
-        iReport = buffer;
-        pDevContext = GetDeviceContext(ControlDevContext->hParentDevice);
+            iReport = buffer;
+            pDevContext = GetDeviceContext(ControlDevContext->hParentDevice);
 
-        LoadPositions(iReport, pDevContext, bufSize);
-        break;
+            LoadPositions(iReport, pDevContext, bufSize);
+            break;
 
 
-    default:
-        status = STATUS_INVALID_DEVICE_REQUEST;
+        default:
+            status = STATUS_INVALID_DEVICE_REQUEST;
     }
 
     //
@@ -1566,7 +1628,7 @@ unsigned int GetInitValueFromRegistry(USHORT		id, PDEVICE_INIT_VALS data_buf)
     WDFKEY					KeyDevice, KeyParameters;
     WCHAR					DeviceKeyName[NameSize] = { 0 };
     UNICODE_STRING			strDev, strControl;
-    PCWSTR					Axes[] = { 
+    PCWSTR					Axes[] = {
         L"X", L"Y", L"Z", L"RX", L"RY", L"RZ", L"SL1", L"SL2",
         L"WHL", L"ACC", L"BRK", L"CLU", L"STE", L"AIL", L"RUD", L"THR",
         L"POV1", L"POV2", L"POV3", L"POV4" };
@@ -1581,7 +1643,7 @@ unsigned int GetInitValueFromRegistry(USHORT		id, PDEVICE_INIT_VALS data_buf)
     nAxes = sizeof(Axes) / sizeof(PCWSTR);
     // BM was sizeof(nButtons) / 8
     // Size in bytes, axes include pov (16+4)
-    if (data_buf->cb < (2 + nAxes + (sizeof(nButtons)/8) )) {
+    if (data_buf->cb < (2 + nAxes + (sizeof(nButtons)/8))) {
         LogEventWithStatus(ERRLOG_REP_REG_FAILED, L"GetInitValueFromRegistry: Buffer size too small", WdfDriverWdmGetDriverObject(WdfGetDriver()), status);
         return 0;
     };
@@ -1786,31 +1848,15 @@ void UpdateCollections(WDFDEVICE Device)
 */
 void InitializeDeviceContext(PDEVICE_EXTENSION   devContext)
 {
-    int i/*, j*/;
-
     // Init array of pointers to reports
-    for (i = 0; i<VJOY_MAX_N_DEVICES; i++)
-        devContext->positions[i] = NULL;
+    for (int id = 1; id<=VJOY_MAX_N_DEVICES; id++) {
+        devContext->positions[id-1] = NULL;
+        Ffb_ResetPIDData(devContext, id);
+    }
 
     devContext->nDevices = 0;
     devContext->ReportDescriptor = NULL;
     devContext->positionLock = NULL;
-
-    // Default lastly created BlockIndex is 0 (not created)
-    for (i = 0; i<VJOY_MAX_N_DEVICES; i++) {
-        PFFB_DEVICE_PID pid = &(devContext->FfbPIDData[i]);
-        pid->PIDPool.MaxSimultaneousEffects = 10;
-        pid->PIDPool.MemoryManagement = 0;
-        pid->PIDPool.RAMPoolSize = 0xFFFF;
-
-        pid->PIDBlockLoad.EffectBlockIndex = 1;
-        pid->PIDBlockLoad.LoadStatus = 0;
-        pid->PIDBlockLoad.RAMPoolAvailable = 0xFFFF;
-
-        for (int j = 0; j<MAX_FFB_EFFECTS_BLOCK_INDEX; j++) {
-            pid->EffectStates[j].EffectState = 0;
-        }
-    }
 }
 
 /*
@@ -1857,7 +1903,7 @@ void InitializeDefaultDev(PDEVICE_EXTENSION   devContext)
         devContext->positions[index]->ValRZ = data_buf.InitValAxis[5] * VJOY_AXIS_MAX_VALUE / 100 + 1;
         devContext->positions[index]->ValSlider = data_buf.InitValAxis[6] * VJOY_AXIS_MAX_VALUE / 100 + 1;
         devContext->positions[index]->ValDial = data_buf.InitValAxis[7] * VJOY_AXIS_MAX_VALUE / 100 + 1;
-        
+
         devContext->positions[index]->ValWheel = data_buf.InitValAxis[8] * VJOY_AXIS_MAX_VALUE / 100 + 1;
         devContext->positions[index]->ValAccelerator = data_buf.InitValAxis[9] * VJOY_AXIS_MAX_VALUE / 100 + 1;
         devContext->positions[index]->ValBrake = data_buf.InitValAxis[10] * VJOY_AXIS_MAX_VALUE / 100 + 1;
@@ -2259,6 +2305,7 @@ VOID FfbNotifyRead(
 #endif // 0
 
     // Other queue has a pending request?
+    //WdfIoQueueGetState(devContext->FfbWriteQ[id-1], &QueueRequests, NULL);
     WdfIoQueueGetState(devContext->FfbReadQ[id-1], &QueueRequests, NULL);
     if (!QueueRequests)
         return;
@@ -2289,6 +2336,7 @@ VOID FfbTransferData(
     BOOLEAN					ReadQueueReady = FALSE, WriteQueueReady = FALSE;
     ULONG					QueueRequests;
 
+    TraceEvents(TRACE_LEVEL_INFORMATION, DBG_INIT, "FfbTransferData Enter\n");
 
     ///////////  Loop ///////////////////////////////////////
     do {
@@ -2302,10 +2350,13 @@ VOID FfbTransferData(
         if (!transferPacket)
             return;
 
+
         // Get the command from the Write request
         WDF_REQUEST_PARAMETERS_INIT(&Params);
         WdfRequestGetParameters(WriteRequest, &Params);
         Cmd = Params.Parameters.DeviceIoControl.IoControlCode;
+
+        TraceEvents(TRACE_LEVEL_INFORMATION, DBG_INIT, "FfbTransferData IoControlCode=%x\n", Cmd);
 
         // Calculate the size of the Read data packet
         DataSize += sizeof(ULONG);						// Size of packet
@@ -2340,14 +2391,28 @@ VOID FfbTransferData(
 
         // Copy data to Read request output buffer
         if (bytesReturned >= 4) {
-            memcpy(&(ReadBuffer[0]), &DataSize, sizeof(ULONG));
-            memcpy(&(ReadBuffer[sizeof(ULONG)]), &Cmd, sizeof(ULONG));
-            memcpy(&(ReadBuffer[2 * sizeof(ULONG)]), transferPacket->reportBuffer, transferPacket->reportBufferLen);
+            memcpy((PUCHAR)&(ReadBuffer[0]), (PUCHAR)&DataSize, sizeof(ULONG));
+            memcpy((PUCHAR)&(ReadBuffer[sizeof(ULONG)]), (PUCHAR)&Cmd, sizeof(ULONG));
+            memcpy((PUCHAR)&(ReadBuffer[2 * sizeof(ULONG)]), transferPacket->reportBuffer, transferPacket->reportBufferLen);
         };
+
+
+        // Intercept Ffb Create New Effect and Free Effect
+
+        TraceEvents(TRACE_LEVEL_INFORMATION, DBG_INIT, "FfbTransferData transferPacket DataSize=%d, id=%x len=%d  buf=",
+            DataSize, transferPacket->reportId, transferPacket->reportBufferLen);
+        for (ULONG i = 0; i<transferPacket->reportBufferLen; i++) {
+            TraceEvents(TRACE_LEVEL_INFORMATION, DBG_INIT, "%x ",
+                transferPacket->reportBuffer[i]
+            );
+        }
+        TraceEvents(TRACE_LEVEL_INFORMATION, DBG_INIT, "\n");
+
+        Ffb_ProcessPacket(devContext, id, ReadBuffer);
+
 
         // Complete Read request
         WdfRequestCompleteWithInformation(ReadRequest, status, bytesReturned);
-
 
         // Complete Write Request
         WdfRequestCompleteWithInformation(WriteRequest, status, transferPacket->reportBufferLen);
@@ -2364,6 +2429,8 @@ VOID FfbTransferData(
         else
             WriteQueueReady = FALSE;
         DataExist = ReadQueueReady && WriteQueueReady;
+
+        TraceEvents(TRACE_LEVEL_INFORMATION, DBG_INIT, "FfbTransferData dataexist=%d\n", DataExist);
 
     } while (DataExist);
     ///////////  Loop ///////////////////////////////////////
@@ -2399,3 +2466,206 @@ int FfbGetDevIDfromFfbRequest(
     else
         return id;
 }
+
+void Ffb_ResetPIDData(
+    PDEVICE_EXTENSION   devContext,
+    int                 id)
+{
+    TraceEvents(TRACE_LEVEL_INFORMATION, DBG_INIT, "Ffb_ResetPIDData: RESET PID for id=%d\n", id);
+    // Default lastly created BlockIndex is 0 (not created)
+    PFFB_DEVICE_PID pid = &(devContext->FfbPIDData[id-1]);
+
+    pid->PIDPool.MaxSimultaneousEffects = 10;
+    // bit0=1:own managed pool
+    // bit1=0:one parameter block set for each effect block
+    pid->PIDPool.MemoryManagement = 0;
+    pid->PIDPool.RAMPoolSize = 0xFFFF;
+
+    pid->PIDBlockLoad.EffectBlockIndex = 0;
+    pid->PIDBlockLoad.LoadStatus = 0;
+    pid->PIDBlockLoad.RAMPoolAvailable = 0xFFFF;
+
+    Ffb_BlockIndexFreeAll(devContext, id);
+}
+
+
+BOOLEAN Ffb_CheckClientConnected(
+    PDEVICE_EXTENSION   devContext,
+    int                 id)
+{
+    ULONG QueueRequests;
+    WdfIoQueueGetState(devContext->FfbReadQ[id-1], &QueueRequests, NULL);
+    if (!QueueRequests)
+        return FALSE;
+    return TRUE;
+}
+
+void Ffb_BlockIndexFreeAll(
+    PDEVICE_EXTENSION   devContext,
+    int                 id)
+{
+    TraceEvents(TRACE_LEVEL_INFORMATION, DBG_INIT, "FfbBlockIndexFreeAll: enter\n");
+    PFFB_DEVICE_PID pid = &(devContext->FfbPIDData[id-1]);
+    pid->LastEID = 0;
+    pid->NextFreeEID = VJOY_FFB_FIRST_EID;
+    for (int j = 0; j<VJOY_FFB_MAX_EFFECTS_BLOCK_INDEX; j++) {
+        pid->EffectStates[j].State = 0;
+        pid->EffectStates[j].PIDEffectStateReport = 0;
+    }
+}
+
+void Ffb_BlockIndexFree(
+    PDEVICE_EXTENSION   devContext,
+    int                 id,
+    BYTE                EffectID
+)
+{
+    TraceEvents(TRACE_LEVEL_INFORMATION, DBG_INIT, "FfbBlockIndexFree: enter\n");
+    PFFB_DEVICE_PID pid = &(devContext->FfbPIDData[id-1]);
+    if (EffectID<1 || EffectID >= VJOY_FFB_MAX_EFFECTS_BLOCK_INDEX) {
+        TraceEvents(TRACE_LEVEL_INFORMATION, DBG_INIT, "FfbBlockIndexFree: wrong id=%d\n", EffectID);
+        return;
+    }
+    pid->EffectStates[EffectID-1].State = VJOY_FFB_EffectState_Free;
+    pid->NextFreeEID = EffectID;
+
+    TraceEvents(TRACE_LEVEL_INFORMATION, DBG_INIT, "FfbBlockIndexFree: NextEID=%d\n", pid->NextFreeEID);
+}
+
+BYTE Ffb_GetNextFreeEffect(
+    PDEVICE_EXTENSION   devContext,
+    int                 id)
+{
+    PFFB_DEVICE_PID pid = &(devContext->FfbPIDData[id-1]);
+    TraceEvents(TRACE_LEVEL_INFORMATION, DBG_INIT, "FfbGetNextFreeEffect: enter with id=%d, NextEID=%d\n", id, pid->NextFreeEID);
+
+    // Check for effect full
+    if (pid->NextFreeEID > VJOY_FFB_MAX_EFFECTS_BLOCK_INDEX) {
+        TraceEvents(TRACE_LEVEL_INFORMATION, DBG_INIT, "FfbGetNextFreeEffect: full! (NextEID=%d)\n", pid->NextFreeEID);
+        return 0;
+    }
+    // Check current slot not in use
+    if (pid->EffectStates[pid->NextFreeEID-1].State != VJOY_FFB_EffectState_Free) {
+        TraceEvents(TRACE_LEVEL_INFORMATION, DBG_INIT, "FfbGetNextFreeEffect: already used! (NextEID=%d)\n", pid->NextFreeEID);
+        return 0;
+    }
+
+    // Pick next free slot as new current slot
+    pid->LastEID = pid->NextFreeEID;
+    BYTE effectId = pid->LastEID;
+    pid->EffectStates[effectId-1].State = VJOY_FFB_EffectState_Allocated;
+
+    // Find the next free slot
+    do {
+        pid->NextFreeEID++;
+        if (pid->NextFreeEID > VJOY_FFB_MAX_EFFECTS_BLOCK_INDEX)
+            break;  // the last slot was taken
+    } while (pid->EffectStates[pid->NextFreeEID-1].State != VJOY_FFB_EffectState_Free);
+
+    TraceEvents(TRACE_LEVEL_INFORMATION, DBG_INIT, "FfbGetNextFreeEffect: took effectId=%d, NextEID=%d)\n", effectId, pid->NextFreeEID);
+
+    return effectId;
+}
+
+BOOLEAN Ffb_ProcessPacket(
+    PDEVICE_EXTENSION   devContext,
+    int                 id,
+    PUCHAR              buffer)
+{
+    // Routine validity checks
+    PFFB_DEVICE_PID pid = &(devContext->FfbPIDData[id-1]);
+    ULONG len = 0;
+    ULONG cmd = 0;
+
+    TraceEvents(TRACE_LEVEL_INFORMATION, DBG_INIT, "Ffb_ProcessPacket: enter\n");
+
+    //KdBreakPoint();
+    if (!buffer)
+        return FALSE;
+
+    memcpy((PUCHAR)&len, (PUCHAR)&(buffer[0]), sizeof(ULONG));
+    memcpy((PUCHAR)&cmd, (PUCHAR)&(buffer[sizeof(ULONG)]), sizeof(ULONG));
+
+    TraceEvents(TRACE_LEVEL_INFORMATION, DBG_INIT, "Ffb_ProcessPacket: before len=%d, cmd=%x buf=", len, cmd);
+
+    if (len<8)
+        return FALSE;
+
+    PUCHAR packet = (PUCHAR)&buffer[2*sizeof(ULONG)];
+    for (ULONG i = 0; i<(len-8); i++) {
+        TraceEvents(TRACE_LEVEL_INFORMATION, DBG_INIT, "%x ",
+            packet[i]
+        );
+    }
+    TraceEvents(TRACE_LEVEL_INFORMATION, DBG_INIT, "\n");
+
+
+
+    // Get the type
+    BYTE tp = (packet[0]) & 0x0F;
+    BYTE DeviceID = ((packet[0]&0xF0) >> 4);
+    // This is a feature then mark it as such
+    if (cmd == 0xb0191) // IOCTL_HID_SET_FEATURE ?
+        tp += 0x10;
+
+    TraceEvents(TRACE_LEVEL_INFORMATION, DBG_INIT, "Ffb_ProcessPacket: id=%d DeviceID=%d tp=%x\n", id, DeviceID, tp);
+
+    switch (tp) {
+
+        case HID_ID_CTRLREP: {
+            BYTE Control = packet[1];
+            TraceEvents(TRACE_LEVEL_INFORMATION, DBG_INIT, "Ffb_ProcessPacket: PID DEVICE CONTROL=%d\n", Control);
+            switch (Control) {
+                // CTRL_DEVRST
+                // Device Reset– Clears any device paused condition, enables all actuators and clears all effects from memory.
+                case 4: {
+                    Ffb_ResetPIDData(devContext, id);
+                    TraceEvents(TRACE_LEVEL_INFORMATION, DBG_INIT, "Ffb_ProcessPacket: PID RESET !\n");
+                } break;
+            }
+        } break;
+
+        case HID_ID_BLKFRREP: {
+            BYTE eid = packet[1];
+            TraceEvents(TRACE_LEVEL_INFORMATION, DBG_INIT, "Ffb_ProcessPacket: BLOCK FREE eid=%d\n", eid);
+            Ffb_BlockIndexFree(devContext, id, eid);
+        } break;
+
+        case (HID_ID_NEWEFREP+0x10): {
+            BYTE eid = Ffb_GetNextFreeEffect(devContext, id);
+            packet[2] = eid;
+            pid->PIDBlockLoad.EffectBlockIndex = eid;
+            if (eid!=0)
+                pid->PIDBlockLoad.LoadStatus = 1;
+            else
+                pid->PIDBlockLoad.LoadStatus = 3;
+            TraceEvents(TRACE_LEVEL_INFORMATION, DBG_INIT, "Ffb_ProcessPacket: CREATE NEW EFFECT eid=%d\n", eid);
+        } break;
+
+        case (HID_ID_BLKLDREP+0x10): {
+            TraceEvents(TRACE_LEVEL_INFORMATION, DBG_INIT, "Ffb_ProcessPacket: BLOCK LOAD\n");
+        } break;
+
+        case (HID_ID_POOLREP+0x10): {
+            TraceEvents(TRACE_LEVEL_INFORMATION, DBG_INIT, "Ffb_ProcessPacket: POOL\n");
+        } break;
+
+        case (HID_ID_STATEREP+0x10): {
+            TraceEvents(TRACE_LEVEL_INFORMATION, DBG_INIT, "Ffb_ProcessPacket: STATE REPORT\n");
+        } break;
+
+    }
+
+    TraceEvents(TRACE_LEVEL_INFORMATION, DBG_INIT, "Ffb_ProcessPacket: after buf=");
+    packet = (PUCHAR)&buffer[2*sizeof(ULONG)];
+    for (ULONG i = 0; i<(len-8); i++) {
+        TraceEvents(TRACE_LEVEL_INFORMATION, DBG_INIT, "%x ",
+            packet[i]
+        );
+    }
+    TraceEvents(TRACE_LEVEL_INFORMATION, DBG_INIT, "\n");
+
+
+    return TRUE;
+}
+
