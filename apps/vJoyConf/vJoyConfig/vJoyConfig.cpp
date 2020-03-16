@@ -212,7 +212,7 @@ bool ParseCommandLine(int argc, _TCHAR* argv[])
             g_isAxisAccelerator = cl_isParamExist(argc, argv, L"-a", L"accelerator");
             g_isAxisBrake = cl_isParamExist(argc, argv, L"-a", L"brake");
             g_isAxisClutch = cl_isParamExist(argc, argv, L"-a", L"clutch");
-            g_isAxisSteering = cl_isParamExist(argc, argv, L"-a", L"steerin");
+            g_isAxisSteering = cl_isParamExist(argc, argv, L"-a", L"steering");
             g_isAxisThrottle = cl_isParamExist(argc, argv, L"-a", L"throttle");
             g_isAxisRudder = cl_isParamExist(argc, argv, L"-a", L"rudder");
             g_isAxisAileron = cl_isParamExist(argc, argv, L"-a", L"aileron");

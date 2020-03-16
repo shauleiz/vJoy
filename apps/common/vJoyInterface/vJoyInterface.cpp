@@ -1342,7 +1342,7 @@ namespace vJoyNS {
             HID_USAGE_RUDDER        0xBA
             HID_USAGE_THROTTLE      0xBB
         */
-        if (rID < 1 || rID>16 || Axis<HID_USAGE_X || Axis>HID_USAGE_WHL)
+        if (rID < 1 || rID>16)
             return FALSE;
 
         switch (Axis) {
@@ -4099,10 +4099,12 @@ INT		GetControls(UINT rID)
     vJoyDeviceEntry(rID);
 
     // Clean  DeviceControls structure
-    vJoyDevices[rID].DeviceControls = { FALSE,
-        FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE,
-        FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE,
-        FALSE, FALSE, FALSE, 0, 0, 0 };
+    vJoyDevices[rID].DeviceControls = { 
+        FALSE,
+        FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE,
+        FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE,
+        FALSE, FALSE, FALSE, FALSE, FALSE, FALSE,
+        0, 0, 0 };
 
 
     // Get Button data
