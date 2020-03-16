@@ -54,6 +54,7 @@ BOOL CvJoyDevice::GetStatus(int id)
         RZ_Exist = GetVJDAxisExist(id, HID_USAGE_RZ); // Test if given axis defined in the specified VDJ
         SL0_Exist = GetVJDAxisExist(id, HID_USAGE_SL0); // Test if given axis defined in the specified VDJ
         SL1_Exist = GetVJDAxisExist(id, HID_USAGE_SL1); // Test if given axis defined in the specified VDJ
+       
         Wheel_Exist = GetVJDAxisExist(id, HID_USAGE_WHL);
         Accelerator_Exist = GetVJDAxisExist(id, HID_USAGE_ACCELERATOR);
         Brake_Exist = GetVJDAxisExist(id, HID_USAGE_BRAKE);

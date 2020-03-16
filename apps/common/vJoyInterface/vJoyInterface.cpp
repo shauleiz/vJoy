@@ -1342,7 +1342,7 @@ namespace vJoyNS {
             HID_USAGE_RUDDER        0xBA
             HID_USAGE_THROTTLE      0xBB
         */
-        if (rID < 1 || rID>16 || Axis<HID_USAGE_X || Axis>HID_USAGE_WHL)
+        if (rID < 1 || rID>16)
             return FALSE;
 
         switch (Axis) {
@@ -4099,10 +4099,12 @@ INT		GetControls(UINT rID)
     vJoyDeviceEntry(rID);
 
     // Clean  DeviceControls structure
-    vJoyDevices[rID].DeviceControls = { FALSE,
-        FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE,
-        FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE,
-        FALSE, FALSE, FALSE, 0, 0, 0 };
+    vJoyDevices[rID].DeviceControls = { 
+        FALSE,
+        FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE,
+        FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE,
+        FALSE, FALSE, FALSE, FALSE, FALSE, FALSE,
+        0, 0, 0 };
 
 
     // Get Button data
@@ -4166,8 +4168,30 @@ INT		GetControls(UINT rID)
                 case HID_USAGE_SL1:
                     vJoyDevices[rID].DeviceControls.Dial = TRUE;
                     break;
+
                 case HID_USAGE_WHL:
                     vJoyDevices[rID].DeviceControls.Wheel = TRUE;
+                    break;
+                case HID_USAGE_ACCELERATOR:
+                    vJoyDevices[rID].DeviceControls.Accelerator = TRUE;
+                    break;
+                case HID_USAGE_BRAKE:
+                    vJoyDevices[rID].DeviceControls.Brake = TRUE;
+                    break;
+                case HID_USAGE_CLUTCH:
+                    vJoyDevices[rID].DeviceControls.Clutch = TRUE;
+                    break;
+                case HID_USAGE_STEERING:
+                    vJoyDevices[rID].DeviceControls.Steering = TRUE;
+                    break;
+                case HID_USAGE_AILERON:
+                    vJoyDevices[rID].DeviceControls.Aileron = TRUE;
+                    break;
+                case HID_USAGE_RUDDER:
+                    vJoyDevices[rID].DeviceControls.Rudder = TRUE;
+                    break;
+                case HID_USAGE_THROTTLE:
+                    vJoyDevices[rID].DeviceControls.Throttle = TRUE;
                     break;
                 case HID_USAGE_POV:
                     if (vCaps[i].LogicalMax == 3)
