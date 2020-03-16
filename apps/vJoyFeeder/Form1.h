@@ -524,7 +524,7 @@ namespace vJoyDemo {
         ReportId = System::Convert::ToInt32(listBoxTarget->SelectedItem->ToString());
 
         // Send info to selected vJoy Device
-        if (!GetPosition(ReportId, (PVOID)&Report))
+        if (!GetPosition(ReportId, &Report))
             return;
         if (ReportId!=Report.bDevice)
             return;
@@ -798,7 +798,7 @@ namespace vJoyDemo {
         }
 
         // Send info to selected vJoy Device
-        UpdateVJD(ReportId, (PVOID)&Report);
+        UpdateVJD(ReportId, &Report);
     }
 
 #pragma endregion

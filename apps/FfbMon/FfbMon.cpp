@@ -27,7 +27,7 @@ _tmain(int argc, _TCHAR* argv[])
     UINT DevID = DEV_ID;
     USHORT Z = 0;
 
-    PVOID pPositionMessage;
+    PJOYSTICK_POSITION pPositionMessage;
     UINT	IoCode = LOAD_POSITIONS;
     UINT	IoSize = sizeof(JOYSTICK_POSITION);
     // HID_DEVICE_ATTRIBUTES attrib;
@@ -127,7 +127,7 @@ _tmain(int argc, _TCHAR* argv[])
 
         iReport.wAxisZ = Z;
 
-        pPositionMessage = (PVOID)(&iReport);
+        pPositionMessage = &iReport;
 
         if (!UpdateVJD(DevID, pPositionMessage)) {
             printf("Feeding vJoy device number %d failed - try to enable device then press enter\n", DevID);
@@ -165,7 +165,7 @@ void CALLBACK FfbFunction1(PVOID data, PVOID userdata)
 
     /////// Packet Device ID, and Type Block Index (if exists)
 #pragma region Packet Device ID, and Type Block Index
-    int DeviceID, BlockIndex;
+    UINT DeviceID, BlockIndex;
     FFBPType	Type;
     TCHAR	TypeStr[100];
 

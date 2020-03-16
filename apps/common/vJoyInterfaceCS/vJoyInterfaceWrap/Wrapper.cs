@@ -489,17 +489,17 @@ namespace vJoyInterfaceWrap
         private static extern bool _IsDeviceFfbEffect(UInt32 rID, UInt32 Effect);
 
         [DllImport("vJoyInterface.dll", EntryPoint = "Ffb_h_DeviceID")]
-        private static extern UInt32 _Ffb_h_DeviceID(IntPtr Packet, ref int DeviceID);
+        private static extern UInt32 _Ffb_h_DeviceID(IntPtr Packet, ref UInt32 DeviceID);
 
         [DllImport("vJoyInterface.dll", EntryPoint = "Ffb_h_Type")]
         private static extern UInt32 _Ffb_h_Type(IntPtr Packet, ref FFBPType Type);
 
         [DllImport("vJoyInterface.dll", EntryPoint = "Ffb_h_Packet")]
-        private static extern UInt32 _Ffb_h_Packet(IntPtr Packet, ref UInt32 Type, ref Int32 DataSize, ref IntPtr Data);
+        private static extern UInt32 _Ffb_h_Packet(IntPtr Packet, ref UInt32 Type, ref UInt32 DataSize, ref IntPtr Data);
 
 
         [DllImport("vJoyInterface.dll", EntryPoint = "Ffb_h_EBI")]
-        private static extern UInt32 _Ffb_h_EBI(IntPtr Packet, ref Int32 Index);
+        private static extern UInt32 _Ffb_h_EBI(IntPtr Packet, ref UInt32 Index);
 
 #pragma warning disable 618
         [DllImport("vJoyInterface.dll", EntryPoint = "Ffb_h_Eff_Const")]
@@ -536,11 +536,24 @@ namespace vJoyInterfaceWrap
         [DllImport("vJoyInterface.dll", EntryPoint = "Ffb_h_Eff_Constant")]
         private static extern UInt32 _Ffb_h_Eff_Constant(IntPtr Packet, ref FFB_EFF_CONSTANT ConstantEffect);
 
-        [DllImport("vJoyInterface.dll", EntryPoint = "Ffb_h_WritePID")]
-        private static extern bool _Ffb_h_WritePID(UInt32 rID, ref FFB_DEVICE_PID PIDBlockLoad);
+        // New API added with 2.2.0
+        [DllImport("vJoyInterface.dll", EntryPoint = "Ffb_h_EffectBlockIndex")]
+        private static extern UInt32 _Ffb_h_EffectBlockIndex(IntPtr packet, ref UInt32 effectId);
 
-        [DllImport("vJoyInterface.dll", EntryPoint = "Ffb_h_ReadPID")]
-        private static extern bool _Ffb_h_ReadPID(UInt32 rID, ref FFB_DEVICE_PID PIDBlockLoad);
+        [DllImport("vJoyInterface.dll", EntryPoint = "Ffb_h_CreateNewEffect")]
+        private static extern UInt32 _Ffb_h_CreateNewEffect(IntPtr packet, ref FFBEType effect, ref UInt32 newEffectId);
+
+        [DllImport("vJoyInterface.dll", EntryPoint = "FfbWritePID")]
+        private static extern UInt32 _Ffb_h_WritePID(UInt32 rID, ref FFB_DEVICE_PID PIDData);
+
+        [DllImport("vJoyInterface.dll", EntryPoint = "FfbReadPID")]
+        private static extern UInt32 _Ffb_h_ReadPID(UInt32 rID, ref FFB_DEVICE_PID PIDData);
+
+        [DllImport("vJoyInterface.dll", EntryPoint = "FfbUpdateEffectState")]
+        private static extern UInt32 _FfbUpdateEffectState(UInt32 rID, UInt32 EffectID, UInt32 effectState);
+
+        [DllImport("vJoyInterface.dll", EntryPoint = "GetPosition")]
+        private static extern UInt32 _GetPosition(UInt32 rID, ref JoystickState pPosition);
 
 
 
@@ -649,9 +662,9 @@ namespace vJoyInterfaceWrap
         public bool FfbStop(UInt32 rID) { return _FfbStop(rID); }
         public bool IsDeviceFfb(UInt32 rID) { return _IsDeviceFfb(rID); }
         public bool IsDeviceFfbEffect(UInt32 rID, UInt32 Effect) { return _IsDeviceFfbEffect(rID, Effect); }
-        public UInt32 Ffb_h_DeviceID(IntPtr Packet, ref int DeviceID) { return _Ffb_h_DeviceID(Packet, ref DeviceID); }
+        public UInt32 Ffb_h_DeviceID(IntPtr Packet, ref UInt32 DeviceID) { return _Ffb_h_DeviceID(Packet, ref DeviceID); }
         public UInt32 Ffb_h_Type(IntPtr Packet, ref FFBPType Type) { return _Ffb_h_Type(Packet, ref Type); }
-        public UInt32 Ffb_h_Packet(IntPtr Packet, ref UInt32 Type, ref Int32 DataSize, ref Byte[] Data)
+        public UInt32 Ffb_h_Packet(IntPtr Packet, ref UInt32 Type, ref UInt32 DataSize, ref Byte[] Data)
         {
             IntPtr buf = IntPtr.Zero;
             UInt32 res = _Ffb_h_Packet(Packet, ref Type, ref DataSize, ref buf);
@@ -660,10 +673,10 @@ namespace vJoyInterfaceWrap
 
             DataSize -= 8;
             Data = new byte[DataSize];
-            Marshal.Copy(buf, Data, 0, DataSize);
+            Marshal.Copy(buf, Data, 0, (Int32)DataSize);
             return res;
         }
-        public UInt32 Ffb_h_EBI(IntPtr Packet, ref Int32 Index) { return _Ffb_h_EBI(Packet, ref Index); }
+        public UInt32 Ffb_h_EBI(IntPtr Packet, ref UInt32 Index) { return _Ffb_h_EBI(Packet, ref Index); }
         [Obsolete("use Ffb_h_Eff_Report instead")]
         public UInt32 Ffb_h_Eff_Const(IntPtr Packet, ref FFB_EFF_CONST Effect) { return _Ffb_h_Eff_Const(Packet, ref Effect); }
         public UInt32 Ffb_h_Eff_Report(IntPtr Packet, ref FFB_EFF_REPORT Effect) { return _Ffb_h_Eff_Report(Packet, ref Effect); }
@@ -676,8 +689,12 @@ namespace vJoyInterfaceWrap
         public UInt32 Ffb_h_EffNew(IntPtr Packet, ref FFBEType Effect) { return _Ffb_h_EffNew(Packet, ref Effect); }
         public UInt32 Ffb_h_Eff_Ramp(IntPtr Packet, ref FFB_EFF_RAMP RampEffect) { return _Ffb_h_Eff_Ramp(Packet, ref RampEffect); }
         public UInt32 Ffb_h_Eff_Constant(IntPtr Packet, ref FFB_EFF_CONSTANT ConstantEffect) { return _Ffb_h_Eff_Constant(Packet, ref ConstantEffect); }
-        public bool Ffb_h_WritePID(UInt32 rID, ref FFB_DEVICE_PID PID) { return _Ffb_h_WritePID(rID, ref PID); }
-        public bool Ffb_h_ReadPID(UInt32 rID, ref FFB_DEVICE_PID PID) { return _Ffb_h_ReadPID(rID, ref PID); }
+        public UInt32 Ffb_h_EffectBlockIndex(IntPtr Packet, ref UInt32 effectId) { return _Ffb_h_EffectBlockIndex(Packet, ref effectId); }
+        public UInt32 Ffb_h_CreateNewEffect(IntPtr Packet, ref FFBEType effectType, ref UInt32 newEffectId) { return _Ffb_h_CreateNewEffect(Packet, ref effectType, ref newEffectId); }
+        public UInt32 FfbWritePID(UInt32 rID, ref FFB_DEVICE_PID PID) { return _Ffb_h_WritePID(rID, ref PID); }
+        public UInt32 FfbReadPID(UInt32 rID, ref FFB_DEVICE_PID PID) { return _Ffb_h_ReadPID(rID, ref PID); }
+        public UInt32 FfbUpdateEffectState(UInt32 rID, UInt32 effectId, UInt32 effectState) { return _FfbUpdateEffectState(rID, effectId, effectState); }
+        public UInt32 GetPosition(UInt32 rID, ref JoystickState pPosition) { return _GetPosition(rID, ref pPosition); }
 
     }
 }

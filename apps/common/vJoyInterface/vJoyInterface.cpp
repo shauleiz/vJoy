@@ -549,13 +549,13 @@ namespace vJoyNS {
         If the data is NULL or if the Report ID (rID) is out of range then the function returns FALSE.
         The function will return TRUE only if the writing was successful
     **/
-    VJOYINTERFACE_API BOOL	__cdecl	UpdateVJD(UINT rID, PVOID pData)
+    VJOYINTERFACE_API BOOL	__cdecl	UpdateVJD(UINT rID, JOYSTICK_POSITION* pPosition)
     {
         // Make sure the the ID is set
-        ((PJOYSTICK_POSITION)pData)->bDevice = (BYTE)rID;
+        pPosition->bDevice = (BYTE)rID;
 
         // Update saved position
-        SavePosition(rID, pData);
+        SavePosition(rID, pPosition);
 
         // Send joystick position structure to vJoy device
         return Update(rID);
@@ -564,10 +564,9 @@ namespace vJoyNS {
     /*
      Read current positions vJoy device
     */
-    VJOYINTERFACE_API DWORD	__cdecl	GetPosition(UINT rID, PVOID pData)
+    VJOYINTERFACE_API DWORD	__cdecl	GetPosition(UINT rID, JOYSTICK_POSITION* pPosition)
     {
         // Make sure the the ID is set
-        PJOYSTICK_POSITION pPosition = (PJOYSTICK_POSITION)pData;
         pPosition->bDevice = (BYTE)rID;
 
         // Update position
@@ -1780,7 +1779,7 @@ namespace vJoyNS {
 
     // FFB Helper functions
 
-    VJOYINTERFACE_API DWORD __cdecl Ffb_h_DeviceID(const FFB_DATA* Packet, int* DeviceID)
+    VJOYINTERFACE_API DWORD __cdecl Ffb_h_DeviceID(const FFB_DATA* Packet, UINT* DeviceID)
         // If valid device ID was found then returns ERROR_SUCCESS and sets the ID (Range 1-15) in DeviceID.
         // If Packet is NULL then returns ERROR_INVALID_PARAMETER. DeviceID is undefined.
         // If Packet is malformed or Device ID is out of range then returns ERROR_INVALID_DATA. DeviceID is undefined.
@@ -1819,7 +1818,7 @@ namespace vJoyNS {
         return ERROR_SUCCESS;
     }
 
-    VJOYINTERFACE_API DWORD __cdecl Ffb_h_Packet(const FFB_DATA* Packet, WORD* Type, int* DataSize, BYTE* Data[])
+    VJOYINTERFACE_API DWORD __cdecl Ffb_h_Packet(const FFB_DATA* Packet, WORD* Type, UINT* DataSize, BYTE* Data[])
         //If valid Packet was found then returns ERROR_SUCCESS and sets Type to IOCTRL value (Expected values are IOCTL_HID_WRITE_REPORT and IOCTL_HID_SET_FEATURE).
         //DataSize is set to the size (in bytes) of the payload data (FFB_DATA.data ).
         //Data holds the payload data (FFB_DATA.data ).
@@ -1838,20 +1837,20 @@ namespace vJoyNS {
         return ERROR_SUCCESS;
     }
 
-    VJOYINTERFACE_API DWORD __cdecl Ffb_h_EffectBlockIndex(const FFB_DATA* Packet, BYTE* Index)
+    VJOYINTERFACE_API DWORD __cdecl Ffb_h_EffectBlockIndex(const FFB_DATA* packet, UINT* effectId)
         //If valid Packet was found then returns ERROR_SUCCESS and sets Index to the value of Effect Block Index (if applicable). Expected value is '1'.
         //If Packet is NULL then returns ERROR_INVALID_PARAMETER. Output parameters are undefined.
         //If Packet is malformed or does not contain an Effect Block Index then returns ERROR_INVALID_DATA. Output parameters are undefined.
     {
         // Routine validity checks
-        if (!Packet)
+        if (!packet)
             return ERROR_INVALID_PARAMETER;
-        if (Packet->size <10)
+        if (packet->size <10)
             return ERROR_INVALID_DATA;
 
         // Some types don't carry Effect Block Index
         FFBPType Type;
-        if (Ffb_h_Type(Packet, &Type) != ERROR_SUCCESS)
+        if (Ffb_h_Type(packet, &Type) != ERROR_SUCCESS)
             return ERROR_INVALID_DATA;
         if (Type == PT_CTRLREP ||
             Type == PT_SMPLREP ||
@@ -1862,19 +1861,19 @@ namespace vJoyNS {
 
         if (Type == PT_NEWEFREP) {
             // Special case for new effect, ID is third byte
-            *Index = Packet->data[2];
+            *effectId = packet->data[2];
             return ERROR_SUCCESS;
         }
         // The Effect Block Index is the second byte (After the Report ID)
-        *Index = Packet->data[1];
+        *effectId = packet->data[1];
         return ERROR_SUCCESS;
     }
-    VJOYINTERFACE_API DWORD __cdecl Ffb_h_EBI(const FFB_DATA* Packet, int* Index)
+    VJOYINTERFACE_API DWORD __cdecl Ffb_h_EBI(const FFB_DATA* Packet, UINT* effectId)
         //If valid Packet was found then returns ERROR_SUCCESS and sets Index to the value of Effect Block Index (if applicable). Expected value is '1'.
         //If Packet is NULL then returns ERROR_INVALID_PARAMETER. Output parameters are undefined.
         //If Packet is malformed or does not contain an Effect Block Index then returns ERROR_INVALID_DATA. Output parameters are undefined.
     {
-        return Ffb_h_EffectBlockIndex(Packet, (PBYTE)Index);
+        return Ffb_h_EffectBlockIndex(Packet, effectId);
     }
 
     VJOYINTERFACE_API DWORD __cdecl Ffb_h_Eff_Report(const FFB_DATA* Packet, FFB_EFF_REPORT* Effect)
@@ -1985,29 +1984,29 @@ namespace vJoyNS {
         return ERROR_SUCCESS;
     }
 
-    VJOYINTERFACE_API DWORD __cdecl Ffb_h_CreateNewEffect(const FFB_DATA* Packet, FFBEType* Effect, BYTE* EffectID)
+    VJOYINTERFACE_API DWORD __cdecl Ffb_h_CreateNewEffect(const FFB_DATA* packet, FFBEType* effectType, UINT* newEffectId)
         //If valid Packet was found then returns ERROR_SUCCESS and sets the new Effect type
         //If Packet is NULL then returns ERROR_INVALID_PARAMETER. Output parameters are undefined.
         //If Packet is malformed  then returns ERROR_INVALID_DATA. Output parameters are undefined.
     {
         // Routine validity checks
-        if (!Packet)
+        if (!packet)
             return ERROR_INVALID_PARAMETER;
-        if (Packet->size <12)
+        if (packet->size <12)
             return ERROR_INVALID_DATA;
 
         // Some types don't carry Effect Block Index
         FFBPType Type;
-        if (Ffb_h_Type(Packet, &Type) != ERROR_SUCCESS)
+        if (Ffb_h_Type(packet, &Type) != ERROR_SUCCESS)
             return ERROR_INVALID_DATA;
         if (Type != PT_NEWEFREP)
             return ERROR_INVALID_DATA;
 
-        if (Effect!=nullptr) {
-            *Effect = static_cast <FFBEType>(Packet->data[1]);
+        if (effectType!=nullptr) {
+            *effectType = static_cast <FFBEType>(packet->data[1]);
         }
-        if (EffectID!=nullptr) {
-            *EffectID = static_cast <BYTE>(Packet->data[2]);
+        if (newEffectId!=nullptr) {
+            *newEffectId = static_cast <BYTE>(packet->data[2]);
         }
         return ERROR_SUCCESS;
     }
@@ -2145,10 +2144,10 @@ namespace vJoyNS {
         return ERROR_SUCCESS;
     }
 
-    VJOYINTERFACE_API DWORD		__cdecl FfbWritePID(UINT rID, FFB_DEVICE_PID* PIDBlockLoad)
+    VJOYINTERFACE_API DWORD		__cdecl FfbWritePID(UINT rID, FFB_DEVICE_PID* PIDData)
         // Update the PID Block load of the specified vJoy Device.
     {
-        PVOID pData = PIDBlockLoad;
+        PVOID pData = PIDData;
         if (!pData || (vJoyDevices.find(rID) == vJoyDevices.end()) || Get_h(rID) == INVALID_HANDLE_VALUE || Get_stat(rID) != VJD_STAT_OWN)
             return FALSE;
 
@@ -2185,10 +2184,10 @@ namespace vJoyNS {
         return res;
     }
 
-    VJOYINTERFACE_API DWORD		__cdecl FfbReadPID(UINT rID, FFB_DEVICE_PID* PIDBlockLoad)
+    VJOYINTERFACE_API DWORD		__cdecl FfbReadPID(UINT rID, FFB_DEVICE_PID* PIDData)
         // Update the PID Block load of the specified vJoy Device.
     {
-        PVOID pData = PIDBlockLoad;
+        PVOID pData = PIDData;
         if (!pData || (vJoyDevices.find(rID) == vJoyDevices.end()) || Get_h(rID) == INVALID_HANDLE_VALUE || Get_stat(rID) != VJD_STAT_OWN)
             return FALSE;
 
@@ -2204,7 +2203,7 @@ namespace vJoyNS {
         OverLapped.hEvent = hIoctlEvent;
 
         // Get FFB_DEVICE_PID structure from vJoy device
-        BOOL res = DeviceIoControl(Get_h(rID), IoCode, NULL, 0, (PVOID)PIDBlockLoad, IoSize, &bytes, &OverLapped);
+        BOOL res = DeviceIoControl(Get_h(rID), IoCode, NULL, 0, pData, IoSize, &bytes, &OverLapped);
         // immediate Return
         if (res) {
             CloseHandle(OverLapped.hEvent);
@@ -2250,17 +2249,17 @@ namespace vJoyNS {
         return res;
     }
 
-    VJOYINTERFACE_API DWORD __cdecl FfbUpdateEffectState(UINT rID, BYTE EffectID, BYTE effectState)
+    VJOYINTERFACE_API DWORD __cdecl FfbUpdateEffectState(UINT rID, UINT effectId, UINT effectState)
     // Update the Ffb state report (bitfield) of the specified effect in given vJoy Device.
     {
         FFB_DEVICE_PID PIDBlockLoad;
-        if (EffectID<VJOY_FFB_FIRST_EFFECT_ID || EffectID>VJOY_FFB_MAX_EFFECTS_BLOCK_INDEX)
+        if (effectId<VJOY_FFB_FIRST_EFFECT_ID || effectId>VJOY_FFB_MAX_EFFECTS_BLOCK_INDEX)
             return ERROR_INVALID_PARAMETER;
 
         DWORD stt = FfbReadPID(rID, &PIDBlockLoad);
         if (stt != ERROR_SUCCESS) return stt;
 
-        PIDBlockLoad.EffectStates[EffectID-1].PIDEffectStateReport = effectState;
+        PIDBlockLoad.EffectStates[effectId-1].PIDEffectStateReport = (BYTE)effectState;
         
         stt = FfbWritePID(rID, &PIDBlockLoad);
         if (stt != ERROR_SUCCESS) return stt;

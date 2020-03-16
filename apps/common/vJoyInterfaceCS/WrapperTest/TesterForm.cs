@@ -312,9 +312,9 @@ namespace WrapperTest
 
         private static void OnEffect(IntPtr data, IntPtr userData)
         {
-            int id = 0;
+            uint id = 0;
             FFBPType type = 0;
-            int DSize = 0;
+            uint DSize = 0;
             Byte[] arr = new Byte[20];
             UInt32 wType = 0;
             IntPtr bytes = IntPtr.Zero;
@@ -352,7 +352,7 @@ namespace WrapperTest
             };
 
             // Get the index of the effect block (Always 1)
-            int iBlock = 0;
+            uint iBlock = 0;
             result = joystick.Ffb_h_EBI(data, ref iBlock);
             if (result == 0)
                 dlg.FfbTextBox_Write(String.Format("\r\n > Effect Block Index: {0}", iBlock));
@@ -511,9 +511,9 @@ namespace WrapperTest
         private static void OnEffectObj(IntPtr data, object userData)
         {
 
-            int id = 0;
+            uint id = 0;
             FFBPType type = 0;
-            int DSize = 0;
+            uint DSize = 0;
             Byte[] arr = new Byte[20];
             UInt32 wType = 0;
             IntPtr bytes = IntPtr.Zero;
@@ -540,7 +540,7 @@ namespace WrapperTest
             };
 
             // Get the index of the effect block (Always 1)
-            int iBlock = 0;
+            uint iBlock = 0;
             result = joystick.Ffb_h_EBI(data, ref iBlock);
             if (result == 0)
                 dlg.FfbTextBox_Write(String.Format("\r\n > Effect Block Index: {0}", iBlock));
