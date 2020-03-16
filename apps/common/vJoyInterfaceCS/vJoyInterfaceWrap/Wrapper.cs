@@ -15,6 +15,13 @@ public enum HID_USAGES
     HID_USAGE_SL1 = 0x37,
     HID_USAGE_WHL = 0x38,
     HID_USAGE_POV = 0x39,
+    HID_USAGE_ACCELERATOR = 0xC4,
+    HID_USAGE_BRAKE = 0xC5,
+    HID_USAGE_CLUTCH = 0xC6,
+    HID_USAGE_STEERING = 0xC8,
+    HID_USAGE_AILERON = 0xB0,
+    HID_USAGE_RUDDER = 0xBA,
+    HID_USAGE_THROTTLE = 0xBB,
 }
 
 public enum VjdStat  /* Declares an enumeration data type called BOOLEAN */
@@ -108,13 +115,15 @@ namespace vJoyInterfaceWrap
         private static WrapFfbCbFunc wf;
         private static GCHandle hFfbUserData;
 
-        [StructLayout(LayoutKind.Sequential)]
+        [StructLayout(LayoutKind.Sequential, Pack = 1)]
         public struct JoystickState
         {
             public byte bDevice;
+
             public Int32 Throttle;
             public Int32 Rudder;
             public Int32 Aileron;
+
             public Int32 AxisX;
             public Int32 AxisY;
             public Int32 AxisZ;
@@ -123,21 +132,30 @@ namespace vJoyInterfaceWrap
             public Int32 AxisZRot;
             public Int32 Slider;
             public Int32 Dial;
+
             public Int32 Wheel;
+            public Int32 Accelerator;
+            public Int32 Brake;
+            public Int32 Clutch;
+            public Int32 Steering;
+
             public Int32 AxisVX;
             public Int32 AxisVY;
-            public Int32 AxisVZ;
-            public Int32 AxisVBRX;
-            public Int32 AxisVBRY;
-            public Int32 AxisVBRZ;
+
             public UInt32 Buttons;
             public UInt32 bHats;	// Lower 4 bits: HAT switch or 16-bit of continuous HAT switch
             public UInt32 bHatsEx1;	// Lower 4 bits: HAT switch or 16-bit of continuous HAT switch
             public UInt32 bHatsEx2;	// Lower 4 bits: HAT switch or 16-bit of continuous HAT switch
             public UInt32 bHatsEx3;	// Lower 4 bits: HAT switch or 16-bit of continuous HAT switch
+
             public UInt32 ButtonsEx1;
             public UInt32 ButtonsEx2;
             public UInt32 ButtonsEx3;
+
+            public Int32 AxisVZ;
+            public Int32 AxisVBRX;
+            public Int32 AxisVBRY;
+            public Int32 AxisVBRZ;
         };
 
         [StructLayout(LayoutKind.Sequential)]
@@ -290,12 +308,11 @@ namespace vJoyInterfaceWrap
         }
 
 
-        public const int VJOY_FFB_FIRST_EID = (0x01);
+        public const int VJOY_FFB_FIRST_EFFECT_ID = (0x01);
         public const int VJOY_FFB_MAX_EFFECTS_BLOCK_INDEX = (0x28);
         public const int VJOY_FFB_MAX_SIMULTANEOUS_EFFECTS = (0x0A);
-        public const int VJOY_FFB_EffectState_Free = (0x00);
-        public const int VJOY_FFB_EffectState_Allocated = (0x01);
-        public const int VJOY_FFB_EffectState_Playing = (0x02);
+        public const int VJOY_FFB_EFFECT_FREE = (0x00);
+        public const int VJOY_FFB_EFFECT_ALLOCATED = (0x01);
 
         [StructLayout(LayoutKind.Explicit, Size = 4)]
         public struct FFB_PID_BLOCK_LOAD_REPORT
@@ -555,6 +572,10 @@ namespace vJoyInterfaceWrap
         [DllImport("vJoyInterface.dll", EntryPoint = "GetPosition")]
         private static extern UInt32 _GetPosition(UInt32 rID, ref JoystickState pPosition);
 
+        [DllImport("vJoyInterface.dll", EntryPoint = "GetvJoyMaxDevices")]
+        private static extern bool _GetvJoyMaxDevices(ref UInt32 nDevices);
+
+
 
 
         /***************************************************/
@@ -695,6 +716,7 @@ namespace vJoyInterfaceWrap
         public UInt32 FfbReadPID(UInt32 rID, ref FFB_DEVICE_PID PID) { return _Ffb_h_ReadPID(rID, ref PID); }
         public UInt32 FfbUpdateEffectState(UInt32 rID, UInt32 effectId, UInt32 effectState) { return _FfbUpdateEffectState(rID, effectId, effectState); }
         public UInt32 GetPosition(UInt32 rID, ref JoystickState pPosition) { return _GetPosition(rID, ref pPosition); }
+        public bool GetvJoyMaxDevices(ref UInt32 nDevices) { return _GetvJoyMaxDevices(ref nDevices); }
 
     }
 }

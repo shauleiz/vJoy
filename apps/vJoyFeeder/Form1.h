@@ -554,21 +554,21 @@ namespace vJoyDemo {
             int Shift = index%32;
 
             switch (index/32) {
-            case 0:
-                Target = &(Report.lButtons);
-                break;
-            case 1:
-                Target = &(Report.lButtonsEx1);
-                break;
-            case 2:
-                Target = &(Report.lButtonsEx2);
-                break;
-            case 3:
-                Target = &(Report.lButtonsEx3);
-                break;
-            default:
-                Target = &(Report.lButtonsEx3);
-                break;
+                case 0:
+                    Target = &(Report.lButtons);
+                    break;
+                case 1:
+                    Target = &(Report.lButtonsEx1);
+                    break;
+                case 2:
+                    Target = &(Report.lButtonsEx2);
+                    break;
+                case 3:
+                    Target = &(Report.lButtonsEx3);
+                    break;
+                default:
+                    Target = &(Report.lButtonsEx3);
+                    break;
             };
 
             ULONG32 mask = (0x00000001 << Shift);
@@ -686,21 +686,21 @@ namespace vJoyDemo {
             int Shift = index%32;
 
             switch (index/32) {
-            case 0:
-                Target = &(Report.lButtons);
-                break;
-            case 1:
-                Target = &(Report.lButtonsEx1);
-                break;
-            case 2:
-                Target = &(Report.lButtonsEx2);
-                break;
-            case 3:
-                Target = &(Report.lButtonsEx3);
-                break;
-            default:
-                Target = &(Report.lButtonsEx3);
-                break;
+                case 0:
+                    Target = &(Report.lButtons);
+                    break;
+                case 1:
+                    Target = &(Report.lButtonsEx1);
+                    break;
+                case 2:
+                    Target = &(Report.lButtonsEx2);
+                    break;
+                case 3:
+                    Target = &(Report.lButtonsEx3);
+                    break;
+                default:
+                    Target = &(Report.lButtonsEx3);
+                    break;
             };
 
             if (this->CBvJoyButton[index]->Checked)
@@ -1536,6 +1536,7 @@ namespace vJoyDemo {
                this->textBoxThrottle->Size = System::Drawing::Size(43, 20);
                this->textBoxThrottle->TabIndex = 1;
                this->textBoxThrottle->Text = L"0";
+               this->textBoxThrottle->TextChanged += gcnew System::EventHandler(this, &Form1::textBoxThrottle_TextChanged);
                // 
                // groupBoxRudder
                // 
@@ -1568,6 +1569,7 @@ namespace vJoyDemo {
                this->textBoxRudder->Size = System::Drawing::Size(43, 20);
                this->textBoxRudder->TabIndex = 1;
                this->textBoxRudder->Text = L"0";
+               this->textBoxRudder->TextChanged += gcnew System::EventHandler(this, &Form1::textBoxRudder_TextChanged);
                // 
                // groupBoxAileron
                // 
@@ -1600,6 +1602,7 @@ namespace vJoyDemo {
                this->textBoxAileron->Size = System::Drawing::Size(43, 20);
                this->textBoxAileron->TabIndex = 1;
                this->textBoxAileron->Text = L"0";
+               this->textBoxAileron->TextChanged += gcnew System::EventHandler(this, &Form1::textBoxAileron_TextChanged);
                // 
                // groupBoxSteering
                // 
@@ -1632,6 +1635,7 @@ namespace vJoyDemo {
                this->textBoxSteering->Size = System::Drawing::Size(43, 20);
                this->textBoxSteering->TabIndex = 1;
                this->textBoxSteering->Text = L"0";
+               this->textBoxSteering->TextChanged += gcnew System::EventHandler(this, &Form1::textBoxSteering_TextChanged);
                // 
                // groupBoxClutch
                // 
@@ -1664,6 +1668,7 @@ namespace vJoyDemo {
                this->textBoxClutch->Size = System::Drawing::Size(43, 20);
                this->textBoxClutch->TabIndex = 1;
                this->textBoxClutch->Text = L"0";
+               this->textBoxClutch->TextChanged += gcnew System::EventHandler(this, &Form1::textBoxClutch_TextChanged);
                // 
                // groupBoxBrake
                // 
@@ -1696,6 +1701,7 @@ namespace vJoyDemo {
                this->textBoxBrake->Size = System::Drawing::Size(43, 20);
                this->textBoxBrake->TabIndex = 1;
                this->textBoxBrake->Text = L"0";
+               this->textBoxBrake->TextChanged += gcnew System::EventHandler(this, &Form1::textBoxBrake_TextChanged);
                // 
                // groupBoxAccelerator
                // 
@@ -2087,35 +2093,46 @@ namespace vJoyDemo {
             SetAxis(ConvAbsolute(this->trackBarAccelerator->Value, AxisAcceleratormax, AxisAcceleratormin), System::Convert::ToInt32(listBoxTarget->SelectedItem->ToString()), HID_USAGE_ACCELERATOR);
         }
     }
-           /*
-    private: System::Void textBoxSL1_TextChanged(System::Object^ sender, System::EventArgs^ e) {
-        textbox_text_changed(this->trackBarSL1, this->textBoxSL1);
-        SetAxis(ConvAbsolute(this->trackBarSL1->Value, AxisSL1max, AxisSL1min), System::Convert::ToInt32(listBoxTarget->SelectedItem->ToString()), HID_USAGE_SL1);
+    private: System::Void textBoxBrake_TextChanged(System::Object^ sender, System::EventArgs^ e) {
+        if (this->checkBoxEnableFeeding->Checked) {
+            textbox_text_changed(this->trackBarBrake, this->textBoxBrake);
+            SetAxis(ConvAbsolute(this->trackBarBrake->Value, AxisBrakemax, AxisBrakemin), System::Convert::ToInt32(listBoxTarget->SelectedItem->ToString()), HID_USAGE_SL1);
+        }
     }
-    private: System::Void textBoxSL1_TextChanged(System::Object^ sender, System::EventArgs^ e) {
-        textbox_text_changed(this->trackBarSL1, this->textBoxSL1);
-        SetAxis(ConvAbsolute(this->trackBarSL1->Value, AxisSL1max, AxisSL1min), System::Convert::ToInt32(listBoxTarget->SelectedItem->ToString()), HID_USAGE_SL1);
+    private: System::Void textBoxClutch_TextChanged(System::Object^ sender, System::EventArgs^ e) {
+        if (this->checkBoxEnableFeeding->Checked) {
+            textbox_text_changed(this->trackBarClutch, this->textBoxClutch);
+            SetAxis(ConvAbsolute(this->trackBarClutch->Value, AxisClutchmax, AxisClutchmin), System::Convert::ToInt32(listBoxTarget->SelectedItem->ToString()), HID_USAGE_SL1);
+        }
     }
-    private: System::Void textBoxSL1_TextChanged(System::Object^ sender, System::EventArgs^ e) {
-        textbox_text_changed(this->trackBarSL1, this->textBoxSL1);
-        SetAxis(ConvAbsolute(this->trackBarSL1->Value, AxisSL1max, AxisSL1min), System::Convert::ToInt32(listBoxTarget->SelectedItem->ToString()), HID_USAGE_SL1);
+    private: System::Void textBoxSteering_TextChanged(System::Object^ sender, System::EventArgs^ e) {
+        if (this->checkBoxEnableFeeding->Checked) {
+            textbox_text_changed(this->trackBarSteering, this->textBoxSteering);
+            SetAxis(ConvAbsolute(this->trackBarSteering->Value, AxisSteeringmax, AxisSteeringmin), System::Convert::ToInt32(listBoxTarget->SelectedItem->ToString()), HID_USAGE_SL1);
+        }
     }
-    private: System::Void textBoxSL1_TextChanged(System::Object^ sender, System::EventArgs^ e) {
-        textbox_text_changed(this->trackBarSL1, this->textBoxSL1);
-        SetAxis(ConvAbsolute(this->trackBarSL1->Value, AxisSL1max, AxisSL1min), System::Convert::ToInt32(listBoxTarget->SelectedItem->ToString()), HID_USAGE_SL1);
+    private: System::Void textBoxAileron_TextChanged(System::Object^ sender, System::EventArgs^ e) {
+        if (this->checkBoxEnableFeeding->Checked) {
+            textbox_text_changed(this->trackBarAileron, this->textBoxAileron);
+            SetAxis(ConvAbsolute(this->trackBarAileron->Value, AxisAileronmax, AxisAileronmin), System::Convert::ToInt32(listBoxTarget->SelectedItem->ToString()), HID_USAGE_SL1);
+        }
     }
-    private: System::Void textBoxSL1_TextChanged(System::Object^ sender, System::EventArgs^ e) {
-        textbox_text_changed(this->trackBarSL1, this->textBoxSL1);
-        SetAxis(ConvAbsolute(this->trackBarSL1->Value, AxisSL1max, AxisSL1min), System::Convert::ToInt32(listBoxTarget->SelectedItem->ToString()), HID_USAGE_SL1);
+    private: System::Void textBoxRudder_TextChanged(System::Object^ sender, System::EventArgs^ e) {
+        if (this->checkBoxEnableFeeding->Checked) {
+            textbox_text_changed(this->trackBarRudder, this->textBoxRudder);
+            SetAxis(ConvAbsolute(this->trackBarRudder->Value, AxisRuddermax, AxisRuddermin), System::Convert::ToInt32(listBoxTarget->SelectedItem->ToString()), HID_USAGE_SL1);
+        }
     }
-    private: System::Void textBoxSL1_TextChanged(System::Object^ sender, System::EventArgs^ e) {
-        textbox_text_changed(this->trackBarSL1, this->textBoxSL1);
-        SetAxis(ConvAbsolute(this->trackBarSL1->Value, AxisSL1max, AxisSL1min), System::Convert::ToInt32(listBoxTarget->SelectedItem->ToString()), HID_USAGE_SL1);
+    private: System::Void textBoxThrottle_TextChanged(System::Object^ sender, System::EventArgs^ e) {
+        if (this->checkBoxEnableFeeding->Checked) {
+            textbox_text_changed(this->trackBarThrottle, this->textBoxThrottle);
+            SetAxis(ConvAbsolute(this->trackBarThrottle->Value, AxisThrottlemax, AxisThrottlemin), System::Convert::ToInt32(listBoxTarget->SelectedItem->ToString()), HID_USAGE_SL1);
+        }
     }
-    */
+
 #pragma endregion
 
-    // Buttons
+           // Buttons
     private: System::Void checkBox_CheckedChanged(System::Object^ sender, System::EventArgs^ e) {
 
         String^ strCB;
@@ -2471,20 +2488,20 @@ namespace vJoyDemo {
         if (ReportId>0) {
             stat = GetVJDStatus(ReportId);
             switch (stat) {
-            case VJD_STAT_FREE:
-            case VJD_STAT_BUSY:
-                Acquired = false;
-                update_from_vjoy();
-                break;
-            case VJD_STAT_OWN:
-                Acquired = true;
-                break;
-            case VJD_STAT_UNKN:
-            case VJD_STAT_MISS:
-            default:
-                ReportId = -1;
-                Enable(false);
-                break;
+                case VJD_STAT_FREE:
+                case VJD_STAT_BUSY:
+                    Acquired = false;
+                    update_from_vjoy();
+                    break;
+                case VJD_STAT_OWN:
+                    Acquired = true;
+                    break;
+                case VJD_STAT_UNKN:
+                case VJD_STAT_MISS:
+                default:
+                    ReportId = -1;
+                    Enable(false);
+                    break;
             }
         }
         /*

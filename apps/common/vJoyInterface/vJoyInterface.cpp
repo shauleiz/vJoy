@@ -4166,8 +4166,30 @@ INT		GetControls(UINT rID)
                 case HID_USAGE_SL1:
                     vJoyDevices[rID].DeviceControls.Dial = TRUE;
                     break;
+
                 case HID_USAGE_WHL:
                     vJoyDevices[rID].DeviceControls.Wheel = TRUE;
+                    break;
+                case HID_USAGE_ACCELERATOR:
+                    vJoyDevices[rID].DeviceControls.Accelerator = TRUE;
+                    break;
+                case HID_USAGE_BRAKE:
+                    vJoyDevices[rID].DeviceControls.Brake = TRUE;
+                    break;
+                case HID_USAGE_CLUTCH:
+                    vJoyDevices[rID].DeviceControls.Clutch = TRUE;
+                    break;
+                case HID_USAGE_STEERING:
+                    vJoyDevices[rID].DeviceControls.Steering = TRUE;
+                    break;
+                case HID_USAGE_AILERON:
+                    vJoyDevices[rID].DeviceControls.Aileron = TRUE;
+                    break;
+                case HID_USAGE_RUDDER:
+                    vJoyDevices[rID].DeviceControls.Rudder = TRUE;
+                    break;
+                case HID_USAGE_THROTTLE:
+                    vJoyDevices[rID].DeviceControls.Throttle = TRUE;
                     break;
                 case HID_USAGE_POV:
                     if (vCaps[i].LogicalMax == 3)
