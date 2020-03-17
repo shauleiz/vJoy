@@ -66,8 +66,6 @@ enum VjdStat  /* Declares an enumeration data type */
 // Device Axis/POVs/Buttons
 struct DEVCTRLS {
     BOOL Init;
-    BOOL	Rudder;
-    BOOL	Aileron;
     BOOL	AxisX;
     BOOL	AxisY;
     BOOL	AxisZ;
@@ -82,6 +80,8 @@ struct DEVCTRLS {
     BOOL	Brake;
     BOOL	Clutch;
     BOOL	Steering;
+    BOOL	Rudder;
+    BOOL	Aileron;
     BOOL	Throttle;
 
     BOOL	AxisVX;
