@@ -190,9 +190,6 @@ typedef BOOL(WINAPI* StatusMessageFunc)(void* output, TCHAR* buffer, enum ERRLEV
 //	DeviceIoControl (hDevice, 100, &iReport, sizeof(HID_INPUT_REPORT), NULL, 0, &bytes, NULL)
 
 
-// Turn on 1 byte packing of struct
-#include <pshpack1.h>
-
 #if USE_JOYSTICK_API_VERSION == 1
 
 typedef struct _JOYSTICK_POSITION
@@ -337,6 +334,8 @@ typedef PJOYSTICK_POSITION_V3 PJOYSTICK_POSITION;
 
 #endif
 
+// Turn on 1 byte packing of struct
+#include <pshpack1.h>
 
 //----------------------------------------------------------
 // FFB Features to be placed in vJoy's driver memory context
