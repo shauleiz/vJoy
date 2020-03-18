@@ -334,11 +334,10 @@ typedef PJOYSTICK_POSITION_V3 PJOYSTICK_POSITION;
 
 #endif
 
-// Turn on 1 byte packing of struct
-#include <pshpack1.h>
 
 //----------------------------------------------------------
 // FFB Features to be placed in vJoy's driver memory context
+
 
 // Max 1..40 effect block index. 0x28=40dv
 #define VJOY_FFB_FIRST_EFFECT_ID            (0x01)
@@ -348,14 +347,8 @@ typedef PJOYSTICK_POSITION_V3 PJOYSTICK_POSITION;
 #define VJOY_FFB_EFFECT_FREE                (0x00)
 #define VJOY_FFB_EFFECT_ALLOCATED           (0x01)
 
-#if 0
-// FFB: Create New Effect Feature Report=1
-typedef struct _FFB_NEW_EFFECT_REPORT
-{
-    BYTE	effectType;	// Enum (1..12): ET 26,27,30,31,32,33,34,40,41,42,43,28
-    USHORT	byteCount;	// 0..511
-} FFB_NEW_EFFECT_REPORT, * PFFB_NEW_EFFECT_REPORT;
-#endif
+// Turn on 1 byte packing of struct, dummy fields will be added when needed
+#include <pshpack1.h>
 
 // FFB: PID Block Load Feature Report=2
 // Only one per device

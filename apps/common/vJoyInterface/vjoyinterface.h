@@ -17,6 +17,7 @@
 
 // Add vJoy driver's own public defines (IOCtl, HID, memory structs like JOYSTICK_POSITION_V2)
 #include <public.h>
+// For data alignment, see https://en.wikipedia.org/wiki/Data_structure_alignment#Typical_alignment_of_C_structs_on_x86
 
 ///////////////////////////// vJoy device (collection) status ////////////////////////////////////////////
 #ifndef VJDSTAT
@@ -66,8 +67,6 @@ enum VjdStat  /* Declares an enumeration data type */
 // Device Axis/POVs/Buttons
 struct DEVCTRLS {
     BOOL Init;
-    BOOL	Rudder;
-    BOOL	Aileron;
     BOOL	AxisX;
     BOOL	AxisY;
     BOOL	AxisZ;
@@ -82,6 +81,8 @@ struct DEVCTRLS {
     BOOL	Brake;
     BOOL	Clutch;
     BOOL	Steering;
+    BOOL	Rudder;
+    BOOL	Aileron;
     BOOL	Throttle;
 
     BOOL	AxisVX;
@@ -119,7 +120,7 @@ struct DEV_INFO {
 typedef void (CALLBACK* RemovalCB)(BOOL, BOOL, PVOID);
 
 
-enum FFBEType // FFB Effect Type
+enum FFBEType : UINT32 // FFB Effect Type
 {
 
     // Effect Type
@@ -138,7 +139,7 @@ enum FFBEType // FFB Effect Type
     ET_CSTM = 12,   //    Custom Force Data
 };
 
-enum FFBPType // FFB Packet Type
+enum FFBPType : UINT32 // FFB Packet Type
 {
     // Write
     PT_EFFREP = HID_ID_EFFREP,	// Usage Set Effect Report
@@ -162,14 +163,14 @@ enum FFBPType // FFB Packet Type
     PT_STATEREP = HID_ID_STATEREP+0x10,	// Usage PID State Report
 };
 
-enum FFBOP
+enum FFBOP : UINT32
 {
     EFF_START = 1, // EFFECT START
     EFF_SOLO = 2, // EFFECT SOLO START
     EFF_STOP = 3, // EFFECT STOP
 };
 
-enum FFB_CTRL
+enum FFB_CTRL : UINT32
 {
     CTRL_ENACT = 1,	// Enable all device actuators.
     CTRL_DISACT = 2,	// Disable all the device actuators.
@@ -179,7 +180,8 @@ enum FFB_CTRL
     CTRL_DEVCONT = 6,	// Device Continue– The all effects that running when the device was paused are restarted from their last time step.
 };
 
-enum FFB_EFFECTS {
+enum FFB_EFFECTS : UINT32
+{
     Constant = 0x0001,
     Ramp = 0x0002,
     Square = 0x0004,
@@ -202,11 +204,13 @@ typedef struct _FFB_DATA {
 
 typedef struct _FFB_EFF_CONSTANT {
     BYTE EffectBlockIndex;
+
     LONG Magnitude; 			  // Constant force magnitude: 	-10000 - 10000
 } FFB_EFF_CONSTANT, * PFFB_EFF_CONSTANT;
 
 typedef struct _FFB_EFF_RAMP {
     BYTE		EffectBlockIndex;
+
     LONG 		Start;             // The Normalized magnitude at the start of the effect (-10000 - 10000)
     LONG 		End;               // The Normalized magnitude at the end of the effect	(-10000 - 10000)
 } FFB_EFF_RAMP, * PFFB_EFF_RAMP;
@@ -214,6 +218,7 @@ typedef struct _FFB_EFF_RAMP {
 //typedef struct _FFB_EFF_CONST {
 typedef struct _FFB_EFF_REPORT {
     BYTE		EffectBlockIndex;
+
     FFBEType	EffectType;
     WORD		Duration;// Value in milliseconds. 0xFFFF means infinite
     WORD		TrigerRpt;
@@ -221,6 +226,7 @@ typedef struct _FFB_EFF_REPORT {
     WORD		StartDelay;
     BYTE		Gain;
     BYTE		TrigerBtn;
+
     BOOL		Polar; // How to interpret force direction Polar (0-360°) or Cartesian (X,Y)
     union
     {
@@ -234,12 +240,15 @@ typedef struct _FFB_EFF_REPORT {
 
 typedef struct _FFB_EFF_OP {
     BYTE		EffectBlockIndex;
+
     FFBOP		EffectOp;
+
     BYTE		LoopCount;
 } FFB_EFF_OP, * PFFB_EFF_OP;
 
 typedef struct _FFB_EFF_PERIOD {
     BYTE		EffectBlockIndex;
+
     DWORD		Magnitude;			// Range: 0 - 10000
     LONG 		Offset;				// Range: –10000 - 10000
     DWORD 		Phase;				// Range: 0 - 35999
@@ -248,6 +257,7 @@ typedef struct _FFB_EFF_PERIOD {
 
 typedef struct _FFB_EFF_COND {
     BYTE		EffectBlockIndex;
+
     BOOL		isY;
     LONG 		CenterPointOffset; // CP Offset:  Range -­10000 ­- 10000
     LONG 		PosCoeff; // Positive Coefficient: Range -­10000 ­- 10000
@@ -259,6 +269,7 @@ typedef struct _FFB_EFF_COND {
 
 typedef struct _FFB_EFF_ENVLP {
     BYTE		EffectBlockIndex;
+
     DWORD 		AttackLevel;   // The Normalized magnitude of the stating point: 0 - 10000
     DWORD 		FadeLevel;	   // The Normalized magnitude of the stopping point: 0 - 10000
     DWORD 		AttackTime;	   // Time of the attack: 0 - 4294967295
@@ -324,7 +335,9 @@ namespace vJoyNS {
     /////	Write access to vJoy Device - Basic
     VJOYINTERFACE_API BOOL		__cdecl	AcquireVJD(UINT rID);				// Acquire the specified vJoy Device.
     VJOYINTERFACE_API VOID		__cdecl	RelinquishVJD(UINT rID);			// Relinquish the specified vJoy Device.
-    VJOYINTERFACE_API BOOL		__cdecl	UpdateVJD(UINT rID, JOYSTICK_POSITION* pData);	// Update the position data of the specified vJoy Device.
+    // Update the position data of the specified vJoy Device.
+    // JOYSTICK_POSITION is a 4-bytes aligned struct defined in public.h
+    VJOYINTERFACE_API BOOL		__cdecl	UpdateVJD(UINT rID, JOYSTICK_POSITION* pData);
 
     /////	Write access to vJoy Device - Modifyiers
     // This group of functions modify the current value of the position data
@@ -382,14 +395,17 @@ namespace vJoyNS {
     // Create new effect base on given type and new effect block id
     VJOYINTERFACE_API DWORD		__cdecl Ffb_h_CreateNewEffect(const FFB_DATA* packet, FFBEType* effectType, UINT* newEffectId);
     // Update the Ffb PID Data of the specified vJoy Device
-    // VERY DANGEROUS AS IT CAN SCREW UP EFFECT BLOCK MANAGEMENT IN DRIVER
+    // !! VERY DANGEROUS AS IT CAN SCREW UP EFFECT BLOCK MANAGEMENT IN DRIVER
     // DO NOT USE IT IF YOU DON'T KNOW WHAT IT DOES !!
+    // FFB_DEVICE_PID is a 1-byte aligned struct defined in public.h
     VJOYINTERFACE_API DWORD		__cdecl FfbWritePID(UINT rID, FFB_DEVICE_PID* PIDData);
     // Read the Ffb PID of the specified vJoy Device
+    // FFB_DEVICE_PID is a 1-byte aligned struct defined in public.h
     VJOYINTERFACE_API DWORD		__cdecl FfbReadPID(UINT rID, FFB_DEVICE_PID* PIDData);
     // Update the Ffb state report (bitfield) of the specified effect in given vJoy Device
     VJOYINTERFACE_API DWORD		__cdecl FfbUpdateEffectState(UINT rID, UINT effectId, UINT effectState);
     // Read the position data of the specified vJoy Device
+    // JOYSTICK_POSITION is a 4-bytes aligned struct defined in public.h
     VJOYINTERFACE_API DWORD		__cdecl	GetPosition(UINT rID, JOYSTICK_POSITION* pPosition);
 
 #pragma endregion

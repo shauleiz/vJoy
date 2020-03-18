@@ -61,12 +61,12 @@ namespace vJoyDemo {
 
 
             /*3*/
-            /*
             if (!AcquireVJD(GetAndUpdateReportId())) {
                 textBoxInfo->Text = L"Cannot open vJoy Device - Cannot continue\r\n";
-                //return;
+                return;
             }
-            */
+            
+            TargetChanged(this, nullptr);
 
             /*4*/
             ResetAll();
@@ -524,7 +524,7 @@ namespace vJoyDemo {
         ReportId = System::Convert::ToInt32(listBoxTarget->SelectedItem->ToString());
 
         // Send info to selected vJoy Device
-        if (!GetPosition(ReportId, &Report))
+        if (GetPosition(ReportId, &Report)!=ERROR_SUCCESS)
             return;
         if (ReportId!=Report.bDevice)
             return;
@@ -1795,6 +1795,8 @@ namespace vJoyDemo {
                // 
                this->checkBoxEnableFeeding->AutoCheck = false;
                this->checkBoxEnableFeeding->AutoSize = true;
+               this->checkBoxEnableFeeding->Checked = true;
+               this->checkBoxEnableFeeding->CheckState = System::Windows::Forms::CheckState::Checked;
                this->checkBoxEnableFeeding->Location = System::Drawing::Point(121, 19);
                this->checkBoxEnableFeeding->Name = L"checkBoxEnableFeeding";
                this->checkBoxEnableFeeding->Size = System::Drawing::Size(100, 17);
@@ -2096,37 +2098,37 @@ namespace vJoyDemo {
     private: System::Void textBoxBrake_TextChanged(System::Object^ sender, System::EventArgs^ e) {
         if (this->checkBoxEnableFeeding->Checked) {
             textbox_text_changed(this->trackBarBrake, this->textBoxBrake);
-            SetAxis(ConvAbsolute(this->trackBarBrake->Value, AxisBrakemax, AxisBrakemin), System::Convert::ToInt32(listBoxTarget->SelectedItem->ToString()), HID_USAGE_SL1);
+            SetAxis(ConvAbsolute(this->trackBarBrake->Value, AxisBrakemax, AxisBrakemin), System::Convert::ToInt32(listBoxTarget->SelectedItem->ToString()), HID_USAGE_BRAKE);
         }
     }
     private: System::Void textBoxClutch_TextChanged(System::Object^ sender, System::EventArgs^ e) {
         if (this->checkBoxEnableFeeding->Checked) {
             textbox_text_changed(this->trackBarClutch, this->textBoxClutch);
-            SetAxis(ConvAbsolute(this->trackBarClutch->Value, AxisClutchmax, AxisClutchmin), System::Convert::ToInt32(listBoxTarget->SelectedItem->ToString()), HID_USAGE_SL1);
+            SetAxis(ConvAbsolute(this->trackBarClutch->Value, AxisClutchmax, AxisClutchmin), System::Convert::ToInt32(listBoxTarget->SelectedItem->ToString()), HID_USAGE_CLUTCH);
         }
     }
     private: System::Void textBoxSteering_TextChanged(System::Object^ sender, System::EventArgs^ e) {
         if (this->checkBoxEnableFeeding->Checked) {
             textbox_text_changed(this->trackBarSteering, this->textBoxSteering);
-            SetAxis(ConvAbsolute(this->trackBarSteering->Value, AxisSteeringmax, AxisSteeringmin), System::Convert::ToInt32(listBoxTarget->SelectedItem->ToString()), HID_USAGE_SL1);
+            SetAxis(ConvAbsolute(this->trackBarSteering->Value, AxisSteeringmax, AxisSteeringmin), System::Convert::ToInt32(listBoxTarget->SelectedItem->ToString()), HID_USAGE_STEERING);
         }
     }
     private: System::Void textBoxAileron_TextChanged(System::Object^ sender, System::EventArgs^ e) {
         if (this->checkBoxEnableFeeding->Checked) {
             textbox_text_changed(this->trackBarAileron, this->textBoxAileron);
-            SetAxis(ConvAbsolute(this->trackBarAileron->Value, AxisAileronmax, AxisAileronmin), System::Convert::ToInt32(listBoxTarget->SelectedItem->ToString()), HID_USAGE_SL1);
+            SetAxis(ConvAbsolute(this->trackBarAileron->Value, AxisAileronmax, AxisAileronmin), System::Convert::ToInt32(listBoxTarget->SelectedItem->ToString()), HID_USAGE_AILERON);
         }
     }
     private: System::Void textBoxRudder_TextChanged(System::Object^ sender, System::EventArgs^ e) {
         if (this->checkBoxEnableFeeding->Checked) {
             textbox_text_changed(this->trackBarRudder, this->textBoxRudder);
-            SetAxis(ConvAbsolute(this->trackBarRudder->Value, AxisRuddermax, AxisRuddermin), System::Convert::ToInt32(listBoxTarget->SelectedItem->ToString()), HID_USAGE_SL1);
+            SetAxis(ConvAbsolute(this->trackBarRudder->Value, AxisRuddermax, AxisRuddermin), System::Convert::ToInt32(listBoxTarget->SelectedItem->ToString()), HID_USAGE_RUDDER);
         }
     }
     private: System::Void textBoxThrottle_TextChanged(System::Object^ sender, System::EventArgs^ e) {
         if (this->checkBoxEnableFeeding->Checked) {
             textbox_text_changed(this->trackBarThrottle, this->textBoxThrottle);
-            SetAxis(ConvAbsolute(this->trackBarThrottle->Value, AxisThrottlemax, AxisThrottlemin), System::Convert::ToInt32(listBoxTarget->SelectedItem->ToString()), HID_USAGE_SL1);
+            SetAxis(ConvAbsolute(this->trackBarThrottle->Value, AxisThrottlemax, AxisThrottlemin), System::Convert::ToInt32(listBoxTarget->SelectedItem->ToString()), HID_USAGE_THROTTLE);
         }
     }
 
