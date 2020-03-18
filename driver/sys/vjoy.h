@@ -1113,6 +1113,8 @@ HID_DESCRIPTOR G_DefaultHidDescriptor =
 // of HID_REPORT_DESCRIPTOR: The order and size of the members are derived from
 // the those in 'COLLECTION (Application)'
 //
+
+// For HID Everything is 1-byte aligned
 #include <pshpack1.h>
 
 #if USE_JOYSTICK_API_VERSION == 1
@@ -1283,8 +1285,6 @@ typedef DEVICE_POSITION_V3 DEVICE_POSITION;
 typedef PDEVICE_POSITION_V3 PDEVICE_POSITION;
 
 #endif
-
-
 
 #include <poppack.h>
 

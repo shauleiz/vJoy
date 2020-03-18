@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Runtime.InteropServices;
 
-public enum HID_USAGES
+public enum HID_USAGES : UInt32
 {
     HID_USAGE_X = 0x30,
     HID_USAGE_Y = 0x31,
@@ -24,7 +24,7 @@ public enum HID_USAGES
     HID_USAGE_THROTTLE = 0xBB,
 }
 
-public enum VjdStat  /* Declares an enumeration data type called BOOLEAN */
+public enum VjdStat : UInt32 /* Declares an enumeration data type called BOOLEAN */
 {
     VJD_STAT_OWN,	// The  vJoy Device is owned by this application.
     VJD_STAT_FREE,	// The  vJoy Device is NOT owned by any application (including this one).
@@ -38,7 +38,7 @@ public enum VjdStat  /* Declares an enumeration data type called BOOLEAN */
 
 // HID Descriptor definitions - FFB Report IDs
 
-public enum FFBPType // FFB Packet Type
+public enum FFBPType : UInt32 // FFB Packet Type
 {
     // Write
     PT_EFFREP = 0x01,   // Usage Set Effect Report
@@ -62,7 +62,7 @@ public enum FFBPType // FFB Packet Type
     PT_STATEREP = 0x04+0x10,    // Usage PID State Report
 };
 
-public enum FFBEType // FFB Effect Type
+public enum FFBEType : UInt32 // FFB Effect Type
 {
 
     // Effect Type
@@ -81,7 +81,7 @@ public enum FFBEType // FFB Effect Type
     ET_CSTM = 12,   //    Custom Force Data
 };
 
-public enum FFB_CTRL
+public enum FFB_CTRL : UInt32
 {
     CTRL_ENACT = 1,	// Enable all device actuators.
     CTRL_DISACT = 2,	// Disable all the device actuators.
@@ -91,7 +91,7 @@ public enum FFB_CTRL
     CTRL_DEVCONT = 6,	// Device Continue– The all effects that running when the device was paused are restarted from their last time step.
 };
 
-public enum FFBOP
+public enum FFBOP : UInt32
 {
     EFF_START = 1, // EFFECT START
     EFF_SOLO = 2, // EFFECT SOLO START
@@ -115,11 +115,12 @@ namespace vJoyInterfaceWrap
         private static WrapFfbCbFunc wf;
         private static GCHandle hFfbUserData;
 
-        [StructLayout(LayoutKind.Sequential, Pack = 1)]
+        #region Mapping vJoyInterface DLL with 4-bytes aligned structs
+
+        [StructLayout(LayoutKind.Sequential)]
         public struct JoystickState
         {
             public byte bDevice;
-
             public Int32 Throttle;
             public Int32 Rudder;
             public Int32 Aileron;
@@ -158,11 +159,14 @@ namespace vJoyInterfaceWrap
             public Int32 AxisVBRZ;
         };
 
-        [StructLayout(LayoutKind.Sequential)]
+        [StructLayout(LayoutKind.Explicit)]
         private struct FFB_DATA
         {
+            [FieldOffset(0)]
             private UInt32 size;
+            [FieldOffset(4)]
             private UInt32 cmd;
+            [FieldOffset(8)]
             private IntPtr data;
         }
 
@@ -306,8 +310,9 @@ namespace vJoyInterfaceWrap
             [FieldOffset(8)]
             public Int16 End;               // The Normalized magnitude at the end of the effect
         }
+        #endregion
 
-
+        #region Mapping to vJoy's driver with 1-byte packed structs
         public const int VJOY_FFB_FIRST_EFFECT_ID = (0x01);
         public const int VJOY_FFB_MAX_EFFECTS_BLOCK_INDEX = (0x28);
         public const int VJOY_FFB_MAX_SIMULTANEOUS_EFFECTS = (0x0A);
@@ -360,6 +365,7 @@ namespace vJoyInterfaceWrap
             [FieldOffset(89)]
             public Byte LastEID;
         }
+        #endregion
 
 
         /***************************************************/
