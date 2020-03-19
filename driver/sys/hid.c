@@ -2520,6 +2520,7 @@ void Ffb_BlockIndexFree(
         return;
     }
     pid->EffectStates[EffectID-1].InUse = VJOY_FFB_EFFECT_FREE;
+    // Force next free block to point to this new empty block to fill holes
     pid->NextFreeEID = EffectID;
 
     TraceEvents(TRACE_LEVEL_INFORMATION, DBG_INIT, "FfbBlockIndexFree: NextEID=%d\n", pid->NextFreeEID);
@@ -2548,12 +2549,16 @@ BYTE Ffb_GetNextFreeEffect(
     BYTE effectId = pid->LastEID;
     pid->EffectStates[effectId-1].InUse = VJOY_FFB_EFFECT_ALLOCATED;
 
-    // Find the next free slot
-    do {
-        pid->NextFreeEID++;
-        if (pid->NextFreeEID > VJOY_FFB_MAX_EFFECTS_BLOCK_INDEX)
-            break;  // the last slot was taken
-    } while (pid->EffectStates[pid->NextFreeEID-1].InUse != VJOY_FFB_EFFECT_FREE);
+    // Find the next free slot by scanning
+    int firstFree = 0;
+    for(; firstFree<VJOY_FFB_MAX_EFFECTS_BLOCK_INDEX; firstFree++) {
+        if (pid->EffectStates[firstFree].InUse == VJOY_FFB_EFFECT_FREE) {
+            break;
+        }
+    }
+    // Save index of first free. If not not found, will be equal to VJOY_FFB_MAX_EFFECTS_BLOCK_INDEX
+    // and the last free slot was taken.
+    pid->NextFreeEID = firstFree+1;
 
     TraceEvents(TRACE_LEVEL_INFORMATION, DBG_INIT, "FfbGetNextFreeEffect: took effectId=%d, NextEID=%d)\n", effectId, pid->NextFreeEID);
 
@@ -2625,13 +2630,20 @@ BOOLEAN Ffb_ProcessPacket(
         } break;
 
         case (HID_ID_NEWEFREP+0x10): {
+            // Find new effect block index. 0 will be returned in case of an error
             BYTE eid = Ffb_GetNextFreeEffect(devContext, id);
+            // Save effect id in the current FFB frame to notify the feeder
             packet[2] = eid;
-            pid->PIDBlockLoad.EffectBlockIndex = eid;
-            if (eid!=0)
+            // If not 0, then we succeed to find a free slot
+            if (eid!=0) {
+                // Save new effect block index for PID Block Load
+                pid->PIDBlockLoad.EffectBlockIndex = eid;
+                // Flag that created was ok
                 pid->PIDBlockLoad.LoadStatus = 1;
-            else
-                pid->PIDBlockLoad.LoadStatus = 3;
+            } else {
+                // Flag error : full
+                pid->PIDBlockLoad.LoadStatus = 2;
+            }
             TraceEvents(TRACE_LEVEL_INFORMATION, DBG_INIT, "Ffb_ProcessPacket: CREATE NEW EFFECT eid=%d\n", eid);
         } break;
 
