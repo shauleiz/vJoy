@@ -2609,7 +2609,7 @@ BOOLEAN Ffb_ProcessPacket(
     TraceEvents(TRACE_LEVEL_INFORMATION, DBG_INIT, "Ffb_ProcessPacket: id=%d DeviceID=%d tp=%x\n", id, DeviceID, tp);
 
     switch (tp) {
-
+        // Write report
         case HID_ID_CTRLREP: {
             BYTE Control = packet[1];
             TraceEvents(TRACE_LEVEL_INFORMATION, DBG_INIT, "Ffb_ProcessPacket: PID DEVICE CONTROL=%d\n", Control);
@@ -2629,6 +2629,7 @@ BOOLEAN Ffb_ProcessPacket(
             Ffb_BlockIndexFree(devContext, id, eid);
         } break;
 
+        // Feature report
         case (HID_ID_NEWEFREP+0x10): {
             // Find new effect block index. 0 will be returned in case of an error
             BYTE eid = Ffb_GetNextFreeEffect(devContext, id);

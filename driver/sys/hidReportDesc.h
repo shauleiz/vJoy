@@ -4,6 +4,9 @@
 	Post number 35
 */
 
+// Generic defines
+#include "public.h"
+
 #define DEV				1
 #define DEV_GEN			1	// The non-FFB Joystick part
 #define DEV_FFB			1	// The FFB Joystick part

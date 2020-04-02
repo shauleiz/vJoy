@@ -347,6 +347,11 @@ typedef PJOYSTICK_POSITION_V3 PJOYSTICK_POSITION;
 #define VJOY_FFB_EFFECT_FREE                (0x00)
 #define VJOY_FFB_EFFECT_ALLOCATED           (0x01)
 
+
+// For HID descriptor : use only X, or X/Y axes for FFB
+// Can be 1 (X) or 2 (X and Y)
+#define NB_FF_AXIS                          (2)
+
 // Turn on 1 byte packing of struct, dummy fields will be added when needed
 #include <pshpack1.h>
 
