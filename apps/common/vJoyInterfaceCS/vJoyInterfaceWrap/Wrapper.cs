@@ -359,12 +359,12 @@ namespace vJoyInterfaceWrap
             [FieldOffset(4)]
             public FFB_PID_POOL_REPORT PIDPool;
             [FieldOffset(8)]
-            public Byte NextFreeEID;
-            [FieldOffset(9)]
-            public Byte LastEID;
-            [FieldOffset(10)]
             [MarshalAs(UnmanagedType.ByValArray, SizeConst = VJOY_FFB_MAX_EFFECTS_BLOCK_INDEX)]
             public FFB_PID_EFFECT_STATE_REPORT[] EffectStates;
+            [FieldOffset(8+2*VJOY_FFB_MAX_EFFECTS_BLOCK_INDEX)]
+            public Byte NextFreeEID;
+            [FieldOffset(8+2*VJOY_FFB_MAX_EFFECTS_BLOCK_INDEX+1)]
+            public Byte LastEID;
         }
         #endregion
 
