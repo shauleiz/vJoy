@@ -2468,7 +2468,7 @@ void Ffb_ResetPIDData(
     // Default lastly created BlockIndex is 0 (not created)
     PFFB_DEVICE_PID pid = &(devContext->FfbPIDData[id-1]);
 
-    pid->PIDPool.MaxSimultaneousEffects = 10;
+    pid->PIDPool.MaxSimultaneousEffects = VJOY_FFB_MAX_SIMULTANEOUS_EFFECTS;
     // bit0=1:own managed pool
     // bit1=0:one parameter block set for each effect block
     pid->PIDPool.MemoryManagement = 0;
