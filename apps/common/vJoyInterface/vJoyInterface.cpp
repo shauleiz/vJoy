@@ -89,9 +89,11 @@ HDEVNOTIFY 	Get_hNotify(int rID);
 
 
 #if 0
+bool	_FfbStart(HANDLE h);
+bool	_FfbStop(HANDLE h);
+#endif
 
-bool	FfbStart(HANDLE h);
-bool	FfbStop(HANDLE h);
+#if 0
 bool	FfbIsStarted(HANDLE h);
 BOOL	FfbGetEffectState(void);
 FFBEType FfbGetEffectType(void);
@@ -1607,21 +1609,21 @@ namespace vJoyNS {
         // Test that device exists and owned by this process
         if (rID < 1 || rID>16 || Get_h(rID) == INVALID_HANDLE_VALUE || Get_stat(rID) != VJD_STAT_OWN)
             return FALSE;
-        else
-            return TRUE;
-
-        //return 	FfbStart(Get_h(rID));
+#if 0
+        return 	_FfbStart(Get_h((int)rID));
+#endif
+        return TRUE;
     }
 
     // Stop the FFB queues of the specified vJoy Device.
     VJOYINTERFACE_API VOID		__cdecl	FfbStop(UINT rID)	// Obsolete
     {
-        return;
-        //// Test that device exists and owned by this process
-        //if (rID<1 || rID>16 || Get_h(rID) == INVALID_HANDLE_VALUE || Get_stat(rID) != VJD_STAT_OWN)
-
-        //FfbStop(Get_h(rID));
-        //return;
+        // Test that device exists and owned by this process
+        if (rID<1 || rID>16 || Get_h(rID) == INVALID_HANDLE_VALUE || Get_stat(rID) != VJD_STAT_OWN)
+            return;
+#if 0
+        _FfbStop(Get_h((int)rID));
+#endif
     }
 
 
@@ -4613,7 +4615,7 @@ FFBEType FfbGetEffectType(void)
 #pragma endregion
 
 #if 0
-bool  FfbStart(HANDLE h) // Obsolete
+bool _FfbStart(HANDLE h) // Obsolete
 {
     // Notify the driver that this feeder supports FFB
     UINT	IoCode = SET_FFB_STAT;
@@ -4677,7 +4679,7 @@ bool  FfbStart(HANDLE h) // Obsolete
         return false;
 }
 
-bool	FfbStop(HANDLE h)	// Obsolete
+bool _FfbStop(HANDLE h)	// Obsolete
 {
     UINT	IoCode = SET_FFB_STAT;
     UINT	IoSize = sizeof(DWORD);
@@ -4721,6 +4723,9 @@ bool	FfbStop(HANDLE h)	// Obsolete
     return TRUE;
 }
 
+#endif
+
+#if 0
 
 bool	FfbIsStarted(HANDLE h)
 {
