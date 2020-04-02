@@ -312,13 +312,14 @@ namespace vJoyInterfaceWrap
         }
         #endregion
 
-        #region Mapping to vJoy's driver with 1-byte packed structs
-        public const int VJOY_FFB_FIRST_EFFECT_ID = (0x01);
-        public const int VJOY_FFB_MAX_EFFECTS_BLOCK_INDEX = (0x28);
-        public const int VJOY_FFB_MAX_SIMULTANEOUS_EFFECTS = (0x0A);
+        #region Mapping to vJoy's driver with 1-byte packed structs - must match driver version!
+        public const int VJOY_FFB_FIRST_EFFECT_ID = (1);
+        public const int VJOY_FFB_MAX_EFFECTS_BLOCK_INDEX = (128);
+        public const int VJOY_FFB_MAX_SIMULTANEOUS_EFFECTS = (10);
         public const int VJOY_FFB_EFFECT_FREE = (0x00);
         public const int VJOY_FFB_EFFECT_ALLOCATED = (0x01);
 
+        // All structures are packed with 1 byte alignment
         [StructLayout(LayoutKind.Explicit, Size = 4)]
         public struct FFB_PID_BLOCK_LOAD_REPORT
         {
@@ -350,7 +351,7 @@ namespace vJoyInterfaceWrap
             public Byte State;
         }
 
-        [StructLayout(LayoutKind.Explicit, Size = 90)]
+        [StructLayout(LayoutKind.Explicit, Size = 10+(2*VJOY_FFB_MAX_EFFECTS_BLOCK_INDEX))]
         public struct FFB_DEVICE_PID
         {
             [FieldOffset(0)]
@@ -358,12 +359,12 @@ namespace vJoyInterfaceWrap
             [FieldOffset(4)]
             public FFB_PID_POOL_REPORT PIDPool;
             [FieldOffset(8)]
+            public Byte NextFreeEID;
+            [FieldOffset(9)]
+            public Byte LastEID;
+            [FieldOffset(10)]
             [MarshalAs(UnmanagedType.ByValArray, SizeConst = VJOY_FFB_MAX_EFFECTS_BLOCK_INDEX)]
             public FFB_PID_EFFECT_STATE_REPORT[] EffectStates;
-            [FieldOffset(88)]
-            public Byte NextFreeEID;
-            [FieldOffset(89)]
-            public Byte LastEID;
         }
         #endregion
 

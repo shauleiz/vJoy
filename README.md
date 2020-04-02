@@ -59,7 +59,7 @@ Notes on how the install process works:
 http://vjoystick.sourceforge.net/site/index.php/dev216/installer
 
 
-#### Building a Debug or Release version for testing on a test
+#### Building a Debug or Release version for testing on a test computer
 
 Since you need a EV certificate to build the public driver (which is expensive),
 there is still a solution for developping, debugging and testing.
@@ -89,9 +89,9 @@ Windows you must run cmd.exe with administrative provilieges and type:
 
 `C:\WINDOWS\system32> bcdedit.exe -set TESTSIGNING ON`
 
-Then reboot your computer. You shoud see a watermark in the bottom right corner telling
-you that the system is in test mode. Worth noting that doing that this is only for 
-testing and not fdor permanent use.
+Then reboot your computer. You shoud see a watermark in the bottom right corner
+telling you that the system is in test mode. Worth noting that doing that this
+is only for testing and not for permanent use.
 
 Install the test certificate in the thrusted root store, see:
 
