@@ -341,7 +341,7 @@ typedef PJOYSTICK_POSITION_V3 PJOYSTICK_POSITION;
 
 // Max 1..128 effect block index, 10 simultaneously played
 #define VJOY_FFB_FIRST_EFFECT_ID            (1)
-#define VJOY_FFB_MAX_EFFECTS_BLOCK_INDEX    (128)
+#define VJOY_FFB_MAX_EFFECTS_BLOCK_INDEX    (40)
 #define VJOY_FFB_MAX_SIMULTANEOUS_EFFECTS   (10)
 
 #define VJOY_FFB_EFFECT_FREE                (0x00)
@@ -396,14 +396,14 @@ typedef struct _FFB_DEVICE_PID
 {
     FFB_PID_BLOCK_LOAD_REPORT   PIDBlockLoad;
     FFB_PID_POOL_REPORT         PIDPool;
+    // All Effect States, as 2-bytes
+    FFB_PID_EFFECT_STATE_REPORT EffectStates[VJOY_FFB_MAX_EFFECTS_BLOCK_INDEX];
     // Index to next free slot, between 1 and VJOY_FFB_MAX_EFFECTS_BLOCK_INDEX+1
     // If >VJOY_FFB_MAX_EFFECTS_BLOCK_INDEX => full
     BYTE                        NextFreeEID;
     // Index to last valid slot that has been used, between 1 to VJOY_FFB_MAX_EFFECTS_BLOCK_INDEX
     // 0 if no effect yet created/used
     BYTE                        LastEID;
-    // All Effect States, as 2-bytes
-    FFB_PID_EFFECT_STATE_REPORT EffectStates[VJOY_FFB_MAX_EFFECTS_BLOCK_INDEX];
 } FFB_DEVICE_PID, * PFFB_DEVICE_PID;
 
 // Turn off 1-byte packing of struct

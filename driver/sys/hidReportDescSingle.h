@@ -740,10 +740,10 @@
                 
         0xA1, 0x02,    //    Collection Datalink
             0x09, 0x94,    //    Usage Effect Playing
-            0x09, 0x98,    //    Usage Device Paused
+            0x09, 0x9F,    //    Usage Device Paused
             0x09, 0xA0,    //    Usage Actuators Enabled
             0x09, 0xA4,    //    Usage Safety Switch
-            0x09, 0x9B,    //    Usage Actuator Override Switch
+            0x09, 0xA5,    //    Usage Actuator Override Switch
             0x09, 0xA6,    //    Usage Actuator Power
             0x75, 0x01,    //    Report Size 1
             0x95, 0x06,    //    Report Count 6
