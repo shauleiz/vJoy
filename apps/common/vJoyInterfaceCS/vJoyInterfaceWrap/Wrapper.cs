@@ -228,13 +228,13 @@ namespace vJoyInterfaceWrap
             public Byte Gain;
             [FieldOffset(17)]
             public Byte TrigerBtn;
-            [FieldOffset(18)]
+            [FieldOffset(20)]
             public bool Polar; // How to interpret force direction Polar (0-360°) or Cartesian (X,Y)
-            [FieldOffset(22)]
+            [FieldOffset(24)]
             public Byte Direction; // Polar direction: (0x00-0xFF correspond to 0-360°)
-            [FieldOffset(22)]
+            [FieldOffset(24)]
             public Byte DirX; // X direction: Positive values are To the right of the center (X); Negative are Two's complement
-            [FieldOffset(23)]
+            [FieldOffset(25)]
             public Byte DirY; // Y direction: Positive values are below the center (Y); Negative are Two's complement
         }
 
@@ -315,7 +315,7 @@ namespace vJoyInterfaceWrap
         #region Mapping to vJoy's driver with 1-byte packed structs - must match driver version!
         public const int VJOY_FFB_FIRST_EFFECT_ID = (1);
         // See VJOY_FFB_MAX_EFFECTS_BLOCK_INDEX in public.h
-        public const int VJOY_FFB_MAX_EFFECTS_BLOCK_INDEX = (40);
+        public const int VJOY_FFB_MAX_EFFECTS_BLOCK_INDEX = (100);
         public const int VJOY_FFB_MAX_SIMULTANEOUS_EFFECTS = (10);
         public const int VJOY_FFB_EFFECT_FREE = (0x00);
         public const int VJOY_FFB_EFFECT_ALLOCATED = (0x01);
