@@ -341,7 +341,7 @@ typedef PJOYSTICK_POSITION_V3 PJOYSTICK_POSITION;
 
 // Max 1..128 effect block index, 10 simultaneously played
 #define VJOY_FFB_FIRST_EFFECT_ID            (1)
-#define VJOY_FFB_MAX_EFFECTS_BLOCK_INDEX    (40)
+#define VJOY_FFB_MAX_EFFECTS_BLOCK_INDEX    (100)
 #define VJOY_FFB_MAX_SIMULTANEOUS_EFFECTS   (10)
 
 #define VJOY_FFB_EFFECT_FREE                (0x00)
