@@ -228,13 +228,13 @@ namespace vJoyInterfaceWrap
             public Byte Gain;
             [FieldOffset(17)]
             public Byte TrigerBtn;
-            [FieldOffset(18)]
+            [FieldOffset(20)]
             public bool Polar; // How to interpret force direction Polar (0-360°) or Cartesian (X,Y)
-            [FieldOffset(22)]
+            [FieldOffset(24)]
             public Byte Direction; // Polar direction: (0x00-0xFF correspond to 0-360°)
-            [FieldOffset(22)]
+            [FieldOffset(24)]
             public Byte DirX; // X direction: Positive values are To the right of the center (X); Negative are Two's complement
-            [FieldOffset(23)]
+            [FieldOffset(25)]
             public Byte DirY; // Y direction: Positive values are below the center (Y); Negative are Two's complement
         }
 
