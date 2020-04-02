@@ -123,9 +123,9 @@
 
        0x09,0x22,    //    Usage Effect Block Index
        0x15,0x01,    //    Logical Minimum 1
-       0x25,0x28,    //    Logical Maximum 28h (40d)
+       0x25, VJOY_FFB_MAX_EFFECTS_BLOCK_INDEX,    //    Logical Maximum 80h (128d)
        0x35,0x01,    //    Physical Minimum 1
-       0x45,0x28,    //    Physical Maximum 28h (40d)
+       0x45, VJOY_FFB_MAX_EFFECTS_BLOCK_INDEX,    //    Physical Maximum 80h (128d)
        0x75,0x07,    //    Report Size 7
        0x95,0x01,    //    Report Count 1
        0x81,0x02,    //    Input (Variable)
@@ -148,9 +148,9 @@
        0x85,HID_ID_EFFREP+0x10*TLID,    //    Report ID 1
        0x09,0x22,    //    Usage Effect Block Index
        0x15,0x01,    //    Logical Minimum 1
-       0x25,0x28,    //    Logical Maximum 28h (40d)
+       0x25, VJOY_FFB_MAX_EFFECTS_BLOCK_INDEX,    //    Logical Maximum 80h (128d)
        0x35,0x01,    //    Physical Minimum 1
-       0x45,0x28,    //    Physical Maximum 28h (40d)
+       0x45, VJOY_FFB_MAX_EFFECTS_BLOCK_INDEX,    //    Physical Maximum 80h (128d)
        0x75,0x08,    //    Report Size 8
        0x95,0x01,    //    Report Count 1
        0x91,0x02,    //    Output (Variable)
@@ -217,11 +217,15 @@
        0xA1,0x02,       //    Collection Datalink
             0x05,0x01,    //    Usage Page Generic Desktop
             0x09,0x30,    //    Usage X
+#ifdef NB_FF_AXIS>1   
+           // If only 1 FFB axis, skip this
             0x09,0x31,    //    Usage Y
+#endif
             0x15,0x00,    //    Logical Minimum 0
             0x25,0x01,    //    Logical Maximum 1
             0x75,0x01,    //    Report Size 1
-            0x95,0x02,    //    Report Count 2
+            // 0x95,0x02,    //    Report Count 2
+            0x95, NB_FF_AXIS,   // Report Count = (NB_FF_AXIS)
             0x91,0x02,    //    Output (Variable)
        0xC0     ,    // End Collection
 
@@ -230,7 +234,8 @@
        0x95,0x01,    //    Report Count 1
        0x91,0x02,    //    Output (Variable)
 
-       0x95,0x05,    //    Report Count 5
+       // 0x95,0x05,    //    Report Count 5
+       0x95,0x07-NB_FF_AXIS,    // Report Count (05 (2 axes) or 06 (1 axes)) seems to be for padding
        0x91,0x03,    //    Output (Constant, Variable)
 
        0x09,0x57,    //    Usage Direction
@@ -269,9 +274,9 @@
         0x85,HID_ID_ENVREP+0x10*TLID,         //    Report ID 2
         0x09,0x22,         //    Usage Effect Block Index
         0x15,0x01,         //    Logical Minimum 1
-        0x25,0x28,         //    Logical Maximum 28h (40d)
+        0x25, VJOY_FFB_MAX_EFFECTS_BLOCK_INDEX,         //    Logical Maximum 80h (128d)
         0x35,0x01,         //    Physical Minimum 1
-        0x45,0x28,         //    Physical Maximum 28h (40d)
+        0x45, VJOY_FFB_MAX_EFFECTS_BLOCK_INDEX,         //    Physical Maximum 80h (128d)
         0x75,0x08,         //    Report Size 8
         0x95,0x01,         //    Report Count 1
         0x91,0x02,         //    Output (Variable)
@@ -305,9 +310,9 @@
        0x85,HID_ID_CONDREP+0x10*TLID,    //    Report ID 3
        0x09,0x22,    //    Usage Effect Block Index
        0x15,0x01,    //    Logical Minimum 1
-       0x25,0x28,    //    Logical Maximum 28h (40d)
+       0x25, VJOY_FFB_MAX_EFFECTS_BLOCK_INDEX,    //    Logical Maximum 80h (128d)
        0x35,0x01,    //    Physical Minimum 1
-       0x45,0x28,    //    Physical Maximum 28h (40d)
+       0x45, VJOY_FFB_MAX_EFFECTS_BLOCK_INDEX,    //    Physical Maximum 80h (128d)
        0x75,0x08,    //    Report Size 8
        0x95,0x01,    //    Report Count 1
        0x91,0x02,    //    Output (Variable)
@@ -366,9 +371,9 @@
        0x85,HID_ID_PRIDREP+0x10*TLID,                   //    Report ID 4
        0x09,0x22,                   //    Usage Effect Block Index
        0x15,0x01,                   //    Logical Minimum 1
-       0x25,0x28,                   //    Logical Maximum 28h (40d)
+       0x25, VJOY_FFB_MAX_EFFECTS_BLOCK_INDEX,                   //    Logical Maximum 80h (128d)
        0x35,0x01,                   //    Physical Minimum 1
-       0x45,0x28,                   //    Physical Maximum 28h (40d)
+       0x45, VJOY_FFB_MAX_EFFECTS_BLOCK_INDEX,                   //    Physical Maximum 80h (128d)
        0x75,0x08,                   //    Report Size 8
        0x95,0x01,                   //    Report Count 1
        0x91,0x02,                   //    Output (Variable)
@@ -422,9 +427,9 @@
        0x85,HID_ID_CONSTREP+0x10*TLID,         //    Report ID 5
        0x09,0x22,         //    Usage Effect Block Index
        0x15,0x01,         //    Logical Minimum 1
-       0x25,0x28,         //    Logical Maximum 28h (40d)
+       0x25, VJOY_FFB_MAX_EFFECTS_BLOCK_INDEX,         //    Logical Maximum 80h (128d)
        0x35,0x01,         //    Physical Minimum 1
-       0x45,0x28,         //    Physical Maximum 28h (40d)
+       0x45, VJOY_FFB_MAX_EFFECTS_BLOCK_INDEX,         //    Physical Maximum 80h (128d)
        0x75,0x08,         //    Report Size 8
        0x95,0x01,         //    Report Count 1
        0x91,0x02,         //    Output (Variable)
@@ -444,9 +449,9 @@
        0x85,HID_ID_RAMPREP+0x10*TLID,         //    Report ID 6
        0x09,0x22,         //    Usage Effect Block Index
        0x15,0x01,         //    Logical Minimum 1
-       0x25,0x28,         //    Logical Maximum 28h (40d)
+       0x25, VJOY_FFB_MAX_EFFECTS_BLOCK_INDEX,         //    Logical Maximum 80h (128d)
        0x35,0x01,         //    Physical Minimum 1
-       0x45,0x28,         //    Physical Maximum 28h (40d)
+       0x45, VJOY_FFB_MAX_EFFECTS_BLOCK_INDEX,         //    Physical Maximum 80h (128d)
        0x75,0x08,         //    Report Size 8
        0x95,0x01,         //    Report Count 1
        0x91,0x02,         //    Output (Variable)
@@ -466,9 +471,9 @@
        0x85,HID_ID_CSTMREP+0x10*TLID,         //    Report ID 7
        0x09,0x22,         //    Usage Effect Block Index
        0x15,0x01,         //    Logical Minimum 1
-       0x25,0x28,         //    Logical Maximum 28h (40d)
+       0x25, VJOY_FFB_MAX_EFFECTS_BLOCK_INDEX,         //    Logical Maximum 80h (128d)
        0x35,0x01,         //    Physical Minimum 1
-       0x45,0x28,         //    Physical Maximum 28h (40d)
+       0x45, VJOY_FFB_MAX_EFFECTS_BLOCK_INDEX,         //    Physical Maximum 80h (128d)
        0x75,0x08,         //    Report Size 8
        0x95,0x01,         //    Report Count 1
        0x91,0x02,         //    Output (Variable)
@@ -513,9 +518,9 @@
        0x85,HID_ID_EFOPREP+0x10*TLID,    //    Report ID Ah (10d)
        0x09,0x22,    //    Usage Effect Block Index
        0x15,0x01,    //    Logical Minimum 1
-       0x25,0x28,    //    Logical Maximum 28h (40d)
+       0x25, VJOY_FFB_MAX_EFFECTS_BLOCK_INDEX,    //    Logical Maximum 80h (128d)
        0x35,0x01,    //    Physical Minimum 1
-       0x45,0x28,    //    Physical Maximum 28h (40d)
+       0x45, VJOY_FFB_MAX_EFFECTS_BLOCK_INDEX,    //    Physical Maximum 80h (128d)
        0x75,0x08,    //    Report Size 8
        0x95,0x01,    //    Report Count 1
        0x91,0x02,    //    Output (Variable)
@@ -544,10 +549,10 @@
     0xA1,0x02,    //    Collection Datalink
        0x85,HID_ID_BLKFRREP+0x10*TLID,    //    Report ID Bh (11d)
        0x09,0x22,    //    Usage Effect Block Index
-       0x25,0x28,    //    Logical Maximum 28h (40d)
        0x15,0x01,    //    Logical Minimum 1
+       0x25, VJOY_FFB_MAX_EFFECTS_BLOCK_INDEX,    //    Logical Maximum 80h (128d)
        0x35,0x01,    //    Physical Minimum 1
-       0x45,0x28,    //    Physical Maximum 28h (40d)
+       0x45, VJOY_FFB_MAX_EFFECTS_BLOCK_INDEX,    //    Physical Maximum 80h (128d)
        0x75,0x08,    //    Report Size 8
        0x95,0x01,    //    Report Count 1
        0x91,0x02,    //    Output (Variable)
@@ -587,9 +592,9 @@
        0x85,HID_ID_SETCREP+0x10*TLID,         //    Report ID Eh (14d)
        0x09,0x22,         //    Usage Effect Block Index
        0x15,0x01,         //    Logical Minimum 1
-       0x25,0x28,         //    Logical Maximum 28h (40d)
+       0x25, VJOY_FFB_MAX_EFFECTS_BLOCK_INDEX,         //    Logical Maximum 80h (128d)
        0x35,0x01,         //    Physical Minimum 1
-       0x45,0x28,         //    Physical Maximum 28h (40d)
+       0x45, VJOY_FFB_MAX_EFFECTS_BLOCK_INDEX,         //    Physical Maximum 80h (128d)
        0x75,0x08,         //    Report Size 8
        0x95,0x01,         //    Report Count 1
        0x91,0x02,         //    Output (Variable)
@@ -636,8 +641,8 @@
             0x09, HID_USAGE_FRIC,    //    Usage ET Friction
             //0x09, HID_USAGE_CUSTM,   //    Usage ET Custom Force Data
             0x09, HID_USAGE_RESERVD, //    Usage ET RESERVED
-           0x25,0x0C,    //    Logical Maximum Ch (12d)
            0x15,0x01,    //    Logical Minimum 1
+           0x25,0x0C,    //    Logical Maximum Ch (12d)
            0x35,0x01,    //    Physical Minimum 1
            0x45,0x0C,    //    Physical Maximum Ch (12d)
            0x75,0x08,    //    Report Size 8
@@ -662,10 +667,10 @@
      0xA1,0x02,    //    Collection Datalink
         0x85,HID_ID_BLKLDREP+0x10*TLID,    //    Report ID 2
         0x09,0x22,    //    Usage Effect Block Index
-        0x25,0x28,    //    Logical Maximum 28h (40d)
         0x15,0x01,    //    Logical Minimum 1
+        0x25, VJOY_FFB_MAX_EFFECTS_BLOCK_INDEX,    //    Logical Maximum 80h (128d)
         0x35,0x01,    //    Physical Minimum 1
-        0x45,0x28,    //    Physical Maximum 28h (40d)
+        0x45, VJOY_FFB_MAX_EFFECTS_BLOCK_INDEX,    //    Physical Maximum 80h (128d)
         0x75,0x08,    //    Report Size 8
         0x95,0x01,    //    Report Count 1
         0xB1,0x02,    //    Feature (Variable)
@@ -675,8 +680,8 @@
            0x09,0x8C,    //    Usage Block Load Success
            0x09,0x8D,    //    Usage Block Load Full
            0x09,0x8E,    //    Usage Block Load Error
-           0x25,0x03,    //    Logical Maximum 3
            0x15,0x01,    //    Logical Minimum 1
+           0x25,0x03,    //    Logical Maximum 3
            0x35,0x01,    //    Physical Minimum 1
            0x45,0x03,    //    Physical Maximum 3
            0x75,0x08,    //    Report Size 8
@@ -731,9 +736,9 @@
         0x85, HID_ID_STATEREP+0x10*TLID, //    Report ID 4
         0x09, 0x22,    //    Usage Effect Block Index
         0x15, 0x01,    //    Logical Minimum 1
-        0x25, 0x28,    //    Logical Maximum 28h (40d)
+        0x25,  VJOY_FFB_MAX_EFFECTS_BLOCK_INDEX,    //    Logical Maximum 80h (128d)
         0x35, 0x01,    //    Physical Minimum 1
-        0x45, 0x28,    //    Physical Maximum 28h (40d)
+        0x45,  VJOY_FFB_MAX_EFFECTS_BLOCK_INDEX,    //    Physical Maximum 80h (128d)
         0x75, 0x08,    //    Report Size 8
         0x95, 0x01,    //    Report Count 1
         0xB1, 0x02,    //    Input

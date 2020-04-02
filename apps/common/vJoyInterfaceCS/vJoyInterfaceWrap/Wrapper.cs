@@ -314,7 +314,8 @@ namespace vJoyInterfaceWrap
 
         #region Mapping to vJoy's driver with 1-byte packed structs - must match driver version!
         public const int VJOY_FFB_FIRST_EFFECT_ID = (1);
-        public const int VJOY_FFB_MAX_EFFECTS_BLOCK_INDEX = (128);
+        // See VJOY_FFB_MAX_EFFECTS_BLOCK_INDEX in public.h
+        public const int VJOY_FFB_MAX_EFFECTS_BLOCK_INDEX = (40);
         public const int VJOY_FFB_MAX_SIMULTANEOUS_EFFECTS = (10);
         public const int VJOY_FFB_EFFECT_FREE = (0x00);
         public const int VJOY_FFB_EFFECT_ALLOCATED = (0x01);
