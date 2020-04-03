@@ -459,7 +459,6 @@ typedef struct _FFB_DEVICE_PID
 #define HID_USAGE_BLKLD_ERROR   0x8E // Usage Block Load Error
 
 // HID Descriptor definitions - FFB Report IDs
-#define HID_ID_STATE        0x02	// Usage PID State report
 #define HID_ID_EFFREP       0x01	// Usage Set Effect Report
 #define HID_ID_ENVREP       0x02	// Usage Set Envelope Report
 #define HID_ID_CONDREP      0x03	// Usage Set Condition Report
