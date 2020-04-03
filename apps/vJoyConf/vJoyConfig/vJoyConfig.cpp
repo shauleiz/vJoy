@@ -351,7 +351,7 @@ void CreateFfbDesc(std::vector<BYTE>* buffer, BYTE ReportId)
     // Vector of bytes depending on the ID
     std::vector<BYTE> vars
     {
-        static_cast<BYTE>(HID_ID_STATE + 0x10 * ReportId),      //    Report ID 2
+        //static_cast<BYTE>(HID_ID_STATE + 0x10 * ReportId),      //    Report ID 2
         static_cast<BYTE>(HID_ID_EFFREP + 0x10 * ReportId),     //    Report ID 1
         static_cast<BYTE>(HID_ID_ENVREP + 0x10 * ReportId),     //    Report ID 2
         static_cast<BYTE>(HID_ID_CONDREP + 0x10 * ReportId),    //    Report ID 3

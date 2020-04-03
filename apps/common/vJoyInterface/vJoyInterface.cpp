@@ -1886,9 +1886,9 @@ namespace vJoyNS {
         // Routine validity checks
         if (!Packet)
             return ERROR_INVALID_PARAMETER;
-        if (Packet->size <22)
+        if (Packet->size <(8+2+18))   // Header = 8+2, packet = 18+(2), (2) is optionnal, depends on direction
             return ERROR_INVALID_DATA;
-
+        
         // Some types don't carry Effect Block Index
         FFBPType Type;
         if (Ffb_h_Type(Packet, &Type) != ERROR_SUCCESS)
@@ -1904,12 +1904,13 @@ namespace vJoyNS {
         Effect->StartDelay = (WORD)((Packet->data[10] << 8) + (Packet->data[9]));
         Effect->Gain = Packet->data[11];
         Effect->TrigerBtn = Packet->data[12];
+        Effect->AxesEnabledDirection = Packet->data[13];
         Effect->Polar = (Packet->data[13] == 0x04);
         if (Effect->Polar)
-            Effect->Direction = Packet->data[14];
+            Effect->Direction = (WORD)((Packet->data[15] << 8) + (Packet->data[14]));
         else {
-            Effect->DirX = Packet->data[14];
-            Effect->DirY = Packet->data[15];
+            Effect->DirX = (WORD)((Packet->data[15] << 8) + (Packet->data[14]));
+            Effect->DirY = (WORD)((Packet->data[17] << 8) + (Packet->data[16]));
         }
         return ERROR_SUCCESS;
     }

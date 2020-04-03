@@ -226,14 +226,15 @@ typedef struct _FFB_EFF_REPORT {
     WORD		StartDelay;
     BYTE		Gain;
     BYTE		TrigerBtn;
+    BYTE		AxesEnabledDirection;
 
     BOOL		Polar; // How to interpret force direction Polar (0-360°) or Cartesian (X,Y)
     union
     {
-        BYTE	Direction; // Polar direction: (0x00-0xFF correspond to 0-360°)
-        BYTE	DirX; // X direction: Positive values are To the right of the center (X); Negative are Two's complement
+        WORD	Direction; // Polar direction: (0x00-0x7FFF correspond to 0-360°)
+        WORD	DirX; // X direction: Positive values are To the right of the center (X); Negative are Two's complement
     };
-    BYTE		DirY; // Y direction: Positive values are below the center (Y); Negative are Two's complement
+    WORD		DirY; // Y direction: Positive values are below the center (Y); Negative are Two's complement
 
 } FFB_EFF_REPORT, * PFFB_EFF_REPORT;
 //} FFB_EFF_CONST, *PFFB_EFF_CONST;

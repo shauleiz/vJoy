@@ -18,6 +18,8 @@ std::vector<std::vector<BYTE>>  FfbDescriptor = { {
         Effect Block Index:	7bit
         */
     0x05, 0x0F,        //    Usage Page Physical Interface
+    // Moved to end of report descriptors
+    /*
     0x09, 0x92,        //    Usage PID State report 
     0xA1, 0x02,        //    Collection Datalink (logical)
         0x85, }, { static_cast<BYTE>(HID_ID_STATE + 0x10 * TLID),    //    Report ID 2
@@ -55,7 +57,7 @@ std::vector<std::vector<BYTE>>  FfbDescriptor = { {
         0x95, 0x01,    //    Report Count 1
         0x81, 0x02,    //    Input (Variable)
     0xC0,    // End Collection
-
+    */
     /*
     Output
     Collection  Datalink:
@@ -142,7 +144,7 @@ std::vector<std::vector<BYTE>>  FfbDescriptor = { {
         0xA1, 0x02,       //    Collection Datalink
             0x05, 0x01,    //    Usage Page Generic Desktop
             0x09, 0x30,    //    Usage X
-#ifdef NB_FF_AXIS>1   
+#ifdef FFB_USE_XY_AXES>1   
            // If only 1 FFB axis, skip this
             0x09, 0x31,    //    Usage Y
 #endif
@@ -150,7 +152,7 @@ std::vector<std::vector<BYTE>>  FfbDescriptor = { {
             0x25, 0x01,    //    Logical Maximum 1
             0x75, 0x01,    //    Report Size 1
             // 0x95,0x02,    //    Report Count 2
-            0x95, NB_FF_AXIS,   // Report Count = (NB_FF_AXIS)
+            0x95, FFB_USE_XY_AXES,   // Report Count = (FFB_USE_XY_AXES)
             0x91, 0x02,    //    Output (Variable)
         0xC0,    // End Collection
 
@@ -160,7 +162,7 @@ std::vector<std::vector<BYTE>>  FfbDescriptor = { {
         0x91, 0x02,    //    Output (Variable)
 
         // 0x95,0x05,    //    Report Count 5
-        0x95, 0x07-NB_FF_AXIS,    // Report Count (05 (2 axes) or 06 (1 axes)) seems to be for padding
+        0x95, 0x07-FFB_USE_XY_AXES,    // Report Count (05 (2 axes) or 06 (1 axes)) seems to be for padding
         0x91, 0x03,    //    Output (Constant, Variable)
 
         0x09, 0x57,    //    Usage Direction
@@ -170,11 +172,17 @@ std::vector<std::vector<BYTE>>  FfbDescriptor = { {
             0x66, 0x14, 0x00,             //    Unit 14h (20d) (Eng Rot:Angular Pos)
                 0x55, 0xFE,                   //    Unit Exponent FEh (254d)
                     0x15, 0x00,                   //    Logical Minimum 0
-                    0x26, 0xFF, 0x00,             //    Logical Maximum FFh (255d)
+                    //0x26, 0xFF, 0x00,             //    Logical Maximum FFh (255d)
+                    0x27, 0xFF, 0x7F, 0x00, 0x00, //    Logical Maximum 7Fffh (32767d)
                     0x35, 0x00,                   //    Physical Minimum 0
                     0x47, 0xA0, 0x8C, 0x00, 0x00, //    Physical Maximum 8CA0h (36000d)
                     0x66, 0x00, 0x00,             //    Unit 0
-                    0x75, 0x08,                   //    Report Size 8
+                    //0x75, 0x08,                   //    Report Size 8
+#ifdef VJOY_FORCE_WRONG_FFB_HID
+                    0x75, 0x08,                   //    Report Size 08d - WRONG IF 7FFFh above
+#else
+                    0x75, 0x10,                   //    Report Size 16d
+#endif
                     0x95, 0x02,                   //    Report Count 2
                     0x91, 0x02,                   //    Output (Variable)
                 0x55, 0x00,                   //    Unit Exponent 0

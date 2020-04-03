@@ -338,6 +338,10 @@ typedef PJOYSTICK_POSITION_V3 PJOYSTICK_POSITION;
 //----------------------------------------------------------
 // FFB Features to be placed in vJoy's driver memory context
 
+// Uncomment this to have a wrong HID descriptor for the FFB
+// This allows to make the device to not being reported as a
+// FFB device!
+//#define VJOY_FORCE_WRONG_FFB_HID
 
 // Max 1..128 effect block index, 10 simultaneously played
 #define VJOY_FFB_FIRST_EFFECT_ID            (1)
@@ -349,8 +353,8 @@ typedef PJOYSTICK_POSITION_V3 PJOYSTICK_POSITION;
 
 
 // For HID descriptor : use only X, or X/Y axes for FFB
-// Can be 1 (X) or 2 (X and Y)
-#define NB_FF_AXIS                          (2)
+// Can be 1 (X) or 2 (X and Y) - see ESP Wheel source code
+#define FFB_USE_XY_AXES                     (2)
 
 // Turn on 1 byte packing of struct, dummy fields will be added when needed
 #include <pshpack1.h>

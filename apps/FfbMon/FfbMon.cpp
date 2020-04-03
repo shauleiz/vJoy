@@ -197,12 +197,12 @@ void CALLBACK FfbFunction1(PVOID data, PVOID userdata)
 #pragma warning( push )
 
         if (Effect.Polar) {
-            _tprintf(L"\n >> Direction: %d deg (%02x)", Polar2Deg(Effect.Direction), Effect.Direction);
+            _tprintf(L"\n >> Direction: %d deg (%04x)", Polar2Deg(Effect.Direction), Effect.Direction);
 
 
         } else {
-            _tprintf(L"\n >> X Direction: %02x", Effect.DirX);
-            _tprintf(L"\n >> Y Direction: %02x", Effect.DirY);
+            _tprintf(L"\n >> X Direction: %04x", Effect.DirX);
+            _tprintf(L"\n >> Y Direction: %04x", Effect.DirY);
         };
 
         if (Effect.Duration == 0xFFFF)
@@ -509,10 +509,10 @@ BOOL EffectOpStr(FFBOP Op, LPTSTR OutStr)
     return stat;
 }
 
-// Polar values (0x00-0xFF) to Degrees (0-360)
-int Polar2Deg(BYTE Polar)
+// Polar values (0x00-0x7FFF) to Degrees (0-360)
+int Polar2Deg(UINT16 Polar)
 {
-    return ((UINT)Polar*360)/255;
+    return (int)((LONG)Polar*360)/32767;
 }
 
 // Convert range 0x00-0xFF to 0%-100%
