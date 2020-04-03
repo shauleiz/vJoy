@@ -200,13 +200,15 @@ namespace vJoyInterfaceWrap
             [FieldOffset(17)]
             public Byte TrigerBtn;
             [FieldOffset(18)]
+            public Byte AxesEnabledDirection;
+            [FieldOffset(20)]
             public bool Polar; // How to interpret force direction Polar (0-360°) or Cartesian (X,Y)
-            [FieldOffset(22)]
-            public Byte Direction; // Polar direction: (0x00-0xFF correspond to 0-360°)
-            [FieldOffset(22)]
-            public Byte DirX; // X direction: Positive values are To the right of the center (X); Negative are Two's complement
-            [FieldOffset(23)]
-            public Byte DirY; // Y direction: Positive values are below the center (Y); Negative are Two's complement
+            [FieldOffset(24)]
+            public UInt16 Direction; // Polar direction: (0x00-0x7FFF correspond to 0-360°)
+            [FieldOffset(24)]
+            public UInt16 DirX; // X direction: Positive values are To the right of the center (X); Negative are Two's complement
+            [FieldOffset(26)]
+            public UInt16 DirY; // Y direction: Positive values are below the center (Y); Negative are Two's complement
         }
 
         [StructLayout(LayoutKind.Explicit)]
@@ -228,14 +230,16 @@ namespace vJoyInterfaceWrap
             public Byte Gain;
             [FieldOffset(17)]
             public Byte TrigerBtn;
+            [FieldOffset(18)]
+            public Byte AxesEnabledDirection;
             [FieldOffset(20)]
             public bool Polar; // How to interpret force direction Polar (0-360°) or Cartesian (X,Y)
             [FieldOffset(24)]
-            public Byte Direction; // Polar direction: (0x00-0xFF correspond to 0-360°)
+            public UInt16 Direction; // Polar direction: (0x00-0x7FFF correspond to 0-360°)
             [FieldOffset(24)]
-            public Byte DirX; // X direction: Positive values are To the right of the center (X); Negative are Two's complement
-            [FieldOffset(25)]
-            public Byte DirY; // Y direction: Positive values are below the center (Y); Negative are Two's complement
+            public UInt16 DirX; // X direction: Positive values are To the right of the center (X); Negative are Two's complement
+            [FieldOffset(26)]
+            public UInt16 DirY; // Y direction: Positive values are below the center (Y); Negative are Two's complement
         }
 
         [StructLayout(LayoutKind.Explicit)]

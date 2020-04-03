@@ -7,10 +7,12 @@ To build the project:
 
 1. Pull the project
 
-2. Run batch file BuildAll.bat
+2. Run batch file BuildAll.bat to get installer (in install/ directory)
+
+3. Run batch file CreateSDK.bat to copy SDK files (in SDK/ directory)
 
 Caution:
-You will need to install Visual Studio 2015 (Free)
+You will need to install Visual Studio 2019 Community (Free) + WDK and MFC/ATL libraires with Spectre mitigation and InnoSetup 6.0.
 To build the entire project including the driver you need to install the SDK and puchase a license to sign drivers.
 
 Justin's notes are now at the end of this document.
