@@ -20,7 +20,7 @@ Justin's notes are now at the end of this document.
 ### Benjamin's notes:
 
 1. Install VS2019 Community + Runtime/MFC/ATL Spectre mitigated librairies,
-all for v142..
+all for v142.
 2. Install last WDK (10.0.18362.0) and last Windows 10 SDK (10.0.18362.0).
 3. Install Inno Setup 6.
 4. DigiCert utility is provided in the git tree for now, but you need a valid EV
@@ -169,7 +169,7 @@ To get information about vJoy module, type :
 `!drvobj vJoy`
 
 
-### Justin's notes:
+### Older Justin's notes:
 1. Install Visual Studio 2013
 2. Install Visual Studio 2015 Update 3
 3. Install Windows 10 SDK 1511
