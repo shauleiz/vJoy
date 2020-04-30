@@ -346,7 +346,7 @@ vJoyGetFeature(
     // Byte[3]: Block Load Full (1-3)
     // Byte[4]: Block Load Error (1-3)
     ////////////////////////////////////////
-    if (transferPacket->reportId == (HID_ID_BLKLDREP+0x10)) {
+    if (reportID == (HID_ID_BLKLDREP)) {
         ucTmp = (PUCHAR)transferPacket->reportBuffer;
         ucTmp[0] = transferPacket->reportId;
         // Lastly created Effect Block Index start at 1. 0 means not yet created
@@ -371,7 +371,7 @@ vJoyGetFeature(
     // Byte[3]: Simultaneous Effects Max
     // Byte[4]: Device Managed Pool (0-1) + Shared Parameter Blocks (0-1)
     ////////////////////////////////////////
-    if (transferPacket->reportId == (HID_ID_POOLREP+0x10)) {
+    if (reportID == (HID_ID_POOLREP)) {
         ucTmp = (PUCHAR)transferPacket->reportBuffer;
         ucTmp[0] = transferPacket->reportId;
         if (devContext->FfbEnable[id-1]) {
@@ -397,9 +397,9 @@ vJoyGetFeature(
     // Byte[1]: Effect Block Index (1-40)
     // Byte[2]: State Report (bitfield)
     ////////////////////////////////////////
-    //NO WORKING FOR NOW, AS WE ARE UNABLE TO SEND A HID REPORT BACK TO
+    //NOT WORKING FOR NOW, AS WE ARE UNABLE TO SEND A HID REPORT BACK TO
     //DIRECTINPUT
-    if (transferPacket->reportId == (HID_ID_STATEREP+0x10)) {
+    if (reportID == (HID_ID_STATEREP)) {
         ucTmp = (PUCHAR)transferPacket->reportBuffer;
         ucTmp[0] = transferPacket->reportId;
         if (devContext->FfbEnable[id-1]) {
