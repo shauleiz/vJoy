@@ -341,7 +341,7 @@ vJoyGetFeature(
 
     ////////////////////////////////////////
     // Block Load Report ID 2
-    // Byte[1]: Effect Block Index (1-40)
+    // Byte[1]: Effect Block Index (1-100) max is VJOY_FFB_MAX_EFFECTS_BLOCK_INDEX
     // Byte[2]: Block Load Success (1-3)
     // Byte[3]: Block Load Full (1-3)
     // Byte[4]: Block Load Error (1-3)
@@ -394,7 +394,7 @@ vJoyGetFeature(
 
     ////////////////////////////////////////
     // State Report ID 4
-    // Byte[1]: Effect Block Index (1-40)
+    // Byte[1]: Effect Block Index (1-100) max is VJOY_FFB_MAX_EFFECTS_BLOCK_INDEX
     // Byte[2]: State Report (bitfield)
     ////////////////////////////////////////
     //NOT WORKING FOR NOW, AS WE ARE UNABLE TO SEND A HID REPORT BACK TO

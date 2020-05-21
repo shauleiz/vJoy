@@ -329,11 +329,11 @@ namespace vJoyInterfaceWrap
         public struct FFB_PID_BLOCK_LOAD_REPORT
         {
             [FieldOffset(0)]
-            public Byte EffectBlockIndex;	// 1..40
+            public Byte EffectBlockIndex;	// 1..100 (max is VJOY_FFB_MAX_EFFECTS_BLOCK_INDEX)
             [FieldOffset(1)]
             public Byte LoadStatus;	        // 0 ongoing, 1=Success,2=Full,3=Error
             [FieldOffset(2)]
-            public UInt16 RAMPoolAvailable;	// =0 if full, or sizeof(FFB_PID_EFFECT_STATE_REPORT) * (40 - created
+            public UInt16 RAMPoolAvailable;	// =0 if full, or sizeof(FFB_PID_EFFECT_STATE_REPORT) * (100 - created)
         }
 
         [StructLayout(LayoutKind.Explicit, Size = 4)]
