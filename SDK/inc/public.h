@@ -363,11 +363,11 @@ typedef PJOYSTICK_POSITION_V3 PJOYSTICK_POSITION;
 // Only one per device
 typedef struct _FFB_PID_BLOCK_LOAD_REPORT
 {
-    // 1..40. If 0, then error (below value is 2 or 3)
+    // 1..100. If 0, then error (below value is 2 or 3)
     BYTE    EffectBlockIndex;
     // 0 ongoing, 1=Success,2=Full,3=Error
     BYTE	LoadStatus;
-    // =0 if full, or sizeof(FFB_PID_EFFECT_STATE_REPORT) * (40 - created) 
+    // =0 if full, or sizeof(FFB_PID_EFFECT_STATE_REPORT) * (100 - created) max is VJOY_FFB_MAX_EFFECTS_BLOCK_INDEX
     USHORT	RAMPoolAvailable;
 } FFB_PID_BLOCK_LOAD_REPORT, * PFFB_PID_BLOCK_LOAD_REPORT;
 
