@@ -1886,7 +1886,7 @@ namespace vJoyNS {
         // Routine validity checks
         if (!Packet)
             return ERROR_INVALID_PARAMETER;
-        if (Packet->size <(8+2+18))   // Header = 8+2, packet = 18+(2), (2) is optionnal, depends on direction
+        if (Packet->size <(8+2+16))   // Header = 8+2, packet = 16+(2), (2) is optionnal, depends on direction
             return ERROR_INVALID_DATA;
         
         // Some types don't carry Effect Block Index
@@ -1909,6 +1909,8 @@ namespace vJoyNS {
         if (Effect->Polar)
             Effect->Direction = (WORD)((Packet->data[15] << 8) + (Packet->data[14]));
         else {
+            if (Packet->size < (8+2+18)) return ERROR_INVALID_DATA; // the extra (2) is no longer optional
+
             Effect->DirX = (WORD)((Packet->data[15] << 8) + (Packet->data[14]));
             Effect->DirY = (WORD)((Packet->data[17] << 8) + (Packet->data[16]));
         }
