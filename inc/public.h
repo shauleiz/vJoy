@@ -65,13 +65,13 @@ DEFINE_GUID(GUID_DEVINTERFACE_VJOY, 0x781EF630, 0x72B2, 0x11d2, 0xB8, 0x52, 0x00
 #include "gen-versioninfo.h"
 // This is a hardcoded version, not to be confused with whole {installer+libs+SDK} that
 // use getversion to retrieve a 'git describe' (tag) version.
-// Version parts as a serie of nibble (4bits from higher (X) significant number to lower (L))
+// Version parts as a serie of digits (from higher (X) significant number to lower (L))
 // Will be taken from CreateVersion.exe in gen-versioninfo.h
-#ifndef VER_H_
-#define VER_X_	2
-#define VER_H_	2
-#define VER_M_	1
-#define VER_L_	0
+#ifndef VER_X_
+#define VER_X_	2 // Must be within 0..0XF
+#define VER_H_	2 // Must be within 0..0XF
+#define VER_M_	1 // Must be within 0..0XF
+#define VER_L_	0 // Must be within 0..0XF
 #endif
 
 
@@ -93,9 +93,14 @@ DEFINE_GUID(GUID_DEVINTERFACE_VJOY, 0x781EF630, 0x72B2, 0x11d2, 0xB8, 0x52, 0x00
 //
 #define VENDOR_N_ID		0x1234
 #define	PRODUCT_N_ID	0xBEAD
-// Version with 4 nibbles (0..F)
-#define	VERSION_N	(0x1000*VER_X_ + 0x100*VER_H_ + 0x10*VER_M_ + VER_L_)
-//#define	VERSION_N	(0x1000*VER_H_ + 0x100*VER_M_ + 0x10*VER_L_ + BUILD)
+
+// Complete driver version on 16bits for HID and driver: v0.0.0.0 (4 nibbles)
+// To avoid bugfix numbering to be reported in vjoy.inx file each time we have a new driver, 
+// just leave the 4th number off.
+// /!\ This number must matched what is written in the vjoy.inx file (root\VID_1234&PID_BEAD&REV_0XHM)
+#define	VERSION_N	(0x100*VER_X_ + 0x10*VER_H_ + VER_M_)
+// In case we want to move to 4digits, use following and change vjoy.inx accordingly
+//#define	VERSION_N	(0x1000*VER_X_ + 0x100*VER_H_ + 0*010*VER_M_ + VER_L_)
 
 // Device Strings
 //
