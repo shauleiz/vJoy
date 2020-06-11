@@ -538,7 +538,7 @@ void OnApply(HWND hDlg)
 
     // Get changed (current) state
     GetCtrlState(hDlg, &AxisChecked[0], &nPovHatsCont, &nPovHatsDir, &nButtons, &FfbEn);
-    
+
     // Filter out disabled FFB in driver
     BOOL FfbSupported = FALSE;
     vJoyFfbCap(&FfbSupported);
@@ -1279,30 +1279,25 @@ void DeleteOEMForceFeedbackFromReg()
     /* Open registry - Most of the path should exist */
     HKEY hParams;
     LONG RegRes = RegOpenKeyEx(HKEY_CURRENT_USER, REG_OEMFORCEFEEDBACK_0, 0, DELETE | KEY_ENUMERATE_SUB_KEYS | KEY_QUERY_VALUE | KEY_SET_VALUE, &hParams);
-    if (RegRes != ERROR_SUCCESS)
-        return;	// Error
-
-    // Delete Tree
-    RegRes = RegDeleteTree(hParams, NULL);
-    RegCloseKey(hParams);
+    if (RegRes == ERROR_SUCCESS) {
+        // Delete Tree
+        RegRes = RegDeleteTree(hParams, NULL);
+        RegCloseKey(hParams);
+    }
 
     RegRes = RegOpenKeyEx(HKEY_CURRENT_USER, REG_OEMFORCEFEEDBACK_1, 0, DELETE | KEY_ENUMERATE_SUB_KEYS | KEY_QUERY_VALUE | KEY_SET_VALUE, &hParams);
-    if (RegRes != ERROR_SUCCESS)
-        return;	// Error
-
-    // Delete Tree
-    RegRes = RegDeleteTree(hParams, NULL);
-    RegCloseKey(hParams);
+    if (RegRes == ERROR_SUCCESS) {
+        // Delete Tree
+        RegRes = RegDeleteTree(hParams, NULL);
+        RegCloseKey(hParams);
+    }
 
     RegRes = RegOpenKeyEx(HKEY_CURRENT_USER, REG_OEMFORCEFEEDBACK_2, 0, DELETE | KEY_ENUMERATE_SUB_KEYS | KEY_QUERY_VALUE | KEY_SET_VALUE, &hParams);
-    if (RegRes != ERROR_SUCCESS)
-        return;	// Error
-
-    // Delete Tree
-    RegRes = RegDeleteTree(hParams, NULL);
-    RegCloseKey(hParams);
-
-    return;
+    if (RegRes == ERROR_SUCCESS) {
+        // Delete Tree
+        RegRes = RegDeleteTree(hParams, NULL);
+        RegCloseKey(hParams);
+    }
 }
 
 // Tests if Id is the only vJoy device implemented

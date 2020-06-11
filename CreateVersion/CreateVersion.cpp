@@ -87,7 +87,7 @@ int main(int argc, char** argv)
         outval = -4;
         goto FINAL;
     }
-    
+
     // Get number of commits
     int nFieldsCommits = sscanf_s(ncommits, "%u", &nbcommits);
 

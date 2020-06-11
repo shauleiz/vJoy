@@ -603,16 +603,16 @@ vJoyCompleteWriteReport(
 
     // Switch By report ID
     switch (transferPacket->reportId) {
-    case 1:
-        break;
-    case 2:
-        break;
-    case 5:
-        EffectBlockIndex = ((PUCHAR)(transferPacket->reportBuffer))[1];
-        Magnitude = ((short*)(transferPacket->reportBuffer))[1];
-        break;
-    default:
-        break;
+        case 1:
+            break;
+        case 2:
+            break;
+        case 5:
+            EffectBlockIndex = ((PUCHAR)(transferPacket->reportBuffer))[1];
+            Magnitude = ((short*)(transferPacket->reportBuffer))[1];
+            break;
+        default:
+            break;
     }; // End switch
 
     if (bytesToCopy)
@@ -1219,7 +1219,7 @@ None.
         }
         if (TraceEventsLevel <= TRACE_LEVEL_ERROR ||
             (TraceEventsLevel <= DebugLevel &&
-            ((TraceEventsFlag & DebugFlag) == TraceEventsFlag))) {
+                ((TraceEventsFlag & DebugFlag) == TraceEventsFlag))) {
             DbgPrint("%s%s", _DRIVER_NAME_, debugMessageBuffer);
         }
     }
