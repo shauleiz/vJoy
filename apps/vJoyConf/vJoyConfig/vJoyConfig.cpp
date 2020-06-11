@@ -875,6 +875,14 @@ void DeleteOEMForceFeedbackFromReg()
     RegRes = RegDeleteTree(hParams, NULL);
     RegCloseKey(hParams);
 
+    RegRes = RegOpenKeyEx(HKEY_CURRENT_USER, REG_OEMFORCEFEEDBACK_2, 0, DELETE | KEY_ENUMERATE_SUB_KEYS | KEY_QUERY_VALUE | KEY_SET_VALUE, &hParams);
+    if (RegRes != ERROR_SUCCESS)
+        return;	// Error
+
+    // Delete Tree
+    RegRes = RegDeleteTree(hParams, NULL);
+    RegCloseKey(hParams);
+
     return;
 }
 

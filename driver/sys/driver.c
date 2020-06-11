@@ -46,7 +46,7 @@ Note: Based of Microsoft sample: %PROJECT_ROOT%\hid\hidusbfx2\sys\driver.c
 //
 #include "driver.tmh"
 #else
-ULONG DebugLevel = TRACE_LEVEL_INFORMATION;
+ULONG DebugLevel = TRACE_LEVEL_VERBOSE;
 ULONG DebugFlag = 0xff;
 #endif
 
