@@ -75,6 +75,7 @@ int  CreateHidReportDesc(void** data, UINT nButtons, bool* axes, int nPovHatsCon
 bool WriteHidReportDescriptor(int target);
 void WriteHidReportDescToReg(int target, UCHAR* Descriptor, int size, bool Overwrite);
 void DeleteHidReportDescFromReg(int target);
+void DeleteOEMForceFeedbackFromReg();
 void DisplayHelp(void);
 void DisplayVersion(void);
 void ReportConf(void);
@@ -786,6 +787,12 @@ bool WriteHidReportDescriptor(int target)
             g_isFfbTr || g_isFfbStUp || g_isFfbStDn || g_isFfbSpr ||
             g_isFfbDm || g_isFfbInr || g_isFfbFric
             );
+    // Filter out disabled FFB in driver
+    BOOL FfbSupported = FALSE;
+    vJoyFfbCap(&FfbSupported);
+    if (!FfbSupported) {
+        isFfb = FALSE;
+    }
 
     // Call external C-function that creats an array of bytes that holds
     // the HID Report Descriptor
@@ -799,8 +806,10 @@ bool WriteHidReportDescriptor(int target)
         return false;
     };
 
-
     WriteHidReportDescToReg((int)target, *out, desc_size, g_cmnd == FRC);
+    if (!isFfb)
+        DeleteOEMForceFeedbackFromReg();
+
     return true;
 }
 
@@ -839,6 +848,33 @@ void DeleteHidReportDescFromReg(int target)
     };
 
     RegCloseKey(hParams);
+    return;
+}
+
+/*
+    Delete OEMForceFeedback key from the registry
+    Key:	HKEY_CURRENT_USER\\SYSTEM\\CurrentControlSet\\Control\\MediaProperties\\PrivateProperties\\Joystick\\OEM\\VID_1234&PID_0FFB"
+*/
+void DeleteOEMForceFeedbackFromReg()
+{
+    /* Open registry - Most of the path should exist */
+    HKEY hParams;
+    LONG RegRes = RegOpenKeyEx(HKEY_CURRENT_USER, REG_OEMFORCEFEEDBACK_0, 0, DELETE | KEY_ENUMERATE_SUB_KEYS | KEY_QUERY_VALUE | KEY_SET_VALUE, &hParams);
+    if (RegRes != ERROR_SUCCESS)
+        return;	// Error
+
+    // Delete Tree
+    RegRes = RegDeleteTree(hParams, NULL);
+    RegCloseKey(hParams);
+
+    RegRes = RegOpenKeyEx(HKEY_CURRENT_USER, REG_OEMFORCEFEEDBACK_1, 0, DELETE | KEY_ENUMERATE_SUB_KEYS | KEY_QUERY_VALUE | KEY_SET_VALUE, &hParams);
+    if (RegRes != ERROR_SUCCESS)
+        return;	// Error
+
+    // Delete Tree
+    RegRes = RegDeleteTree(hParams, NULL);
+    RegCloseKey(hParams);
+
     return;
 }
 

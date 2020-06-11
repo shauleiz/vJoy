@@ -62,6 +62,10 @@
 #define DESC_NAME			L"HidReportDesctiptor"
 #define DESC_SIZE			L"HidReportDesctiptorSize"
 
+#define REG_OEMFORCEFEEDBACK_0		L"SYSTEM\\CurrentControlSet\\Control\\MediaProperties\\PrivateProperties\\Joystick\\OEM\\VID_1234&PID_0FFB"
+#define REG_OEMFORCEFEEDBACK_1		L"SYSTEM\\CurrentControlSet\\Control\\MediaProperties\\PrivateProperties\\Joystick\\OEM\\VID_1234&PID_1FFB"
+
+
 enum ACTION {config, del, del_all};
 
 

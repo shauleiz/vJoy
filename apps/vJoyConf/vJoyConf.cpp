@@ -95,6 +95,7 @@ void				GetCtrlState(HWND hDlg, bool* AxisArr, int* nPovCont, int* nPovDisc, int
 int 				CreateHidReportDesc(void** data, UINT nButtons, bool* axes, int nPovHatsCont, int nPovHatsDir, BYTE ReportId, bool Ffb);
 void				WriteHidReportDescToReg(int target, UCHAR* Descriptor, int size);
 void				DeleteHidReportDescFromReg(int target);
+void DeleteOEMForceFeedbackFromReg();
 BOOL				isOnlyDevice(UINT Id);
 void				DeleteDevice(int Id);
 void				AddDevice(int Id);
@@ -537,6 +538,13 @@ void OnApply(HWND hDlg)
 
     // Get changed (current) state
     GetCtrlState(hDlg, &AxisChecked[0], &nPovHatsCont, &nPovHatsDir, &nButtons, &FfbEn);
+    
+    // Filter out disabled FFB in driver
+    BOOL FfbSupported = FALSE;
+    vJoyFfbCap(&FfbSupported);
+    if (!FfbSupported) {
+        FfbEn = FALSE;
+    }
 
     ///////// Create HID Report Descriptor and load it to the registry                  /////////////////
     ///////// We do it twice - once without the FFB section for backwords compatibility ///////////////// 
@@ -559,6 +567,8 @@ void OnApply(HWND hDlg)
     WriteHidReportDescToReg((int)(iTab + 1), *out2, desc_size);
     free(out2);
 
+    if (!FfbEn)
+        DeleteOEMForceFeedbackFromReg();
 
     // Refresh
     refresh_vjoy();
@@ -1257,6 +1267,33 @@ void DeleteHidReportDescFromReg(int target)
     }
 
     RegCloseKey(hParams);
+    return;
+}
+
+/*
+    Delete OEMForceFeedback key from the registry
+    Key:	HKEY_CURRENT_USER\\SYSTEM\\CurrentControlSet\\Control\\MediaProperties\\PrivateProperties\\Joystick\\OEM\\VID_1234&PID_0FFB"
+*/
+void DeleteOEMForceFeedbackFromReg()
+{
+    /* Open registry - Most of the path should exist */
+    HKEY hParams;
+    LONG RegRes = RegOpenKeyEx(HKEY_CURRENT_USER, REG_OEMFORCEFEEDBACK_0, 0, DELETE | KEY_ENUMERATE_SUB_KEYS | KEY_QUERY_VALUE | KEY_SET_VALUE, &hParams);
+    if (RegRes != ERROR_SUCCESS)
+        return;	// Error
+
+    // Delete Tree
+    RegRes = RegDeleteTree(hParams, NULL);
+    RegCloseKey(hParams);
+
+    RegRes = RegOpenKeyEx(HKEY_CURRENT_USER, REG_OEMFORCEFEEDBACK_1, 0, DELETE | KEY_ENUMERATE_SUB_KEYS | KEY_QUERY_VALUE | KEY_SET_VALUE, &hParams);
+    if (RegRes != ERROR_SUCCESS)
+        return;	// Error
+
+    // Delete Tree
+    RegRes = RegDeleteTree(hParams, NULL);
+    RegCloseKey(hParams);
+
     return;
 }
 

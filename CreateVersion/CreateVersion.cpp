@@ -112,12 +112,12 @@ FINAL:
     // Put data into file
     fprintf(f, "#pragma once\n");
     fprintf(f, "// Version as four nibbles as X.H.M.L\n");
-    fprintf(f, "#define VER_X_ (%u)\n", major);
-    fprintf(f, "#define VER_H_ (%u)\n", mid);
-    fprintf(f, "#define VER_M_ (%u)\n", minor);
-    fprintf(f, "#define VER_L_ (%u)\n", bugfix);
+    fprintf(f, "#define VER_X_ %u\n", major);
+    fprintf(f, "#define VER_H_ %u\n", mid);
+    fprintf(f, "#define VER_M_ %u\n", minor);
+    fprintf(f, "#define VER_L_ %u\n", bugfix);
     fprintf(f, "// Internal use only\n");
-    fprintf(f, "#define BUILD (%u)\n", nbcommits);
+    fprintf(f, "#define BUILD %u\n", nbcommits);
     fprintf(f, "\n");
     fprintf(f, "#define FILEVER\t\t\t\t\"%u, %u, %u, %u\"\n", major, mid, minor, bugfix);
     fprintf(f, "#define PRODVER_TAG\t\t\t\"%s\"\n", version);
