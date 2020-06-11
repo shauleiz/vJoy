@@ -144,7 +144,7 @@ std::vector<std::vector<BYTE>>  FfbDescriptor = { {
         0xA1, 0x02,       //    Collection Datalink
             0x05, 0x01,    //    Usage Page Generic Desktop
             0x09, 0x30,    //    Usage X
-#ifdef FFB_USE_XY_AXES>1   
+#if FFB_USE_XY_AXES>1
            // If only 1 FFB axis, skip this
             0x09, 0x31,    //    Usage Y
 #endif

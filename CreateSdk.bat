@@ -12,6 +12,7 @@ COPY %X64RELEASE_PATH%\vJoyInterfaceWrap.dll "%SDK_PATH%\c#\x64\vJoyInterfaceWra
 
 REM Include Files
 COPY %INC_PATH%\public.h "%SDK_PATH%\Inc\public.h"
+COPY %INC_PATH%\gen-versioninfo.h "%SDK_PATH%\Inc\gen-versioninfo.h"
 COPY apps\common\vJoyInterface\vjoyinterface.h "%SDK_PATH%\Inc\vjoyinterface.h"
 
 REM Library Files

@@ -15,7 +15,7 @@
 #define VER_ORIGINALFILENAME_STR    "vJoy.sys"
 #define VER_PRODUCTNAME_STR			"vJoy"
 #define VER_COMPANYNAME_STR			"Shaul Eizikovich"
-#define VER_FILEVERSION				VER_H_,VER_M_,VER_L_ ,BUILD
+#define VER_FILEVERSION				VER_X_,VER_H_,VER_M_,VER_L_
 #define PRODVER						PRODVER_TAG " Commit:" PRODVER_SHA1
 
 #if defined(AMD64)

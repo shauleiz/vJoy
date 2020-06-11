@@ -128,7 +128,6 @@
     <ExecutablePath>$(VC_ExecutablePath_x86);$(WindowsSDK_ExecutablePath);$(VS_ExecutablePath);$(MSBuild_ExecutablePath);$(SystemRoot)\SysWow64;$(FxCopDir);$(PATH);$(LOCALAPPDATA)\Atlassian\SourceTree\git_local\bin</ExecutablePath>
     <OutDir>$(SolutionDir)$(Platform)\$(Configuration)\</OutDir>
     <IntDir>$(Platform)\$(Configuration)\</IntDir>
-    <PostBuildEventUseInBuild>false</PostBuildEventUseInBuild>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug_STAT|Win32'">
     <LinkIncremental>true</LinkIncremental>
@@ -139,7 +138,6 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
     <ExecutablePath>C:\Users\Shaul\AppData\Local\Atlassian\SourceTree\git_local\bin;$(VC_ExecutablePath_x64);$(WindowsSDK_ExecutablePath);$(VS_ExecutablePath);$(MSBuild_ExecutablePath);$(FxCopDir);$(PATH);$(LOCALAPPDATA)\Atlassian\SourceTree\git_local\bin</ExecutablePath>
-    <PostBuildEventUseInBuild>false</PostBuildEventUseInBuild>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug_STAT|x64'">
     <LinkIncremental>true</LinkIncremental>
@@ -150,7 +148,6 @@
     <ExecutablePath>$(VC_ExecutablePath_x86);$(WindowsSDK_ExecutablePath);$(VS_ExecutablePath);$(MSBuild_ExecutablePath);$(SystemRoot)\SysWow64;$(FxCopDir);$(PATH);$(LOCALAPPDATA)\Atlassian\SourceTree\git_local\bin</ExecutablePath>
     <OutDir>$(SolutionDir)$(Platform)\$(Configuration)\</OutDir>
     <IntDir>$(Platform)\$(Configuration)\</IntDir>
-    <PostBuildEventUseInBuild>false</PostBuildEventUseInBuild>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release_STAT|Win32'">
     <LinkIncremental>false</LinkIncremental>
@@ -161,7 +158,6 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
     <ExecutablePath>C:\Users\Shaul\AppData\Local\Atlassian\SourceTree\git_local\bin;$(VC_ExecutablePath_x64);$(WindowsSDK_ExecutablePath);$(VS_ExecutablePath);$(MSBuild_ExecutablePath);$(FxCopDir);$(PATH);$(LOCALAPPDATA)\Atlassian\SourceTree\git_local\bin</ExecutablePath>
-    <PostBuildEventUseInBuild>false</PostBuildEventUseInBuild>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release_STAT|x64'">
     <LinkIncremental>false</LinkIncremental>
@@ -184,7 +180,8 @@
       <PreprocessorDefinitions>_UNICODE;UNICODE;%(PreprocessorDefinitions);_DEBUG</PreprocessorDefinitions>
     </ResourceCompile>
     <PostBuildEvent>
-      <Message>Deleting Version file</Message>
+      <Message>Creating new Version file in inc/</Message>
+      <Command>$(OutDir)CreateVersion.exe $(ProjectDir)..\inc\gen-versioninfo.h</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug_STAT|Win32'">
@@ -204,7 +201,8 @@
       <PreprocessorDefinitions>_UNICODE;UNICODE;%(PreprocessorDefinitions);_DEBUG</PreprocessorDefinitions>
     </ResourceCompile>
     <PostBuildEvent>
-      <Message>Deleting Version file</Message>
+      <Message>Creating new Version file in inc/</Message>
+      <Command>$(OutDir)CreateVersion.exe $(ProjectDir)..\inc\gen-versioninfo.h</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -224,7 +222,8 @@
       <PreprocessorDefinitions>_UNICODE;UNICODE;%(PreprocessorDefinitions);_DEBUG;X64;X64;X64;X64;X64</PreprocessorDefinitions>
     </ResourceCompile>
     <PostBuildEvent>
-      <Message>Deleting Version file</Message>
+      <Message>Creating new Version file in inc/</Message>
+      <Command>$(OutDir)CreateVersion.exe $(ProjectDir)..\inc\gen-versioninfo.h</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug_STAT|x64'">
@@ -244,7 +243,8 @@
       <PreprocessorDefinitions>_UNICODE;UNICODE;%(PreprocessorDefinitions);_DEBUG;X64;X64;X64;X64;X64</PreprocessorDefinitions>
     </ResourceCompile>
     <PostBuildEvent>
-      <Message>Deleting Version file</Message>
+      <Message>Creating new Version file in inc/</Message>
+      <Command>$(OutDir)CreateVersion.exe $(ProjectDir)..\inc\gen-versioninfo.h</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -265,7 +265,8 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
     <PostBuildEvent>
-      <Message>Deleting Version file</Message>
+      <Message>Creating new Version file in inc/</Message>
+      <Command>$(OutDir)CreateVersion.exe $(ProjectDir)..\inc\gen-versioninfo.h</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release_STAT|Win32'">
@@ -286,7 +287,8 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
     <PostBuildEvent>
-      <Message>Deleting Version file</Message>
+      <Message>Creating new Version file in inc/</Message>
+      <Command>$(OutDir)CreateVersion.exe $(ProjectDir)..\inc\gen-versioninfo.h</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -310,7 +312,8 @@
       <PreprocessorDefinitions>_UNICODE;UNICODE;%(PreprocessorDefinitions);;X64;X64;X64;X64;X64</PreprocessorDefinitions>
     </ResourceCompile>
     <PostBuildEvent>
-      <Message>Deleting Version file</Message>
+      <Message>Creating new Version file in inc/</Message>
+      <Command>$(OutDir)CreateVersion.exe $(ProjectDir)..\inc\gen-versioninfo.h</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release_STAT|x64'">
@@ -334,7 +337,8 @@
       <PreprocessorDefinitions>_UNICODE;UNICODE;%(PreprocessorDefinitions);;X64;X64;X64;X64;X64</PreprocessorDefinitions>
     </ResourceCompile>
     <PostBuildEvent>
-      <Message>Deleting Version file</Message>
+      <Message>Creating new Version file in inc/</Message>
+      <Command>$(OutDir)CreateVersion.exe $(ProjectDir)..\inc\gen-versioninfo.h</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>

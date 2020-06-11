@@ -61,14 +61,17 @@ DEFINE_GUID(GUID_DEVINTERFACE_VJOY, 0x781EF630, 0x72B2, 0x11d2, 0xB8, 0x52, 0x00
 #define	DOS_FILE_NAME				"\\\\.\\"DEVICENAME_STRING
 #define VJOY_INTERFACE				L"Device_"
 
-// Version parts
+// Use auto-generated version file from inc/
+#include "gen-versioninfo.h"
+// This is a hardcoded version, not to be confused with whole {installer+libs+SDK} that
+// use getversion to retrieve a 'git describe' (tag) version.
+// Version parts as a serie of nibble (4bits from higher (X) significant number to lower (L))
 // Will be taken from CreateVersion.exe in gen-versioninfo.h
 #ifndef VER_H_
+#define VER_X_	2
 #define VER_H_	2
-#define VER_M_	2
+#define VER_M_	1
 #define VER_L_	0
-#define BUILD	0
-#define VER_X_	0
 #endif
 
 
@@ -90,13 +93,15 @@ DEFINE_GUID(GUID_DEVINTERFACE_VJOY, 0x781EF630, 0x72B2, 0x11d2, 0xB8, 0x52, 0x00
 //
 #define VENDOR_N_ID		0x1234
 #define	PRODUCT_N_ID	0xBEAD
-#define	VERSION_N	(VER_L_ + 0x10*VER_M_ + 0x100*VER_H_ + 0x1000*VER_X_)
+// Version with 4 nibbles (0..F)
+#define	VERSION_N	(0x1000*VER_X_ + 0x100*VER_H_ + 0x10*VER_M_ + VER_L_)
+//#define	VERSION_N	(0x1000*VER_H_ + 0x100*VER_M_ + 0x10*VER_L_ + BUILD)
 
 // Device Strings
 //
 #define VENDOR_STR_ID		L"Shaul Eizikovich"
 #define PRODUCT_STR_ID		L"vJoy - Virtual Joystick"
-#define	SERIALNUMBER_STR	MAKEWIDE(STRINGIFY(VER_H_)) L"." MAKEWIDE(STRINGIFY(VER_M_)) L"."  MAKEWIDE(STRINGIFY(VER_L_))
+#define	SERIALNUMBER_STR	MAKEWIDE(STRINGIFY(VER_X_)) L"." MAKEWIDE(STRINGIFY(VER_H_)) L"." MAKEWIDE(STRINGIFY(VER_M_)) L"."  MAKEWIDE(STRINGIFY(VER_L_))
 
 // Function codes;
 //#define LOAD_POSITIONS	0x910

@@ -168,70 +168,70 @@ INT_PTR CALLBACK vJoyConfCB(HWND hDlg, UINT message, WPARAM wParam, LPARAM lPara
 
     UNREFERENCED_PARAMETER(lParam);
     switch (message) {
-    case WM_VJOYCHANGED:
-        if (wParam && lParam) // First remove message
-            vJoyDeviceRemoved();
-        else if (!wParam) // Any arrival message
-            vJoyDeviceArrived();
-        break;
+        case WM_VJOYCHANGED:
+            if (wParam && lParam) // First remove message
+                vJoyDeviceRemoved();
+            else if (!wParam) // Any arrival message
+                vJoyDeviceArrived();
+            break;
 
-    case WM_INITDIALOG:
-        hTopDlg = hDlg;
-        TopDialogInit(hDlg);
-        CreateToolTip(hDlg, g_Controls, sizeof(g_Controls) / sizeof(int)); // Initialize tooltip object
-        RegisterRemovalCB(vJoyConfChangedCB, (PVOID)hDlg);
-        return (INT_PTR)TRUE;
+        case WM_INITDIALOG:
+            hTopDlg = hDlg;
+            TopDialogInit(hDlg);
+            CreateToolTip(hDlg, g_Controls, sizeof(g_Controls) / sizeof(int)); // Initialize tooltip object
+            RegisterRemovalCB(vJoyConfChangedCB, (PVOID)hDlg);
+            return (INT_PTR)TRUE;
 
-    case WM_COMMAND:
-        if (LOWORD(wParam) == IDOK || LOWORD(wParam) == IDCANCEL) {
-            if (OnClosing()) {
-                EndDialog(hDlg, LOWORD(wParam));
-                PostQuitMessage(0);
+        case WM_COMMAND:
+            if (LOWORD(wParam) == IDOK || LOWORD(wParam) == IDCANCEL) {
+                if (OnClosing()) {
+                    EndDialog(hDlg, LOWORD(wParam));
+                    PostQuitMessage(0);
+                }
+
+                return (INT_PTR)TRUE;
             }
 
-            return (INT_PTR)TRUE;
-        }
+            if ((wParam&0xFFFF) == IDC_RSTALL) {
+                OnResetAll(hDlg);
+                break;
+            }
 
-        if ((wParam&0xFFFF) == IDC_RSTALL) {
-            OnResetAll(hDlg);
+            // Enable vJoy checkbox
+            if ((LOWORD(wParam) == IDC_CHK_ENVJOY) && (HIWORD(wParam) == BN_CLICKED)) {
+                Checked = (IsDlgButtonChecked(hDlg, IDC_CHK_ENVJOY) == BST_CHECKED);
+                if (Checked)
+                    enable(GetvJoyVersion());
+                else
+                    disable(GetvJoyVersion());
+                vJoyIsOn = vJoyEnabled();
+            }
             break;
-        }
-
-        // Enable vJoy checkbox
-        if ((LOWORD(wParam) == IDC_CHK_ENVJOY) && (HIWORD(wParam) == BN_CLICKED)) {
-            Checked = (IsDlgButtonChecked(hDlg, IDC_CHK_ENVJOY) == BST_CHECKED);
-            if (Checked)
-                enable(GetvJoyVersion());
-            else
-                disable(GetvJoyVersion());
-            vJoyIsOn = vJoyEnabled();
-        }
-        break;
 
 
-        SendMessage(hDlgTab, WM_COMMAND, wParam, lParam);
-        break;
+            SendMessage(hDlgTab, WM_COMMAND, wParam, lParam);
+            break;
 
 
-    case WM_NOTIFY:
-        if (((LPNMHDR)lParam)->idFrom == IDC_DEVTABS) {
-            if (((LPNMHDR)lParam)->code == TCN_SELCHANGING) {
-                SetWindowLongPtr(hDlg, DWLP_MSGRESULT, OnSelChanging(hDlgTab));
+        case WM_NOTIFY:
+            if (((LPNMHDR)lParam)->idFrom == IDC_DEVTABS) {
+                if (((LPNMHDR)lParam)->code == TCN_SELCHANGING) {
+                    SetWindowLongPtr(hDlg, DWLP_MSGRESULT, OnSelChanging(hDlgTab));
+                    return  (INT_PTR)TRUE;
+                };
+                if (((LPNMHDR)lParam)->code == TCN_SELCHANGE)
+                    OnSelChanged(hDlgTab);
+
+                return  (INT_PTR)TRUE;
+            }
+
+            // Tooltips
+            if (((LPNMHDR)lParam)->code == TTN_GETDISPINFO) {
+                UpdateToolTip((LPVOID)lParam);
                 return  (INT_PTR)TRUE;
             };
-            if (((LPNMHDR)lParam)->code == TCN_SELCHANGE)
-                OnSelChanged(hDlgTab);
 
-            return  (INT_PTR)TRUE;
-        }
-
-        // Tooltips
-        if (((LPNMHDR)lParam)->code == TTN_GETDISPINFO) {
-            UpdateToolTip((LPVOID)lParam);
-            return  (INT_PTR)TRUE;
-        };
-
-        break;
+            break;
     }
     return (INT_PTR)FALSE;
 }
@@ -243,112 +243,112 @@ INT_PTR CALLBACK DlgTabCB(HWND hDlgTab, UINT message, WPARAM wParam, LPARAM lPar
     int nButtons = 0;
 
     switch (message) {
-    case WM_INITDIALOG:
-        // Place the tab dialog box in the tabs control and display it
-        SetWindowPos(hDlgTab, HWND_TOP, 0, 45, 0, 0, SWP_NOSIZE);
-        InitializeTab(hDlgTab);
-        ShowWindow(hDlgTab, SW_SHOW);
-        CreateToolTip(hDlgTab, g_Controls, sizeof(g_Controls) / sizeof(int)); // Initialize tooltip object
-        return (INT_PTR)TRUE;
-
-    case WM_NOTIFY:
-        // Tooltips
-        if (((LPNMHDR)lParam)->code == TTN_GETDISPINFO) {
-            UpdateToolTip((LPVOID)lParam);
-            return  (INT_PTR)TRUE;
-        };
-
-        break;
-
-    case WM_COMMAND:
-        if (LOWORD(wParam) == IDC_POV_LST && HIWORD(wParam) == LBN_SELCHANGE)
-            OnUserChanged();
-        if (LOWORD(wParam) == IDC_NBTN && HIWORD(wParam) == EN_CHANGE) {
-            TCHAR nBtnStr[5];
-            // 	Limit the values of number of buttons
-            GetWindowText(GetDlgItem(hDlgTab, IDC_NBTN), nBtnStr, 5);
-            _stscanf_s(nBtnStr, TEXT("%d"), &nButtons);
-            if (nButtons > 128)
-                SetWindowText(GetDlgItem(hDlgTab, IDC_NBTN), TEXT("128"));
-            if (nButtons < 0)
-                SetWindowText(GetDlgItem(hDlgTab, IDC_NBTN), TEXT("0"));
-
-            OnUserChanged();
-        };
-
-        switch (wParam&0xFFFF) {
-        case IDOK:
-        case IDCANCEL:
-            EndDialog(hDlgTab, LOWORD(wParam));
+        case WM_INITDIALOG:
+            // Place the tab dialog box in the tabs control and display it
+            SetWindowPos(hDlgTab, HWND_TOP, 0, 45, 0, 0, SWP_NOSIZE);
+            InitializeTab(hDlgTab);
+            ShowWindow(hDlgTab, SW_SHOW);
+            CreateToolTip(hDlgTab, g_Controls, sizeof(g_Controls) / sizeof(int)); // Initialize tooltip object
             return (INT_PTR)TRUE;
 
-        case IDC_APPLY_BTN:
-            OnApply(hDlgTab);
+        case WM_NOTIFY:
+            // Tooltips
+            if (((LPNMHDR)lParam)->code == TTN_GETDISPINFO) {
+                UpdateToolTip((LPVOID)lParam);
+                return  (INT_PTR)TRUE;
+            };
+
             break;
 
-        case IDC_REVT_BTN:
-            OnRevert(hDlgTab, FALSE);
+        case WM_COMMAND:
+            if (LOWORD(wParam) == IDC_POV_LST && HIWORD(wParam) == LBN_SELCHANGE)
+                OnUserChanged();
+            if (LOWORD(wParam) == IDC_NBTN && HIWORD(wParam) == EN_CHANGE) {
+                TCHAR nBtnStr[5];
+                // 	Limit the values of number of buttons
+                GetWindowText(GetDlgItem(hDlgTab, IDC_NBTN), nBtnStr, 5);
+                _stscanf_s(nBtnStr, TEXT("%d"), &nButtons);
+                if (nButtons > 128)
+                    SetWindowText(GetDlgItem(hDlgTab, IDC_NBTN), TEXT("128"));
+                if (nButtons < 0)
+                    SetWindowText(GetDlgItem(hDlgTab, IDC_NBTN), TEXT("0"));
+
+                OnUserChanged();
+            };
+
+            switch (wParam&0xFFFF) {
+                case IDOK:
+                case IDCANCEL:
+                    EndDialog(hDlgTab, LOWORD(wParam));
+                    return (INT_PTR)TRUE;
+
+                case IDC_APPLY_BTN:
+                    OnApply(hDlgTab);
+                    break;
+
+                case IDC_REVT_BTN:
+                    OnRevert(hDlgTab, FALSE);
+                    break;
+
+                case IDC_ADDDEL_BTN:
+                    OnAddDeleteDevice(hDlgTab);
+                    break;
+
+                case IDC_DEL:
+                    if (!AddBtn)
+                        OnAddDeleteDevice(hDlgTab);
+                    break;
+
+                case IDC_ADD:
+                    if (AddBtn)
+                        OnAddDeleteDevice(hDlgTab);
+                    break;
+
+                    // Change in FFB checkbox
+                case IDC_CHK_FFB:
+                    FfbCBChanged();
+                    OnUserChanged();
+                    break;
+
+                case IDC_CHK_X:
+                case IDC_CHK_Y:
+                case IDC_CHK_Z:
+                case IDC_CHK_RX:
+                case IDC_CHK_RY:
+                case IDC_CHK_RZ:
+                case IDC_CHK_SL0:
+                case IDC_CHK_SL1:
+                case IDC_CHK_WHEEL:
+                case IDC_CHK_ACCELERATOR:
+                case IDC_CHK_BRAKE:
+                case IDC_CHK_CLUTCH:
+                case IDC_CHK_STEERING:
+                case IDC_CHK_AILERON:
+                case IDC_CHK_RUDDER:
+                case IDC_CHK_THROTTLE:
+
+                case IDC_POV_DESC:
+                case IDC_POV_CONT:
+                case IDC_CHK_FFB_CONST:
+                case IDC_CHK_FFB_RAMP:
+                case IDC_CHK_FFB_SQUARE:
+                case IDC_CHK_FFB_SINE:
+                case IDC_CHK_FFB_TRI:
+                case IDC_CHK_FFB_STUP:
+                case IDC_CHK_FFB_STDN:
+                case IDC_CHK_FFB_SPRING:
+                case IDC_CHK_FFB_DAMPER:
+                case IDC_CHK_FFB_INERTIA:
+                case IDC_CHK_FFB_FRICTION:
+                    OnUserChanged();
+                    break;
+
+
+
+                default:
+                    break;
+            };
             break;
-
-        case IDC_ADDDEL_BTN:
-            OnAddDeleteDevice(hDlgTab);
-            break;
-
-        case IDC_DEL:
-            if (!AddBtn)
-                OnAddDeleteDevice(hDlgTab);
-            break;
-
-        case IDC_ADD:
-            if (AddBtn)
-                OnAddDeleteDevice(hDlgTab);
-            break;
-
-            // Change in FFB checkbox
-        case IDC_CHK_FFB:
-            FfbCBChanged();
-            OnUserChanged();
-            break;
-
-        case IDC_CHK_X:
-        case IDC_CHK_Y:
-        case IDC_CHK_Z:
-        case IDC_CHK_RX:
-        case IDC_CHK_RY:
-        case IDC_CHK_RZ:
-        case IDC_CHK_SL0:
-        case IDC_CHK_SL1:
-        case IDC_CHK_WHEEL:
-        case IDC_CHK_ACCELERATOR:
-        case IDC_CHK_BRAKE:
-        case IDC_CHK_CLUTCH:
-        case IDC_CHK_STEERING:
-        case IDC_CHK_AILERON:
-        case IDC_CHK_RUDDER:
-        case IDC_CHK_THROTTLE:
-
-        case IDC_POV_DESC:
-        case IDC_POV_CONT:
-        case IDC_CHK_FFB_CONST:
-        case IDC_CHK_FFB_RAMP:
-        case IDC_CHK_FFB_SQUARE:
-        case IDC_CHK_FFB_SINE:
-        case IDC_CHK_FFB_TRI:
-        case IDC_CHK_FFB_STUP:
-        case IDC_CHK_FFB_STDN:
-        case IDC_CHK_FFB_SPRING:
-        case IDC_CHK_FFB_DAMPER:
-        case IDC_CHK_FFB_INERTIA:
-        case IDC_CHK_FFB_FRICTION:
-            OnUserChanged();
-            break;
-
-
-
-        default:
-            break;
-        };
-        break;
     }
     return (INT_PTR)FALSE;
 }
@@ -1001,179 +1001,180 @@ int CreateHidReportDesc(void** data, UINT nButtons, bool* axes, int nPovHatsCont
     buffer.clear();
 
     /* Create standard header */
-    NEXT_BYTE(buffer, HIDP_GLOBAL_USAGE_PAGE_1)		// USAGE_PAGE(Generic Desktop):		05 01
-        NEXT_BYTE(buffer, HID_USAGE_PAGE_GENERIC)
-        NEXT_BYTE(buffer, HIDP_GLOBAL_LOG_MIN_1)			// LOGICAL_MINIMUM(0):				15 00
-        NEXT_BYTE(buffer, 0)
-        NEXT_BYTE(buffer, HIDP_LOCAL_USAGE_1)			// USAGE (Joystick):				09 04
-        NEXT_BYTE(buffer, HID_USAGE_GENERIC_JOYSTICK)
-        NEXT_BYTE(buffer, HIDP_MAIN_COLLECTION)			// COLLECTION( Application):		A1 01
-        NEXT_BYTE(buffer, HIDP_MAIN_COLLECTION_APP)
+    NEXT_BYTE(buffer, HIDP_GLOBAL_USAGE_PAGE_1);     // USAGE_PAGE(Generic Desktop):		05 01
+    NEXT_BYTE(buffer, HID_USAGE_PAGE_GENERIC);
+    NEXT_BYTE(buffer, HIDP_GLOBAL_LOG_MIN_1);			// LOGICAL_MINIMUM(0):				15 00
+    NEXT_BYTE(buffer, 0);
+    NEXT_BYTE(buffer, HIDP_LOCAL_USAGE_1);			// USAGE (Joystick):				09 04
+    NEXT_BYTE(buffer, HID_USAGE_GENERIC_JOYSTICK);
+    NEXT_BYTE(buffer, HIDP_MAIN_COLLECTION);			// COLLECTION( Application):		A1 01
+    NEXT_BYTE(buffer, HIDP_MAIN_COLLECTION_APP);
 
-        /* Collection 1 */
-        NEXT_BYTE(buffer, HIDP_GLOBAL_USAGE_PAGE_1)		// USAGE_PAGE(Generic Desktop):		05 01
-        NEXT_BYTE(buffer, HID_USAGE_PAGE_GENERIC)
-        NEXT_BYTE(buffer, HIDP_GLOBAL_REPORT_ID)			//	REPORT_ID (x)					85 ID
-        NEXT_BYTE(buffer, ReportId)
-        NEXT_BYTE(buffer, HIDP_LOCAL_USAGE_1)			// USAGE(Pointer):					09 01
-        NEXT_BYTE(buffer, HID_USAGE_GENERIC_POINTER)
-        NEXT_BYTE(buffer, HIDP_GLOBAL_LOG_MIN_1)			// LOGICAL_MINIMUM(0):				15 00
-        NEXT_BYTE(buffer, 0)
-        NEXT_BYTE(buffer, HIDP_GLOBAL_LOG_MAX_2)			// LOGICAL_MAXIMUM(32767):			26 FF 7F
-        NEXT_SHORT(buffer, VJOY_AXIS_MAX_VALUE)
-        NEXT_BYTE(buffer, HIDP_GLOBAL_REPORT_SIZE)		// REPORT_SIZE(32):					75 20
-        NEXT_BYTE(buffer, 0x20)
-        NEXT_BYTE(buffer, HIDP_GLOBAL_REPORT_COUNT_1)	// REPORT_COUNT(1):					95 01
-        NEXT_BYTE(buffer, 0x01)
-        NEXT_BYTE(buffer, HIDP_MAIN_COLLECTION)			// COLLECTION(Physical):			A1 00
-        NEXT_BYTE(buffer, 0x00)
+    /* Collection 1 */
+    NEXT_BYTE(buffer, HIDP_GLOBAL_USAGE_PAGE_1);		// USAGE_PAGE(Generic Desktop):		05 01
+    NEXT_BYTE(buffer, HID_USAGE_PAGE_GENERIC);
+    NEXT_BYTE(buffer, HIDP_GLOBAL_REPORT_ID);			//	REPORT_ID (x)					85 ID
+    NEXT_BYTE(buffer, ReportId);
+    NEXT_BYTE(buffer, HIDP_LOCAL_USAGE_1);			// USAGE(Pointer):					09 01
+    NEXT_BYTE(buffer, HID_USAGE_GENERIC_POINTER);
+    NEXT_BYTE(buffer, HIDP_GLOBAL_LOG_MIN_1);			// LOGICAL_MINIMUM(0):				15 00
+    NEXT_BYTE(buffer, 0);
+    NEXT_BYTE(buffer, HIDP_GLOBAL_LOG_MAX_2);			// LOGICAL_MAXIMUM(32767):			26 FF 7F
+    NEXT_SHORT(buffer, VJOY_AXIS_MAX_VALUE);
+    NEXT_BYTE(buffer, HIDP_GLOBAL_REPORT_SIZE);		// REPORT_SIZE(32):					75 20
+    NEXT_BYTE(buffer, 0x20);
+    NEXT_BYTE(buffer, HIDP_GLOBAL_REPORT_COUNT_1);	// REPORT_COUNT(1):					95 01
+    NEXT_BYTE(buffer, 0x01);
+    NEXT_BYTE(buffer, HIDP_MAIN_COLLECTION);			// COLLECTION(Physical):			A1 00
+    NEXT_BYTE(buffer, 0x00);
 
-        /** Collection 2 **/
-        /* Loop on fitst Axes */
-        for (int i = 0; i<VJOY_NUMBER_OF_AXES; i++) {
-            if (axes[i]) {
-                // Insert Axis
-                NEXT_BYTE(buffer, HIDP_LOCAL_USAGE_1)	// USAGE(X+offset):					0x09 0x30+i
-                    NEXT_BYTE(buffer, AxesHID[i])
-                    NEXT_BYTE(buffer, HIDP_MAIN_INPUT_1)		// INPUT (Data,Var,Abs):			0x81 0x02
-                    NEXT_BYTE(buffer, 0x02)
-            } else {
-                // Insert place holder
-                NEXT_BYTE(buffer, HIDP_MAIN_INPUT_1)		// INPUT (Cnst,Ary,Abs):			0x81 0x01
-                    NEXT_BYTE(buffer, 0x01)
-            };
-        };
-    NEXT_BYTE(buffer, HIDP_MAIN_ENDCOLLECTION)		// END_COLLECTION:					0xC0
+    /** Collection 2 **/
+    /* Loop on fitst Axes */
+    for (int i = 0; i<VJOY_NUMBER_OF_AXES; i++) {
+        if (axes[i]) {
+            // Insert Axis
+            NEXT_BYTE(buffer, HIDP_LOCAL_USAGE_1);	// USAGE(X+offset):					0x09 0x30+i
+            NEXT_BYTE(buffer, AxesHID[i]);
+            NEXT_BYTE(buffer, HIDP_MAIN_INPUT_1);		// INPUT (Data,Var,Abs):			0x81 0x02
+            NEXT_BYTE(buffer, 0x02);
+        } else {
+            // Insert place holder
+            NEXT_BYTE(buffer, HIDP_MAIN_INPUT_1);		// INPUT (Cnst,Ary,Abs):			0x81 0x01
+            NEXT_BYTE(buffer, 0x01);
+        }
+    }
+    NEXT_BYTE(buffer, HIDP_MAIN_ENDCOLLECTION);		// END_COLLECTION:					0xC0
 
-        if (nPovHatsDir) {
-            // POV - supported: One switch at most, 5-state only
-            NEXT_BYTE(buffer, HIDP_GLOBAL_LOG_MIN_1)			// LOGICAL_MINIMUM(0):		15 00
-                NEXT_BYTE(buffer, 0x00)
-                NEXT_BYTE(buffer, HIDP_GLOBAL_LOG_MAX_1)			// LOGICAL_MAXIMUM(3):		25 03
-                NEXT_BYTE(buffer, 0x03)
-                NEXT_BYTE(buffer, HIDP_GLOBAL_PHY_MIN_1)			// PHYSICAL_MINIMUM (0):	35 00
-                NEXT_BYTE(buffer, 0x00)
-                NEXT_BYTE(buffer, HIDP_GLOBAL_PHY_MAX_2)			// PHYSICAL_MAXIMUM (270):	46 0e 01
-                NEXT_SHORT(buffer, 0x010e)
-                NEXT_BYTE(buffer, HIDP_GLOBAL_UNIT_1)			// UNIT (Eng Rot:Angular Pos):	65 14
-                NEXT_BYTE(buffer, 0x14)
-                // One 4-bit data  + 31 4-bit padding
-                NEXT_BYTE(buffer, HIDP_GLOBAL_REPORT_SIZE)		// REPORT_SIZE(4):			75 04
-                NEXT_BYTE(buffer, 0x04)
-                NEXT_BYTE(buffer, HIDP_GLOBAL_REPORT_COUNT_1)	// REPORT_COUNT(1):			95 01
-                NEXT_BYTE(buffer, 0x01)
+    if (nPovHatsDir) {
+        // POV - supported: One switch at most, 5-state only
+        NEXT_BYTE(buffer, HIDP_GLOBAL_LOG_MIN_1);			// LOGICAL_MINIMUM(0):		15 00
+        NEXT_BYTE(buffer, 0x00);
+        NEXT_BYTE(buffer, HIDP_GLOBAL_LOG_MAX_1);			// LOGICAL_MAXIMUM(3):		25 03
+        NEXT_BYTE(buffer, 0x03);
+        NEXT_BYTE(buffer, HIDP_GLOBAL_PHY_MIN_1);			// PHYSICAL_MINIMUM (0):	35 00
+        NEXT_BYTE(buffer, 0x00);
+        NEXT_BYTE(buffer, HIDP_GLOBAL_PHY_MAX_2);			// PHYSICAL_MAXIMUM (270):	46 0e 01
+        NEXT_SHORT(buffer, 0x010e);
+        NEXT_BYTE(buffer, HIDP_GLOBAL_UNIT_1);			// UNIT (Eng Rot:Angular Pos):	65 14
+        NEXT_BYTE(buffer, 0x14);
+        // One 4-bit data  + 31 4-bit padding
+        NEXT_BYTE(buffer, HIDP_GLOBAL_REPORT_SIZE);		// REPORT_SIZE(4):			75 04
+        NEXT_BYTE(buffer, 0x04);
+        NEXT_BYTE(buffer, HIDP_GLOBAL_REPORT_COUNT_1);	// REPORT_COUNT(1):			95 01
+        NEXT_BYTE(buffer, 0x01);
 
-                // Insert 1-4 5-state POVs
-                for (int i = 1; i <= nPovHatsDir; i++) {
-                    NEXT_BYTE(buffer, HIDP_LOCAL_USAGE_1)			// USAGE(Hat switch):		0x09 0x39
-                        NEXT_BYTE(buffer, HID_USAGE_GENERIC_HATSWITCH)
-                        NEXT_BYTE(buffer, HIDP_MAIN_INPUT_1)				// INPUT (Data,Var,Abs):	0x81 0x02
-                        NEXT_BYTE(buffer, 0x02)
-                };
+        // Insert 1-4 5-state POVs
+        for (int i = 1; i <= nPovHatsDir; i++) {
+            NEXT_BYTE(buffer, HIDP_LOCAL_USAGE_1);			// USAGE(Hat switch):		0x09 0x39
+            NEXT_BYTE(buffer, HID_USAGE_GENERIC_HATSWITCH);
+            NEXT_BYTE(buffer, HIDP_MAIN_INPUT_1);				// INPUT (Data,Var,Abs):	0x81 0x02
+            NEXT_BYTE(buffer, 0x02);
+        }
 
-            // Insert 5-state POV place holders
-            NEXT_BYTE(buffer, HIDP_GLOBAL_REPORT_COUNT_1)	// REPORT_COUNT(31):		95 1F
-                NEXT_BYTE(buffer, 0x20 - nPovHatsDir)
-                NEXT_BYTE(buffer, HIDP_MAIN_INPUT_1)				// INPUT (Cnst,Ary,Abs):	0x81 0x01
-                NEXT_BYTE(buffer, 0x01)
-        } else if (nPovHatsCont) {
-                // Continuous POV
-                NEXT_BYTE(buffer, HIDP_GLOBAL_LOG_MIN_1)			// LOGICAL_MINIMUM(0):		15 00
-                    NEXT_BYTE(buffer, 0x00)
-                    NEXT_BYTE(buffer, HIDP_GLOBAL_LOG_MAX_4)			// LOGICAL_MAXIMUM(35900):	27 3c 8c 00 00
-                    NEXT_SHORT(buffer, 0x8C3C)
-                    NEXT_SHORT(buffer, 0x0000)
-                    NEXT_BYTE(buffer, HIDP_GLOBAL_PHY_MIN_1)			// PHYSICAL_MINIMUM (0):	35 00
-                    NEXT_BYTE(buffer, 0x00)
-                    NEXT_BYTE(buffer, HIDP_GLOBAL_PHY_MAX_4)			// PHYSICAL_MAXIMUM (35900):	47 3c 8c 00 00
-                    NEXT_SHORT(buffer, 0x8C3C)
-                    NEXT_SHORT(buffer, 0x0000)
-                    NEXT_BYTE(buffer, HIDP_GLOBAL_UNIT_1)			// UNIT (Eng Rot:Angular Pos):	65 14
-                    NEXT_BYTE(buffer, 0x14)
-                    //
-                    NEXT_BYTE(buffer, HIDP_GLOBAL_REPORT_SIZE)		// REPORT_SIZE(32):			75 20
-                    NEXT_BYTE(buffer, 0x20)
-                    NEXT_BYTE(buffer, HIDP_GLOBAL_REPORT_COUNT_1)	// REPORT_COUNT(1):			95 01
-                    NEXT_BYTE(buffer, 0x01)
+        // Insert 5-state POV place holders
+        NEXT_BYTE(buffer, HIDP_GLOBAL_REPORT_COUNT_1);	// REPORT_COUNT(31):		95 1F
+        NEXT_BYTE(buffer, 0x20 - nPovHatsDir);
+        NEXT_BYTE(buffer, HIDP_MAIN_INPUT_1);				// INPUT (Cnst,Ary,Abs):	0x81 0x01
+        NEXT_BYTE(buffer, 0x01);
 
-                    // Insert 1-4 continuous POVs
-                    for (int i = 1; i <= nPovHatsCont; i++) {
-                        NEXT_BYTE(buffer, HIDP_LOCAL_USAGE_1)			// USAGE(Hat switch):		0x09 0x39
-                            NEXT_BYTE(buffer, HID_USAGE_GENERIC_HATSWITCH)
-                            NEXT_BYTE(buffer, HIDP_MAIN_INPUT_1)				// INPUT (Data,Var,Abs):	0x81 0x02
-                            NEXT_BYTE(buffer, 0x02)
-                    };
+    } else if (nPovHatsCont) {
+        // Continuous POV
+        NEXT_BYTE(buffer, HIDP_GLOBAL_LOG_MIN_1);			// LOGICAL_MINIMUM(0):		15 00
+        NEXT_BYTE(buffer, 0x00);
+        NEXT_BYTE(buffer, HIDP_GLOBAL_LOG_MAX_4);			// LOGICAL_MAXIMUM(35900):	27 3c 8c 00 00
+        NEXT_SHORT(buffer, 0x8C3C);
+        NEXT_SHORT(buffer, 0x0000);
+        NEXT_BYTE(buffer, HIDP_GLOBAL_PHY_MIN_1);			// PHYSICAL_MINIMUM (0):	35 00
+        NEXT_BYTE(buffer, 0x00);
+        NEXT_BYTE(buffer, HIDP_GLOBAL_PHY_MAX_4);			// PHYSICAL_MAXIMUM (35900):	47 3c 8c 00 00
+        NEXT_SHORT(buffer, 0x8C3C);
+        NEXT_SHORT(buffer, 0x0000);
+        NEXT_BYTE(buffer, HIDP_GLOBAL_UNIT_1);			// UNIT (Eng Rot:Angular Pos):	65 14
+        NEXT_BYTE(buffer, 0x14);
+        //
+        NEXT_BYTE(buffer, HIDP_GLOBAL_REPORT_SIZE);		// REPORT_SIZE(32):			75 20
+        NEXT_BYTE(buffer, 0x20);
+        NEXT_BYTE(buffer, HIDP_GLOBAL_REPORT_COUNT_1);	// REPORT_COUNT(1):			95 01
+        NEXT_BYTE(buffer, 0x01);
 
-                // Insert 1-3 continuous POV place holders
-                if (nPovHatsCont<4) {
-                    NEXT_BYTE(buffer, HIDP_GLOBAL_REPORT_COUNT_1)	// REPORT_COUNT(3):		95 03
-                        NEXT_BYTE(buffer, 0x04 - nPovHatsCont)
-                        NEXT_BYTE(buffer, HIDP_MAIN_INPUT_1)				// INPUT (Cnst,Ary,Abs):	0x81 0x01
-                        NEXT_BYTE(buffer, 0x01)
-                };
-            } else {
-                // Sixteen 4-bit padding
-                NEXT_BYTE(buffer, HIDP_GLOBAL_REPORT_SIZE)		// REPORT_SIZE(32):			75 20
-                    NEXT_BYTE(buffer, 0x20)
-                    NEXT_BYTE(buffer, HIDP_GLOBAL_REPORT_COUNT_1)	// REPORT_COUNT(4):			95 04
-                    NEXT_BYTE(buffer, 0x04)
-                    NEXT_BYTE(buffer, HIDP_MAIN_INPUT_1)				// INPUT (Cnst,Ary,Abs):	0x81 0x01
-                    NEXT_BYTE(buffer, 0x01)
-            };
+        // Insert 1-4 continuous POVs
+        for (int i = 1; i <= nPovHatsCont; i++) {
+            NEXT_BYTE(buffer, HIDP_LOCAL_USAGE_1);			// USAGE(Hat switch):		0x09 0x39
+            NEXT_BYTE(buffer, HID_USAGE_GENERIC_HATSWITCH);
+            NEXT_BYTE(buffer, HIDP_MAIN_INPUT_1);				// INPUT (Data,Var,Abs):	0x81 0x02
+            NEXT_BYTE(buffer, 0x02);
+        }
 
-
-            // Buttons - up to 32 buttons supported. Only the NUMBER of buttons can be set
-            //int nButtons = 0;
-            //for (int i=0; i<MAX_BUTTONS; i++)
-            //	if (buttons[i]) 
-            //		nButtons++;
-
-            // There are buttons
-            NEXT_BYTE(buffer, HIDP_GLOBAL_USAGE_PAGE_1)		// USAGE_PAGE(Buttons):		05 09
-                NEXT_BYTE(buffer, HID_USAGE_PAGE_BUTTON)
-                NEXT_BYTE(buffer, HIDP_GLOBAL_LOG_MIN_1)			// LOGICAL_MINIMUM(0):		15 00
-                NEXT_BYTE(buffer, 0x00)
-                NEXT_BYTE(buffer, HIDP_GLOBAL_LOG_MAX_1)			// LOGICAL_MAXIMUM(0):		25 01
-                NEXT_BYTE(buffer, 0x01)
-                NEXT_BYTE(buffer, HIDP_GLOBAL_UNIT_EXP_1)		// UNIT_EXPONENT(0):		55 00
-                NEXT_BYTE(buffer, 0x00)
-                NEXT_BYTE(buffer, HIDP_GLOBAL_UNIT_1)			// UNIT (None):				65 00
-                NEXT_BYTE(buffer, 0x00)
-                NEXT_BYTE(buffer, HIDP_LOCAL_USAGE_MIN_1)		// USAGE_MINIMUM(1):		19 01/00
-                NEXT_BYTE(buffer, localminusage_buttons)
-                NEXT_BYTE(buffer, HIDP_LOCAL_USAGE_MAX_1)		// USAGE_MAXIMUM(nButtons):	29 nButtons
-                NEXT_BYTE(buffer, nButtons)
-                NEXT_BYTE(buffer, HIDP_GLOBAL_REPORT_SIZE)		// REPORT_SIZE(1):			75 01
-                NEXT_BYTE(buffer, 0x01)
-                NEXT_BYTE(buffer, HIDP_GLOBAL_REPORT_COUNT_1)	// REPORT_COUNT(nButtons):	95 nButtons
-                NEXT_BYTE(buffer, nButtons)
-                NEXT_BYTE(buffer, HIDP_MAIN_INPUT_1)				// INPUT (Data,Var,Abs):	0x81 0x02
-                NEXT_BYTE(buffer, 0x02)
-
-                // Padding, if there are less than 32 buttons
-                if (nButtons < VJOY_NUMBER_OF_BUTTONS) {
-                    NEXT_BYTE(buffer, HIDP_GLOBAL_REPORT_SIZE)	// REPORT_SIZE(x):		75 32-nButtons
-                        NEXT_BYTE(buffer, VJOY_NUMBER_OF_BUTTONS - nButtons)
-                        NEXT_BYTE(buffer, HIDP_GLOBAL_REPORT_COUNT_1)	// REPORT_COUNT(1):	95 nButtons
-                        NEXT_BYTE(buffer, 0x01)
-                        NEXT_BYTE(buffer, HIDP_MAIN_INPUT_1)			// INPUT (Cnst,Ary,Abs):0x81 0x01
-                        NEXT_BYTE(buffer, 0x01)
-                };
+        // Insert 1-3 continuous POV place holders
+        if (nPovHatsCont<4) {
+            NEXT_BYTE(buffer, HIDP_GLOBAL_REPORT_COUNT_1);	// REPORT_COUNT(3):		95 03
+            NEXT_BYTE(buffer, 0x04 - nPovHatsCont);
+            NEXT_BYTE(buffer, HIDP_MAIN_INPUT_1);				// INPUT (Cnst,Ary,Abs):	0x81 0x01
+            NEXT_BYTE(buffer, 0x01);
+        }
+    } else {
+        // Sixteen 4-bit padding
+        NEXT_BYTE(buffer, HIDP_GLOBAL_REPORT_SIZE);		// REPORT_SIZE(32):			75 20
+        NEXT_BYTE(buffer, 0x20);
+        NEXT_BYTE(buffer, HIDP_GLOBAL_REPORT_COUNT_1);	// REPORT_COUNT(4):			95 04
+        NEXT_BYTE(buffer, 0x04);
+        NEXT_BYTE(buffer, HIDP_MAIN_INPUT_1);				// INPUT (Cnst,Ary,Abs):	0x81 0x01
+        NEXT_BYTE(buffer, 0x01);
+    }
 
 
-            // Insert FFB section to the descriptor if the user chose to
-            if (Ffb) {
-                CreateFfbDesc(&buffer, ReportId);
-                UINT16 mask = GetFfbEffectMask();
-                ModifyFfbEffectDesc(&buffer, mask);
-            }
+    // Buttons - up to 32 buttons supported. Only the NUMBER of buttons can be set
+    //int nButtons = 0;
+    //for (int i=0; i<MAX_BUTTONS; i++)
+    //	if (buttons[i]) 
+    //		nButtons++;
 
-            NEXT_BYTE(buffer, HIDP_MAIN_ENDCOLLECTION)			// END_COLLECTION:					0xC0
+    // There are buttons
+    NEXT_BYTE(buffer, HIDP_GLOBAL_USAGE_PAGE_1);		// USAGE_PAGE(Buttons):		05 09
+    NEXT_BYTE(buffer, HID_USAGE_PAGE_BUTTON);
+    NEXT_BYTE(buffer, HIDP_GLOBAL_LOG_MIN_1); 		// LOGICAL_MINIMUM(0):		15 00
+    NEXT_BYTE(buffer, 0x00);
+    NEXT_BYTE(buffer, HIDP_GLOBAL_LOG_MAX_1);			// LOGICAL_MAXIMUM(0):		25 01
+    NEXT_BYTE(buffer, 0x01);
+    NEXT_BYTE(buffer, HIDP_GLOBAL_UNIT_EXP_1);		// UNIT_EXPONENT(0):		55 00
+    NEXT_BYTE(buffer, 0x00);
+    NEXT_BYTE(buffer, HIDP_GLOBAL_UNIT_1);			// UNIT (None):				65 00
+    NEXT_BYTE(buffer, 0x00);
+    NEXT_BYTE(buffer, HIDP_LOCAL_USAGE_MIN_1);		// USAGE_MINIMUM(1):		19 01/00
+    NEXT_BYTE(buffer, localminusage_buttons);
+    NEXT_BYTE(buffer, HIDP_LOCAL_USAGE_MAX_1);		// USAGE_MAXIMUM(nButtons):	29 nButtons
+    NEXT_BYTE(buffer, nButtons);
+    NEXT_BYTE(buffer, HIDP_GLOBAL_REPORT_SIZE);		// REPORT_SIZE(1):			75 01
+    NEXT_BYTE(buffer, 0x01);
+    NEXT_BYTE(buffer, HIDP_GLOBAL_REPORT_COUNT_1);	// REPORT_COUNT(nButtons):	95 nButtons
+    NEXT_BYTE(buffer, nButtons);
+    NEXT_BYTE(buffer, HIDP_MAIN_INPUT_1);				// INPUT (Data,Var,Abs):	0x81 0x02
+    NEXT_BYTE(buffer, 0x02);
 
-                UCHAR* orig = &buffer[0];
-            *data = (void**)orig;
+    // Padding, if there are less than 32 buttons
+    if (nButtons < VJOY_NUMBER_OF_BUTTONS) {
+        NEXT_BYTE(buffer, HIDP_GLOBAL_REPORT_SIZE);	// REPORT_SIZE(x):		75 32-nButtons
+        NEXT_BYTE(buffer, VJOY_NUMBER_OF_BUTTONS - nButtons);
+        NEXT_BYTE(buffer, HIDP_GLOBAL_REPORT_COUNT_1);	// REPORT_COUNT(1):	95 nButtons
+        NEXT_BYTE(buffer, 0x01);
+        NEXT_BYTE(buffer, HIDP_MAIN_INPUT_1);			// INPUT (Cnst,Ary,Abs):0x81 0x01
+        NEXT_BYTE(buffer, 0x01);
+    }
 
-            return (int)buffer.size();
+
+    // Insert FFB section to the descriptor if the user chose to
+    if (Ffb) {
+        CreateFfbDesc(&buffer, ReportId);
+        UINT16 mask = GetFfbEffectMask();
+        ModifyFfbEffectDesc(&buffer, mask);
+    }
+
+    NEXT_BYTE(buffer, HIDP_MAIN_ENDCOLLECTION);			// END_COLLECTION:					0xC0
+
+    UCHAR* orig = &buffer[0];
+    *data = (void**)orig;
+
+    return (int)buffer.size();
 
 }
 
@@ -1246,10 +1247,14 @@ void DeleteHidReportDescFromReg(int target)
         LPCWSTR lpRegParam = RegParam;
 
         // Delete
-        if (lpRegParam)
-            RegDeleteTree(HKEY_LOCAL_MACHINE, lpRegParam);
-
-    };
+        if (lpRegParam) {
+            auto stt = RegDeleteTree(HKEY_LOCAL_MACHINE, lpRegParam);
+            if (stt != ERROR_SUCCESS) {
+                auto msg = "Failed with error" + std::to_string(stt);
+                perror(msg.c_str());
+            }
+        }
+    }
 
     RegCloseKey(hParams);
     return;
@@ -1412,83 +1417,83 @@ void UpdateToolTip(LPVOID param)
 
     switch (CtrlId) // Per-control tooltips
     {
-    case IDC_CHK_X:
-        DisplayToolTip(lpttt, IDS_I_CHK_X, NULL, TTI_NONE);
-        break;
+        case IDC_CHK_X:
+            DisplayToolTip(lpttt, IDS_I_CHK_X, NULL, TTI_NONE);
+            break;
 
-    case IDC_CHK_Y:
-        DisplayToolTip(lpttt, IDS_I_CHK_Y, NULL, TTI_NONE);
-        break;
+        case IDC_CHK_Y:
+            DisplayToolTip(lpttt, IDS_I_CHK_Y, NULL, TTI_NONE);
+            break;
 
-    case IDC_CHK_Z:
-        DisplayToolTip(lpttt, IDS_I_CHK_Z, NULL, TTI_NONE);
-        break;
+        case IDC_CHK_Z:
+            DisplayToolTip(lpttt, IDS_I_CHK_Z, NULL, TTI_NONE);
+            break;
 
-    case IDC_CHK_RX:
-        DisplayToolTip(lpttt, IDS_I_CHK_RX, NULL, TTI_NONE);
-        break;
+        case IDC_CHK_RX:
+            DisplayToolTip(lpttt, IDS_I_CHK_RX, NULL, TTI_NONE);
+            break;
 
-    case IDC_CHK_RY:
-        DisplayToolTip(lpttt, IDS_I_CHK_RY, NULL, TTI_NONE);
-        break;
+        case IDC_CHK_RY:
+            DisplayToolTip(lpttt, IDS_I_CHK_RY, NULL, TTI_NONE);
+            break;
 
-    case IDC_CHK_RZ:
-        DisplayToolTip(lpttt, IDS_I_CHK_RZ, NULL, TTI_NONE);
-        break;
+        case IDC_CHK_RZ:
+            DisplayToolTip(lpttt, IDS_I_CHK_RZ, NULL, TTI_NONE);
+            break;
 
-    case IDC_CHK_SL0:
-        DisplayToolTip(lpttt, IDS_I_CHK_SL0, NULL, TTI_NONE);
-        break;
+        case IDC_CHK_SL0:
+            DisplayToolTip(lpttt, IDS_I_CHK_SL0, NULL, TTI_NONE);
+            break;
 
-    case IDC_CHK_SL1:
-        DisplayToolTip(lpttt, IDS_I_CHK_SL1, NULL, TTI_NONE);
-        break;
+        case IDC_CHK_SL1:
+            DisplayToolTip(lpttt, IDS_I_CHK_SL1, NULL, TTI_NONE);
+            break;
 
-    case IDC_NBTN:
-        DisplayToolTip(lpttt, IDS_I_NBTN, IDS_T_NBTN, TTI_NONE);
-        break;
+        case IDC_NBTN:
+            DisplayToolTip(lpttt, IDS_I_NBTN, IDS_T_NBTN, TTI_NONE);
+            break;
 
-    case IDC_POV_DESC:
-        DisplayToolTip(lpttt, IDS_I_POV_DESC, IDS_T_POV, TTI_NONE);
-        break;
+        case IDC_POV_DESC:
+            DisplayToolTip(lpttt, IDS_I_POV_DESC, IDS_T_POV, TTI_NONE);
+            break;
 
-    case IDC_POV_CONT:
-        DisplayToolTip(lpttt, IDS_I_POV_CONT, IDS_T_POV, TTI_NONE);
-        break;
+        case IDC_POV_CONT:
+            DisplayToolTip(lpttt, IDS_I_POV_CONT, IDS_T_POV, TTI_NONE);
+            break;
 
-    case IDC_POV_LST:
-        DisplayToolTip(lpttt, IDS_I_POV_LST, NULL, TTI_NONE);
-        break;
+        case IDC_POV_LST:
+            DisplayToolTip(lpttt, IDS_I_POV_LST, NULL, TTI_NONE);
+            break;
 
-    case IDC_ADDDEL_BTN:
-        if (AddBtn)
-            DisplayToolTip(lpttt, IDS_I_ADD_BTN, NULL, TTI_NONE);
-        else
-            DisplayToolTip(lpttt, IDS_I_DEL_BTN, NULL, TTI_NONE);
-        break;
+        case IDC_ADDDEL_BTN:
+            if (AddBtn)
+                DisplayToolTip(lpttt, IDS_I_ADD_BTN, NULL, TTI_NONE);
+            else
+                DisplayToolTip(lpttt, IDS_I_DEL_BTN, NULL, TTI_NONE);
+            break;
 
-    case IDC_APPLY_BTN:
-        DisplayToolTip(lpttt, IDS_I_APPLY_BTN, IDS_T_APPLY_BTN, TTI_NONE);
-        break;
+        case IDC_APPLY_BTN:
+            DisplayToolTip(lpttt, IDS_I_APPLY_BTN, IDS_T_APPLY_BTN, TTI_NONE);
+            break;
 
-    case IDC_REVT_BTN:
-        DisplayToolTip(lpttt, IDS_I_REVT_BTN, IDS_T_REVT_BTN, TTI_NONE);
-        break;
+        case IDC_REVT_BTN:
+            DisplayToolTip(lpttt, IDS_I_REVT_BTN, IDS_T_REVT_BTN, TTI_NONE);
+            break;
 
-    case IDC_RSTALL:
-        DisplayToolTip(lpttt, IDS_I_RSTALL, IDS_T_RSTALL, TTI_NONE);
-        break;
+        case IDC_RSTALL:
+            DisplayToolTip(lpttt, IDS_I_RSTALL, IDS_T_RSTALL, TTI_NONE);
+            break;
 
-    case IDC_CHK_ENVJOY: // TODO: Implement with condition (vJoyIsOn)
-        if (vJoyIsOn)
-            DisplayToolTip(lpttt, IDS_I_CHK_DISVJOY, IDS_T_CHK_ENVJOY, TTI_NONE);
-        else
-            DisplayToolTip(lpttt, IDS_I_CHK_ENVJOY, IDS_T_CHK_ENVJOY, TTI_NONE);
+        case IDC_CHK_ENVJOY: // TODO: Implement with condition (vJoyIsOn)
+            if (vJoyIsOn)
+                DisplayToolTip(lpttt, IDS_I_CHK_DISVJOY, IDS_T_CHK_ENVJOY, TTI_NONE);
+            else
+                DisplayToolTip(lpttt, IDS_I_CHK_ENVJOY, IDS_T_CHK_ENVJOY, TTI_NONE);
 
 
-    default:
-        //DisplayToolTip(lpttt, IDS_W_NOT_IMP, L"OOOPS", TTI_WARNING);
-        break;
+        default:
+            //DisplayToolTip(lpttt, IDS_W_NOT_IMP, L"OOOPS", TTI_WARNING);
+            break;
     }
 
 }

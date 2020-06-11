@@ -1,17 +1,17 @@
 #if DEV_GEN
-0x05,0x01,  //    Usage Page Generic Desktop
+0x05, 0x01, //    Usage Page Generic Desktop
 0x15, 0x00, // LOGICAL_MINIMUM (0)
-0x09,0x04,  //    Usage Joystick
-0xA1,0x01,  //    Collection Application
+0x09, 0x04, //    Usage Joystick
+0xA1, 0x01, //    Collection Application
     0x05, 0x01,                    //   USAGE_PAGE (Generic Desktop)
-    0x85, TLID,						//    Report ID 1
+    0x85, TLID,                    //    Report ID 1
     /***************** Eight Axes ************************************/
     0x09, 0x01,                    //   USAGE (Pointer)
     0x15, 0x00,                    //   LOGICAL_MINIMUM (0)
     0x26, (VJOY_AXIS_MAX_VALUE&0xFF), ((VJOY_AXIS_MAX_VALUE>>8)&0xFF), //   LOGICAL_MAXIMUM (32767) -> 65535
     0x75, 0x20,                    //   REPORT_SIZE (32)
     0x95, 0x01,                    //   REPORT_COUNT (1)
-    0xa1, 0x00,                    //   COLLECTION (Physical)
+    0xA1, 0x00,                    //   COLLECTION (Physical)
         0x09, 0x30,                    //     USAGE (X)
         0x81, 0x02,                    //     INPUT (Data,Var,Abs)
         0x09, 0x31,                    //     USAGE (Y)
@@ -44,7 +44,7 @@
         0x81, 0x02,                    //     INPUT (Data,Var,Abs)
         0x09, 0xBB,                    //     USAGE (Throttle)
         0x81, 0x02,                    //     INPUT (Data,Var,Abs)
-    0xc0,                          //   END_COLLECTION
+    0xC0,                          //   END_COLLECTION
     /***************** Place holder for 4 POV Hat switches *******************/
     0x75, 0x20,                    //   REPORT_SIZE (32)
     0x95, 0x04,                    //   REPORT_COUNT (4)
@@ -219,7 +219,7 @@
        0xA1,0x02,       //    Collection Datalink
             0x05,0x01,    //    Usage Page Generic Desktop
             0x09,0x30,    //    Usage X
-#ifdef FFB_USE_XY_AXES>1   
+#if FFB_USE_XY_AXES>1
            // If only 1 FFB axis, skip this
             0x09,0x31,    //    Usage Y
 #endif

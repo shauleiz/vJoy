@@ -840,7 +840,7 @@ void DeleteHidReportDescFromReg(int target)
 
     RegCloseKey(hParams);
     return;
-    }
+}
 
 /*
     Call vJoyConf if in the same folder
@@ -1234,7 +1234,7 @@ void DisplayVersion(void)
     wprintf_s(L"\n%s version %s\n", InternalName, FileVersion);
 
     LocalFree(pResCopy);
-    }
+}
 
 bool TestBitness(void)
 {
@@ -1334,44 +1334,44 @@ CMD		cl_Flag2Cmd(int argc, _TCHAR* argv[], int iItem)
         return CRT;
 
     switch (argv[iItem][1]) {
-    case 'h':
-    case 'H':
-        return HLP;
+        case 'h':
+        case 'H':
+            return HLP;
 
-    case 'v':
-    case 'V':
-        return VER;
+        case 'v':
+        case 'V':
+            return VER;
 
-    case 'r':
-    case 'R':
-        return RST;
+        case 'r':
+        case 'R':
+            return RST;
 
-    case 'd':
-    case 'D':
-        return DEL;
+        case 'd':
+        case 'D':
+            return DEL;
 
-    case 'f':
-    case 'F':
-        return FRC;
+        case 'f':
+        case 'F':
+            return FRC;
 
-    case 'a':
-    case 'A':
-        return AXS;
+        case 'a':
+        case 'A':
+            return AXS;
 
-    case 'b':
-    case 'B':
-        return BTN;
+        case 'b':
+        case 'B':
+            return BTN;
 
-    case 'p':
-    case 'P':
-        return PVA;
+        case 'p':
+        case 'P':
+            return PVA;
 
-    case 's':
-    case 'S':
-        return PVD;
+        case 's':
+        case 'S':
+            return PVD;
 
-    default:
-        return UNK;
+        default:
+            return UNK;
     };
 
     return UNK;
