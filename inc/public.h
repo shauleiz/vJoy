@@ -98,7 +98,8 @@ DEFINE_GUID(GUID_DEVINTERFACE_VJOY, 0x781EF630, 0x72B2, 0x11d2, 0xB8, 0x52, 0x00
 #define VENDOR_N_ID		0x1234
 // Product ID changes if FFB is enabled or not (so we will have 2 different products and drivers)
 #ifdef VJOY_HAS_FFB
-#define	PRODUCT_N_ID	0x1FFB
+#define	PRODUCT_N_ID	0xBEAD
+//#define	PRODUCT_N_ID	0x1FFB
 #else
 #define	PRODUCT_N_ID	0x0FFB
 #endif
