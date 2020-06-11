@@ -89,39 +89,6 @@ Return Value:
     //WDF_OBJECT_ATTRIBUTES	attributes;
     WDFDRIVER				hDriver;
 
-    // BM: why is this code been added compared to Shaul's version?
-#if 0
-    //
-    //// Create a framework driver object to represent our driver.
-    //
-    //   Register AddDevice callback function
-    //
-    WDF_DRIVER_CONFIG_INIT(&config, vJoyEvtDeviceAdd);
-    //
-    //   Register a cleanup callback so that we can call WPP_CLEANUP when
-    //   the framework driver object is deleted during driver unload.
-    //
-
-    //WDF_OBJECT_ATTRIBUTES_INIT(&attributes);
-    //attributes.EvtCleanupCallback = vJoyEvtDriverContextCleanup;
-
-    // Driver and its decendents are set to execute at PASSIVE_LEVEL
-    // This will make the synchronization of the event handlers simpler
-
-    //attributes.ExecutionLevel = WdfExecutionLevelPassive;
-
-    status = WdfDriverCreate(DriverObject,
-        RegistryPath,
-        /*&attributes*/ WDF_NO_OBJECT_ATTRIBUTES,
-        &config,
-        &hDriver);
-    if (!NT_SUCCESS(status)) {
-        KdPrint(("WdfDriverCreate failed with status 0x%x\n", status));
-        LogEventWithStatus(ERRLOG_DRIVER_FAILED, L"WdfDriverCreate", DriverObject, status);
-        return status;
-    };
-#endif
-
     //
     // Initialize WPP Tracing
     //
@@ -253,7 +220,7 @@ Return Value:
 
     PAGED_CODE();
 
-    TraceEvents(TRACE_LEVEL_INFORMATION, DBG_PNP, "vJoyEvtDeviceAdd called\n");
+    TraceEvents(TRACE_LEVEL_INFORMATION, DBG_PNP, "vJoyEvtDeviceAdd: entering\n");
     //KdBreakPoint();
 
 
@@ -601,6 +568,11 @@ Return Value:
         i = 1;
 }
 
+#if 0
+/*
+ NOT USED!
+ Has been deferred to user code handling.
+*/
 NTSTATUS
 vJoyCompleteWriteReport(
     WDFREQUEST request
@@ -627,7 +599,8 @@ vJoyCompleteWriteReport(
         return status;
     };
 
-    TraceEvents(TRACE_LEVEL_INFORMATION, DBG_INIT, "vJoyCompleteWriteReport:reportId=%d\n", transferPacket->reportId);
+    TraceEvents(TRACE_LEVEL_INFORMATION, DBG_INIT, "vJoyCompleteWriteReport: entering with reportId=%d\n", transferPacket->reportId);
+
     // Switch By report ID
     switch (transferPacket->reportId) {
     case 1:
@@ -645,12 +618,12 @@ vJoyCompleteWriteReport(
     if (bytesToCopy)
         status = WdfRequestRetrieveInputBuffer(request, bytesToCopy, (PVOID*)&ucBuffer, &bytesReturned);
     WdfRequestCompleteWithInformation(request, status, bytesReturned);
+
+    TraceEvents(TRACE_LEVEL_INFORMATION, DBG_INIT, "vJoyCompleteWriteReport: exiting with stt=0x%d\n", status);
+
     return status;
-
-
-
 }
-
+#endif
 
 #if 0
 NTSTATUS
@@ -710,7 +683,7 @@ Routine Description
 
     This method handles the completion of the pended request for the
     IOCTL_HID_READ_REPORT
-    If there is a pending requests it passes the joystick position to the colling
+    If there is a pending requests it passes the joystick position to the calling
     driver encapsulated in a HID_INPUT_REPORT structure.
 
 Arguments:
@@ -786,7 +759,9 @@ Return Value:
             TraceEvents(TRACE_LEVEL_ERROR, DBG_IOCTL, "WdfIoQueueRetrieveNextRequest status STATUS_INVALID_DEVICE_STATE\n");
         if (status != STATUS_NO_MORE_ENTRIES)
             TraceEvents(TRACE_LEVEL_ERROR, DBG_IOCTL, "WdfIoQueueRetrieveNextRequest status %08x\n", status);
-    };
+    }
+
+    TraceEvents(TRACE_LEVEL_INFORMATION, DBG_IOCTL, "vJoyCompleteReadReport: exiting with stt=0x%x\n", status);
 
     return status;
 }
@@ -1090,6 +1065,7 @@ VOID FfbDisableAll(PDEVICE_EXTENSION devContext)
 {
     size_t szarry, szelement, sz;
     size_t i;
+    TraceEvents(TRACE_LEVEL_INFORMATION, DBG_FFB, "FfbDisableAll: entering\n");
 
     // Initialize all joysticks so they are not FFB capable.
     if (!devContext)
@@ -1102,6 +1078,7 @@ VOID FfbDisableAll(PDEVICE_EXTENSION devContext)
     for (i = 0; i<sz; i++)
         devContext->FfbEnable[i] = FALSE;
 
+    TraceEvents(TRACE_LEVEL_INFORMATION, DBG_FFB, "FfbDisableAll: exiting\n");
     return;
 }
 
@@ -1117,6 +1094,7 @@ VOID LogEvent(NTSTATUS code, PWSTR msg, PVOID pObj)
 
     if (packetlen > ERROR_LOG_MAXIMUM_SIZE)
         return;
+    // Allocate error log entry (will be free when sending)
     p = (PIO_ERROR_LOG_PACKET)IoAllocateErrorLogEntry(pObj, (UCHAR)packetlen);
     if (!p)
         return;
@@ -1137,6 +1115,7 @@ VOID LogEvent(NTSTATUS code, PWSTR msg, PVOID pObj)
     } else
         p->NumberOfStrings = 0;
 
+    // Send error log to system's log and release error log entry
     IoWriteErrorLogEntry(p);
 }
 

@@ -1708,6 +1708,7 @@ void InitializeDefaultDev(
 void InitializeDev(
     PDEVICE_EXTENSION   devContext,
     USHORT Mask,
+    USHORT FFbmask,
     BOOLEAN ResetOnly
 );
 
@@ -1719,7 +1720,8 @@ void CleanUpDev(
 PVOID
 GetReportDescriptorFromRegistry(
     USHORT* Size,
-    USHORT* IdMask
+    USHORT* IdMask,
+    USHORT* FFBMask
 );
 
 unsigned int
@@ -1759,6 +1761,11 @@ VOID LogEventWithStatus(
 USHORT ParseIdInDescriptor(
     BYTE* desc,
     DWORD size
+);
+
+SHORT ParsePIDCollectionForFFBInDescriptor(
+    BYTE* desc,
+    DWORD dDescSize
 );
 
 VOID FfbActiveSet(

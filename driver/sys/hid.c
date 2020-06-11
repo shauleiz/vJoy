@@ -106,7 +106,8 @@ Return Value:
 
     device = WdfIoQueueGetDevice(Queue);
     devContext = GetDeviceContext(device);
-    TraceEvents(TRACE_LEVEL_INFORMATION, DBG_INIT, "vJoyEvtInternalDeviceControl: IoControlCode=%x\n", IoControlCode);
+
+    TraceEvents(TRACE_LEVEL_INFORMATION, DBG_IOCTL, "vJoyEvtInternalDeviceControl: IoControlCode=%x\n", IoControlCode);
 
     //
     // Please note that HIDCLASS provides the buffer in the Irp->UserBuffer
@@ -123,12 +124,14 @@ Return Value:
             //
             // Retrieves the device's HID descriptor.
             //
+            TraceEvents(TRACE_LEVEL_VERBOSE, DBG_IOCTL, "vJoyEvtInternalDeviceControl[IOCTL_HID_GET_DEVICE_DESCRIPTOR]:\n");
             status = vJoyGetHidDescriptor(device, Request);
             break;
         case IOCTL_HID_GET_DEVICE_ATTRIBUTES:
             //
             //Retrieves a device's attributes in a HID_DEVICE_ATTRIBUTES structure.
             //
+            TraceEvents(TRACE_LEVEL_VERBOSE, DBG_IOCTL, "vJoyEvtInternalDeviceControl[IOCTL_HID_GET_DEVICE_ATTRIBUTES]:\n");
             status = vJoyGetDeviceAttributes(Request);
             break;
 
@@ -136,6 +139,7 @@ Return Value:
             //
             //Obtains the report descriptor for the HID device.
             //
+            TraceEvents(TRACE_LEVEL_VERBOSE, DBG_IOCTL, "vJoyEvtInternalDeviceControl[IOCTL_HID_GET_REPORT_DESCRIPTOR]:\n");
             status = vJoyGetReportDescriptor(device, Request);
             break;
 
@@ -148,6 +152,7 @@ Return Value:
             // be retrived and completd when continuous reader reads new data
             // from the device.
             //
+            TraceEvents(TRACE_LEVEL_VERBOSE, DBG_IOCTL, "vJoyEvtInternalDeviceControl[IOCTL_HID_READ_REPORT]:\n");
             status = WdfRequestForwardToIoQueue(Request, devContext->ReadReportMsgQueue);
 
             if (!NT_SUCCESS(status)) {
@@ -184,7 +189,7 @@ Return Value:
             // the device. In the second case, an external wake event triggers completion
             // of wait-wake irp and powering up of device.
             //
-            TraceEvents(TRACE_LEVEL_ERROR, DBG_IOCTL, "IOCTL_HID_SEND_IDLE_NOTIFICATION_REQUEST\n");
+            TraceEvents(TRACE_LEVEL_ERROR, DBG_IOCTL, "vJoyEvtInternalDeviceControl[IOCTL_HID_SEND_IDLE_NOTIFICATION_REQUEST]:\n");
             status = STATUS_NOT_SUPPORTED;
             break;
 
@@ -195,7 +200,7 @@ Return Value:
             //
             // returns a feature report associated with a top-level collection
             //
-            TraceEvents(TRACE_LEVEL_ERROR, DBG_IOCTL, "IOCTL_HID_GET_FEATURE\n");
+            TraceEvents(TRACE_LEVEL_VERBOSE, DBG_IOCTL, "vJoyEvtInternalDeviceControl[IOCTL_HID_GET_FEATURE]:\n");
             status = vJoyGetFeature(Request);
             WdfRequestComplete(Request, status);
             return;
@@ -205,14 +210,17 @@ Return Value:
             // This sends a HID class feature report to a top-level collection of
             // a HID class device.
             //
+            TraceEvents(TRACE_LEVEL_VERBOSE, DBG_IOCTL, "vJoyEvtInternalDeviceControl[IOCTL_HID_SET_FEATURE]:\n");
 
         case IOCTL_HID_WRITE_REPORT:
 
             // Extracting the ID from the request
             id = FfbGetDevIDfromFfbRequest(Request);
+            TraceEvents(TRACE_LEVEL_VERBOSE, DBG_IOCTL, "vJoyEvtInternalDeviceControl[IOCTL_HID_WRITE_REPORT]: id=%d\n", id);
 
             // If FFB is not active then just reject this request
             if (!devContext->FfbEnable[id-1]) {
+                TraceEvents(TRACE_LEVEL_VERBOSE, DBG_IOCTL, "vJoyEvtInternalDeviceControl[IOCTL_HID_WRITE_REPORT]: ffb disabled for id=%d !\n", id);
                 WdfRequestComplete(Request, STATUS_SUCCESS);
                 return;
             };
@@ -224,6 +232,7 @@ Return Value:
                     "WdfRequestForwardToIoQueue (FfbWriteQ[%d]) failed with status: 0x%x\n", id - 1, status);
                 WdfRequestComplete(Request, status);
             }
+            TraceEvents(TRACE_LEVEL_VERBOSE, DBG_IOCTL, "vJoyEvtInternalDeviceControl[IOCTL_HID_WRITE_REPORT]: forwarded to queue and leaving with stt=0x%x !\n", status);
             return;
 
 
@@ -232,7 +241,7 @@ Return Value:
             // returns a HID class input report associated with a top-level
             // collection of a HID class device.
             //
-            TraceEvents(TRACE_LEVEL_ERROR, DBG_IOCTL, "IOCTL_HID_GET_INPUT_REPORT\n");
+            TraceEvents(TRACE_LEVEL_ERROR, DBG_IOCTL, "vJoyEvtInternalDeviceControl[IOCTL_HID_GET_INPUT_REPORT]:\n");
             status = STATUS_NOT_SUPPORTED;
             break;
 
@@ -241,7 +250,7 @@ Return Value:
             // sends a HID class output report to a top-level collection of a HID
             // class device.
             //
-            TraceEvents(TRACE_LEVEL_ERROR, DBG_IOCTL, "IOCTL_HID_SET_OUTPUT_REPORT\n");
+            TraceEvents(TRACE_LEVEL_ERROR, DBG_IOCTL, "vJoyEvtInternalDeviceControl[IOCTL_HID_SET_OUTPUT_REPORT]:\n");
             status = STATUS_NOT_SUPPORTED;
             break;
 
@@ -259,16 +268,15 @@ Return Value:
             // from the device extension of a top level collection associated with
             // the device.
             //
+            TraceEvents(TRACE_LEVEL_VERBOSE, DBG_IOCTL, "vJoyEvtInternalDeviceControl[IOCTL_HID_GET_STRING]:\n");
             status = vJoyGetHidString(Request);
-            //TraceEvents(TRACE_LEVEL_ERROR, DBG_IOCTL,   "IOCTL_HID_GET_STRING\n");
-            //status = STATUS_NOT_SUPPORTED;
             break;
 
         case IOCTL_HID_ACTIVATE_DEVICE:
             //
             // Makes the device ready for I/O operations.
             //
-            TraceEvents(TRACE_LEVEL_ERROR, DBG_IOCTL, "IOCTL_HID_ACTIVATE_DEVICE\n");
+            TraceEvents(TRACE_LEVEL_ERROR, DBG_IOCTL, "vJoyEvtInternalDeviceControl[IOCTL_HID_ACTIVATE_DEVICE]:\n");
             status = STATUS_NOT_SUPPORTED;
             break;
         case IOCTL_HID_DEACTIVATE_DEVICE:
@@ -276,21 +284,29 @@ Return Value:
             // Causes the device to cease operations and terminate all outstanding
             // I/O requests.
             //
-            TraceEvents(TRACE_LEVEL_ERROR, DBG_IOCTL, "IOCTL_HID_DEACTIVATE_DEVICE\n");
+            TraceEvents(TRACE_LEVEL_ERROR, DBG_IOCTL, "vJoyEvtInternalDeviceControl[IOCTL_HID_DEACTIVATE_DEVICE]:\n");
             status = STATUS_NOT_SUPPORTED;
             break;
 
         default:
+            TraceEvents(TRACE_LEVEL_ERROR, DBG_IOCTL, "vJoyEvtInternalDeviceControl[default]: ioctl not supported!\n");
             status = STATUS_NOT_SUPPORTED;
             break;
     }
 
     WdfRequestComplete(Request, status);
 
+    TraceEvents(TRACE_LEVEL_INFORMATION, DBG_IOCTL, "vJoyEvtInternalDeviceControl: exiting with stt=0x%x\n", status);
+
     return;
 }
 
 
+// Handle IOCTL_HID_GET_FEATURE
+/*
+ This function acts as a filter for FFB packets that needs processing, like:
+ -
+ */
 NTSTATUS
 vJoyGetFeature(
     IN WDFREQUEST Request
@@ -311,10 +327,11 @@ vJoyGetFeature(
     WDF_REQUEST_PARAMETERS_INIT(&params);
     WdfRequestGetParameters(Request, &params);
 
-    TraceEvents(TRACE_LEVEL_INFORMATION, DBG_INIT, "vJoyGetFeature: controlcode=%x\n", params.Parameters.DeviceIoControl.IoControlCode);
+    TraceEvents(TRACE_LEVEL_INFORMATION, DBG_IOCTL, "vJoyGetFeature: entering with controlcode=%x\n", params.Parameters.DeviceIoControl.IoControlCode);
 
     if (params.Parameters.DeviceIoControl.OutputBufferLength < sizeof(HID_XFER_PACKET)) {
         status = STATUS_BUFFER_TOO_SMALL;
+        TraceEvents(TRACE_LEVEL_ERROR, DBG_IOCTL, "vJoyGetFeature: error Outputbuffer too small (%d should be >= %d)\n", params.Parameters.DeviceIoControl.OutputBufferLength, sizeof(HID_XFER_PACKET));
         return status;
     };
 
@@ -322,6 +339,7 @@ vJoyGetFeature(
     transferPacket = (PHID_XFER_PACKET)WdfRequestWdmGetIrp(Request)->UserBuffer;
     if (transferPacket == NULL) {
         status = STATUS_INVALID_DEVICE_REQUEST;
+        TraceEvents(TRACE_LEVEL_ERROR, DBG_IOCTL, "vJoyGetFeature: error transfer packet is null\n");
         return status;
     }
 
@@ -330,14 +348,20 @@ vJoyGetFeature(
     device = WdfIoQueueGetDevice(ParentQueue);
     devContext = GetDeviceContext(device);
 
+    // Check device exists
     id = FfbGetDevIDfromFfbRequest(Request);
     if (!id) {
-        status = STATUS_NO_SUCH_DEVICE;;
+        status = STATUS_NO_SUCH_DEVICE;
+        TraceEvents(TRACE_LEVEL_ERROR, DBG_IOCTL, "vJoyGetFeature: error invalid device id (%d)\n", id);
         return status;
     }
 
+    // Retrieve reportID
     BYTE reportID = transferPacket->reportId&0x0F;
-    TraceEvents(TRACE_LEVEL_INFORMATION, DBG_INIT, "vJoyGetFeature: id=%d, xfer=%x reportId=%x\n", id, transferPacket->reportId, reportID);
+    TraceEvents(TRACE_LEVEL_VERBOSE, DBG_FFB, "vJoyGetFeature: id=%d, xfer=%x reportId=%x\n", id, transferPacket->reportId, reportID);
+
+    // Flag to know whether report has been processed or not
+    BOOLEAN knownReport = FALSE;
 
     ////////////////////////////////////////
     // Block Load Report ID 2
@@ -355,14 +379,15 @@ vJoyGetFeature(
             ucTmp[2] = (UCHAR)((devContext->FfbPIDData[id-1].PIDBlockLoad.LoadStatus)&0xFF);
             ucTmp[3] = (UCHAR)((devContext->FfbPIDData[id-1].PIDBlockLoad.RAMPoolAvailable)&0xFF);
             ucTmp[4] = (UCHAR)((devContext->FfbPIDData[id-1].PIDBlockLoad.RAMPoolAvailable>>8)&0xFF);; // Load Error =0
+            knownReport = TRUE;
         } else {
             ucTmp[2] = 0; // Load Success = 0
             ucTmp[3] = 0; // Load Full = 0
             ucTmp[4] = 1; // Load Error =1
         };
-        TraceEvents(TRACE_LEVEL_INFORMATION, DBG_INIT, "vJoyGetFeature: Block Load ucTmp[1]=%x ucTmp[2]=%x ucTmp[3]=%x ucTmp[4]=%x\n",
+        TraceEvents(TRACE_LEVEL_VERBOSE, DBG_FFB, "vJoyGetFeature: Block Load ucTmp[1]=%x ucTmp[2]=%x ucTmp[3]=%x ucTmp[4]=%x\n",
             transferPacket->reportBuffer[1], transferPacket->reportBuffer[2], transferPacket->reportBuffer[3], transferPacket->reportBuffer[4]);
-    };
+    }
 
     ////////////////////////////////////////
     // Pool Report ID 3
@@ -379,13 +404,14 @@ vJoyGetFeature(
             ucTmp[2] = (UCHAR)((devContext->FfbPIDData[id-1].PIDPool.RAMPoolSize>>8)&0xFF);
             ucTmp[3] = (UCHAR)((devContext->FfbPIDData[id-1].PIDPool.MaxSimultaneousEffects)&0xFF);
             ucTmp[4] = (UCHAR)((devContext->FfbPIDData[id-1].PIDPool.MemoryManagement)&0xFF);
+            knownReport = TRUE;
         } else {
             ucTmp[1] = (UCHAR)(0);
             ucTmp[2] = (UCHAR)(0);
             ucTmp[3] = (UCHAR)(0);
             ucTmp[4] = (UCHAR)(0);
         }
-        TraceEvents(TRACE_LEVEL_INFORMATION, DBG_INIT, "vJoyGetFeature: Pool ucTmp[1]=%x ucTmp[2]=%x ucTmp[3]=%x ucTmp[4]=%x\n",
+        TraceEvents(TRACE_LEVEL_VERBOSE, DBG_FFB, "vJoyGetFeature: Pool ucTmp[1]=%x ucTmp[2]=%x ucTmp[3]=%x ucTmp[4]=%x\n",
             transferPacket->reportBuffer[1], transferPacket->reportBuffer[2], transferPacket->reportBuffer[3], transferPacket->reportBuffer[4]);
     }
     // Report ID 3?
@@ -405,13 +431,17 @@ vJoyGetFeature(
         if (devContext->FfbEnable[id-1]) {
             ucTmp[1] = (UCHAR)(0);
             ucTmp[2] = (UCHAR)(0);
+            knownReport = TRUE;
         } else {
             ucTmp[1] = (UCHAR)(0);
             ucTmp[2] = (UCHAR)(0);
         }
-        TraceEvents(TRACE_LEVEL_INFORMATION, DBG_INIT, "vJoyGetFeature: State report ucTmp[1]=%x ucTmp[2]=%x\n",
+        TraceEvents(TRACE_LEVEL_VERBOSE, DBG_FFB, "vJoyGetFeature: State report ucTmp[1]=%x ucTmp[2]=%x\n",
             transferPacket->reportBuffer[1], transferPacket->reportBuffer[2]);
     }
+
+
+    TraceEvents(TRACE_LEVEL_INFORMATION, DBG_IOCTL, "vJoyGetFeature: exiting with stt=%d\n", status);
 
 
     return status;
@@ -455,7 +485,7 @@ Return Value:
     WDF_REQUEST_PARAMETERS_INIT(&params);
     WdfRequestGetParameters(Request, &params);
 
-    TraceEvents(TRACE_LEVEL_INFORMATION, DBG_INIT, "vJoySetFeature Enter\n", params.Parameters.DeviceIoControl);
+    TraceEvents(TRACE_LEVEL_INFORMATION, DBG_IOCTL, "vJoySetFeature: entering with ioctl=0x%x\n", params.Parameters.DeviceIoControl.IoControlCode);
 
     //
     // IOCTL_HID_SET_FEATURE & IOCTL_HID_GET_FEATURE are not METHOD_NIEHTER
@@ -566,7 +596,7 @@ Return Value:
     size_t              bytesToCopy = 0;
     WDFMEMORY           memory;
 
-    TraceEvents(TRACE_LEVEL_VERBOSE, DBG_IOCTL, "vJoyGetHidDescriptor Entry\n");
+    TraceEvents(TRACE_LEVEL_INFORMATION, DBG_IOCTL, "vJoyGetHidDescriptor: entering\n");
 
     //
     // This IOCTL is METHOD_NEITHER so WdfRequestRetrieveOutputMemory
@@ -606,7 +636,7 @@ Return Value:
     //
     WdfRequestSetInformation(Request, bytesToCopy);
 
-    TraceEvents(TRACE_LEVEL_VERBOSE, DBG_IOCTL, "vJoyGetHidDescriptor Exit = 0x%x\n", status);
+    TraceEvents(TRACE_LEVEL_INFORMATION, DBG_IOCTL, "vJoyGetHidDescriptor: exiting with stt=0x%x\n", status);
     return status;
 }
 
@@ -647,6 +677,7 @@ Return Value:
 
     WDF_REQUEST_PARAMETERS_INIT(&Parameters);
     WdfRequestGetParameters(Request, &Parameters);
+    TraceEvents(TRACE_LEVEL_INFORMATION, DBG_IOCTL, "vJoyGetHidString: entering with hid string type=0x%x\n", (ULONGLONG)Parameters.Parameters.DeviceIoControl.Type3InputBuffer & 0xffff);
 
     switch ((ULONGLONG)Parameters.Parameters.DeviceIoControl.Type3InputBuffer & 0xffff) {
         case HID_STRING_ID_IMANUFACTURER:
@@ -676,6 +707,7 @@ Return Value:
     bytesToCopy = pwstrID ? wcslen(pwstrID)*sizeof(WCHAR) + sizeof(UNICODE_NULL) : 0;
     if (bytesToCopy == 0) {
         status = STATUS_INVALID_DEVICE_STATE;
+        TraceEvents(TRACE_LEVEL_ERROR, DBG_IOCTL, "Unable to copy HID string\n");
         LogEvent(ERRLOG_HID_STRING_FAILED1, NULL, WdfDriverWdmGetDriverObject(WdfGetDriver()));
         return status;
     };
@@ -690,7 +722,7 @@ Return Value:
 
     WdfRequestSetInformation(Request, NumBytesTransferred);
 
-    TraceEvents(TRACE_LEVEL_VERBOSE, DBG_IOCTL, "vJoyGetHidString Exit = 0x%x\n", status);
+    TraceEvents(TRACE_LEVEL_INFORMATION, DBG_IOCTL, "vJoyGetHidString: exiting with stt=0x%x\n", status);
     return status;
 
 }
@@ -728,7 +760,7 @@ Return Value:
     PDEVICE_EXTENSION   pDeviceContext = NULL;
 
 
-    TraceEvents(TRACE_LEVEL_VERBOSE, DBG_IOCTL, "vJoyGetReportDescriptor Entry\n");
+    TraceEvents(TRACE_LEVEL_INFORMATION, DBG_IOCTL, "vJoyGetReportDescriptor: entering\n");
 
     //
     // This IOCTL is METHOD_NEITHER so WdfRequestRetrieveOutputMemory
@@ -778,7 +810,7 @@ Return Value:
     //
     WdfRequestSetInformation(Request, bytesToCopy);
 
-    TraceEvents(TRACE_LEVEL_VERBOSE, DBG_IOCTL, "vJoyGetReportDescriptor Exit = 0x%x\n", status);
+    TraceEvents(TRACE_LEVEL_INFORMATION, DBG_IOCTL, "vJoyGetReportDescriptor: exiting with stt=0x%x\n", status);
     return status;
 }
 
@@ -807,7 +839,7 @@ Return Value:
     PHID_DEVICE_ATTRIBUTES   deviceAttributes = NULL;
     PDEVICE_EXTENSION        pDeviceContext = NULL;
 
-    TraceEvents(TRACE_LEVEL_VERBOSE, DBG_IOCTL, "vJoyGetDeviceAttributes Entry\n");
+    TraceEvents(TRACE_LEVEL_INFORMATION, DBG_IOCTL, "vJoyGetDeviceAttributes: entering\n");
 
     pDeviceContext = GetDeviceContext(WdfIoQueueGetDevice(WdfRequestGetIoQueue(Request)));
 
@@ -836,7 +868,7 @@ Return Value:
     //
     WdfRequestSetInformation(Request, sizeof(HID_DEVICE_ATTRIBUTES));
 
-    TraceEvents(TRACE_LEVEL_VERBOSE, DBG_IOCTL, "vJoyGetDeviceAttributes Exit = 0x%x\n", status);
+    TraceEvents(TRACE_LEVEL_INFORMATION, DBG_IOCTL, "vJoyGetDeviceAttributes Exit = 0x%x\n", status);
     return status;
 }
 
@@ -1022,7 +1054,7 @@ Return Value:
     DECLARE_CONST_UNICODE_STRING(__SDDL_DEVOBJ_SYS_ALL_ADM_RWX_WORLD_RW_RES_R, L"D:P(A;;GA;;;SY)(A;;GRGWGX;;;BA)(A;;GRGW;;;WD)(A;;GR;;;RC)");
 
     PAGED_CODE();
-    TraceEvents(TRACE_LEVEL_INFORMATION, DBG_INIT, "Entering vJoyCreateControlDevice\n");
+    TraceEvents(TRACE_LEVEL_INFORMATION, DBG_INIT, "vJoyCreateControlDevice: entering\n");
 
     //
     // First find out whether any Control Device has been created. If the
@@ -1038,13 +1070,14 @@ Return Value:
     WdfWaitLockRelease(vJoyDeviceCollectionLock);
 
     if (!bCreate) {
+        TraceEvents(TRACE_LEVEL_INFORMATION, DBG_INIT, "vJoyCreateControlDevice: Device already created, exiting with success\n");
         //
         // Control device is already created. So return success.
         //
         return STATUS_SUCCESS;
     }
 
-    TraceEvents(TRACE_LEVEL_INFORMATION, DBG_INIT, "Creating Control Device\n");
+    TraceEvents(TRACE_LEVEL_INFORMATION, DBG_INIT, "vJoyCreateControlDevice: Creating Control Device\n");
 
     //
     //
@@ -1057,6 +1090,7 @@ Return Value:
     pInit = WdfControlDeviceInitAllocate(WdfDeviceGetDriver(Device), &__SDDL_DEVOBJ_SYS_ALL_ADM_RWX_WORLD_RW_RES_R);
 
     if (pInit == NULL) {
+        TraceEvents(TRACE_LEVEL_ERROR, DBG_INIT, "vJoyCreateControlDevice: WdfControlDeviceInitAllocate Failed for insufficient resources\n");
         status = STATUS_INSUFFICIENT_RESOURCES;
         goto Error;
     }
@@ -1073,12 +1107,16 @@ Return Value:
     //
     RtlInitAnsiString(&ntDeviceNameA, TEXT(NTDEVICE_NAME_STRING));
     status = RtlAnsiStringToUnicodeString(&ntDeviceName, &ntDeviceNameA, TRUE);
-    if (!NT_SUCCESS(status))
+    if (!NT_SUCCESS(status)) {
+        TraceEvents(TRACE_LEVEL_ERROR, DBG_INIT, "vJoyCreateControlDevice: RtlAnsiStringToUnicodeString for device name Failed\n");
         goto Error;
+    }
     TraceEvents(TRACE_LEVEL_INFORMATION, DBG_INIT, "vJoyCreateControlDevice: Calling WdfDeviceInitAssignName\n");
     status = WdfDeviceInitAssignName(pInit, &ntDeviceName);
-    if (!NT_SUCCESS(status))
+    if (!NT_SUCCESS(status)) {
+        TraceEvents(TRACE_LEVEL_ERROR, DBG_INIT, "vJoyCreateControlDevice: WdfDeviceInitAssignName Failed\n");
         goto Error;
+    }
     RtlFreeUnicodeString(&ntDeviceName);
 
 
@@ -1088,8 +1126,10 @@ Return Value:
     TraceEvents(TRACE_LEVEL_INFORMATION, DBG_INIT, "vJoyCreateControlDevice: Creating Control Device\n");
     WDF_OBJECT_ATTRIBUTES_INIT_CONTEXT_TYPE(&controlAttributes, CONTROL_DEVICE_EXTENSION);
     status = WdfDeviceCreate(&pInit, &controlAttributes, &g_ControlDevice);
-    if (!NT_SUCCESS(status))
+    if (!NT_SUCCESS(status)) {
+        TraceEvents(TRACE_LEVEL_ERROR, DBG_INIT, "vJoyCreateControlDevice: WdfDeviceCreate Failed\n");
         goto Error;
+    }
 
     //
     // Create a symbolic link for the control object so that usermode can open
@@ -1099,11 +1139,13 @@ Return Value:
     //
     RtlInitAnsiString(&symbolicLinkNameA, TEXT(SYMBOLIC_NAME_STRING));
     status = RtlAnsiStringToUnicodeString(&symbolicLinkName, &symbolicLinkNameA, TRUE);
-    if (!NT_SUCCESS(status))
+    if (!NT_SUCCESS(status)) {
+        TraceEvents(TRACE_LEVEL_ERROR, DBG_INIT, "vJoyCreateControlDevice: RtlAnsiStringToUnicodeString for symbolic name Failed\n");
         goto Error;
+    }
     status = WdfDeviceCreateSymbolicLink(g_ControlDevice, &symbolicLinkName);
     if (!NT_SUCCESS(status)) {
-        TraceEvents(TRACE_LEVEL_ERROR, DBG_IOCTL, "Failed to create symbolic link (Native)\n");
+        TraceEvents(TRACE_LEVEL_ERROR, DBG_INIT, "vJoyCreateControlDevice: Failed to create symbolic link (Native)\n");
         goto Error;
     }
     RtlFreeUnicodeString(&symbolicLinkName);
@@ -1123,8 +1165,10 @@ Return Value:
     // filter drivers.
     //
     status = WdfIoQueueCreate(g_ControlDevice, &ioQueueConfig, WDF_NO_OBJECT_ATTRIBUTES, &queue);
-    if (!NT_SUCCESS(status))
+    if (!NT_SUCCESS(status)) {
+        TraceEvents(TRACE_LEVEL_ERROR, DBG_INIT, "vJoyCreateControlDevice: WdfIoQueueCreate Failed\n");
         goto Error;
+    }
 
 
     ConDevContext = ControlGetData(g_ControlDevice);
@@ -1138,6 +1182,7 @@ Return Value:
     TraceEvents(TRACE_LEVEL_INFORMATION, DBG_INIT, "vJoyCreateControlDevice: Calling WdfControlFinishInitializing\n");
     WdfControlFinishInitializing(g_ControlDevice);
 
+    TraceEvents(TRACE_LEVEL_INFORMATION, DBG_INIT, "vJoyCreateControlDevice: exiting cleanly\n");
     return STATUS_SUCCESS;
 
 Error:
@@ -1154,6 +1199,7 @@ Error:
         WdfObjectDelete(g_ControlDevice);
         g_ControlDevice = NULL;
     }
+    TraceEvents(TRACE_LEVEL_INFORMATION, DBG_INIT, "vJoyCreateControlDevice: exiting with error 0x%x\n", status);
 
     return status;
 }
@@ -1184,25 +1230,27 @@ Return Value:
 
     PAGED_CODE();
 
-    TraceEvents(TRACE_LEVEL_INFORMATION, DBG_INIT, "Control Device: Start deleting\n");
+    TraceEvents(TRACE_LEVEL_INFORMATION, DBG_INIT, "vJoyDeleteControlDevice: entering Control Device Start deleting\n");
     if (!g_ControlDevice) {
-        TraceEvents(TRACE_LEVEL_ERROR, DBG_IOCTL, "No Control Device to delete\n");
+        TraceEvents(TRACE_LEVEL_ERROR, DBG_INIT, "vJoyDeleteControlDevice: error No Control Device to delete\n");
         return;
     }
 
-    TraceEvents(TRACE_LEVEL_INFORMATION, DBG_INIT, "Control Device: Purging queue\n");
+    TraceEvents(TRACE_LEVEL_INFORMATION, DBG_INIT, "vJoyDeleteControlDevice: Control Device: Purging queue\n");
     WdfIoQueuePurge(WdfDeviceGetDefaultQueue(g_ControlDevice), WDF_NO_EVENT_CALLBACK, WDF_NO_CONTEXT);
 
 
-    TraceEvents(TRACE_LEVEL_INFORMATION, DBG_INIT, "Control Device: Deleting\n");
+    TraceEvents(TRACE_LEVEL_INFORMATION, DBG_INIT, "vJoyDeleteControlDevice: Control Device: Deleting\n");
 
     if (g_ControlDevice) {
-        TraceEvents(TRACE_LEVEL_INFORMATION, DBG_INIT, "Control Device: Deleting (Just before WdfObjectDelete)\n");
+        TraceEvents(TRACE_LEVEL_INFORMATION, DBG_INIT, "vJoyDeleteControlDevice: Control Device: Deleting (Just before WdfObjectDelete)\n");
         WdfObjectDelete(g_ControlDevice);
         //WdfObjectDelete(Device);
-        TraceEvents(TRACE_LEVEL_INFORMATION, DBG_INIT, "Control Device: Deleting (Just after WdfObjectDelete)\n");
+        TraceEvents(TRACE_LEVEL_INFORMATION, DBG_INIT, "vJoyDeleteControlDevice: Control Device: Deleting (Just after WdfObjectDelete)\n");
         g_ControlDevice = NULL;
     }
+
+    TraceEvents(TRACE_LEVEL_INFORMATION, DBG_INIT, "vJoyDeleteControlDevice: exiting\n");
 }
 
 
@@ -1238,10 +1286,10 @@ Return Value:
     int   nDevices = 0;
     PDEVICE_EXTENSION             devContext = NULL;
 
-    TraceEvents(TRACE_LEVEL_INFORMATION, DBG_INIT, "Entered FilterEvtDeviceContextCleanup\n");
+    TraceEvents(TRACE_LEVEL_INFORMATION, DBG_INIT, "FilterEvtDeviceContextCleanup: entering\n");
 
     nDevices = DeviceCount(TRUE, -1); // Decrementing device count
-    TraceEvents(TRACE_LEVEL_INFORMATION, DBG_INIT, "Device Count before decrementing is %d\n", nDevices);
+    TraceEvents(TRACE_LEVEL_INFORMATION, DBG_INIT, "FilterEvtDeviceContextCleanup: Device Count before decrementing is %d\n", nDevices);
 
     WdfWaitLockAcquire(vJoyDeviceCollectionLock, NULL);
 
@@ -1267,6 +1315,8 @@ Return Value:
 
     //WdfCollectionRemove(vJoyDeviceCollection, Device);
     WdfWaitLockRelease(vJoyDeviceCollectionLock);
+
+    TraceEvents(TRACE_LEVEL_INFORMATION, DBG_INIT, "FilterEvtDeviceContextCleanup: exiting with Device Count after decrementing is %d\n", nDevices);
 }
 
 NTSTATUS vJoyEvtDeviceReleaseHardware(
@@ -1279,7 +1329,7 @@ NTSTATUS vJoyEvtDeviceReleaseHardware(
     UNREFERENCED_PARAMETER(Device);
     UNREFERENCED_PARAMETER(ResourcesTranslated);
 
-    TraceEvents(TRACE_LEVEL_INFORMATION, DBG_INIT, "PNP: Entered vJoyEvtDeviceReleaseHardware\n");
+    TraceEvents(TRACE_LEVEL_INFORMATION, DBG_INIT, "vJoyEvtDeviceReleaseHardware: entering/exiting for PNP\n");
     return STATUS_SUCCESS;
 }
 
@@ -1295,7 +1345,7 @@ NTSTATUS vJoyEvtDevicePrepareHardware(
     UNREFERENCED_PARAMETER(ResourcesRaw);
     UNREFERENCED_PARAMETER(ResourcesTranslated);
 
-    TraceEvents(TRACE_LEVEL_INFORMATION, DBG_INIT, "PNP: Entered vJoyEvtDevicePrepareHardware\n");
+    TraceEvents(TRACE_LEVEL_INFORMATION, DBG_INIT, "vJoyEvtDevicePrepareHardware: entering/exiting for PNP\n");
     return STATUS_SUCCESS;
 }
 
@@ -1307,7 +1357,7 @@ VOID vJoyEvtDeviceSelfManagedIoFlush(
     PAGED_CODE();
     UNREFERENCED_PARAMETER(Device);
 
-    TraceEvents(TRACE_LEVEL_INFORMATION, DBG_INIT, "PNP: Entered vJoyEvtDeviceSelfManagedIoFlush\n");
+    TraceEvents(TRACE_LEVEL_INFORMATION, DBG_INIT, "vJoyEvtDeviceSelfManagedIoFlush: entering/exiting for PNP\n");
 }
 
 VOID vJoyEvtDevicePnpStateChange(
@@ -1319,13 +1369,15 @@ VOID vJoyEvtDevicePnpStateChange(
     UNREFERENCED_PARAMETER(Device);
     UNREFERENCED_PARAMETER(NotificationData);
 
-    TraceEvents(TRACE_LEVEL_INFORMATION, DBG_INIT, "PNP: Entered vJoyEvtDevicePnpStateChange\n");
+    TraceEvents(TRACE_LEVEL_INFORMATION, DBG_INIT, "vJoyEvtDevicePnpStateChange: entering/exiting for PNP\n");
 }
 
 
 VOID
 LoadPositions(PJOYSTICK_POSITION pPosition, PDEVICE_EXTENSION pDevContext, size_t buffsize)
 {
+    UNREFERENCED_PARAMETER(buffsize);
+
     int i;
 
     i = pPosition->bDevice-1; // Index is zero-based
@@ -1428,9 +1480,11 @@ Routine Description:
    Size [out]:		Caller suplied pointer to buffer that holds the size of the HID report descriptor
    IdMask [out]:	Caller suplied pointer to a WORD. Each bit represent a top-level report.
                     If bit n is set then Report ID n+1 is valid.
+   FFbmask [out]:	Caller suplied pointer to a WORD. Each bit represent a ffb enable bit.
+                    If bit n is set then FFB n+1 is enabled in registry.
 
 --*/
-PVOID GetReportDescriptorFromRegistry(USHORT* Size, USHORT* IdMask)
+PVOID GetReportDescriptorFromRegistry(USHORT* Size, USHORT* IdMask, USHORT* FFbmask)
 {
 
     NTSTATUS				status = STATUS_SUCCESS;
@@ -1446,7 +1500,7 @@ PVOID GetReportDescriptorFromRegistry(USHORT* Size, USHORT* IdMask)
     ULONG					nameLength;
     WCHAR					DeviceKeyName[NameSize];
     size_t					pcb = 0;
-    USHORT					id = 0;
+    USHORT					reportId = 0;
 
     PAGED_CODE();
 
@@ -1454,10 +1508,12 @@ PVOID GetReportDescriptorFromRegistry(USHORT* Size, USHORT* IdMask)
     // Get the key of the Parameters key under "SYSTEM\\CurrentControlSet\\services\\vjoy"
     status = WdfDriverOpenParametersRegistryKey(WdfGetDriver(), WRITE_DAC, WDF_NO_OBJECT_ATTRIBUTES, &KeyParameters);
     if (!NT_SUCCESS(status)) {
+        TraceEvents(TRACE_LEVEL_ERROR, DBG_INIT, "GetReportDescriptorFromRegistry: error opening registry key stt=0x%x\n", status);
         LogEventWithStatus(ERRLOG_REP_REG_FAILED, L"WdfDriverOpenParametersRegistryKey", WdfDriverWdmGetDriverObject(WdfGetDriver()), status);
         return NULL;
-    };
+    }
 
+    TraceEvents(TRACE_LEVEL_INFORMATION, DBG_INIT, "GetReportDescriptorFromRegistry: entering\n");
 
     // Enumerate Subkeys holding the configuration data
     status = STATUS_SUCCESS;
@@ -1478,14 +1534,15 @@ PVOID GetReportDescriptorFromRegistry(USHORT* Size, USHORT* IdMask)
             RtlZeroMemory(pDeviceBasicInfo, ResultLength);
             // 3.
             status = ZwEnumerateKey(hKeyParameters, iDevice++, KeyBasicInformation, pDeviceBasicInfo, ResultLength, &ResultLength);
-        };
+        }
+        // Check we are done
         if (status == STATUS_NO_MORE_ENTRIES)
             break;
         if (!NT_SUCCESS(status)) {
             LogEventWithStatus(ERRLOG_REP_REG_FAILED, L"ZwEnumerateKey", WdfDriverWdmGetDriverObject(WdfGetDriver()), status);
             //ExFreePoolWithTag(pDeviceBasicInfo, 'fnIb');
             return NULL;
-        };
+        }
 
         if (!pDeviceBasicInfo)
             return NULL;
@@ -1498,7 +1555,7 @@ PVOID GetReportDescriptorFromRegistry(USHORT* Size, USHORT* IdMask)
             LogEventWithStatus(ERRLOG_REP_REG_FAILED, L"RtlStringCbCopyNW", WdfDriverWdmGetDriverObject(WdfGetDriver()), status);
             ExFreePoolWithTag(pDeviceBasicInfo, 'fnIb');
             return NULL;
-        };
+        }
         RtlInitUnicodeString(&strDev, DeviceKeyName);
         ExFreePoolWithTag(pDeviceBasicInfo, 'fnIb');
 
@@ -1514,7 +1571,7 @@ PVOID GetReportDescriptorFromRegistry(USHORT* Size, USHORT* IdMask)
         if (!NT_SUCCESS(status)) {
             //WdfRegistryClose(KeyParameters);
             continue;
-        };
+        }
 
 
         // Get the size of value 'HidReportDesctiptor' - It should return status of STATUS_BUFFER_OVERFLOW and a positive value in ValueLengthQueried
@@ -1526,20 +1583,20 @@ PVOID GetReportDescriptorFromRegistry(USHORT* Size, USHORT* IdMask)
             //WdfRegistryClose(KeyParameters);
             WdfRegistryClose(KeyDevice);
             continue;
-        };
+        }
         RtlInitUnicodeString(&strDescSize, DESC_SIZE);
         status = WdfRegistryQueryValue(KeyDevice, &strDescSize, 4, &dDescSize, NULL, NULL);
         if (!NT_SUCCESS(status)) {
             //WdfRegistryClose(KeyParameters);
             WdfRegistryClose(KeyDevice);
             continue;
-        };
+        }
 
         if ((dDescSize != ValueLengthQueried) | !dDescSize) {
             //WdfRegistryClose(KeyParameters);
             WdfRegistryClose(KeyDevice);
             continue;
-        };
+        }
 
         // The size of the descriptor was verified - Allocate memory and read it
         out = ReAllocatePoolWithTag(out, dDescSizePrev, PagedPool, dDescSizePrev+dDescSize, MEM_TAG_HIDRPRT);
@@ -1548,14 +1605,14 @@ PVOID GetReportDescriptorFromRegistry(USHORT* Size, USHORT* IdMask)
             WdfRegistryClose(KeyDevice);
             LogEvent(ERRLOG_REP_REG_FAILED1, NULL, WdfDriverWdmGetDriverObject(WdfGetDriver()));
             return NULL;
-        };
+        }
 
         status = WdfRegistryQueryValue(KeyDevice, &strDescName, dDescSize, (BYTE*)out+dDescSizePrev, NULL, NULL);
         if (!NT_SUCCESS(status)) {
             WdfRegistryClose(KeyDevice);
             //ExFreePoolWithTag(out, MEM_TAG_HIDRPRT);
             continue;
-        };
+        }
 
 
 
@@ -1574,28 +1631,34 @@ PVOID GetReportDescriptorFromRegistry(USHORT* Size, USHORT* IdMask)
 
 #endif // 0
 
-        id = ParseIdInDescriptor(
-            (BYTE*)out + dDescSizePrev,
-            dDescSize);
+        reportId = ParseIdInDescriptor((BYTE*)out + dDescSizePrev, dDescSize);
+        TraceEvents(TRACE_LEVEL_VERBOSE, DBG_INIT, "GetReportDescriptorFromRegistry: parsed id=%d, size=%d\n", reportId, dDescSize);
+
 
         // Check if this is a unique ID
-        if ((*IdMask) & (1<<(id-1))) {
+        if ((*IdMask) & (1<<(reportId-1))) {
             WdfRegistryClose(KeyDevice);
             continue;
-        };
+        }
 
         // Update ID mask
-        *IdMask |= 1<<(id-1);
+        *IdMask |= 1<<(reportId-1);
         //////////////////////////////////////////////////////////////////////////////
+
+
+        TraceEvents(TRACE_LEVEL_VERBOSE, DBG_INIT, "GetReportDescriptorFromRegistry: mask=0x%x, ffbmask=0x%x\n", *IdMask, *FFbmask);
 
         dDescSizePrev += dDescSize;
         WdfRegistryClose(KeyDevice);
 
-    }; // Loop on all sub-keys
+    } // Loop on all sub-keys
 
     WdfRegistryClose(KeyParameters);
 
     *Size = dDescSizePrev;
+
+    TraceEvents(TRACE_LEVEL_INFORMATION, DBG_INIT, "GetReportDescriptorFromRegistry: exiting with size=%d, mask=0x%x\n", *Size, *IdMask);
+
     return out;
 }
 
@@ -1782,11 +1845,11 @@ void   CalcInitValue(USHORT		id, PDEVICE_INIT_VALS data_buf)
 */
 void UpdateHidDescriptor(void)
 {
-    USHORT	Size = 0, Mask = 0;
+    USHORT	Size = 0, Mask = 0, FFBMask = 0;
     PVOID	out;
 
     // Get the size from the registry
-    out = GetReportDescriptorFromRegistry(&Size, &Mask);
+    out = GetReportDescriptorFromRegistry(&Size, &Mask, &FFBMask);
 
     if (Size) {
         ExFreePoolWithTag(out, MEM_TAG_HIDRPRT);
@@ -1809,30 +1872,43 @@ void UpdateHidDescriptor(void)
 */
 void UpdateCollections(WDFDEVICE Device)
 {
-    USHORT	Size = 0, Mask = 0;
+    USHORT	Size = 0, Mask = 0, FFBMask = 0;
     PVOID	out;
     PDEVICE_EXTENSION   devContext = NULL;
+
+    TraceEvents(TRACE_LEVEL_INFORMATION, DBG_INIT, "UpdateCollections: entering\n");
 
     // Initialize
     devContext = GetDeviceContext(Device);
     CleanUpDev(devContext);
 
     // Get the data, size and IDs from the registry
-    out = GetReportDescriptorFromRegistry(&Size, &Mask);
+    out = GetReportDescriptorFromRegistry(&Size, &Mask, &FFBMask);
     if (out && Mask && Size) {	/* Registry holds valid data */
-        InitializeDev(devContext, Mask, FALSE);
+
+        TraceEvents(TRACE_LEVEL_VERBOSE, DBG_INIT, "UpdateCollections: valid registry data\n");
+
+        InitializeDev(devContext, Mask, FFBMask, FALSE);
         devContext->isHardcodedDevice = FALSE;
         // Free HID Report Descriptor
         if (devContext->ReportDescriptor) {
             ExFreePoolWithTag(devContext->ReportDescriptor, MEM_TAG_HIDRPRT);
             devContext->ReportDescriptor = NULL;
-        };
+        }
+
+        // Store new descriptor
         devContext->ReportDescriptor = out;
         G_DefaultHidDescriptor.DescriptorList[0].wReportLength = Size;
-    } else {	/* Use default (hard-coded) data */
+        TraceEvents(TRACE_LEVEL_VERBOSE, DBG_INIT, "UpdateCollections: new registry entry, with size=%d\n", Size);
+
+    } else {
+        /* Use default (hard-coded) data */
+        TraceEvents(TRACE_LEVEL_VERBOSE, DBG_INIT, "UpdateCollections: invalid registry data, using hard-coded values\n");
+
         InitializeDefaultDev(devContext);
         devContext->isHardcodedDevice = TRUE;
-    };
+    }
+    TraceEvents(TRACE_LEVEL_INFORMATION, DBG_INIT, "UpdateCollections: exiting\n");
 
 }
 
@@ -2013,7 +2089,7 @@ void ResetDeviceControls(int id, PDEVICE_EXTENSION devContext, PDEVICE_INIT_VALS
 /*
     Initialize data structures representing virtual devices
 */
-void InitializeDev(PDEVICE_EXTENSION   devContext, USHORT Mask, BOOLEAN ResetOnly)
+void InitializeDev(PDEVICE_EXTENSION devContext, USHORT Mask, USHORT FFBMask, BOOLEAN ResetOnly)
 {
     int index;
     UCHAR* cTag;
@@ -2025,27 +2101,41 @@ void InitializeDev(PDEVICE_EXTENSION   devContext, USHORT Mask, BOOLEAN ResetOnl
     cTag = (UCHAR*)&Tag;
     devContext->nDevices = 0;
 
-    if (devContext->positionLock)
+    TraceEvents(TRACE_LEVEL_INFORMATION, DBG_INIT, "InitializeDev: entering with mask=0x%x FFBMask=0x%x, ResetOnly=0x%x\n", Mask, FFBMask, ResetOnly);
+
+    if (devContext->positionLock) {
         WdfWaitLockAcquire(devContext->positionLock, NULL);
+    }
+
     // Create a DEVICE_POSITION structure for each hard-coded top-level collection
     for (index = 0; index<VJOY_MAX_N_DEVICES; index++) {
+
+        // Mask bit will give implemented status
         if (!((Mask >> index) & 1)) {
-            if (!ResetOnly)
+            if (!ResetOnly) {
                 devContext->DeviceImplemented[index] = FALSE;
+                TraceEvents(TRACE_LEVEL_VERBOSE, DBG_INIT, "InitializeDev: disabling id=%d\n", index+1);
+            }
             continue;
-        };
+        }
 
         // Initially - no file objects associated with the device
         devContext->DeviceFileObject[index] = NULL;
 
         devContext->nDevices++;
         devContext->DeviceImplemented[index] = TRUE;
+        TraceEvents(TRACE_LEVEL_VERBOSE, DBG_INIT, "InitializeDev: enabling id=%d\n", index+1);
+
 
         cTag[3] = SerialL[index];
         cTag[2] = SerialH[index];
         devContext->positions[index] = ExAllocatePoolWithTag(NonPagedPool, sizeof(DEVICE_POSITION), Tag);
-        if (!devContext->positions[index])
+        // Check device's position struct was allocated
+        if (!devContext->positions[index]) {
+            // We got an error here
+            TraceEvents(TRACE_LEVEL_VERBOSE, DBG_INIT, "InitializeDev: error for id=%d, position struct not allocated!\n", index);
             break;
+        }
 
         // Get initialization values
         CalcInitValue((USHORT)index + 1, &data_buf);
@@ -2115,9 +2205,16 @@ void InitializeDev(PDEVICE_EXTENSION   devContext, USHORT Mask, BOOLEAN ResetOnl
         devContext->positions[index]->ValButtonsEx1 = ((DWORD*)(data_buf.ButtonMask))[1];
         devContext->positions[index]->ValButtonsEx2 = ((DWORD*)(data_buf.ButtonMask))[2];
         devContext->positions[index]->ValButtonsEx3 = ((DWORD*)(data_buf.ButtonMask))[3];
+
+        TraceEvents(TRACE_LEVEL_VERBOSE, DBG_INIT, "InitializeDev: id=%d was initialized with default position values\n", index+1);
+
     }
-    if (devContext->positionLock)
+
+    if (devContext->positionLock) {
         WdfWaitLockRelease(devContext->positionLock);
+    }
+
+    TraceEvents(TRACE_LEVEL_INFORMATION, DBG_INIT, "InitializeDev: leaving with %d devices initialized\n", devContext->nDevices);
 
 }
 
@@ -2217,10 +2314,35 @@ USHORT ParseIdInDescriptor(BYTE* desc, DWORD dDescSize)
         }
         desc++;
     }
-    if (id < 1 || id>VJOY_MAX_N_DEVICES)
+    if (id < 1 || id>VJOY_MAX_N_DEVICES) {
         id = 0;
+    }
 
     return id;
+}
+
+/*
+ Parse descriptor (read from the registry) to see whether a FFB is used (Physical interface)
+ Look for first occurrence of 0x05,0x0F in the descriptor (Usage Page Physical Interface)
+ Alternatively we could look for 0x09,0x21 (Usage Set Effect Report)
+
+ Returns -1 if not found, else an index of first position found in the descriptor
+ */
+SHORT ParsePIDCollectionForFFBInDescriptor(BYTE* desc, DWORD dDescSize)
+{
+    SHORT first_pos = -1;
+
+    for (DWORD i = 0; i < dDescSize-1; i++) {
+        if (*desc == 0x05) {
+            if (*(desc + 1) == 0x0F) {
+                first_pos = (SHORT)i;
+                break;
+            }
+        }
+        desc++;
+    }
+
+    return first_pos;
 }
 
 VOID  FfbNotifyWrite(
@@ -2329,7 +2451,7 @@ VOID FfbTransferData(
     BOOLEAN					ReadQueueReady = FALSE, WriteQueueReady = FALSE;
     ULONG					QueueRequests;
 
-    TraceEvents(TRACE_LEVEL_INFORMATION, DBG_INIT, "FfbTransferData Enter\n");
+    TraceEvents(TRACE_LEVEL_INFORMATION, DBG_FFB, "FfbTransferData Enter\n");
 
     ///////////  Loop ///////////////////////////////////////
     do {
@@ -2349,7 +2471,7 @@ VOID FfbTransferData(
         WdfRequestGetParameters(WriteRequest, &Params);
         Cmd = Params.Parameters.DeviceIoControl.IoControlCode;
 
-        TraceEvents(TRACE_LEVEL_INFORMATION, DBG_INIT, "FfbTransferData IoControlCode=%x\n", Cmd);
+        TraceEvents(TRACE_LEVEL_VERBOSE, DBG_FFB, "FfbTransferData IoControlCode=%x\n", Cmd);
 
         // Calculate the size of the Read data packet
         DataSize += sizeof(ULONG);						// Size of packet
@@ -2392,14 +2514,14 @@ VOID FfbTransferData(
 
         // Intercept Ffb Create New Effect and Free Effect
 
-        TraceEvents(TRACE_LEVEL_INFORMATION, DBG_INIT, "FfbTransferData transferPacket DataSize=%d, id=%x len=%d  buf=",
+        TraceEvents(TRACE_LEVEL_VERBOSE, DBG_FFB, "FfbTransferData transferPacket DataSize=%d, id=%x len=%d  buf=",
             DataSize, transferPacket->reportId, transferPacket->reportBufferLen);
         for (ULONG i = 0; i<transferPacket->reportBufferLen; i++) {
-            TraceEvents(TRACE_LEVEL_INFORMATION, DBG_INIT, "%x ",
+            TraceEvents(TRACE_LEVEL_VERBOSE, DBG_FFB, "%x ",
                 transferPacket->reportBuffer[i]
             );
         }
-        TraceEvents(TRACE_LEVEL_INFORMATION, DBG_INIT, "\n");
+        TraceEvents(TRACE_LEVEL_VERBOSE, DBG_FFB, "\n");
 
         Ffb_ProcessPacket(devContext, id, ReadBuffer);
 
@@ -2423,7 +2545,7 @@ VOID FfbTransferData(
             WriteQueueReady = FALSE;
         DataExist = ReadQueueReady && WriteQueueReady;
 
-        TraceEvents(TRACE_LEVEL_INFORMATION, DBG_INIT, "FfbTransferData dataexist=%d\n", DataExist);
+        TraceEvents(TRACE_LEVEL_INFORMATION, DBG_FFB, "FfbTransferData dataexist=%d\n", DataExist);
 
     } while (DataExist);
     ///////////  Loop ///////////////////////////////////////
@@ -2464,7 +2586,8 @@ void Ffb_ResetPIDData(
     PDEVICE_EXTENSION   devContext,
     int                 id)
 {
-    TraceEvents(TRACE_LEVEL_INFORMATION, DBG_INIT, "Ffb_ResetPIDData: RESET PID for id=%d\n", id);
+    TraceEvents(TRACE_LEVEL_INFORMATION, DBG_FFB, "Ffb_ResetPIDData: RESET PID for id=%d\n", id);
+
     // Default lastly created BlockIndex is 0 (not created)
     PFFB_DEVICE_PID pid = &(devContext->FfbPIDData[id-1]);
 
@@ -2479,6 +2602,8 @@ void Ffb_ResetPIDData(
     pid->PIDBlockLoad.RAMPoolAvailable = 0xFFFF;
 
     Ffb_BlockIndexFreeAll(devContext, id);
+
+    TraceEvents(TRACE_LEVEL_INFORMATION, DBG_FFB, "Ffb_ResetPIDData: exiting\n");
 }
 
 
@@ -2493,11 +2618,18 @@ BOOLEAN Ffb_CheckClientConnected(
     return TRUE;
 }
 
+
+/*
+ Free all effect blocks index.
+
+ This is used to reset internal data.
+*/
 void Ffb_BlockIndexFreeAll(
     PDEVICE_EXTENSION   devContext,
     int                 id)
 {
-    TraceEvents(TRACE_LEVEL_INFORMATION, DBG_INIT, "FfbBlockIndexFreeAll: enter\n");
+    TraceEvents(TRACE_LEVEL_INFORMATION, DBG_FFB, "FfbBlockIndexFreeAll: entering\n");
+
     PFFB_DEVICE_PID pid = &(devContext->FfbPIDData[id-1]);
     pid->LastEID = 0;
     pid->NextFreeEID = VJOY_FFB_FIRST_EFFECT_ID;
@@ -2505,42 +2637,56 @@ void Ffb_BlockIndexFreeAll(
         pid->EffectStates[j].InUse = VJOY_FFB_EFFECT_FREE;
         pid->EffectStates[j].PIDEffectStateReport = 0;
     }
-}
 
+    TraceEvents(TRACE_LEVEL_INFORMATION, DBG_FFB, "FfbBlockIndexFreeAll: exiting\n");
+}
+/*
+ Free an Effect Block Index for this device id.
+
+ The next free effect slot index (NextEID) is updated with the freshly freed block.
+*/
 void Ffb_BlockIndexFree(
     PDEVICE_EXTENSION   devContext,
     int                 id,
     BYTE                EffectID
 )
 {
-    TraceEvents(TRACE_LEVEL_INFORMATION, DBG_INIT, "FfbBlockIndexFree: enter\n");
+    TraceEvents(TRACE_LEVEL_INFORMATION, DBG_FFB, "FfbBlockIndexFree: entering\n");
     PFFB_DEVICE_PID pid = &(devContext->FfbPIDData[id-1]);
     if (EffectID<1 || EffectID >= VJOY_FFB_MAX_EFFECTS_BLOCK_INDEX) {
-        TraceEvents(TRACE_LEVEL_INFORMATION, DBG_INIT, "FfbBlockIndexFree: wrong id=%d\n", EffectID);
+        TraceEvents(TRACE_LEVEL_ERROR, DBG_FFB, "FfbBlockIndexFree: error wrong eid=%d\n", EffectID);
         return;
     }
     pid->EffectStates[EffectID-1].InUse = VJOY_FFB_EFFECT_FREE;
     // Force next free block to point to this new empty block to fill holes
     pid->NextFreeEID = EffectID;
 
-    TraceEvents(TRACE_LEVEL_INFORMATION, DBG_INIT, "FfbBlockIndexFree: NextEID=%d\n", pid->NextFreeEID);
+    TraceEvents(TRACE_LEVEL_INFORMATION, DBG_FFB, "FfbBlockIndexFree: exiting with NextEID=%d\n", pid->NextFreeEID);
 }
 
+/*
+ Find a free Block Index for this device id.
+
+ The function loops over all blocks and returns first free slot.
+
+ LastEID and NextEID are updated.
+*/
 BYTE Ffb_GetNextFreeEffect(
     PDEVICE_EXTENSION   devContext,
     int                 id)
 {
+    // Retrieve device PID
     PFFB_DEVICE_PID pid = &(devContext->FfbPIDData[id-1]);
-    TraceEvents(TRACE_LEVEL_INFORMATION, DBG_INIT, "FfbGetNextFreeEffect: enter with id=%d, NextEID=%d\n", id, pid->NextFreeEID);
+    TraceEvents(TRACE_LEVEL_INFORMATION, DBG_FFB, "FfbGetNextFreeEffect: enter with id=%d, NextEID=%d\n", id, pid->NextFreeEID);
 
     // Check for effect full
     if (pid->NextFreeEID > VJOY_FFB_MAX_EFFECTS_BLOCK_INDEX) {
-        TraceEvents(TRACE_LEVEL_INFORMATION, DBG_INIT, "FfbGetNextFreeEffect: full! (NextEID=%d)\n", pid->NextFreeEID);
+        TraceEvents(TRACE_LEVEL_ERROR, DBG_FFB, "FfbGetNextFreeEffect: full! (NextEID=%d)\n", pid->NextFreeEID);
         return 0;
     }
     // Check current slot not in use
     if (pid->EffectStates[pid->NextFreeEID-1].InUse != VJOY_FFB_EFFECT_FREE) {
-        TraceEvents(TRACE_LEVEL_INFORMATION, DBG_INIT, "FfbGetNextFreeEffect: already used! (NextEID=%d)\n", pid->NextFreeEID);
+        TraceEvents(TRACE_LEVEL_ERROR, DBG_FFB, "FfbGetNextFreeEffect: already used! (NextEID=%d)\n", pid->NextFreeEID);
         return 0;
     }
 
@@ -2558,13 +2704,48 @@ BYTE Ffb_GetNextFreeEffect(
     }
     // Save index of first free. If not not found, will be equal to VJOY_FFB_MAX_EFFECTS_BLOCK_INDEX
     // and the last free slot was taken.
-    pid->NextFreeEID = firstFree+1;
+    pid->NextFreeEID = (BYTE)(firstFree+1);
 
-    TraceEvents(TRACE_LEVEL_INFORMATION, DBG_INIT, "FfbGetNextFreeEffect: took effectId=%d, NextEID=%d)\n", effectId, pid->NextFreeEID);
+    TraceEvents(TRACE_LEVEL_INFORMATION, DBG_FFB, "FfbGetNextFreeEffect: exiting with effectId=%d, NextFreeEID=%d)\n", effectId, pid->NextFreeEID);
 
     return effectId;
 }
 
+/*
+ Find a free Block Index for this device id.
+
+ The function loops over all blocks and returns first free slot.
+
+ LastEID and NextEID are updated.
+*/
+BYTE Ffb_GetNumUsedEffect(
+    PDEVICE_EXTENSION   devContext,
+    int                 id)
+{
+    // Retrieve device PID
+    PFFB_DEVICE_PID pid = &(devContext->FfbPIDData[id-1]);
+    TraceEvents(TRACE_LEVEL_INFORMATION, DBG_FFB, "Ffb_GetNumUsedEffect: enter with id=%d, NextEID=%d\n", id, pid->NextFreeEID);
+
+    BYTE numUsed = 0;
+    for (int idx = 0; idx<VJOY_FFB_MAX_EFFECTS_BLOCK_INDEX; idx++) {
+        if (pid->EffectStates[idx].InUse == VJOY_FFB_EFFECT_ALLOCATED) {
+            numUsed++;
+        }
+    }
+    return numUsed;
+}
+
+/*
+ Process a FFB packet.
+
+ This methods catches (or pre-filter) outgoing packets that are "read" feature report
+ to return PID block data from driver side instead of gettig them user land
+ feeder application.
+
+ This is because current FFB design only allows single direction communication,
+ ie: FFB packets can only be send to feeder application, and cannot go back to
+ driver.
+ */
 BOOLEAN Ffb_ProcessPacket(
     PDEVICE_EXTENSION   devContext,
     int                 id,
@@ -2575,7 +2756,7 @@ BOOLEAN Ffb_ProcessPacket(
     ULONG len = 0;
     ULONG cmd = 0;
 
-    TraceEvents(TRACE_LEVEL_INFORMATION, DBG_INIT, "Ffb_ProcessPacket: enter\n");
+    TraceEvents(TRACE_LEVEL_INFORMATION, DBG_FFB, "Ffb_ProcessPacket: entering\n");
 
     //KdBreakPoint();
     if (!buffer)
@@ -2584,18 +2765,18 @@ BOOLEAN Ffb_ProcessPacket(
     memcpy((PUCHAR)&len, (PUCHAR)&(buffer[0]), sizeof(ULONG));
     memcpy((PUCHAR)&cmd, (PUCHAR)&(buffer[sizeof(ULONG)]), sizeof(ULONG));
 
-    TraceEvents(TRACE_LEVEL_INFORMATION, DBG_INIT, "Ffb_ProcessPacket: before len=%d, cmd=%x buf=", len, cmd);
+    TraceEvents(TRACE_LEVEL_VERBOSE, DBG_INIT, "Ffb_ProcessPacket: before len=%d, cmd=%x buf=", len, cmd);
 
     if (len<8)
         return FALSE;
 
     PUCHAR packet = (PUCHAR)&buffer[2*sizeof(ULONG)];
     for (ULONG i = 0; i<(len-8); i++) {
-        TraceEvents(TRACE_LEVEL_INFORMATION, DBG_INIT, "%x ",
+        TraceEvents(TRACE_LEVEL_VERBOSE, DBG_INIT, "%x ",
             packet[i]
         );
     }
-    TraceEvents(TRACE_LEVEL_INFORMATION, DBG_INIT, "\n");
+    TraceEvents(TRACE_LEVEL_VERBOSE, DBG_INIT, "\n");
 
 
 
@@ -2606,31 +2787,39 @@ BOOLEAN Ffb_ProcessPacket(
     if (cmd == 0xb0191) // IOCTL_HID_SET_FEATURE ?
         tp += 0x10;
 
-    TraceEvents(TRACE_LEVEL_INFORMATION, DBG_INIT, "Ffb_ProcessPacket: id=%d DeviceID=%d tp=%x\n", id, DeviceID, tp);
+    TraceEvents(TRACE_LEVEL_INFORMATION, DBG_FFB, "Ffb_ProcessPacket: id=%d DeviceID=%d tp=%x\n", id, DeviceID, tp);
 
+    // Now catches (filters) packets data when PID block ionformation is needed
+    // from driver side
     switch (tp) {
-        // Write report
+        // Next are write reports
+
         case HID_ID_CTRLREP: {
+            // Catch PID control report
             BYTE Control = packet[1];
-            TraceEvents(TRACE_LEVEL_INFORMATION, DBG_INIT, "Ffb_ProcessPacket: PID DEVICE CONTROL=%d\n", Control);
+            TraceEvents(TRACE_LEVEL_VERBOSE, DBG_FFB, "Ffb_ProcessPacket: PID DEVICE CONTROL=%d\n", Control);
             switch (Control) {
                 // CTRL_DEVRST
                 // Device Reset– Clears any device paused condition, enables all actuators and clears all effects from memory.
                 case 4: {
                     Ffb_ResetPIDData(devContext, id);
-                    TraceEvents(TRACE_LEVEL_INFORMATION, DBG_INIT, "Ffb_ProcessPacket: PID RESET !\n");
+                    TraceEvents(TRACE_LEVEL_VERBOSE, DBG_FFB, "Ffb_ProcessPacket: PID RESET !\n");
                 } break;
             }
         } break;
 
         case HID_ID_BLKFRREP: {
+            // Catch Block free report
             BYTE eid = packet[1];
-            TraceEvents(TRACE_LEVEL_INFORMATION, DBG_INIT, "Ffb_ProcessPacket: BLOCK FREE eid=%d\n", eid);
+            TraceEvents(TRACE_LEVEL_VERBOSE, DBG_FFB, "Ffb_ProcessPacket: BLOCK FREE eid=%d\n", eid);
             Ffb_BlockIndexFree(devContext, id, eid);
         } break;
 
-        // Feature report
+            // Next are Feature report
+
         case (HID_ID_NEWEFREP+0x10): {
+            // Catch New effect report
+
             // Find new effect block index. 0 will be returned in case of an error
             BYTE eid = Ffb_GetNextFreeEffect(devContext, id);
             // Save effect id in the current FFB frame to notify the feeder
@@ -2642,35 +2831,41 @@ BOOLEAN Ffb_ProcessPacket(
                 // Flag that created was ok
                 pid->PIDBlockLoad.LoadStatus = 1;
             } else {
+                // Error on last allocated block index
                 // Flag error : full
                 pid->PIDBlockLoad.LoadStatus = 2;
             }
-            TraceEvents(TRACE_LEVEL_INFORMATION, DBG_INIT, "Ffb_ProcessPacket: CREATE NEW EFFECT eid=%d\n", eid);
+
+            TraceEvents(TRACE_LEVEL_VERBOSE, DBG_FFB, "Ffb_ProcessPacket: CREATE NEW EFFECT eid=%d\n", eid);
         } break;
 
         case (HID_ID_BLKLDREP+0x10): {
-            TraceEvents(TRACE_LEVEL_INFORMATION, DBG_INIT, "Ffb_ProcessPacket: BLOCK LOAD\n");
+            // Handled in vJoyGetFeature()
+            TraceEvents(TRACE_LEVEL_VERBOSE, DBG_FFB, "Ffb_ProcessPacket: BLOCK LOAD\n");
         } break;
 
         case (HID_ID_POOLREP+0x10): {
-            TraceEvents(TRACE_LEVEL_INFORMATION, DBG_INIT, "Ffb_ProcessPacket: POOL\n");
+            // Handled in vJoyGetFeature()
+            TraceEvents(TRACE_LEVEL_VERBOSE, DBG_FFB, "Ffb_ProcessPacket: POOL\n");
         } break;
 
         case (HID_ID_STATEREP+0x10): {
-            TraceEvents(TRACE_LEVEL_INFORMATION, DBG_INIT, "Ffb_ProcessPacket: STATE REPORT\n");
+            // Handled in vJoyGetFeature()
+            TraceEvents(TRACE_LEVEL_VERBOSE, DBG_FFB, "Ffb_ProcessPacket: STATE REPORT\n");
         } break;
 
     }
 
-    TraceEvents(TRACE_LEVEL_INFORMATION, DBG_INIT, "Ffb_ProcessPacket: after buf=");
+    TraceEvents(TRACE_LEVEL_VERBOSE, DBG_FFB, "Ffb_ProcessPacket: after buf=");
     packet = (PUCHAR)&buffer[2*sizeof(ULONG)];
     for (ULONG i = 0; i<(len-8); i++) {
-        TraceEvents(TRACE_LEVEL_INFORMATION, DBG_INIT, "%x ",
+        TraceEvents(TRACE_LEVEL_VERBOSE, DBG_FFB, "%x ",
             packet[i]
         );
     }
-    TraceEvents(TRACE_LEVEL_INFORMATION, DBG_INIT, "\n");
+    TraceEvents(TRACE_LEVEL_VERBOSE, DBG_FFB, "\n");
 
+    TraceEvents(TRACE_LEVEL_INFORMATION, DBG_FFB, "Ffb_ProcessPacket: exiting");
 
     return TRUE;
 }
