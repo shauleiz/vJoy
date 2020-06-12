@@ -74,8 +74,8 @@ Revision History:
 #define REG_DEVICE		L"Device"
 #define REG_INIT		L"Init"
 #define BTN_INIT		L"BTNS"
-#define DESC_NAME		L"HidReportDesctiptor"
-#define DESC_SIZE		L"HidReportDesctiptorSize"
+#define DESC_NAME		L"HidReportDescriptor"
+#define DESC_SIZE		L"HidReportDescriptorSize"
 #define	MEM_TAG_DESC	'1gaT'
 #define	MEM_TAG_HIDRPRT	'rDIH'
 

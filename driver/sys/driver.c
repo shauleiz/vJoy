@@ -246,7 +246,7 @@ Return Value:
 #else
     SerialNumber = DeviceCount(TRUE, 1);
     if (-1 > SerialNumber) {
-        TraceEvents(TRACE_LEVEL_WARNING, DBG_PNP, "DeviceCount Failed- vJoyEvtDeviceAdd aborting\n");
+        TraceEvents(TRACE_LEVEL_WARNING, DBG_PNP, "vJoyEvtDeviceAdd: DeviceCount Failed- aborting\n");
         return STATUS_UNSUCCESSFUL;
     }
     //if (SerialNumber>0)
@@ -272,19 +272,19 @@ Return Value:
     // Additional ones may be added below
     status = WdfPdoInitAddCompatibleID(DeviceInit, &CompatId);
     if (!NT_SUCCESS(status)) {
-        TraceEvents(TRACE_LEVEL_WARNING, DBG_PNP, "WdfPdoInitAddCompatibleID failed with status code 0x%x\n", status);
+        TraceEvents(TRACE_LEVEL_WARNING, DBG_PNP, "vJoyEvtDeviceAdd: WdfPdoInitAddCompatibleID failed with status code 0x%x\n", status);
         LogEventWithStatus(ERRLOG_DEVICE_FAILED, L"WdfPdoInitAddCompatibleID", NULL, status);
     }
 
     status = WdfPdoInitAssignDeviceID(DeviceInit, &DeviceId);
     if (!NT_SUCCESS(status)) {
-        TraceEvents(TRACE_LEVEL_WARNING, DBG_PNP, "WdfPdoInitAssignDeviceID failed with status code 0x%x\n", status);
+        TraceEvents(TRACE_LEVEL_WARNING, DBG_PNP, "vJoyEvtDeviceAdd: WdfPdoInitAssignDeviceID failed with status code 0x%x\n", status);
         LogEventWithStatus(ERRLOG_DEVICE_FAILED, L"WdfPdoInitAssignDeviceID", NULL, status);
     }
 
     status = WdfPdoInitAssignInstanceID(DeviceInit, &InstanceId);
     if (!NT_SUCCESS(status)) {
-        TraceEvents(TRACE_LEVEL_WARNING, DBG_PNP, "WdfPdoInitAssignInstanceID failed with status code 0x%x\n", status);
+        TraceEvents(TRACE_LEVEL_WARNING, DBG_PNP, "vJoyEvtDeviceAdd: WdfPdoInitAssignInstanceID failed with status code 0x%x\n", status);
         LogEventWithStatus(ERRLOG_DEVICE_FAILED, L"WdfPdoInitAssignInstanceID", NULL, status);
     }
 
@@ -316,7 +316,7 @@ Return Value:
     //
     status = WdfDeviceCreate(&DeviceInit, &attributes, &hDevice);
     if (!NT_SUCCESS(status)) {
-        TraceEvents(TRACE_LEVEL_ERROR, DBG_PNP, "WdfDeviceCreate failed with status code 0x%x\n", status);
+        TraceEvents(TRACE_LEVEL_ERROR, DBG_PNP, "vJoyEvtDeviceAdd: WdfDeviceCreate failed with status code 0x%x\n", status);
         LogEventWithStatus(ERRLOG_DEVICE_FAILED, L"WdfDeviceCreate", NULL, status);
         return status;
     }
@@ -331,7 +331,7 @@ Return Value:
     attributes.ParentObject = hDevice;
     status = WdfWaitLockCreate(&attributes, &(devContext->positionLock));
     if (!NT_SUCCESS(status)) {
-        TraceEvents(TRACE_LEVEL_ERROR, DBG_INIT, "WdfWaitLockCreate failed 0x%x\n", status);
+        TraceEvents(TRACE_LEVEL_ERROR, DBG_INIT, "vJoyEvtDeviceAdd: WdfWaitLockCreate failed 0x%x\n", status);
         LogEventWithStatus(ERRLOG_RAW_DEV_FAILED, L"WdfWaitLockCreate", WdfDriverWdmGetDriverObject(WdfGetDriver()), status);
         return status;
     }
@@ -344,7 +344,7 @@ Return Value:
 
     status = WdfIoQueueCreate(hDevice, &queueConfig, WDF_NO_OBJECT_ATTRIBUTES, &queue);
     if (!NT_SUCCESS(status)) {
-        TraceEvents(TRACE_LEVEL_ERROR, DBG_PNP, "WdfIoQueueCreate failed to create Internal Device Control Queue 0x%x\n", status);
+        TraceEvents(TRACE_LEVEL_ERROR, DBG_PNP, "vJoyEvtDeviceAdd: WdfIoQueueCreate failed to create Internal Device Control Queue 0x%x\n", status);
         LogEventWithStatus(ERRLOG_DEVICE_FAILED, L"WdfIoQueueCreate (1)", WdfDeviceWdmGetDeviceObject(hDevice), status);
         return status;
     }
@@ -368,7 +368,7 @@ Return Value:
     queueConfig.PowerManaged = WdfFalse/*WdfTrue*/;
     status = WdfIoQueueCreate(hDevice, &queueConfig, WDF_NO_OBJECT_ATTRIBUTES, &devContext->ReadReportMsgQueue);
     if (!NT_SUCCESS(status)) {
-        TraceEvents(TRACE_LEVEL_ERROR, DBG_PNP, "WdfIoQueueCreate failed 0x%x\n", status);
+        TraceEvents(TRACE_LEVEL_ERROR, DBG_PNP, "vJoyEvtDeviceAdd: WdfIoQueueCreate failed 0x%x\n", status);
         LogEventWithStatus(ERRLOG_DEVICE_FAILED, L"WdfIoQueueCreate (2)", WdfDeviceWdmGetDeviceObject(hDevice), status);
         return status;
     }
@@ -397,7 +397,7 @@ Return Value:
     for (i = 0; i < VJOY_MAX_N_DEVICES; i++) {
         status = WdfIoQueueCreate(hDevice, &queueConfig, &FfbQueueAttribs, &devContext->FfbWriteQ[i]);
         if (!NT_SUCCESS(status)) {
-            TraceEvents(TRACE_LEVEL_ERROR, DBG_PNP, "WdfIoQueueCreate failed[id=%d] 0x%x\n", i+1, status);
+            TraceEvents(TRACE_LEVEL_ERROR, DBG_PNP, "vJoyEvtDeviceAdd: WdfIoQueueCreate failed[id=%d] 0x%x\n", i+1, status);
             LogEventWithStatus(ERRLOG_DEVICE_FAILED, L"WdfIoQueueCreate (3)", WdfDeviceWdmGetDeviceObject(hDevice), status);
             return status;
         };
@@ -414,7 +414,7 @@ Return Value:
         // Whenever a the queue is ready this function starts
         status = WdfIoQueueReadyNotify(devContext->FfbWriteQ[i], FfbNotifyWrite, devContext);
         if (!NT_SUCCESS(status)) {
-            TraceEvents(TRACE_LEVEL_ERROR, DBG_PNP, "WdfIoQueueReadyNotify failed[id=%d] 0x%x\n", i+1, status);
+            TraceEvents(TRACE_LEVEL_ERROR, DBG_PNP, "vJoyEvtDeviceAdd: WdfIoQueueReadyNotify failed[id=%d] 0x%x\n", i+1, status);
             LogEventWithStatus(ERRLOG_DEVICE_FAILED, L"WdfIoQueueReadyNotify (Write)", WdfDeviceWdmGetDeviceObject(hDevice), status);
             return status;
         }
@@ -433,7 +433,7 @@ Return Value:
     for (i = 0; i < VJOY_MAX_N_DEVICES; i++) {
         status = WdfIoQueueCreate(hDevice, &queueConfig, &FfbQueueAttribs, &devContext->FfbReadQ[i]);
         if (!NT_SUCCESS(status)) {
-            TraceEvents(TRACE_LEVEL_ERROR, DBG_PNP, "WdfIoQueueCreate failed[id=%d] 0x%x\n", i+1, status);
+            TraceEvents(TRACE_LEVEL_ERROR, DBG_PNP, "vJoyEvtDeviceAdd: WdfIoQueueCreate failed[id=%d] 0x%x\n", i+1, status);
             LogEventWithStatus(ERRLOG_DEVICE_FAILED, L"WdfIoQueueCreate (3)", WdfDeviceWdmGetDeviceObject(hDevice), status);
             return status;
         }
@@ -450,7 +450,7 @@ Return Value:
         // Whenever a the queue is ready this function starts
         status = WdfIoQueueReadyNotify(devContext->FfbReadQ[i], FfbNotifyRead, devContext);
         if (!NT_SUCCESS(status)) {
-            TraceEvents(TRACE_LEVEL_ERROR, DBG_PNP, "WdfIoQueueReadyNotify failed[id=%d] 0x%x\n", i+1, status);
+            TraceEvents(TRACE_LEVEL_ERROR, DBG_PNP, "vJoyEvtDeviceAdd: WdfIoQueueReadyNotify failed[id=%d] 0x%x\n", i+1, status);
             LogEventWithStatus(ERRLOG_DEVICE_FAILED, L"WdfIoQueueReadyNotify (Read)", WdfDeviceWdmGetDeviceObject(hDevice), status);
             return status;
         }
@@ -459,7 +459,7 @@ Return Value:
     // Create a wait lock that ensure a single contemporary inter-queue transfer
     status = WdfWaitLockCreate(WDF_NO_OBJECT_ATTRIBUTES, &(devContext->FfbXferLock));
     if (!NT_SUCCESS(status)) {
-        TraceEvents(TRACE_LEVEL_ERROR, DBG_PNP, "WdfWaitLockCreate failed 0x%x\n", status);
+        TraceEvents(TRACE_LEVEL_ERROR, DBG_PNP, "vJoyEvtDeviceAdd: WdfWaitLockCreate failed 0x%x\n", status);
         LogEventWithStatus(ERRLOG_DEVICE_FAILED, L"WdfWaitLockCreate (FfbXferLock)", WdfDeviceWdmGetDeviceObject(hDevice), status);
         return status;
     }
@@ -477,6 +477,7 @@ Return Value:
     //Step 2. Create the I/O target object.
     status = WdfIoTargetCreate(hDevice, WDF_NO_OBJECT_ATTRIBUTES, &ioTarget);
     if (!NT_SUCCESS(status)) {
+        TraceEvents(TRACE_LEVEL_ERROR, DBG_PNP, "vJoyEvtDeviceAdd: WdfIoTargetCreate failed status:0x%x\n", status);
         LogEventWithStatus(ERRLOG_DEVICE_FAILED, L"WdfIoTargetCreate", fdoDeviceObject, status);
         return status;
     }
@@ -487,6 +488,7 @@ Return Value:
     //Step 4. Open the I/O target.
     status = WdfIoTargetOpen(ioTarget, &openParams);
     if (!NT_SUCCESS(status)) {
+        TraceEvents(TRACE_LEVEL_ERROR, DBG_PNP, "vJoyEvtDeviceAdd: WdfIoTargetOpen failed status:0x%x\n", status);
         LogEventWithStatus(ERRLOG_DEVICE_FAILED, L"WdfIoTargetOpen", fdoDeviceObject, status);
         return status;
     }
@@ -506,7 +508,9 @@ Return Value:
     // approach to providing sideband communication.
     //
     status = vJoy_CreateRawPdo(hDevice, SerialNumber);
-
+    if (!NT_SUCCESS(status)) {
+        TraceEvents(TRACE_LEVEL_ERROR, DBG_PNP, "vJoyEvtDeviceAdd: vJoy_CreateRawPdo failed status:0x%x\n", status);
+    }
 
     //
     /////////////////////////////////////////////////////////////////////////////////////////
@@ -524,13 +528,14 @@ Return Value:
     attributes.ParentObject = hDevice;
     status = WdfTimerCreate(&timerConfig, &attributes, &(devContext->timerHandle));
     if (!NT_SUCCESS(status)) {
-        TraceEvents(TRACE_LEVEL_ERROR, DBG_PNP, "WdfTimerCreate failed status:0x%x\n", status);
+        TraceEvents(TRACE_LEVEL_ERROR, DBG_PNP, "vJoyEvtDeviceAdd: WdfTimerCreate failed status:0x%x\n", status);
         return status;
     }
     // Temporarily remove the timer - this will disable the periodic data update
     WdfTimerStart(devContext->timerHandle, 100);
     /////////////////////////////////////////////////////////////////////////////////////////
 
+    TraceEvents(TRACE_LEVEL_INFORMATION, DBG_PNP, "vJoyEvtDeviceAdd: exiting\n");
 
 
     LogEvent(ERRLOG_DEVICE_ADDED, NULL, fdoDeviceObject);
@@ -667,7 +672,7 @@ vJoyWriteReport(
     WdfRequestCompleteWithInformation(FfbRequest, status, bytesReturned);
 
     return status;
-}
+    }
 
 
 #endif // 0
@@ -1231,7 +1236,7 @@ None.
     UNREFERENCED_PARAMETER(TraceEventsFlag);
     UNREFERENCED_PARAMETER(DebugMessage);
 #endif
-}
+    }
 
 #endif
 

@@ -470,7 +470,7 @@ UINT16 GetFfbEffectMask(void)
 /*
     Write the HID Report Descriptor to the registry
     Key:	HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\services\vjoy\Parameters\Device0
-    Name:	HidReportDesctiptor
+    Name:	HidReportDescriptor
     Type:	REG_BINARY
 */
 void WriteHidReportDescToReg(int target, UCHAR* Descriptor, int size, bool Overwrite)
@@ -854,6 +854,9 @@ void DeleteHidReportDescFromReg(int target)
 /*
     Delete OEMForceFeedback key from the registry
     Key:	HKEY_CURRENT_USER\\SYSTEM\\CurrentControlSet\\Control\\MediaProperties\\PrivateProperties\\Joystick\\OEM\\VID_1234&PID_0FFB"
+    Other interesting places to clean-up:
+            HKEY_LOCAL_MACHINE\SYSTEM\ControlSet001\Control\MediaProperties\PrivateProperties\Joystick\OEM\VID_1234&PID_0FFB
+            HKEY_LOCAL_MACHINE\SYSTEM\Setup\Upgrade\PnP\CurrentControlSet\Control\DeviceMigration\Devices\HID\HIDCLASS
 */
 void DeleteOEMForceFeedbackFromReg()
 {

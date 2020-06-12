@@ -853,7 +853,7 @@ void PopulateTab(int iTab)
     // and only for the first 15 tabs
     BOOL FfbSupported = FALSE;
     vJoyFfbCap(&FfbSupported);
-    if (iTab >= MAX_N_FFB || !FfbSupported) {
+    if ((iTab+1) >= MAX_N_FFB || !FfbSupported) {
         //ShowWindow(GetDlgItem(hDlgTab, IDC_FRAME_FFB), SW_HIDE);
         //ShowWindow(GetDlgItem(hDlgTab, IDC_CHK_FFB), SW_HIDE); 
         EnableWindow(GetDlgItem(hDlgTab, IDC_CHK_FFB), FALSE);
@@ -888,7 +888,7 @@ void PopulateTab(int iTab)
     }
 
 
-    if ((iTab >= MAX_N_FFB) && (FfbState == 2)) // This is Device 16 + FFB State: Active
+    if (((iTab+1) >= MAX_N_FFB) && (FfbState == 2)) // This is Device 16 + FFB State: Active
         EnableTab(iTab, FALSE);
 
 }
@@ -1192,7 +1192,7 @@ int CreateHidReportDesc(void** data, UINT nButtons, bool* axes, int nPovHatsCont
 /*
 Write the HID Report Descriptor to the registry
 Key:	HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\services\vjoy\Parameters\Devicexx
-Name:	HidReportDesctiptor
+Name:	HidReportDescriptor
 Type:	REG_BINARY
 */
 void WriteHidReportDescToReg(int target, UCHAR* Descriptor, int size)
@@ -1273,6 +1273,9 @@ void DeleteHidReportDescFromReg(int target)
 /*
     Delete OEMForceFeedback key from the registry
     Key:	HKEY_CURRENT_USER\\SYSTEM\\CurrentControlSet\\Control\\MediaProperties\\PrivateProperties\\Joystick\\OEM\\VID_1234&PID_0FFB"
+    Other interesting places to clean-up:
+            HKEY_LOCAL_MACHINE\SYSTEM\ControlSet001\Control\MediaProperties\PrivateProperties\Joystick\OEM\VID_1234&PID_0FFB
+            HKEY_LOCAL_MACHINE\SYSTEM\Setup\Upgrade\PnP\CurrentControlSet\Control\DeviceMigration\Devices\HID\HIDCLASS
 */
 void DeleteOEMForceFeedbackFromReg()
 {

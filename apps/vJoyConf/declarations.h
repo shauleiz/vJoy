@@ -50,7 +50,7 @@
 #endif
 
 
-#define MAX_N_FFB 	15 // Maximum number of vJoy devices that support FFB
+#define MAX_N_FFB 	15 // Maximum number of vJoy devices that support FFB, base 1
 
 
 
@@ -59,8 +59,8 @@
 //#define REG_PARAM_DEV0	L"SYSTEM\\CurrentControlSet\\services\\vjoy\\Parameters\\Device0"
 #define REG_PARAM_DEV		L"SYSTEM\\CurrentControlSet\\services\\vjoy\\Parameters\\Device"
 #define REG_PARAM_FFBDEV	L"SYSTEM\\CurrentControlSet\\services\\vjoy\\Parameters\\FFBDevice"
-#define DESC_NAME			L"HidReportDesctiptor"
-#define DESC_SIZE			L"HidReportDesctiptorSize"
+#define DESC_NAME			L"HidReportDescriptor"
+#define DESC_SIZE			L"HidReportDescriptorSize"
 
 #define REG_OEMFORCEFEEDBACK_0		L"SYSTEM\\CurrentControlSet\\Control\\MediaProperties\\PrivateProperties\\Joystick\\OEM\\VID_1234&PID_0FFB"
 #define REG_OEMFORCEFEEDBACK_1		L"SYSTEM\\CurrentControlSet\\Control\\MediaProperties\\PrivateProperties\\Joystick\\OEM\\VID_1234&PID_1FFB"

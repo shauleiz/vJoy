@@ -480,8 +480,6 @@ Return Value:
 
     PAGED_CODE();
 
-    TraceEvents(TRACE_LEVEL_VERBOSE, DBG_IOCTL, "vJoySetFeature Enter\n");
-
     WDF_REQUEST_PARAMETERS_INIT(&params);
     WdfRequestGetParameters(Request, &params);
 
@@ -854,7 +852,7 @@ Return Value:
     //
     status = WdfRequestRetrieveOutputBuffer(Request, sizeof(HID_DEVICE_ATTRIBUTES), &deviceAttributes, NULL);
     if (!NT_SUCCESS(status)) {
-        TraceEvents(TRACE_LEVEL_ERROR, DBG_IOCTL, "WdfRequestRetrieveOutputBuffer failed 0x%x\n", status);
+        TraceEvents(TRACE_LEVEL_ERROR, DBG_IOCTL, "vJoyGetDeviceAttributes: WdfRequestRetrieveOutputBuffer failed 0x%x\n", status);
         LogEventWithStatus(ERRLOG_DEVICE_ATTR_FAILED, L"WdfRequestRetrieveOutputBuffer", WdfDeviceWdmGetDeviceObject(WdfIoQueueGetDevice(WdfRequestGetIoQueue(Request))), status);
         return status;
     }
@@ -868,7 +866,7 @@ Return Value:
     //
     WdfRequestSetInformation(Request, sizeof(HID_DEVICE_ATTRIBUTES));
 
-    TraceEvents(TRACE_LEVEL_INFORMATION, DBG_IOCTL, "vJoyGetDeviceAttributes Exit = 0x%x\n", status);
+    TraceEvents(TRACE_LEVEL_INFORMATION, DBG_IOCTL, "vJoyGetDeviceAttributes: exiting with stt=0x%x\n", status);
     return status;
 }
 
@@ -1505,6 +1503,9 @@ PVOID GetReportDescriptorFromRegistry(USHORT* Size, USHORT* IdMask, USHORT* FFbm
     PAGED_CODE();
 
     *Size = 0;
+    *IdMask = 0;
+    *FFbmask = 0;
+
     // Get the key of the Parameters key under "SYSTEM\\CurrentControlSet\\services\\vjoy"
     status = WdfDriverOpenParametersRegistryKey(WdfGetDriver(), WRITE_DAC, WDF_NO_OBJECT_ATTRIBUTES, &KeyParameters);
     if (!NT_SUCCESS(status)) {
@@ -1536,50 +1537,64 @@ PVOID GetReportDescriptorFromRegistry(USHORT* Size, USHORT* IdMask, USHORT* FFbm
             status = ZwEnumerateKey(hKeyParameters, iDevice++, KeyBasicInformation, pDeviceBasicInfo, ResultLength, &ResultLength);
         }
         // Check we are done
-        if (status == STATUS_NO_MORE_ENTRIES)
+        if (status == STATUS_NO_MORE_ENTRIES) {
+            TraceEvents(TRACE_LEVEL_VERBOSE, DBG_INIT, "GetReportDescriptorFromRegistry: done enumarating\n");
             break;
+        }
         if (!NT_SUCCESS(status)) {
+            TraceEvents(TRACE_LEVEL_ERROR, DBG_INIT, "GetReportDescriptorFromRegistry: error enumerating key, exiting\n");
             LogEventWithStatus(ERRLOG_REP_REG_FAILED, L"ZwEnumerateKey", WdfDriverWdmGetDriverObject(WdfGetDriver()), status);
             //ExFreePoolWithTag(pDeviceBasicInfo, 'fnIb');
             return NULL;
         }
 
-        if (!pDeviceBasicInfo)
+        if (!pDeviceBasicInfo) {
+            TraceEvents(TRACE_LEVEL_ERROR, DBG_INIT, "GetReportDescriptorFromRegistry: error geting devicebasicinfo, exiting\n");
             return NULL;
+        }
 
         // Copy name of subkey to unicode buffer and release temporary buffer
         nameLength = pDeviceBasicInfo->NameLength;
         RtlZeroMemory(DeviceKeyName, NameSize);
         status = RtlStringCbCopyNW(DeviceKeyName, NameSize *sizeof(WCHAR), pDeviceBasicInfo->Name, nameLength);
         if (!NT_SUCCESS(status)) {
+            TraceEvents(TRACE_LEVEL_ERROR, DBG_INIT, "GetReportDescriptorFromRegistry: descriptor key not matching, continue\n");
             LogEventWithStatus(ERRLOG_REP_REG_FAILED, L"RtlStringCbCopyNW", WdfDriverWdmGetDriverObject(WdfGetDriver()), status);
             ExFreePoolWithTag(pDeviceBasicInfo, 'fnIb');
             return NULL;
         }
         RtlInitUnicodeString(&strDev, DeviceKeyName);
         ExFreePoolWithTag(pDeviceBasicInfo, 'fnIb');
-
+        
+        TraceEvents(TRACE_LEVEL_VERBOSE, DBG_INIT, "GetReportDescriptorFromRegistry: opening descriptor key:%Ws\n", DeviceKeyName);
+        
         // The sub-key name should range from "Device01" to "Device16"
         status = RtlStringCbLengthW(REG_DEVICE, NameSize, &pcb);
-        if (!NT_SUCCESS(status))
+        if (!NT_SUCCESS(status)) {
+            TraceEvents(TRACE_LEVEL_VERBOSE, DBG_INIT, "GetReportDescriptorFromRegistry: failed getting size of descriptor key, continue\n");
             continue;
-        if (!RtlEqualMemory(DeviceKeyName, REG_DEVICE, pcb))
+        }
+        if (!RtlEqualMemory(DeviceKeyName, REG_DEVICE, pcb)) {
+            TraceEvents(TRACE_LEVEL_VERBOSE, DBG_INIT, "GetReportDescriptorFromRegistry: descriptor key not matching, continue\n");
             continue;
+        }
 
         // Get the Subkey holding the configuration data
         status = WdfRegistryOpenKey(KeyParameters, &strDev, GENERIC_READ, WDF_NO_OBJECT_ATTRIBUTES, &KeyDevice);
         if (!NT_SUCCESS(status)) {
+            TraceEvents(TRACE_LEVEL_VERBOSE, DBG_INIT, "GetReportDescriptorFromRegistry: failed opening descriptor key, continue\n");
             //WdfRegistryClose(KeyParameters);
             continue;
         }
 
 
-        // Get the size of value 'HidReportDesctiptor' - It should return status of STATUS_BUFFER_OVERFLOW and a positive value in ValueLengthQueried
-        // Then compare this value to the one in value 'HidReportDesctiptorSize'. 
-        // If they are identical create a buffer and get the data in value 'HidReportDesctiptor'
+        // Get the size of value 'HidReportDescriptor' - It should return status of STATUS_BUFFER_OVERFLOW and a positive value in ValueLengthQueried
+        // Then compare this value to the one in value 'HidReportDescriptorSize'. 
+        // If they are identical create a buffer and get the data in value 'HidReportDescriptor'
         RtlInitUnicodeString(&strDescName, DESC_NAME);
         status = WdfRegistryQueryValue(KeyDevice, &strDescName, 0, NULL, &ValueLengthQueried, NULL);
         if (status != STATUS_BUFFER_OVERFLOW) {
+            TraceEvents(TRACE_LEVEL_VERBOSE, DBG_INIT, "GetReportDescriptorFromRegistry: failed opening descriptorsize key, continue\n");
             //WdfRegistryClose(KeyParameters);
             WdfRegistryClose(KeyDevice);
             continue;
@@ -1587,12 +1602,14 @@ PVOID GetReportDescriptorFromRegistry(USHORT* Size, USHORT* IdMask, USHORT* FFbm
         RtlInitUnicodeString(&strDescSize, DESC_SIZE);
         status = WdfRegistryQueryValue(KeyDevice, &strDescSize, 4, &dDescSize, NULL, NULL);
         if (!NT_SUCCESS(status)) {
+            TraceEvents(TRACE_LEVEL_VERBOSE, DBG_INIT, "GetReportDescriptorFromRegistry: failed getting descriptorsize value, continue\n");
             //WdfRegistryClose(KeyParameters);
             WdfRegistryClose(KeyDevice);
             continue;
         }
 
         if ((dDescSize != ValueLengthQueried) | !dDescSize) {
+            TraceEvents(TRACE_LEVEL_VERBOSE, DBG_INIT, "GetReportDescriptorFromRegistry: failed matching real descriptor size and descriptorsize value, continue\n");
             //WdfRegistryClose(KeyParameters);
             WdfRegistryClose(KeyDevice);
             continue;
@@ -1603,12 +1620,14 @@ PVOID GetReportDescriptorFromRegistry(USHORT* Size, USHORT* IdMask, USHORT* FFbm
         if (!out) {
             WdfRegistryClose(KeyParameters);
             WdfRegistryClose(KeyDevice);
+            TraceEvents(TRACE_LEVEL_ERROR, DBG_INIT, "GetReportDescriptorFromRegistry: cannot allocate memory for descriptor, exiting\n");
             LogEvent(ERRLOG_REP_REG_FAILED1, NULL, WdfDriverWdmGetDriverObject(WdfGetDriver()));
             return NULL;
         }
 
         status = WdfRegistryQueryValue(KeyDevice, &strDescName, dDescSize, (BYTE*)out+dDescSizePrev, NULL, NULL);
         if (!NT_SUCCESS(status)) {
+            TraceEvents(TRACE_LEVEL_VERBOSE, DBG_INIT, "GetReportDescriptorFromRegistry: cannot copy descriptor, continue\n");
             WdfRegistryClose(KeyDevice);
             //ExFreePoolWithTag(out, MEM_TAG_HIDRPRT);
             continue;
@@ -1634,9 +1653,12 @@ PVOID GetReportDescriptorFromRegistry(USHORT* Size, USHORT* IdMask, USHORT* FFbm
         reportId = ParseIdInDescriptor((BYTE*)out + dDescSizePrev, dDescSize);
         TraceEvents(TRACE_LEVEL_VERBOSE, DBG_INIT, "GetReportDescriptorFromRegistry: parsed id=%d, size=%d\n", reportId, dDescSize);
 
+        SHORT ffbEnabled = ParsePIDCollectionForFFBInDescriptor((BYTE*)out + dDescSizePrev, dDescSize);
+        TraceEvents(TRACE_LEVEL_VERBOSE, DBG_INIT, "GetReportDescriptorFromRegistry: id=%d, ffb=%d\n", reportId, ffbEnabled);
 
         // Check if this is a unique ID
         if ((*IdMask) & (1<<(reportId-1))) {
+            TraceEvents(TRACE_LEVEL_VERBOSE, DBG_INIT, "GetReportDescriptorFromRegistry: unique ID, continue\n");
             WdfRegistryClose(KeyDevice);
             continue;
         }
@@ -1645,6 +1667,10 @@ PVOID GetReportDescriptorFromRegistry(USHORT* Size, USHORT* IdMask, USHORT* FFbm
         *IdMask |= 1<<(reportId-1);
         //////////////////////////////////////////////////////////////////////////////
 
+        // Update FFB mask
+        if (ffbEnabled>=0) {
+            *FFbmask |= 1<<(reportId-1);
+        }
 
         TraceEvents(TRACE_LEVEL_VERBOSE, DBG_INIT, "GetReportDescriptorFromRegistry: mask=0x%x, ffbmask=0x%x\n", *IdMask, *FFbmask);
 
@@ -1945,13 +1971,18 @@ void InitializeDefaultDev(PDEVICE_EXTENSION   devContext)
     cTag = (UCHAR*)&Tag;
     n = devContext->nDevices = N_COLLECTIONS;
 
-    if (devContext->positionLock)
+    TraceEvents(TRACE_LEVEL_INFORMATION, DBG_INIT, "InitializeDefaultDev: entering\n");
+
+    if (devContext->positionLock) {
         WdfWaitLockAcquire(devContext->positionLock, NULL);
+    }
+
     // Create a DEVICE_POSITION structure for each hard-coded top-level collection
     for (index = 0; index<n; index++) {
 
         // Mark default device(s) as implemented
         devContext->DeviceImplemented[index] = TRUE;
+        TraceEvents(TRACE_LEVEL_VERBOSE, DBG_INIT, "InitializeDefaultDev: enabling id=%d\n", index+1);
 
         //id = index+1;
         cTag[3] = SerialL[index];
@@ -2008,10 +2039,11 @@ void InitializeDefaultDev(PDEVICE_EXTENSION   devContext)
         devContext->positions[index]->ValButtonsEx3 = ((DWORD*)(data_buf.ButtonMask))[3];
     };
 
-    if (devContext->positionLock)
+    if (devContext->positionLock) {
         WdfWaitLockRelease(devContext->positionLock);
+    }
 
-    // Copy HID Report Descriptor
+    // Copy default HID Report Descriptor
     devContext->ReportDescriptor = ExAllocatePoolWithTag(PagedPool, sizeof(G_DefaultReportDescriptor), MEM_TAG_HIDRPRT);
     if (!devContext->ReportDescriptor)
         return;
@@ -2019,6 +2051,8 @@ void InitializeDefaultDev(PDEVICE_EXTENSION   devContext)
 
     // Init HID Descriptor
     G_DefaultHidDescriptor.DescriptorList[0].wReportLength = sizeof(G_DefaultReportDescriptor);
+
+    TraceEvents(TRACE_LEVEL_INFORMATION, DBG_INIT, "InitializeDefaultDev: exiting\n");
 
 }
 
@@ -2126,6 +2160,18 @@ void InitializeDev(PDEVICE_EXTENSION devContext, USHORT Mask, USHORT FFBMask, BO
         devContext->DeviceImplemented[index] = TRUE;
         TraceEvents(TRACE_LEVEL_VERBOSE, DBG_INIT, "InitializeDev: enabling id=%d\n", index+1);
 
+        if ((FFBMask >> index) & 1) {
+#ifdef VJOY_HAS_FFB
+            TraceEvents(TRACE_LEVEL_VERBOSE, DBG_INIT, "InitializeDev: enabling FFB for id=%d\n", index+1);
+            //FfbActiveSet(TRUE, index+1, devContext);
+#else
+            TraceEvents(TRACE_LEVEL_VERBOSE, DBG_INIT, "InitializeDev: asked for FFB but disabled in driver!! id=%d\n", index+1);
+            //FfbActiveSet(FALSE, index+1, devContext);
+#endif
+        } else {
+            TraceEvents(TRACE_LEVEL_VERBOSE, DBG_INIT, "InitializeDev: disabling FFB for id=%d\n", index+1);
+            //FfbActiveSet(FALSE, index+1, devContext);
+        }
 
         cTag[3] = SerialL[index];
         cTag[2] = SerialH[index];
@@ -2697,7 +2743,7 @@ BYTE Ffb_GetNextFreeEffect(
 
     // Find the next free slot by scanning
     int firstFree = 0;
-    for(; firstFree<VJOY_FFB_MAX_EFFECTS_BLOCK_INDEX; firstFree++) {
+    for (; firstFree<VJOY_FFB_MAX_EFFECTS_BLOCK_INDEX; firstFree++) {
         if (pid->EffectStates[firstFree].InUse == VJOY_FFB_EFFECT_FREE) {
             break;
         }

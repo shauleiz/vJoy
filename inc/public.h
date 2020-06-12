@@ -86,7 +86,12 @@ DEFINE_GUID(GUID_DEVINTERFACE_VJOY, 0x781EF630, 0x72B2, 0x11d2, 0xB8, 0x52, 0x00
 
 // Select whether driver has support for FFB
 #define VJOY_HAS_FFB
-
+// For FFB, Look for Registrys Keys to cleanup: 
+// HKEY_CURRENT_USER\\SYSTEM\\CurrentControlSet\\Control\\MediaProperties\\PrivateProperties\\Joystick\\OEM\\VID_1234& PID_0FFB"
+// HKEY_LOCAL_MACHINE\SYSTEM\ControlSet001\Control\MediaProperties\PrivateProperties\Joystick\OEM\VID_1234&PID_0FFB
+// HKEY_LOCAL_MACHINE\SYSTEM\Setup\Upgrade\PnP\CurrentControlSet\Control\DeviceMigration\Devices\HID\HIDCLASS\*
+// HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Setup\PnpResources\Registry\HKLM\SYSTEM\CurrentControlSet\Control\MediaProperties\PrivateProperties\Joystick\OEM
+// HKEY_LOCAL_MACHINE\SOFTWARE\WOW6432Node\Microsoft\Windows\CurrentVersion\Setup\PnpResources\Registry\HKLM\SYSTEM\CurrentControlSet\Control\MediaProperties\PrivateProperties\Joystick\OEM\VID_1234&PID_1FFB
 
 #define STRINGIFY_1(x)   #x
 #define STRINGIFY(x)     STRINGIFY_1(x)
@@ -94,11 +99,13 @@ DEFINE_GUID(GUID_DEVINTERFACE_VJOY, 0x781EF630, 0x72B2, 0x11d2, 0xB8, 0x52, 0x00
 #define MAKEWIDE(x) PASTE(L,x)
 
 // Device Attributes
-//
+// Vendor ID
 #define VENDOR_N_ID		0x1234
 // Product ID changes if FFB is enabled or not (so we will have 2 different products and drivers)
 #ifdef VJOY_HAS_FFB
+// Product ID: FFB with registry keys in INF file
 #define	PRODUCT_N_ID	0xBEAD
+// Product ID: FFB without registry keys in INF file
 //#define	PRODUCT_N_ID	0x1FFB
 #else
 #define	PRODUCT_N_ID	0x0FFB

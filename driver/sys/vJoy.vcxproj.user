@@ -32,7 +32,7 @@
     <DbgengKernelMachineName>HP-6330</DbgengKernelMachineName>
     <RemoveDriver>True</RemoveDriver>
     <InstallMode>HardwareId</InstallMode>
-    <HardwareIdString>root\VID_1234&amp;PID_1FFB&amp;REV_0221</HardwareIdString>
+    <HardwareIdString>root\VID_1234&amp;PID_BEAD&amp;REV_0221</HardwareIdString>
     <CommandLine />
     <ScriptPath>C:\Program Files (x86)\Windows Kits\10\Testing\Tests\Utilities\DefaultDriverPackageInstallationTask.dll</ScriptPath>
     <DbgengRemoteMachineName>HP-6330</DbgengRemoteMachineName>
