@@ -856,8 +856,8 @@ namespace vJoyNS {
     {
 
         WORD vJoyVersion = GetvJoyVersion();
-        // Only 3 digits for now, same as driver
-        WORD DLLVersion = (VER_X_ << 8) + (VER_H_ << 4) + VER_M_;
+        // Only 3 digits for now, same as driver when we built it
+        WORD DLLVersion = VERSION_N;
         // 4 digits version will be used when bugfix will be needed.
         // See CreateVersion.cpp, VERSION_N in public.h and vjoy.inx
         //WORD DLLVersion = (VER_X_ << 12) + (VER_H_ << 8) + (VER_M_ << 4) + VER_L_;
