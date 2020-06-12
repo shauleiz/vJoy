@@ -61,14 +61,17 @@ DEFINE_GUID(GUID_DEVINTERFACE_VJOY, 0x781EF630, 0x72B2, 0x11d2, 0xB8, 0x52, 0x00
 #define	DOS_FILE_NAME				"\\\\.\\"DEVICENAME_STRING
 #define VJOY_INTERFACE				L"Device_"
 
-// Version parts
+// Use auto-generated version file from inc/
+#include "gen-versioninfo.h"
+// This is a hardcoded version, not to be confused with whole {installer+libs+SDK} that
+// use getversion to retrieve a 'git describe' (tag) version.
+// Version parts as a serie of digits (from higher (X) significant number to lower (L))
 // Will be taken from CreateVersion.exe in gen-versioninfo.h
-#ifndef VER_H_
-#define VER_H_	2
-#define VER_M_	2
-#define VER_L_	0
-#define BUILD	0
-#define VER_X_	0
+#ifndef VER_X_
+#define VER_X_	2 // Must be within 0..0XF
+#define VER_H_	2 // Must be within 0..0XF
+#define VER_M_	1 // Must be within 0..0XF
+#define VER_L_	0 // Must be within 0..0XF
 #endif
 
 
@@ -81,22 +84,46 @@ DEFINE_GUID(GUID_DEVINTERFACE_VJOY, 0x781EF630, 0x72B2, 0x11d2, 0xB8, 0x52, 0x00
 #endif // !USE_JOYSTICK_API_VERSION
 
 
+// Select whether driver has support for FFB
+#define VJOY_HAS_FFB
+// For FFB, Look for Registrys Keys to cleanup: 
+// HKEY_CURRENT_USER\\SYSTEM\\CurrentControlSet\\Control\\MediaProperties\\PrivateProperties\\Joystick\\OEM\\VID_1234& PID_0FFB"
+// HKEY_LOCAL_MACHINE\SYSTEM\ControlSet001\Control\MediaProperties\PrivateProperties\Joystick\OEM\VID_1234&PID_0FFB
+// HKEY_LOCAL_MACHINE\SYSTEM\Setup\Upgrade\PnP\CurrentControlSet\Control\DeviceMigration\Devices\HID\HIDCLASS\*
+// HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Setup\PnpResources\Registry\HKLM\SYSTEM\CurrentControlSet\Control\MediaProperties\PrivateProperties\Joystick\OEM
+// HKEY_LOCAL_MACHINE\SOFTWARE\WOW6432Node\Microsoft\Windows\CurrentVersion\Setup\PnpResources\Registry\HKLM\SYSTEM\CurrentControlSet\Control\MediaProperties\PrivateProperties\Joystick\OEM\VID_1234&PID_1FFB
+
 #define STRINGIFY_1(x)   #x
 #define STRINGIFY(x)     STRINGIFY_1(x)
 #define PASTE(x, y) x##y
 #define MAKEWIDE(x) PASTE(L,x)
 
 // Device Attributes
-//
+// Vendor ID
 #define VENDOR_N_ID		0x1234
+// Product ID changes if FFB is enabled or not (so we will have 2 different products and drivers)
+#ifdef VJOY_HAS_FFB
+// Product ID: FFB with registry keys in INF file
 #define	PRODUCT_N_ID	0xBEAD
-#define	VERSION_N	(VER_L_ + 0x10*VER_M_ + 0x100*VER_H_ + 0x1000*VER_X_)
+// Product ID: FFB without registry keys in INF file
+//#define	PRODUCT_N_ID	0x1FFB
+#else
+#define	PRODUCT_N_ID	0x0FFB
+#endif
+
+// Complete driver version on 16bits for HID and driver: v0.0.0.0 (4 nibbles)
+// To avoid bugfix numbering to be reported in vjoy.inx file each time we have a new driver, 
+// just leave the 4th number off.
+// /!\ This number must matched what is written in the vjoy.inx file (root\VID_1234&PID_BEAD&REV_0XHM)
+#define	VERSION_N	(0x100*VER_X_ + 0x10*VER_H_ + VER_M_)
+// In case we want to move to 4digits, use following and change vjoy.inx accordingly
+//#define	VERSION_N	(0x1000*VER_X_ + 0x100*VER_H_ + 0*010*VER_M_ + VER_L_)
 
 // Device Strings
 //
 #define VENDOR_STR_ID		L"Shaul Eizikovich"
 #define PRODUCT_STR_ID		L"vJoy - Virtual Joystick"
-#define	SERIALNUMBER_STR	MAKEWIDE(STRINGIFY(VER_H_)) L"." MAKEWIDE(STRINGIFY(VER_M_)) L"."  MAKEWIDE(STRINGIFY(VER_L_))
+#define	SERIALNUMBER_STR	MAKEWIDE(STRINGIFY(VER_X_)) L"." MAKEWIDE(STRINGIFY(VER_H_)) L"." MAKEWIDE(STRINGIFY(VER_M_)) L"."  MAKEWIDE(STRINGIFY(VER_L_))
 
 // Function codes;
 //#define LOAD_POSITIONS	0x910
