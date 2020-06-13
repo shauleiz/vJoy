@@ -360,9 +360,6 @@ vJoyGetFeature(
     BYTE reportID = transferPacket->reportId&0x0F;
     TraceEvents(TRACE_LEVEL_VERBOSE, DBG_FFB, "vJoyGetFeature: id=%d, xfer=%x reportId=%x\n", id, transferPacket->reportId, reportID);
 
-    // Flag to know whether report has been processed or not
-    BOOLEAN knownReport = FALSE;
-
     ////////////////////////////////////////
     // Block Load Report ID 2
     // Byte[1]: Effect Block Index (1-100) max is VJOY_FFB_MAX_EFFECTS_BLOCK_INDEX
@@ -379,7 +376,6 @@ vJoyGetFeature(
             ucTmp[2] = (UCHAR)((devContext->FfbPIDData[id-1].PIDBlockLoad.LoadStatus)&0xFF);
             ucTmp[3] = (UCHAR)((devContext->FfbPIDData[id-1].PIDBlockLoad.RAMPoolAvailable)&0xFF);
             ucTmp[4] = (UCHAR)((devContext->FfbPIDData[id-1].PIDBlockLoad.RAMPoolAvailable>>8)&0xFF);; // Load Error =0
-            knownReport = TRUE;
         } else {
             ucTmp[2] = 0; // Load Success = 0
             ucTmp[3] = 0; // Load Full = 0
@@ -404,19 +400,22 @@ vJoyGetFeature(
             ucTmp[2] = (UCHAR)((devContext->FfbPIDData[id-1].PIDPool.RAMPoolSize>>8)&0xFF);
             ucTmp[3] = (UCHAR)((devContext->FfbPIDData[id-1].PIDPool.MaxSimultaneousEffects)&0xFF);
             ucTmp[4] = (UCHAR)((devContext->FfbPIDData[id-1].PIDPool.MemoryManagement)&0xFF);
-            knownReport = TRUE;
+            TraceEvents(TRACE_LEVEL_VERBOSE, DBG_FFB, "vJoyGetFeature: PoolRep ucTmp[1]=%x ucTmp[2]=%x ucTmp[3]=%x ucTmp[4]=%x\n",
+                transferPacket->reportBuffer[1], transferPacket->reportBuffer[2], transferPacket->reportBuffer[3], transferPacket->reportBuffer[4]);
         } else {
+            // FFB Disabled
             ucTmp[1] = (UCHAR)(0);
             ucTmp[2] = (UCHAR)(0);
             ucTmp[3] = (UCHAR)(0);
             ucTmp[4] = (UCHAR)(0);
+            // Very important: Notify device does not exist for POOL_REPORT!
+            status = STATUS_NO_SUCH_DEVICE;
+            TraceEvents(TRACE_LEVEL_ERROR, DBG_IOCTL, "vJoyGetFeature: PoolRep ffb disabled, leaving early with stt=%d\n", status);
+            return status;
         }
         TraceEvents(TRACE_LEVEL_VERBOSE, DBG_FFB, "vJoyGetFeature: Pool ucTmp[1]=%x ucTmp[2]=%x ucTmp[3]=%x ucTmp[4]=%x\n",
             transferPacket->reportBuffer[1], transferPacket->reportBuffer[2], transferPacket->reportBuffer[3], transferPacket->reportBuffer[4]);
     }
-    // Report ID 3?
-    if ((transferPacket->reportId&0x0F) == 3 && !devContext->FfbEnable[id-1])
-        status = STATUS_NO_SUCH_DEVICE;
 
     ////////////////////////////////////////
     // State Report ID 4
@@ -431,7 +430,6 @@ vJoyGetFeature(
         if (devContext->FfbEnable[id-1]) {
             ucTmp[1] = (UCHAR)(0);
             ucTmp[2] = (UCHAR)(0);
-            knownReport = TRUE;
         } else {
             ucTmp[1] = (UCHAR)(0);
             ucTmp[2] = (UCHAR)(0);
@@ -440,9 +438,7 @@ vJoyGetFeature(
             transferPacket->reportBuffer[1], transferPacket->reportBuffer[2]);
     }
 
-
     TraceEvents(TRACE_LEVEL_INFORMATION, DBG_IOCTL, "vJoyGetFeature: exiting with stt=%d\n", status);
-
 
     return status;
 }
@@ -1565,9 +1561,9 @@ PVOID GetReportDescriptorFromRegistry(USHORT* Size, USHORT* IdMask, USHORT* FFbm
         }
         RtlInitUnicodeString(&strDev, DeviceKeyName);
         ExFreePoolWithTag(pDeviceBasicInfo, 'fnIb');
-        
+
         TraceEvents(TRACE_LEVEL_VERBOSE, DBG_INIT, "GetReportDescriptorFromRegistry: opening descriptor key:%Ws\n", DeviceKeyName);
-        
+
         // The sub-key name should range from "Device01" to "Device16"
         status = RtlStringCbLengthW(REG_DEVICE, NameSize, &pcb);
         if (!NT_SUCCESS(status)) {
