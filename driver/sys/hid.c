@@ -2637,11 +2637,18 @@ void Ffb_ResetPIDData(
     // bit0=1:own managed pool
     // bit1=0:one parameter block set for each effect block
     pid->PIDPool.MemoryManagement = 0;
-    pid->PIDPool.RAMPoolSize = 0xFFFF; // Should be (USHORT)(sizeof(FFB_PID_EFFECT_STATE_REPORT)*(VJOY_FFB_MAX_EFFECTS_BLOCK_INDEX));
 
+#ifdef FIRST_EID_PREALLOCATED
+    pid->PIDPool.RAMPoolSize = (USHORT)(sizeof(FFB_PID_EFFECT_STATE_REPORT)*(VJOY_FFB_MAX_EFFECTS_BLOCK_INDEX));
+    pid->PIDBlockLoad.EffectBlockIndex = 1;
+    pid->PIDBlockLoad.LoadStatus = 1;
+    pid->PIDBlockLoad.RAMPoolAvailable = sizeof(FFB_PID_EFFECT_STATE_REPORT)*(VJOY_FFB_MAX_EFFECTS_BLOCK_INDEX-1);
+#else
+    pid->PIDPool.RAMPoolSize = 0xFFFF;
     pid->PIDBlockLoad.EffectBlockIndex = 0;
     pid->PIDBlockLoad.LoadStatus = 0;
     pid->PIDBlockLoad.RAMPoolAvailable = 0xFFFF;
+#endif
 
     Ffb_BlockIndexFreeAll(devContext, id);
 
@@ -2673,15 +2680,26 @@ void Ffb_BlockIndexFreeAll(
     TraceEvents(TRACE_LEVEL_INFORMATION, DBG_FFB, "FfbBlockIndexFreeAll: entering\n");
 
     PFFB_DEVICE_PID pid = &(devContext->FfbPIDData[id-1]);
+#ifdef FIRST_EID_PREALLOCATED
+    pid->LastEID = 1;
+    pid->NextFreeEID = VJOY_FFB_FIRST_EFFECT_ID+1;
+    pid->EffectStates[0].InUse = VJOY_FFB_EFFECT_ALLOCATED;
+    pid->EffectStates[0].PIDEffectStateReport = 0;
+
+    for (int j = 1; j<VJOY_FFB_MAX_EFFECTS_BLOCK_INDEX; j++) {
+#else
     pid->LastEID = 0;
     pid->NextFreeEID = VJOY_FFB_FIRST_EFFECT_ID;
     for (int j = 0; j<VJOY_FFB_MAX_EFFECTS_BLOCK_INDEX; j++) {
+#endif
         pid->EffectStates[j].InUse = VJOY_FFB_EFFECT_FREE;
         pid->EffectStates[j].PIDEffectStateReport = 0;
     }
 
     // Update RAM pool?
-    //pid->PIDBlockLoad.RAMPoolAvailable = (USHORT)(sizeof(FFB_PID_EFFECT_STATE_REPORT)*((int)VJOY_FFB_MAX_EFFECTS_BLOCK_INDEX));
+#ifdef FIRST_EID_PREALLOCATED
+    pid->PIDBlockLoad.RAMPoolAvailable = (USHORT)(sizeof(FFB_PID_EFFECT_STATE_REPORT)*((int)VJOY_FFB_MAX_EFFECTS_BLOCK_INDEX-1));
+#endif
 
     TraceEvents(TRACE_LEVEL_INFORMATION, DBG_FFB, "FfbBlockIndexFreeAll: exiting\n");
 }
@@ -2877,12 +2895,18 @@ BOOLEAN Ffb_ProcessPacket(
                 pid->PIDBlockLoad.LoadStatus = 1;
             } else {
                 // Error on last allocated block index
+#ifdef FIRST_EID_PREALLOCATED
+                pid->PIDBlockLoad.EffectBlockIndex = 0;
+#endif
                 // Flag error : full
                 pid->PIDBlockLoad.LoadStatus = 2;
             }
+
+#ifdef FIRST_EID_PREALLOCATED
             // Update RAM pool in PID?
-            //int numUsed = Ffb_GetNumUsedEffect(devContext, id);
-            //pid->PIDBlockLoad.RAMPoolAvailable = (USHORT)(sizeof(FFB_PID_EFFECT_STATE_REPORT)*((int)VJOY_FFB_MAX_EFFECTS_BLOCK_INDEX-numUsed));
+            int numUsed = Ffb_GetNumUsedEffect(devContext, id);
+            pid->PIDBlockLoad.RAMPoolAvailable = (USHORT)(sizeof(FFB_PID_EFFECT_STATE_REPORT)*((int)VJOY_FFB_MAX_EFFECTS_BLOCK_INDEX-numUsed));
+#endif
 
             TraceEvents(TRACE_LEVEL_VERBOSE, DBG_FFB, "Ffb_ProcessPacket: CREATE NEW EFFECT eid=%d\n", eid);
         } break;

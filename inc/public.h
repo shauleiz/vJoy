@@ -93,6 +93,13 @@ DEFINE_GUID(GUID_DEVINTERFACE_VJOY, 0x781EF630, 0x72B2, 0x11d2, 0xB8, 0x52, 0x00
 // HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Setup\PnpResources\Registry\HKLM\SYSTEM\CurrentControlSet\Control\MediaProperties\PrivateProperties\Joystick\OEM
 // HKEY_LOCAL_MACHINE\SOFTWARE\WOW6432Node\Microsoft\Windows\CurrentVersion\Setup\PnpResources\Registry\HKLM\SYSTEM\CurrentControlSet\Control\MediaProperties\PrivateProperties\Joystick\OEM\VID_1234&PID_1FFB
 
+// For FFB: when bellow flag is enabled, a first Effect Block Index is always allocated,
+// even if there is no feeder.
+// This is to avoid some games being locked if a feeder with FFB was not started.
+// This also enables RAM Pool emulation.
+#define FIRST_EID_PREALLOCATED
+
+
 #define STRINGIFY_1(x)   #x
 #define STRINGIFY(x)     STRINGIFY_1(x)
 #define PASTE(x, y) x##y
