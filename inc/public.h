@@ -397,7 +397,7 @@ typedef PJOYSTICK_POSITION_V3 PJOYSTICK_POSITION;
 // Only one per device
 typedef struct _FFB_PID_BLOCK_LOAD_REPORT
 {
-    // 1..100. If 0, then error (below value is 2 or 3)
+    // 1..100. If 0, then error (LoadStatus below is 2 or 3)
     BYTE    EffectBlockIndex;
     // 0 ongoing, 1=Success,2=Full,3=Error
     BYTE	LoadStatus;
