@@ -374,10 +374,11 @@ namespace vJoyNS {
     VJOYINTERFACE_API DWORD 	__cdecl	Ffb_h_DeviceID(const FFB_DATA* Packet, UINT* DeviceID);
     VJOYINTERFACE_API DWORD 	__cdecl Ffb_h_Type(const FFB_DATA* Packet, FFBPType* Type);
     VJOYINTERFACE_API DWORD 	__cdecl Ffb_h_Packet(const FFB_DATA* Packet, WORD* Type, UINT* DataSize, BYTE* Data[]);
-    VJOYINTERFACE_API DWORD 	__cdecl Ffb_h_EBI(const FFB_DATA* Packet, UINT* Index);
+    __declspec(deprecated("** Ffb_h_EBI function was deprecated - Use Ffb_h_EffectBlockIndex **")) \
+        VJOYINTERFACE_API DWORD 	__cdecl Ffb_h_EBI(const FFB_DATA* Packet, UINT* Index);
     VJOYINTERFACE_API DWORD 	__cdecl Ffb_h_Eff_Report(const FFB_DATA* Packet, FFB_EFF_REPORT* Effect);
     __declspec(deprecated("** Ffb_h_Eff_Const function was deprecated - Use function Ffb_h_Eff_Report **")) \
-    VJOYINTERFACE_API DWORD __cdecl Ffb_h_Eff_Const(const FFB_DATA* Packet, FFB_EFF_CONST* Effect);
+        VJOYINTERFACE_API DWORD __cdecl Ffb_h_Eff_Const(const FFB_DATA* Packet, FFB_EFF_CONST* Effect);
     VJOYINTERFACE_API DWORD		__cdecl Ffb_h_Eff_Ramp(const FFB_DATA* Packet, FFB_EFF_RAMP* RampEffect);
     VJOYINTERFACE_API DWORD 	__cdecl Ffb_h_EffOp(const FFB_DATA* Packet, FFB_EFF_OP* Operation);
     VJOYINTERFACE_API DWORD 	__cdecl Ffb_h_DevCtrl(const FFB_DATA* Packet, FFB_CTRL* Control);
@@ -385,7 +386,8 @@ namespace vJoyNS {
     VJOYINTERFACE_API DWORD 	__cdecl Ffb_h_Eff_Cond(const FFB_DATA* Packet, FFB_EFF_COND* Condition);
     VJOYINTERFACE_API DWORD 	__cdecl Ffb_h_DevGain(const FFB_DATA* Packet, BYTE* Gain);
     VJOYINTERFACE_API DWORD		__cdecl Ffb_h_Eff_Envlp(const FFB_DATA* Packet, FFB_EFF_ENVLP* Envelope);
-    VJOYINTERFACE_API DWORD		__cdecl Ffb_h_EffNew(const FFB_DATA* Packet, FFBEType* Effect);
+    __declspec(deprecated("** Ffb_h_Eff_Const function was deprecated - Use function Ffb_h_CreateNewEffect **")) \
+        VJOYINTERFACE_API DWORD		__cdecl Ffb_h_EffNew(const FFB_DATA* Packet, FFBEType* Effect);
 
     // Added in 2.1.6
     VJOYINTERFACE_API DWORD		__cdecl Ffb_h_Eff_Constant(const FFB_DATA* Packet, FFB_EFF_CONSTANT* ConstantEffect);

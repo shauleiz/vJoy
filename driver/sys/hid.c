@@ -2865,6 +2865,10 @@ BOOLEAN Ffb_ProcessPacket(
             BYTE eid = packet[1];
             TraceEvents(TRACE_LEVEL_VERBOSE, DBG_FFB, "Ffb_ProcessPacket: BLOCK FREE eid=%d\n", eid);
             Ffb_BlockIndexFree(devContext, id, eid);
+            // Update PID block
+            int numUsed = Ffb_GetNumUsedEffect(devContext, id);
+            pid->PIDBlockLoad.RAMPoolAvailable = (USHORT)(sizeof(FFB_PID_EFFECT_STATE_REPORT)*(VJOY_FFB_MAX_EFFECTS_BLOCK_INDEX-numUsed));
+
         } break;
 
             // Next are Feature report

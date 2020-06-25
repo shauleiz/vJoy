@@ -401,14 +401,14 @@ typedef struct _FFB_PID_BLOCK_LOAD_REPORT
     BYTE    EffectBlockIndex;
     // 0 ongoing, 1=Success,2=Full,3=Error
     BYTE	LoadStatus;
-    // =0 if full, or sizeof(FFB_PID_EFFECT_STATE_REPORT) * (100 - created) max is VJOY_FFB_MAX_EFFECTS_BLOCK_INDEX
+    // equals =0 if full, or sizeof(FFB_PID_EFFECT_STATE_REPORT) * (100 - created) max is VJOY_FFB_MAX_EFFECTS_BLOCK_INDEX
     USHORT	RAMPoolAvailable;
 } FFB_PID_BLOCK_LOAD_REPORT, * PFFB_PID_BLOCK_LOAD_REPORT;
 
 // FFB: PID Pool Feature Report=3
 typedef struct _FFB_PID_POOL_REPORT
 {
-    // 0xFFFF
+    // equals sizeof(FFB_PID_EFFECT_STATE_REPORT) * 100, max is 0xFFFF
     USHORT	RAMPoolSize;
     // 0..10
     BYTE	MaxSimultaneousEffects;
