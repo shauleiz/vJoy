@@ -30,6 +30,12 @@ certificate.
 the installer.
 7. To build the SDK, run SDK\CreateSdk.bat from command line.
 
+#### When install failed (notes from Shaul's vJoy website)
+
+In case the installation failed, please post your problem in the forum. Attach two log files:
+
+The log file for the Inno Setup wrapper is called Setup Log 2011-11-01 #xxx.txt and is located under %TEMP% folder. (xxx can be any number in the range 001-999).
+The log file for the executable is called vJoyInstall.log and located in the vJoy folder (C:/Program Files/vJoy).
 
 #### Updating the version
 
