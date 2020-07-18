@@ -78,7 +78,7 @@ int main(int argc, char** argv)
     // Version
     version = vbuf;
     // Hardcoded for v221 branch development
-    version = "v2.2.1.0";
+    version = "v2.2.1.1";
 
     // Break the version number into its components
     int nFieldsVersion = sscanf_s(version, "v%u.%u.%u.%u", &major, &mid, &minor, &bugfix);
