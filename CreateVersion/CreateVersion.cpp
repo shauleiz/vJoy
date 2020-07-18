@@ -21,7 +21,7 @@ static void find_delim(char* s, char** res, int* ix)
 
 int main(int argc, char** argv)
 {
-    unsigned int major = 2, mid = 2, minor = 0, bugfix = 0, nbcommits = 0;
+    unsigned int major = 2, mid = 2, minor = 1, bugfix = 0, nbcommits = 0;
     char vbuf[4096] = { 0 };
     char* version = "v0.0.0.0", * ncommits = "0", * sha = "0";
     FILE* po;
@@ -78,7 +78,7 @@ int main(int argc, char** argv)
     // Version
     version = vbuf;
     // Hardcoded for v221 branch development
-    //version = "v2.2.1.0";
+    version = "v2.2.1.0";
 
     // Break the version number into its components
     int nFieldsVersion = sscanf_s(version, "v%u.%u.%u.%u", &major, &mid, &minor, &bugfix);
