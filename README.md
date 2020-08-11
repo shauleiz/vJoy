@@ -99,7 +99,7 @@ Then reboot your computer. You shoud see a watermark in the bottom right corner
 telling you that the system is in test mode. Worth noting that doing that this
 is only for testing and not for permanent use.
 
-Install the test certificate in the thrusted root store, see:
+Install the test certificate in the trusted root store, see:
 
 https://www.tbs-certificates.co.uk/FAQ/en/174.html
 
