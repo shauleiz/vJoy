@@ -379,87 +379,87 @@ namespace vJoyInterfaceWrap
         /***************************************************/
 
         /////	General driver data
-        [DllImport("vJoyInterface.dll", EntryPoint = "GetvJoyVersion")]
+        [DllImport("vJoyInterface.dll", EntryPoint = "GetvJoyVersion", CallingConvention = CallingConvention.Cdecl)]
         private static extern short _GetvJoyVersion();
 
-        [DllImport("vJoyInterface.dll", EntryPoint = "vJoyEnabled")]
+        [DllImport("vJoyInterface.dll", EntryPoint = "vJoyEnabled", CallingConvention = CallingConvention.Cdecl)]
         private static extern bool _vJoyEnabled();
 
-        [DllImport("vJoyInterface.dll", EntryPoint = "GetvJoyProductString")]
+        [DllImport("vJoyInterface.dll", EntryPoint = "GetvJoyProductString", CallingConvention = CallingConvention.Cdecl)]
         private static extern IntPtr _GetvJoyProductString();
 
-        [DllImport("vJoyInterface.dll", EntryPoint = "GetvJoyManufacturerString")]
+        [DllImport("vJoyInterface.dll", EntryPoint = "GetvJoyManufacturerString", CallingConvention = CallingConvention.Cdecl)]
         private static extern IntPtr _GetvJoyManufacturerString();
 
-        [DllImport("vJoyInterface.dll", EntryPoint = "GetvJoySerialNumberString")]
+        [DllImport("vJoyInterface.dll", EntryPoint = "GetvJoySerialNumberString", CallingConvention = CallingConvention.Cdecl)]
         private static extern IntPtr _GetvJoySerialNumberString();
 
-        [DllImport("vJoyInterface.dll", EntryPoint = "DriverMatch")]
+        [DllImport("vJoyInterface.dll", EntryPoint = "DriverMatch", CallingConvention = CallingConvention.Cdecl)]
         private static extern bool _DriverMatch(ref UInt32 DllVer, ref UInt32 DrvVer);
 
         /////	vJoy Device properties
-        [DllImport("vJoyInterface.dll", EntryPoint = "GetVJDButtonNumber")]
+        [DllImport("vJoyInterface.dll", EntryPoint = "GetVJDButtonNumber", CallingConvention = CallingConvention.Cdecl)]
         private static extern int _GetVJDButtonNumber(UInt32 rID);
 
-        [DllImport("vJoyInterface.dll", EntryPoint = "GetVJDDiscPovNumber")]
+        [DllImport("vJoyInterface.dll", EntryPoint = "GetVJDDiscPovNumber", CallingConvention = CallingConvention.Cdecl)]
         private static extern int _GetVJDDiscPovNumber(UInt32 rID);
 
-        [DllImport("vJoyInterface.dll", EntryPoint = "GetVJDContPovNumber")]
+        [DllImport("vJoyInterface.dll", EntryPoint = "GetVJDContPovNumber", CallingConvention = CallingConvention.Cdecl)]
         private static extern int _GetVJDContPovNumber(UInt32 rID);
 
-        [DllImport("vJoyInterface.dll", EntryPoint = "GetVJDAxisExist")]
+        [DllImport("vJoyInterface.dll", EntryPoint = "GetVJDAxisExist", CallingConvention = CallingConvention.Cdecl)]
         private static extern UInt32 _GetVJDAxisExist(UInt32 rID, UInt32 Axis);
 
-        [DllImport("vJoyInterface.dll", EntryPoint = "GetVJDAxisMax")]
+        [DllImport("vJoyInterface.dll", EntryPoint = "GetVJDAxisMax", CallingConvention = CallingConvention.Cdecl)]
         private static extern bool _GetVJDAxisMax(UInt32 rID, UInt32 Axis, ref long Max);
 
-        [DllImport("vJoyInterface.dll", EntryPoint = "GetVJDAxisMin")]
+        [DllImport("vJoyInterface.dll", EntryPoint = "GetVJDAxisMin", CallingConvention = CallingConvention.Cdecl)]
         private static extern bool _GetVJDAxisMin(UInt32 rID, UInt32 Axis, ref long Min);
 
-        [DllImport("vJoyInterface.dll", EntryPoint = "isVJDExists")]
+        [DllImport("vJoyInterface.dll", EntryPoint = "isVJDExists", CallingConvention = CallingConvention.Cdecl)]
         private static extern bool _isVJDExists(UInt32 rID);
 
-        [DllImport("vJoyInterface.dll", EntryPoint = "GetOwnerPid")]
+        [DllImport("vJoyInterface.dll", EntryPoint = "GetOwnerPid", CallingConvention = CallingConvention.Cdecl)]
         private static extern int _GetOwnerPid(UInt32 rID);
 
         /////	Write access to vJoy Device - Basic
-        [DllImport("vJoyInterface.dll", EntryPoint = "AcquireVJD")]
+        [DllImport("vJoyInterface.dll", EntryPoint = "AcquireVJD", CallingConvention = CallingConvention.Cdecl)]
         private static extern bool _AcquireVJD(UInt32 rID);
 
-        [DllImport("vJoyInterface.dll", EntryPoint = "RelinquishVJD")]
+        [DllImport("vJoyInterface.dll", EntryPoint = "RelinquishVJD", CallingConvention = CallingConvention.Cdecl)]
         private static extern void _RelinquishVJD(UInt32 rID);
 
-        [DllImport("vJoyInterface.dll", EntryPoint = "UpdateVJD")]
+        [DllImport("vJoyInterface.dll", EntryPoint = "UpdateVJD", CallingConvention = CallingConvention.Cdecl)]
         private static extern bool _UpdateVJD(UInt32 rID, ref JoystickState pData);
 
-        [DllImport("vJoyInterface.dll", EntryPoint = "GetVJDStatus")]
+        [DllImport("vJoyInterface.dll", EntryPoint = "GetVJDStatus", CallingConvention = CallingConvention.Cdecl)]
         private static extern int _GetVJDStatus(UInt32 rID);
 
 
         //// Reset functions
-        [DllImport("vJoyInterface.dll", EntryPoint = "ResetVJD")]
+        [DllImport("vJoyInterface.dll", EntryPoint = "ResetVJD", CallingConvention = CallingConvention.Cdecl)]
         private static extern bool _ResetVJD(UInt32 rID);
 
-        [DllImport("vJoyInterface.dll", EntryPoint = "ResetAll")]
+        [DllImport("vJoyInterface.dll", EntryPoint = "ResetAll", CallingConvention = CallingConvention.Cdecl)]
         private static extern bool _ResetAll();
 
-        [DllImport("vJoyInterface.dll", EntryPoint = "ResetButtons")]
+        [DllImport("vJoyInterface.dll", EntryPoint = "ResetButtons", CallingConvention = CallingConvention.Cdecl)]
         private static extern bool _ResetButtons(UInt32 rID);
 
-        [DllImport("vJoyInterface.dll", EntryPoint = "ResetPovs")]
+        [DllImport("vJoyInterface.dll", EntryPoint = "ResetPovs", CallingConvention = CallingConvention.Cdecl)]
         private static extern bool _ResetPovs(UInt32 rID);
 
         ////// Write data
-        [DllImport("vJoyInterface.dll", EntryPoint = "SetAxis")]
+        [DllImport("vJoyInterface.dll", EntryPoint = "SetAxis", CallingConvention = CallingConvention.Cdecl)]
         private static extern bool _SetAxis(Int32 Value, UInt32 rID, HID_USAGES Axis);
 
-        [DllImport("vJoyInterface.dll", EntryPoint = "SetBtn")]
+        [DllImport("vJoyInterface.dll", EntryPoint = "SetBtn", CallingConvention = CallingConvention.Cdecl)]
         private static extern bool _SetBtn(bool Value, UInt32 rID, Byte nBtn);
 
-        [DllImport("vJoyInterface.dll", EntryPoint = "SetDiscPov")]
+        [DllImport("vJoyInterface.dll", EntryPoint = "SetDiscPov", CallingConvention = CallingConvention.Cdecl)]
         private static extern bool _SetDiscPov(Int32 Value, UInt32 rID, uint nPov);
 
-        [DllImport("vJoyInterface.dll", EntryPoint = "SetContPov")]
+        [DllImport("vJoyInterface.dll", EntryPoint = "SetContPov", CallingConvention = CallingConvention.Cdecl)]
         private static extern bool _SetContPov(Int32 Value, UInt32 rID, uint nPov);
 
         [DllImport("vJoyInterface.dll", EntryPoint = "RegisterRemovalCB", CallingConvention = CallingConvention.Cdecl)]
@@ -505,86 +505,86 @@ namespace vJoyInterfaceWrap
             UserFfbCB(data, obj);
         }
 
-        [DllImport("vJoyInterface.dll", EntryPoint = "FfbStart")]
+        [DllImport("vJoyInterface.dll", EntryPoint = "FfbStart", CallingConvention = CallingConvention.Cdecl)]
         private static extern bool _FfbStart(UInt32 rID);
 
-        [DllImport("vJoyInterface.dll", EntryPoint = "FfbStop")]
+        [DllImport("vJoyInterface.dll", EntryPoint = "FfbStop", CallingConvention = CallingConvention.Cdecl)]
         private static extern bool _FfbStop(UInt32 rID);
 
-        [DllImport("vJoyInterface.dll", EntryPoint = "IsDeviceFfb")]
+        [DllImport("vJoyInterface.dll", EntryPoint = "IsDeviceFfb", CallingConvention = CallingConvention.Cdecl)]
         private static extern bool _IsDeviceFfb(UInt32 rID);
 
-        [DllImport("vJoyInterface.dll", EntryPoint = "IsDeviceFfbEffect")]
+        [DllImport("vJoyInterface.dll", EntryPoint = "IsDeviceFfbEffect", CallingConvention = CallingConvention.Cdecl)]
         private static extern bool _IsDeviceFfbEffect(UInt32 rID, UInt32 Effect);
 
-        [DllImport("vJoyInterface.dll", EntryPoint = "Ffb_h_DeviceID")]
+        [DllImport("vJoyInterface.dll", EntryPoint = "Ffb_h_DeviceID", CallingConvention = CallingConvention.Cdecl)]
         private static extern UInt32 _Ffb_h_DeviceID(IntPtr Packet, ref UInt32 DeviceID);
 
-        [DllImport("vJoyInterface.dll", EntryPoint = "Ffb_h_Type")]
+        [DllImport("vJoyInterface.dll", EntryPoint = "Ffb_h_Type", CallingConvention = CallingConvention.Cdecl)]
         private static extern UInt32 _Ffb_h_Type(IntPtr Packet, ref FFBPType Type);
 
-        [DllImport("vJoyInterface.dll", EntryPoint = "Ffb_h_Packet")]
+        [DllImport("vJoyInterface.dll", EntryPoint = "Ffb_h_Packet", CallingConvention = CallingConvention.Cdecl)]
         private static extern UInt32 _Ffb_h_Packet(IntPtr Packet, ref UInt32 Type, ref UInt32 DataSize, ref IntPtr Data);
 
 
-        [DllImport("vJoyInterface.dll", EntryPoint = "Ffb_h_EBI")]
+        [DllImport("vJoyInterface.dll", EntryPoint = "Ffb_h_EBI", CallingConvention = CallingConvention.Cdecl)]
         private static extern UInt32 _Ffb_h_EBI(IntPtr Packet, ref UInt32 Index);
 
 #pragma warning disable 618
-        [DllImport("vJoyInterface.dll", EntryPoint = "Ffb_h_Eff_Const")]
+        [DllImport("vJoyInterface.dll", EntryPoint = "Ffb_h_Eff_Const", CallingConvention = CallingConvention.Cdecl)]
         private static extern UInt32 _Ffb_h_Eff_Const(IntPtr Packet, ref FFB_EFF_CONST Effect);
 #pragma warning restore 618
 
-        [DllImport("vJoyInterface.dll", EntryPoint = "Ffb_h_Eff_Report")]
+        [DllImport("vJoyInterface.dll", EntryPoint = "Ffb_h_Eff_Report", CallingConvention = CallingConvention.Cdecl)]
         private static extern UInt32 _Ffb_h_Eff_Report(IntPtr Packet, ref FFB_EFF_REPORT Effect);
 
-        [DllImport("vJoyInterface.dll", EntryPoint = "Ffb_h_DevCtrl")]
+        [DllImport("vJoyInterface.dll", EntryPoint = "Ffb_h_DevCtrl", CallingConvention = CallingConvention.Cdecl)]
         private static extern UInt32 _Ffb_h_DevCtrl(IntPtr Packet, ref FFB_CTRL Control);
 
-        [DllImport("vJoyInterface.dll", EntryPoint = "Ffb_h_EffOp")]
+        [DllImport("vJoyInterface.dll", EntryPoint = "Ffb_h_EffOp", CallingConvention = CallingConvention.Cdecl)]
         private static extern UInt32 _Ffb_h_EffOp(IntPtr Packet, ref FFB_EFF_OP Operation);
 
-        [DllImport("vJoyInterface.dll", EntryPoint = "Ffb_h_DevGain")]
+        [DllImport("vJoyInterface.dll", EntryPoint = "Ffb_h_DevGain", CallingConvention = CallingConvention.Cdecl)]
         private static extern UInt32 _Ffb_h_DevGain(IntPtr Packet, ref Byte Gain);
 
-        [DllImport("vJoyInterface.dll", EntryPoint = "Ffb_h_Eff_Cond")]
+        [DllImport("vJoyInterface.dll", EntryPoint = "Ffb_h_Eff_Cond", CallingConvention = CallingConvention.Cdecl)]
         private static extern UInt32 _Ffb_h_Eff_Cond(IntPtr Packet, ref FFB_EFF_COND Condition);
 
-        [DllImport("vJoyInterface.dll", EntryPoint = "Ffb_h_Eff_Envlp")]
+        [DllImport("vJoyInterface.dll", EntryPoint = "Ffb_h_Eff_Envlp", CallingConvention = CallingConvention.Cdecl)]
         private static extern UInt32 _Ffb_h_Eff_Envlp(IntPtr Packet, ref FFB_EFF_ENVLP Envelope);
 
-        [DllImport("vJoyInterface.dll", EntryPoint = "Ffb_h_Eff_Period")]
+        [DllImport("vJoyInterface.dll", EntryPoint = "Ffb_h_Eff_Period", CallingConvention = CallingConvention.Cdecl)]
         private static extern UInt32 _Ffb_h_Eff_Period(IntPtr Packet, ref FFB_EFF_PERIOD Effect);
 
-        [DllImport("vJoyInterface.dll", EntryPoint = "Ffb_h_EffNew")]
+        [DllImport("vJoyInterface.dll", EntryPoint = "Ffb_h_EffNew", CallingConvention = CallingConvention.Cdecl)]
         private static extern UInt32 _Ffb_h_EffNew(IntPtr Packet, ref FFBEType Effect);
 
-        [DllImport("vJoyInterface.dll", EntryPoint = "Ffb_h_Eff_Ramp")]
+        [DllImport("vJoyInterface.dll", EntryPoint = "Ffb_h_Eff_Ramp", CallingConvention = CallingConvention.Cdecl)]
         private static extern UInt32 _Ffb_h_Eff_Ramp(IntPtr Packet, ref FFB_EFF_RAMP RampEffect);
 
-        [DllImport("vJoyInterface.dll", EntryPoint = "Ffb_h_Eff_Constant")]
+        [DllImport("vJoyInterface.dll", EntryPoint = "Ffb_h_Eff_Constant", CallingConvention = CallingConvention.Cdecl)]
         private static extern UInt32 _Ffb_h_Eff_Constant(IntPtr Packet, ref FFB_EFF_CONSTANT ConstantEffect);
 
         // New API added with 2.2.0
-        [DllImport("vJoyInterface.dll", EntryPoint = "Ffb_h_EffectBlockIndex")]
+        [DllImport("vJoyInterface.dll", EntryPoint = "Ffb_h_EffectBlockIndex", CallingConvention = CallingConvention.Cdecl)]
         private static extern UInt32 _Ffb_h_EffectBlockIndex(IntPtr packet, ref UInt32 effectId);
 
-        [DllImport("vJoyInterface.dll", EntryPoint = "Ffb_h_CreateNewEffect")]
+        [DllImport("vJoyInterface.dll", EntryPoint = "Ffb_h_CreateNewEffect", CallingConvention = CallingConvention.Cdecl)]
         private static extern UInt32 _Ffb_h_CreateNewEffect(IntPtr packet, ref FFBEType effect, ref UInt32 newEffectId);
 
-        [DllImport("vJoyInterface.dll", EntryPoint = "FfbWritePID")]
+        [DllImport("vJoyInterface.dll", EntryPoint = "FfbWritePID", CallingConvention = CallingConvention.Cdecl)]
         private static extern UInt32 _Ffb_h_WritePID(UInt32 rID, ref FFB_DEVICE_PID PIDData);
 
-        [DllImport("vJoyInterface.dll", EntryPoint = "FfbReadPID")]
+        [DllImport("vJoyInterface.dll", EntryPoint = "FfbReadPID", CallingConvention = CallingConvention.Cdecl)]
         private static extern UInt32 _Ffb_h_ReadPID(UInt32 rID, ref FFB_DEVICE_PID PIDData);
 
-        [DllImport("vJoyInterface.dll", EntryPoint = "FfbUpdateEffectState")]
+        [DllImport("vJoyInterface.dll", EntryPoint = "FfbUpdateEffectState", CallingConvention = CallingConvention.Cdecl)]
         private static extern UInt32 _FfbUpdateEffectState(UInt32 rID, UInt32 EffectID, UInt32 effectState);
 
-        [DllImport("vJoyInterface.dll", EntryPoint = "GetPosition")]
+        [DllImport("vJoyInterface.dll", EntryPoint = "GetPosition", CallingConvention = CallingConvention.Cdecl)]
         private static extern UInt32 _GetPosition(UInt32 rID, ref JoystickState pPosition);
 
-        [DllImport("vJoyInterface.dll", EntryPoint = "GetvJoyMaxDevices")]
+        [DllImport("vJoyInterface.dll", EntryPoint = "GetvJoyMaxDevices", CallingConvention = CallingConvention.Cdecl)]
         private static extern bool _GetvJoyMaxDevices(ref UInt32 nDevices);
 
 
