@@ -82,7 +82,7 @@
     <Configuration>Debug</Configuration>
     <Platform Condition="'$(Platform)' == ''">Win32</Platform>
     <RootNamespace>Package</RootNamespace>
-    <WindowsTargetPlatformVersion>10.0.10586.0</WindowsTargetPlatformVersion>
+    <WindowsTargetPlatformVersion>10.0.18362.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
@@ -251,7 +251,6 @@
     <IntDir>$(Platform)\$(ConfigurationName)\</IntDir>
     <ExecutablePath>$(ExecutablePath);$(WDKContentRoot)bin\x86;$(WDKContentRoot)tools\tracing\x86;$(LOCALAPPDATA)\Atlassian\SourceTree\git_local\bin</ExecutablePath>
     <PostBuildEventUseInBuild>false</PostBuildEventUseInBuild>
-    <PreBuildEventUseInBuild>true</PreBuildEventUseInBuild>
     <TargetName>$(TargetName)</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug_CPP|Win32'">
@@ -279,11 +278,11 @@
     <VerifyDrivers />
     <VerifyFlags>133563</VerifyFlags>
     <OutDir>$(SolutionDir)$(Platform)\$(ConfigurationName)\</OutDir>
-    <IntDir>$(Platform)\$(ConfigurationName)\</IntDir>
     <ExecutablePath>$(ExecutablePath);$(WDKContentRoot)bin\x86;$(WDKContentRoot)tools\tracing\x86;$(LOCALAPPDATA)\Atlassian\SourceTree\git_local\bin</ExecutablePath>
     <PostBuildEventUseInBuild>false</PostBuildEventUseInBuild>
-    <PreBuildEventUseInBuild>true</PreBuildEventUseInBuild>
     <TargetName>$(TargetName)</TargetName>
+    <Inf2CatUseLocalTime>true</Inf2CatUseLocalTime>
+    <IntDir>$(Platform)\$(Configuration)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release_CPP|Win32'">
     <DebuggerFlavor>DbgengKernelDebugger</DebuggerFlavor>
@@ -310,9 +309,8 @@
     <VerifyDrivers />
     <VerifyFlags>133563</VerifyFlags>
     <ExecutablePath>$(ExecutablePath);$(WDKContentRoot)bin\x86;$(WDKContentRoot)tools\tracing\x64;$(LOCALAPPDATA)\Atlassian\SourceTree\git_local\bin</ExecutablePath>
-    <PostBuildEventUseInBuild>false</PostBuildEventUseInBuild>
-    <PreBuildEventUseInBuild>true</PreBuildEventUseInBuild>
     <TargetName>$(TargetName)</TargetName>
+    <Inf2CatUseLocalTime>true</Inf2CatUseLocalTime>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug_CPP|x64'">
     <DebuggerFlavor>DbgengKernelDebugger</DebuggerFlavor>
@@ -337,11 +335,10 @@
     <VerifyDrivers />
     <VerifyFlags>133563</VerifyFlags>
     <ExecutablePath>$(ExecutablePath);$(WDKContentRoot)bin\x86;$(WDKContentRoot)tools\tracing\x64;$(LOCALAPPDATA)\Atlassian\SourceTree\git_local\bin</ExecutablePath>
-    <PostBuildEventUseInBuild>false</PostBuildEventUseInBuild>
-    <PreBuildEventUseInBuild>true</PreBuildEventUseInBuild>
     <TargetName>$(TargetName)</TargetName>
     <IntDir>$(Platform)\$(Configuration)\</IntDir>
     <OutDir>$(SolutionDir)$(Platform)\$(Configuration)\</OutDir>
+    <Inf2CatUseLocalTime>true</Inf2CatUseLocalTime>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release_CPP|x64'">
     <DebuggerFlavor>DbgengKernelDebugger</DebuggerFlavor>
@@ -367,7 +364,6 @@
     <VerifyFlags>133563</VerifyFlags>
     <ExecutablePath>$(VC_ExecutablePath_ARM);$(WindowsSDK_ExecutablePath);$(VS_ExecutablePath);$(MSBuild_ExecutablePath);$(FxCopDir);$(PATH);$(LOCALAPPDATA)\Atlassian\SourceTree\git_local\bin</ExecutablePath>
     <PostBuildEventUseInBuild>false</PostBuildEventUseInBuild>
-    <PreBuildEventUseInBuild>true</PreBuildEventUseInBuild>
     <TargetName>$(TargetName)</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug_CPP|ARM'">
@@ -394,7 +390,6 @@
     <VerifyFlags>133563</VerifyFlags>
     <ExecutablePath>$(VC_ExecutablePath_ARM);$(WindowsSDK_ExecutablePath);$(VS_ExecutablePath);$(MSBuild_ExecutablePath);$(FxCopDir);$(PATH);$(LOCALAPPDATA)\Atlassian\SourceTree\git_local\bin</ExecutablePath>
     <PostBuildEventUseInBuild>false</PostBuildEventUseInBuild>
-    <PreBuildEventUseInBuild>true</PreBuildEventUseInBuild>
     <TargetName>$(TargetName)</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release_CPP|ARM'">
@@ -500,95 +495,67 @@
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <PreBuildEvent>
-      <Command>$(OutDir)CreateVersion.exe $(ProjectDir)gen-versioninfo.h</Command>
-      <Message>Generating Version File</Message>
-    </PreBuildEvent>
+    <PreBuildEvent />
     <PostBuildEvent>
       <Command>DEL $(ProjectDir)gen-versioninfo.h</Command>
       <Message>Deleting Version file</Message>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug_CPP|Win32'">
-    <PreBuildEvent>
-      <Command>$(OutDir)CreateVersion.exe $(ProjectDir)gen-versioninfo.h</Command>
-      <Message>Generating Version File</Message>
-    </PreBuildEvent>
+    <PreBuildEvent />
     <PostBuildEvent>
       <Command>DEL $(ProjectDir)gen-versioninfo.h</Command>
       <Message>Deleting Version file</Message>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <PreBuildEvent>
-      <Command>$(OutDir)CreateVersion.exe $(ProjectDir)gen-versioninfo.h</Command>
-      <Message>Generating Version File</Message>
-    </PreBuildEvent>
+    <PreBuildEvent />
     <PostBuildEvent>
       <Command>DEL $(ProjectDir)gen-versioninfo.h</Command>
       <Message>Deleting Version file</Message>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release_CPP|Win32'">
-    <PreBuildEvent>
-      <Command>$(OutDir)CreateVersion.exe $(ProjectDir)gen-versioninfo.h</Command>
-      <Message>Generating Version File</Message>
-    </PreBuildEvent>
+    <PreBuildEvent />
     <PostBuildEvent>
       <Command>DEL $(ProjectDir)gen-versioninfo.h</Command>
       <Message>Deleting Version file</Message>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">
-    <PreBuildEvent>
-      <Command>$(OutDir)CreateVersion.exe $(ProjectDir)gen-versioninfo.h</Command>
-      <Message>Generating Version File</Message>
-    </PreBuildEvent>
+    <PreBuildEvent />
     <PostBuildEvent>
       <Command>DEL $(ProjectDir)gen-versioninfo.h</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug_CPP|ARM'">
-    <PreBuildEvent>
-      <Command>$(OutDir)CreateVersion.exe $(ProjectDir)gen-versioninfo.h</Command>
-      <Message>Generating Version File</Message>
-    </PreBuildEvent>
+    <PreBuildEvent />
     <PostBuildEvent>
       <Command>DEL $(ProjectDir)gen-versioninfo.h</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">
-    <PreBuildEvent>
-      <Command>$(OutDir)CreateVersion.exe $(ProjectDir)gen-versioninfo.h</Command>
-      <Message>Generating Version File</Message>
-    </PreBuildEvent>
+    <PreBuildEvent />
     <PostBuildEvent>
       <Command>DEL $(ProjectDir)gen-versioninfo.h</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release_CPP|ARM'">
-    <PreBuildEvent>
-      <Command>$(OutDir)CreateVersion.exe $(ProjectDir)gen-versioninfo.h</Command>
-      <Message>Generating Version File</Message>
-    </PreBuildEvent>
+    <PreBuildEvent />
     <PostBuildEvent>
       <Command>DEL $(ProjectDir)gen-versioninfo.h</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <PreBuildEvent>
-      <Command>$(OutDir)CreateVersion.exe $(ProjectDir)gen-versioninfo.h</Command>
-      <Message>Generating Version File</Message>
-    </PreBuildEvent>
-    <PostBuildEvent>
-      <Command>DEL $(ProjectDir)gen-versioninfo.h</Command>
-      <Message>Deleting Version file</Message>
-    </PostBuildEvent>
+    <PreBuildEvent />
+    <PostBuildEvent />
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug_CPP|x64'">
     <PreBuildEvent>
-      <Command>$(OutDir)CreateVersion.exe $(ProjectDir)gen-versioninfo.h</Command>
-      <Message>Generating Version File</Message>
+      <Command>
+      </Command>
+      <Message>
+      </Message>
     </PreBuildEvent>
     <PostBuildEvent>
       <Command>DEL $(ProjectDir)gen-versioninfo.h</Command>
@@ -596,19 +563,15 @@
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <PreBuildEvent>
-      <Command>$(OutDir)CreateVersion.exe $(ProjectDir)gen-versioninfo.h</Command>
-      <Message>Generating Version File</Message>
-    </PreBuildEvent>
-    <PostBuildEvent>
-      <Command>DEL $(ProjectDir)gen-versioninfo.h</Command>
-      <Message>Deleting Version file</Message>
-    </PostBuildEvent>
+    <PreBuildEvent />
+    <PostBuildEvent />
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release_CPP|x64'">
     <PreBuildEvent>
-      <Command>$(OutDir)CreateVersion.exe $(ProjectDir)gen-versioninfo.h</Command>
-      <Message>Generating Version File</Message>
+      <Command>
+      </Command>
+      <Message>
+      </Message>
     </PreBuildEvent>
     <PostBuildEvent>
       <Command>DEL $(ProjectDir)gen-versioninfo.h</Command>

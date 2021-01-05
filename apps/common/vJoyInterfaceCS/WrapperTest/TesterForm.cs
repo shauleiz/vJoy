@@ -312,9 +312,9 @@ namespace WrapperTest
 
         private static void OnEffect(IntPtr data, IntPtr userData)
         {
-            int id = 0;
+            uint id = 0;
             FFBPType type = 0;
-            int DSize = 0;
+            uint DSize = 0;
             Byte[] arr = new Byte[20];
             UInt32 wType = 0;
             IntPtr bytes = IntPtr.Zero;
@@ -352,7 +352,7 @@ namespace WrapperTest
             };
 
             // Get the index of the effect block (Always 1)
-            int iBlock = 0;
+            uint iBlock = 0;
             result = joystick.Ffb_h_EBI(data, ref iBlock);
             if (result == 0)
                 dlg.FfbTextBox_Write(String.Format("\r\n > Effect Block Index: {0}", iBlock));
@@ -374,11 +374,11 @@ namespace WrapperTest
 
                 // Effect Direction 
                 if (Effect.Polar)
-                    dlg.FfbTextBox_Write(String.Format("\r\n >> Direction: {0} deg ({1:D2})", Polar2Deg(Effect.Direction), Effect.Direction));
+                    dlg.FfbTextBox_Write(String.Format("\r\n >> Direction: {0} deg ({1:D4})", Polar2Deg(Effect.Direction), Effect.Direction));
                 else
                 {
-                    dlg.FfbTextBox_Write(String.Format("\r\n >> X Direction: {0:X2}", Effect.DirX));
-                    dlg.FfbTextBox_Write(String.Format("\r\n >> Y Direction: {0:X2}", Effect.DirY));
+                    dlg.FfbTextBox_Write(String.Format("\r\n >> X Direction: {0:X4}", Effect.DirX));
+                    dlg.FfbTextBox_Write(String.Format("\r\n >> Y Direction: {0:X4}", Effect.DirY));
                 };
 
                 // Duration of the effect
@@ -511,9 +511,9 @@ namespace WrapperTest
         private static void OnEffectObj(IntPtr data, object userData)
         {
 
-            int id = 0;
+            uint id = 0;
             FFBPType type = 0;
-            int DSize = 0;
+            uint DSize = 0;
             Byte[] arr = new Byte[20];
             UInt32 wType = 0;
             IntPtr bytes = IntPtr.Zero;
@@ -540,7 +540,7 @@ namespace WrapperTest
             };
 
             // Get the index of the effect block (Always 1)
-            int iBlock = 0;
+            uint iBlock = 0;
             result = joystick.Ffb_h_EBI(data, ref iBlock);
             if (result == 0)
                 dlg.FfbTextBox_Write(String.Format("\r\n > Effect Block Index: {0}", iBlock));
@@ -717,10 +717,10 @@ namespace WrapperTest
                 return (int)inVal;
         }
 
-        // Polar values (0x00-0xFF) to Degrees (0-360)
-        private static int Polar2Deg(Byte Polar)
+        // Polar values (0x00-0x7FFF) to Degrees (0-360)
+        private static int Polar2Deg(UInt16 Polar)
         {
-            return (Polar * 360) / 255;
+            return (int)(((long)Polar * 360) / 32767);
         }
 
         // Convert PID Device Control to String
