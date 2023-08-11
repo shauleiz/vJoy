@@ -24,11 +24,13 @@ all for v142.
 2. Install last WDK (10.0.18362.0) and last Windows 10 SDK (10.0.18362.0).
 3. Install Inno Setup 6.
 4. DigiCert utility is provided in the git tree for now, but you need a valid EV
-certificate.
+certificate. If you want to testsign the software, creates a WDKTestCertificate 
+from VS2019 and register it in the certificate store (see chapter below)
 5. Open BuildAll.bat and make sure all paths are correct.
-6. Run BuildAll.bat from command line. This will compile all software and build
+6. Launch Developer Command Prompt for VS2019
+7. Run BuildAll.bat from command line. This will compile all software and build
 the installer.
-7. To build the SDK, run SDK\CreateSdk.bat from command line.
+8. To build the SDK, run SDK\CreateSdk.bat from command line.
 
 #### When install failed (notes from Shaul's vJoy website)
 
@@ -139,6 +141,9 @@ https://docs.microsoft.com/en-us/windows-hardware/drivers/debugger/setting-up-a-
 
 The recommanded debugger is WinDbg Preview, that is available in the Microsoft 
 Store.
+
+https://learn.microsoft.com/en-us/windows-hardware/drivers/debugger/
+
 A tutorial is given here:
 
 https://docs.microsoft.com/en-us/windows-hardware/drivers/debugger/getting-started-with-windbg--kernel-mode-

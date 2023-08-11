@@ -14,13 +14,18 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <CrossCertificateFile>$(SolutionDir)\DigiCert High Assurance EV Root CA.crt</CrossCertificateFile>
     <ProductionCertificate>CN=On-site Dental Systems (Justin Shafer), O=On-site Dental Systems (Justin Shafer), L=North Richland Hills, S=Texas, C=US, SERIALNUMBER=A214013764, OID.2.5.4.15=Business Entity, OID.1.3.6.1.4.1.311.60.2.1.1=Tarrant County, OID.1.3.6.1.4.1.311.60.2.1.2=Texas, OID.1.3.6.1.4.1.311.60.2.1.3=US | 6B05E5CC0DB88A0D8962482ECB9CD959E1B05790</ProductionCertificate>
-    <TestCertificate>CN="WDKTestCert Benjamin,132277919481947922" | 0E33DBA13D3AF4CA5BA140EF6C35C50652292AAB</TestCertificate>
+    <TestCertificate>CN="WDKTestCert Benjamin,132574407229330219" | 375864C22999374C288D41804157C675FEBFC5A6</TestCertificate>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release_CPP|x64'">
     <CrossCertificateFile>$(SolutionDir)\DigiCert High Assurance EV Root CA.crt</CrossCertificateFile>
     <ProductionCertificate>CN=On-site Dental Systems (Justin Shafer), O=On-site Dental Systems (Justin Shafer), L=North Richland Hills, S=Texas, C=US, SERIALNUMBER=A214013764, OID.2.5.4.15=Business Entity, OID.1.3.6.1.4.1.311.60.2.1.1=Tarrant County, OID.1.3.6.1.4.1.311.60.2.1.2=Texas, OID.1.3.6.1.4.1.311.60.2.1.3=US | 6B05E5CC0DB88A0D8962482ECB9CD959E1B05790</ProductionCertificate>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <TestCertificate>CN="WDKTestCert Benjamin,132277919481947922" | 0E33DBA13D3AF4CA5BA140EF6C35C50652292AAB</TestCertificate>
+    <TestCertificate>CN="WDKTestCert Benjamin,132574407229330219" | 375864C22999374C288D41804157C675FEBFC5A6</TestCertificate>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <TestCertificate>CN="WDKTestCert Benjamin,132574407229330219" | 375864C22999374C288D41804157C675FEBFC5A6</TestCertificate>
+    <CrossCertificateFile>$(SolutionDir)\DigiCert High Assurance EV Root CA.crt</CrossCertificateFile>
+    <ProductionCertificate>CN=On-site Dental Systems (Justin Shafer), O=On-site Dental Systems (Justin Shafer), L=North Richland Hills, S=Texas, C=US, SERIALNUMBER=A214013764, OID.2.5.4.15=Business Entity, OID.1.3.6.1.4.1.311.60.2.1.1=Tarrant County, OID.1.3.6.1.4.1.311.60.2.1.2=Texas, OID.1.3.6.1.4.1.311.60.2.1.3=US | 6B05E5CC0DB88A0D8962482ECB9CD959E1B05790</ProductionCertificate>
   </PropertyGroup>
 </Project>
