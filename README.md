@@ -55,12 +55,27 @@ perform an annoted tag operation with TortoiseGit, simply add a message like
 Shaul wrote very good guides about vJoy's internal, please see:
 
 http://vjoystick.sourceforge.net/site/index.php/dev216/system-architecture
+Archived here:
+https://web.archive.org/web/20190509030210/http://vjoystick.sourceforge.net/site/index.php/dev216/system-architecture
+
 
 http://vjoystick.sourceforge.net/site/index.php/dev216/internal-architecture
 
 How to remove completly vJoy when it is a complete mess:
 
 http://vjoystick.sourceforge.net/site/index.php/download-a-install/77-vjoy
+Archived here:
+http://vjoystick.sourceforge.net/site/index.php/download-a-install/77-vjoy
+
+Enter pnputil -e in the command-line window.
+Search for Shaul in the text you receive.
+If you don't find then vJoy is not installed
+If you find entries of the following type:
+[img]Driver store 2
+Write down the names of the OEM files (e.g. oem86.inf) associated with vJoy.
+Remove all OEM files associated with vJoy, one by one.
+To remove an OEM file  (e.g. oem86.inf) you need to enter pnputil -f -d oemXX.inf where XX stands for the appropriate number.
+(e.g pnputil -f -d oem86.inf)
 
 Notes on how the install process works:
 
@@ -163,6 +178,7 @@ To load symbols, use the already builtin sympath, or add Microsoft's symbol
 server 
 
 `.sympath srv*`
+
 
 `.sympath srv*https://msdl.microsoft.com/download/symbols`
 
