@@ -196,6 +196,13 @@ To get information about vJoy module, type :
 `!drvobj vJoy`
 
 
+
+### Compiling and redistibuting vJoy's apps
+
+When updating your build system (like update from VSXX to VSYY), place
+the C++ dll dependencies in apps\External\DLL
+
+
 ### Older Justin's notes:
 1. Install Visual Studio 2013
 2. Install Visual Studio 2015 Update 3

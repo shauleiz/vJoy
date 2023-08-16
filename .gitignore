@@ -15,8 +15,6 @@
 *.suo
 *.user
 
-/apps/vJoyFeeder/vJoyFeeder01.vcxproj
-
 # Folders
 win32/
 x64/
@@ -56,7 +54,6 @@ apps/common/vJoyInterfaceCS/vJoyInterfaceWrap/obj/Debug_CPP/build.force
 apps/common/vJoyInterfaceCS/WrapperTest/obj/
 apps/common/vJoyInterfaceCS/vJoyInterfaceWrap/bin/
 apps/common/vJoyInterfaceCS/vJoyInterfaceWrap/obj/
-Release_STAT/
 apps/common/vJoyInterfaceStat/bldInterface.bat
 apps/common/vJoyInterfaceStat/makefile
 apps/common/vJoyInterfaceStat/makefile.inc
@@ -74,6 +71,7 @@ apps/common/vJoyInterfaceStat/gen-versioninfo.h
 driver/sys/gen-versioninfo.h
 apps/vJoyInstall/CmdLine/gen-versioninfo.h
 driver/Package/gen-versioninfo.h
+driver/sys/vJoy.vcxproj.user
 SDK/ReadMe-2.1.5.odt
 apps/vJoyList/gen-versioninfo.h
 SDK.zip

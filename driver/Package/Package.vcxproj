@@ -253,6 +253,9 @@
       <Command>DEL $(ProjectDir)gen-versioninfo.h</Command>
       <Message>Deleting Version file</Message>
     </PostBuildEvent>
+    <DriverSign>
+      <FileDigestAlgorithm>SHA256</FileDigestAlgorithm>
+    </DriverSign>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug_CPP|Win32'">
     <PreBuildEvent />
@@ -267,6 +270,9 @@
       <Command>DEL $(ProjectDir)gen-versioninfo.h</Command>
       <Message>Deleting Version file</Message>
     </PostBuildEvent>
+    <DriverSign>
+      <FileDigestAlgorithm>SHA256</FileDigestAlgorithm>
+    </DriverSign>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release_CPP|Win32'">
     <PreBuildEvent />
