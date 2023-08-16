@@ -3,13 +3,15 @@ echo off
 SET BuildMode=Release
 REM SET BuildMode=Debug
 
-SET VS=2019\Community
-SET BUILDER=%ProgramFiles(x86)%\Microsoft Visual Studio\%VS%\MSBuild\Current\Bin\MSBuild.exe
+SET VS=2022\Community
+SET BUILDER=%ProgramFiles%\Microsoft Visual Studio\%VS%\MSBuild\Current\Bin\MSBuild.exe
 SET Target64=x64\%BuildMode%
 SET Target32=Win32\%BuildMode%
 SET DigiCertUtil=DigiCertUtil.exe
 SET InnoCompiler=%ProgramFiles(x86)%\Inno Setup 6\ISCC.exe
 
+REM Skip x86 for Windows 10 and above
+goto build64
 
 :build32
 echo %DATE% %TIME%: Cleaning vJoy (x86) 

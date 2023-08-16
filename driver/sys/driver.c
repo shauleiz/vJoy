@@ -106,14 +106,7 @@ Return Value:
     // To build a single driver binary that runs both in Windows 8 and in earlier versions of Windows, use the POOL_NX_OPTIN opt-in mechanism. 
     ExInitializeDriverRuntime(DrvRtPoolNxOptIn);
 
-    status = WdfCollectionCreate(WDF_NO_OBJECT_ATTRIBUTES, &vJoyDeviceCollection);
-    if (!NT_SUCCESS(status)) {
-        KdPrint(("WdfCollectionCreate failed with status 0x%x\n", status));
-        LogEventWithStatus(ERRLOG_DRIVER_FAILED, L"WdfCollectionCreate", DriverObject, status);
-        return status;
-    }
-
-
+    
     //
     //// Create a framework driver object to represent our driver.
     //
@@ -143,6 +136,14 @@ Return Value:
         LogEventWithStatus(ERRLOG_DRIVER_FAILED, L"WdfDriverCreate", DriverObject, status);
         return status;
     };
+
+    status = WdfCollectionCreate(WDF_NO_OBJECT_ATTRIBUTES, &vJoyDeviceCollection);
+    if (!NT_SUCCESS(status)) {
+        KdPrint(("WdfCollectionCreate failed with status 0x%x\n", status));
+        LogEventWithStatus(ERRLOG_DRIVER_FAILED, L"WdfCollectionCreate", DriverObject, status);
+        return status;
+    }
+
 
 
     status = WdfWaitLockCreate(WDF_NO_OBJECT_ATTRIBUTES, &vJoyDeviceCollectionLock);

@@ -16,6 +16,16 @@
     <ProductionCertificate>CN=On-site Dental Systems (Justin Shafer), O=On-site Dental Systems (Justin Shafer), L=North Richland Hills, S=Texas, C=US, SERIALNUMBER=A214013764, OID.2.5.4.15=Business Entity, OID.1.3.6.1.4.1.311.60.2.1.1=Tarrant County, OID.1.3.6.1.4.1.311.60.2.1.2=Texas, OID.1.3.6.1.4.1.311.60.2.1.3=US | 6B05E5CC0DB88A0D8962482ECB9CD959E1B05790</ProductionCertificate>
     <CrossCertificateFile>$(SolutionDir)\DigiCert High Assurance EV Root CA.crt</CrossCertificateFile>
     <TestCertificate>CN="WDKTestCert Benjamin,132574407229330219" | 375864C22999374C288D41804157C675FEBFC5A6</TestCertificate>
+    <RemoveDriver>True</RemoveDriver>
+    <InstallMode>None</InstallMode>
+    <HardwareIdString>root\VID_1234&amp;PID_BEAD&amp;REV_0221</HardwareIdString>
+    <CommandLine />
+    <ScriptPath>C:\Program Files (x86)\Windows Kits\10\Testing\Tests\Utilities\DefaultDriverPackageInstallationTask.dll</ScriptPath>
+    <DbgengRemoteMachineName>w10</DbgengRemoteMachineName>
+    <DbgengKernelMachineName>w10</DbgengKernelMachineName>
+    <DeployFiles />
+    <ScriptName>Microsoft.DriverKit.DefaultDriverPackageInstallationClass.PerformDefaultDriverPackageInstallation</ScriptName>
+    <ScriptDeviceQuery />
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release_CPP|Win32'">
     <SignMode>ProductionSign</SignMode>
@@ -29,16 +39,21 @@
     <DebuggerFlavor>DbgengKernelDebugger</DebuggerFlavor>
     <CrossCertificateFile>$(SolutionDir)\DigiCert High Assurance EV Root CA.crt</CrossCertificateFile>
     <TestCertificate>CN="WDKTestCert Benjamin,132574407229330219" | 375864C22999374C288D41804157C675FEBFC5A6</TestCertificate>
-    <DbgengKernelMachineName>HP-6330</DbgengKernelMachineName>
+    <DbgengKernelMachineName>racecab</DbgengKernelMachineName>
     <RemoveDriver>True</RemoveDriver>
-    <InstallMode>HardwareId</InstallMode>
+    <InstallMode>None</InstallMode>
     <HardwareIdString>root\VID_1234&amp;PID_BEAD&amp;REV_0221</HardwareIdString>
     <CommandLine />
     <ScriptPath>C:\Program Files (x86)\Windows Kits\10\Testing\Tests\Utilities\DefaultDriverPackageInstallationTask.dll</ScriptPath>
-    <DbgengRemoteMachineName>HP-6330</DbgengRemoteMachineName>
+    <DbgengRemoteMachineName>racecab</DbgengRemoteMachineName>
     <DeployFiles />
     <ScriptName>Microsoft.DriverKit.DefaultDriverPackageInstallationClass.PerformDefaultDriverPackageInstallation</ScriptName>
     <ScriptDeviceQuery />
+    <EnableVerifier>True</EnableVerifier>
+    <AllDrivers>False</AllDrivers>
+    <VerifyProjectOutput>True</VerifyProjectOutput>
+    <VerifyDrivers />
+    <VerifyFlags>133563</VerifyFlags>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug_CPP|x64'">
     <SignMode>ProductionSign</SignMode>
@@ -57,21 +72,5 @@
     <SignMode>ProductionSign</SignMode>
     <ProductionCertificate>CN=On-site Dental Systems (Justin Shafer), O=On-site Dental Systems (Justin Shafer), L=North Richland Hills, S=Texas, C=US, SERIALNUMBER=A214013764, OID.2.5.4.15=Business Entity, OID.1.3.6.1.4.1.311.60.2.1.1=Tarrant County, OID.1.3.6.1.4.1.311.60.2.1.2=Texas, OID.1.3.6.1.4.1.311.60.2.1.3=US | 6B05E5CC0DB88A0D8962482ECB9CD959E1B05790</ProductionCertificate>
     <CrossCertificateFile>$(SolutionDir)\DigiCert High Assurance EV Root CA.crt</CrossCertificateFile>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|ARM64'">
-    <SignMode>ProductionSign</SignMode>
-    <ProductionCertificate>CN=On-site Dental Systems (Justin Shafer), O=On-site Dental Systems (Justin Shafer), L=North Richland Hills, S=Texas, C=US, SERIALNUMBER=A214013764, OID.2.5.4.15=Business Entity, OID.1.3.6.1.4.1.311.60.2.1.1=Tarrant County, OID.1.3.6.1.4.1.311.60.2.1.2=Texas, OID.1.3.6.1.4.1.311.60.2.1.3=US | 6B05E5CC0DB88A0D8962482ECB9CD959E1B05790</ProductionCertificate>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release_CPP|ARM64'">
-    <SignMode>ProductionSign</SignMode>
-    <ProductionCertificate>CN=On-site Dental Systems (Justin Shafer), O=On-site Dental Systems (Justin Shafer), L=North Richland Hills, S=Texas, C=US, SERIALNUMBER=A214013764, OID.2.5.4.15=Business Entity, OID.1.3.6.1.4.1.311.60.2.1.1=Tarrant County, OID.1.3.6.1.4.1.311.60.2.1.2=Texas, OID.1.3.6.1.4.1.311.60.2.1.3=US | 6B05E5CC0DB88A0D8962482ECB9CD959E1B05790</ProductionCertificate>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">
-    <SignMode>ProductionSign</SignMode>
-    <ProductionCertificate>CN=On-site Dental Systems (Justin Shafer), O=On-site Dental Systems (Justin Shafer), L=North Richland Hills, S=Texas, C=US, SERIALNUMBER=A214013764, OID.2.5.4.15=Business Entity, OID.1.3.6.1.4.1.311.60.2.1.1=Tarrant County, OID.1.3.6.1.4.1.311.60.2.1.2=Texas, OID.1.3.6.1.4.1.311.60.2.1.3=US | 6B05E5CC0DB88A0D8962482ECB9CD959E1B05790</ProductionCertificate>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release_CPP|ARM'">
-    <SignMode>ProductionSign</SignMode>
-    <ProductionCertificate>CN=On-site Dental Systems (Justin Shafer), O=On-site Dental Systems (Justin Shafer), L=North Richland Hills, S=Texas, C=US, SERIALNUMBER=A214013764, OID.2.5.4.15=Business Entity, OID.1.3.6.1.4.1.311.60.2.1.1=Tarrant County, OID.1.3.6.1.4.1.311.60.2.1.2=Texas, OID.1.3.6.1.4.1.311.60.2.1.3=US | 6B05E5CC0DB88A0D8962482ECB9CD959E1B05790</ProductionCertificate>
   </PropertyGroup>
 </Project>

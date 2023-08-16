@@ -139,7 +139,7 @@ For NET debugging, see also:
 
 https://docs.microsoft.com/en-us/windows-hardware/drivers/debugger/setting-up-a-network-debugging-connection-automatically
 
-The recommanded debugger is WinDbg Preview, that is available in the Microsoft 
+The recommanded debugger is WinDbg, that is available in the Microsoft 
 Store.
 
 https://learn.microsoft.com/en-us/windows-hardware/drivers/debugger/
