@@ -38,7 +38,7 @@
     <DebugDeployment>True</DebugDeployment>
     <DebuggerFlavor>DbgengKernelDebugger</DebuggerFlavor>
     <CrossCertificateFile>$(SolutionDir)\DigiCert High Assurance EV Root CA.crt</CrossCertificateFile>
-    <TestCertificate>CN="WDKTestCert Benjamin,132574407229330219" | 375864C22999374C288D41804157C675FEBFC5A6</TestCertificate>
+    <TestCertificate>CN="WDKTestCert Benjamin,132852041570103000" | 6C8E8E5D69C8E21F14B0C79B2605A9D8F2F62AC8</TestCertificate>
     <DbgengKernelMachineName>racecab</DbgengKernelMachineName>
     <RemoveDriver>True</RemoveDriver>
     <InstallMode>None</InstallMode>

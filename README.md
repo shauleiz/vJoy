@@ -48,7 +48,8 @@ annoted tag stored in the git tree. How to update the version:
 - perform an annoted tag with git : git tag -a v2.1.9.2 -m "v2.1.9.2". To
 perform an annoted tag operation with TortoiseGit, simply add a message like 
 "v2.1.9.2" and Tortoise will automatically deduce it is an annoted tag.
-
+- **update the "vjoy.inx" file!!**: look for _%vjoy% = vjoy.Inst.Win7, 
+root\VID_1234&PID_0FFB&REV_0222_ and replace 0222 by the correct version.
 
 #### Know a bit more what is vJoy and how it works
 

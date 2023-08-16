@@ -8,6 +8,7 @@
 #define ALWAYS_USE_HARD_CODED_VERSION
 
 #define HARD_CODED_VERSION "v2.2.2.0"
+#define HARD_CODED_VERSIONSHA "000000"
 
 #ifdef _WIN32
 #define popen _popen
@@ -55,7 +56,7 @@ int main(int argc, char** argv)
 
 #ifdef ALWAYS_USE_HARD_CODED_VERSION
     build_ncommits = "0";
-    sha1 = "Hardcoded";
+    sha1 = HARD_CODED_VERSIONSHA;
 #else
     /** Get the output */
     int buflen;
