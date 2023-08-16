@@ -21,7 +21,7 @@
 ;#define vJoyDllDirx86 "..\apps\External\DLL\x86"
 #define vJoyIconFile ".\Joystick-icon.ico"
 
-;#define DestSubDirX86 "x86"
+#define DestSubDirX86 "x86"
 #define DestSubDirX64 "x64"
 #define RegLocDirX86 "DllX86Location"
 #define RegLocDirX64 "DllX64Location"
@@ -114,14 +114,14 @@ Source: "{#vJoyAppsx64}\vJoyList.exe"; DestDir: "{app}\{#DestSubDirX64}"; Compon
 Name: "{group}\Uninstall vJoy"; Filename: "{uninstallexe}"
 ;Name: "{group}\Monitor vJoy"; Filename: "{app}\{#DestSubDirX86}\JoyMonitor.exe"; Components: Apps\vJoyMon  ; Check: IsX86
 ;Name: "{group}\Configure vJoy"; Filename: "{app}\{#DestSubDirX86}\vJoyConf.exe"; Components: Apps\vJoyConf ; Check: IsX86
-Name: "{group}\vJoy Feeder (Demo)"; Filename: "{app}\{#DestSubDirX86}\vJoyFeeder.exe"; Components: Apps\vJoyFeeder ; Check: IsX86
+;Name: "{group}\vJoy Feeder (Demo)"; Filename: "{app}\{#DestSubDirX86}\vJoyFeeder.exe"; Components: Apps\vJoyFeeder ; Check: IsX86
 Name: "{group}\Monitor vJoy"; Filename: "{app}\{#DestSubDirX64}\JoyMonitor.exe"; Components: Apps\vJoyMon  ; Check: IsX64
 Name: "{group}\Configure vJoy"; Filename: "{app}\{#DestSubDirX64}\vJoyConf.exe"; Components: Apps\vJoyConf ; Check: IsX64
 Name: "{group}\vJoy Feeder (Demo)"; Filename: "{app}\{#DestSubDirX64}\vJoyFeeder.exe"; Components: Apps\vJoyFeeder ; Check: IsX64
 Name: "{group}\vJoy Home"; Filename: "http://vjoystick.sourceforge.net/site"; Comment: "vJoy site"; IconFilename:  "{#vJoyIconFile}"
 Name: "{group}\vJoy SDK"; Filename: "http://vjoystick.sourceforge.net/redirect_download_vJoy2SDK.php"; Comment: "vJoy SDK"; IconFilename:  "{#vJoyIconFile}"
 Name: "{group}\vJoy Device List"; Filename: "{app}\{#DestSubDirX64}\vJoyList.exe"; Components: Apps\vJoyList ; Check: IsX64
-Name: "{group}\vJoy Device List"; Filename: "{app}\{#DestSubDirX86}\vJoyList.exe"; Components: Apps\vJoyList ; Check: IsX86
+;Name: "{group}\vJoy Device List"; Filename: "{app}\{#DestSubDirX86}\vJoyList.exe"; Components: Apps\vJoyList ; Check: IsX86
 
 [Registry]
 Root: HKCU; Subkey: "System\CurrentControlSet\Control\MediaProperties\PrivateProperties\Joystick\OEM\VID_1234&PID_BEAD"; ValueName: "OEMName";  ValueType: none; Flags:deletevalue  uninsdeletevalue
