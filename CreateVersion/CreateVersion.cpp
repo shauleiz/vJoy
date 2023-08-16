@@ -3,6 +3,12 @@
 #include <string.h>
 #include <stdio.h>
 #include <stdlib.h>
+
+// When building without git tools, use hardcoded version below
+#define ALWAYS_USE_HARD_CODED_VERSION
+
+#define HARD_CODED_VERSION "v2.2.2.0"
+
 #ifdef _WIN32
 #define popen _popen
 #define pclose _pclose
@@ -21,11 +27,10 @@ static void find_delim(char* s, char** res, int* ix)
 
 int main(int argc, char** argv)
 {
-    unsigned int major = 2, mid = 2, minor = 1, bugfix = 0, nbcommits = 0;
+    unsigned int major = 0, mid = 0, minor = 0, bugfix = 0, nbcommits = 0;
     char vbuf[4096] = { 0 };
-    char* version = "v0.0.0.0", * ncommits = "0", * sha = "0";
-    FILE* po;
-    int buflen;
+    // Hardcoded for v221 branch development
+    char* version = HARD_CODED_VERSION, * build_ncommits = "0", * sha1 = "0";
     int outval;
 
     // Open output file
@@ -45,22 +50,26 @@ int main(int argc, char** argv)
     fprintf(stderr, "Starting CreateVersion\n");
     if (argc != 2) {
         fprintf(stderr, "Usage: %s <Outputfile>\n", argv[0]);
-        outval = -1;
-        goto FINAL;
+        return -1;
     }
 
+#ifdef ALWAYS_USE_HARD_CODED_VERSION
+    build_ncommits = "0";
+    sha1 = "Hardcoded";
+#else
     /** Get the output */
-    po = popen("git describe --long --match  v*", "r");
+    int buflen;
+    FILE* po = popen("git describe --long --match  v*", "r");
     if (!po) {
-        perror("git describe");
+        fprintf(stderr, "git describe is missing, please install git for windows. Using default hardcoded version.\n");
         outval = -2;
-        goto FINAL;
+        goto PARSE_VERSION;
     }
 
     if (!fgets(vbuf, sizeof(vbuf), po)) {
-        fprintf(stderr, "git describe closed stream\n");
+        fprintf(stderr, "git describe closed stream is missing, please install git for windows. Using default hardcoded version.\n");
         outval = -3;
-        goto FINAL;
+        goto PARSE_VERSION;
     }
     pclose(po);
     buflen = (int)strlen(vbuf);
@@ -68,28 +77,27 @@ int main(int argc, char** argv)
     buflen -= 1;
 
     // SHA1	 (Remove the leading 'g')
-    find_delim(vbuf, &sha, &buflen);
-    sha++;
+    find_delim(vbuf, &sha1, &buflen);
+    sha1++;
 
     // Commit #	 - Will be used as build number
-    find_delim(vbuf, &ncommits, &buflen);
+    find_delim(vbuf, &build_ncommits, &buflen);
 
-
+PARSE_VERSION:
     // Version
     version = vbuf;
-    // Hardcoded for v221 branch development
-    version = "v2.2.1.1";
+#endif
 
     // Break the version number into its components
     int nFieldsVersion = sscanf_s(version, "v%u.%u.%u.%u", &major, &mid, &minor, &bugfix);
     if (nFieldsVersion < 3) {
-        fprintf(stderr, "Version string corrupt\n");
+        fprintf(stderr, "Version string wrongly formatted, value was %s\n", version);
         outval = -4;
         goto FINAL;
     }
 
     // Get number of commits
-    int nFieldsCommits = sscanf_s(ncommits, "%u", &nbcommits);
+    int nFieldsCommits = sscanf_s(build_ncommits, "%u", &nbcommits);
 
     // Case of version of type v2.1.9, in this case take last 4th number to be nb of commits
     if (nFieldsVersion == 3 && nFieldsCommits>0) {
@@ -121,18 +129,9 @@ FINAL:
     fprintf(f, "\n");
     fprintf(f, "#define FILEVER\t\t\t\t\"%u, %u, %u, %u\"\n", major, mid, minor, bugfix);
     fprintf(f, "#define PRODVER_TAG\t\t\t\"%s\"\n", version);
-    fprintf(f, "#define PRODVER_SHA1\t\t\"%s\"\n", sha);
+    fprintf(f, "#define PRODVER_SHA1\t\t\"%s\"\n", sha1);
     fprintf(f, "\n");
 
 
     return 0;
 }
-
-//#include "stdafx.h"
-//
-//
-//int main()
-//{
-//    return 0;
-//}
-//
