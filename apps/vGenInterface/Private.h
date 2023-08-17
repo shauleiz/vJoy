@@ -19,7 +19,7 @@ typedef struct
 		union 
 		{
 			XINPUT_GAMEPAD * vXboxPos;
-			JOYSTICK_POSITION_V2 * vJoyPos;
+			JOYSTICK_POSITION_V3 * vJoyPos;
 		} PPosition;
 	} DEVICE, *PDEVICE;
 

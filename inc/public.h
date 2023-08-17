@@ -70,7 +70,7 @@ DEFINE_GUID(GUID_DEVINTERFACE_VJOY, 0x781EF630, 0x72B2, 0x11d2, 0xB8, 0x52, 0x00
 #ifndef VER_X_
 #define VER_X_	2 // Must be within 0..0XF
 #define VER_H_	2 // Must be within 0..0XF
-#define VER_M_	1 // Must be within 0..0XF
+#define VER_M_	2 // Must be within 0..0XF
 #define VER_L_	0 // Must be within 0..0XF
 #endif
 
@@ -123,6 +123,7 @@ DEFINE_GUID(GUID_DEVINTERFACE_VJOY, 0x781EF630, 0x72B2, 0x11d2, 0xB8, 0x52, 0x00
 // just leave the 4th number off.
 // /!\ This number must matched what is written in the vjoy.inx file (root\VID_1234&PID_BEAD&REV_0XHM)
 #define	VERSION_N	(0x100*VER_X_ + 0x10*VER_H_ + VER_M_)
+
 // In case we want to move to 4digits, use following and change vjoy.inx accordingly
 //#define	VERSION_N	(0x1000*VER_X_ + 0x100*VER_H_ + 0*010*VER_M_ + VER_L_)
 
@@ -135,8 +136,8 @@ DEFINE_GUID(GUID_DEVINTERFACE_VJOY, 0x781EF630, 0x72B2, 0x11d2, 0xB8, 0x52, 0x00
 // Function codes;
 //#define LOAD_POSITIONS	0x910
 //#define GETATTRIB		0x911
-// #define GET_FFB_DATA	0x00222912	// METHOD_OUT_DIRECT + FILE_DEVICE_UNKNOWN	+ FILE_ANY_ACCESS
-//#define SET_FFB_STAT	0x913	 // METHOD_NEITHER
+//#define GET_FFB_DATA	0x00222912  // METHOD_OUT_DIRECT + FILE_DEVICE_UNKNOWN	+ FILE_ANY_ACCESS
+//#define SET_FFB_STAT	0x913	    // METHOD_NEITHER
 //#define GET_FFB_STAT	0x916
 
 #define F_LOAD_POSITIONS	0x910
@@ -183,7 +184,8 @@ DEFINE_GUID(GUID_DEVINTERFACE_VJOY, 0x781EF630, 0x72B2, 0x11d2, 0xB8, 0x52, 0x00
 
 
 
-typedef struct _HID_DEVICE_ATTRIBUTES {
+typedef struct _HID_DEVICE_ATTRIBUTES
+{
 
     ULONG           Size;
     //
@@ -377,7 +379,7 @@ typedef PJOYSTICK_POSITION_V3 PJOYSTICK_POSITION;
 // FFB device!
 //#define VJOY_FORCE_WRONG_FFB_HID
 
-// Max 1..128 effect block index, 10 simultaneously played
+// Max 1..100 effect block index, 10 simultaneously played
 #define VJOY_FFB_FIRST_EFFECT_ID            (1)
 #define VJOY_FFB_MAX_EFFECTS_BLOCK_INDEX    (100)
 #define VJOY_FFB_MAX_SIMULTANEOUS_EFFECTS   (10)

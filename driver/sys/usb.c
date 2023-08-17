@@ -248,7 +248,7 @@ Revision History:
 PCHAR
 DbgDevicePowerString(
     IN WDF_POWER_DEVICE_STATE Type
-    )
+)
 /*++
 
 Updated Routine Description:
@@ -256,26 +256,25 @@ Updated Routine Description:
 
 --*/
 {
-    switch (Type)
-    {
-    case WdfPowerDeviceInvalid:
-        return "WdfPowerDeviceInvalid";
-    case WdfPowerDeviceD0:
-        return "WdfPowerDeviceD0";
-    case PowerDeviceD1:
-        return "WdfPowerDeviceD1";
-    case WdfPowerDeviceD2:
-        return "WdfPowerDeviceD2";
-    case WdfPowerDeviceD3:
-        return "WdfPowerDeviceD3";
-    case WdfPowerDeviceD3Final:
-        return "WdfPowerDeviceD3Final";
-    case WdfPowerDevicePrepareForHibernation:
-        return "WdfPowerDevicePrepareForHibernation";
-    case WdfPowerDeviceMaximum:
-        return "PowerDeviceMaximum";
-    default:
-        return "UnKnown Device Power State";
+    switch (Type) {
+        case WdfPowerDeviceInvalid:
+            return "WdfPowerDeviceInvalid";
+        case WdfPowerDeviceD0:
+            return "WdfPowerDeviceD0";
+        case PowerDeviceD1:
+            return "WdfPowerDeviceD1";
+        case WdfPowerDeviceD2:
+            return "WdfPowerDeviceD2";
+        case WdfPowerDeviceD3:
+            return "WdfPowerDeviceD3";
+        case WdfPowerDeviceD3Final:
+            return "WdfPowerDeviceD3Final";
+        case WdfPowerDevicePrepareForHibernation:
+            return "WdfPowerDevicePrepareForHibernation";
+        case WdfPowerDeviceMaximum:
+            return "PowerDeviceMaximum";
+        default:
+            return "UnKnown Device Power State";
     }
 }
 

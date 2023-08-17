@@ -65,10 +65,10 @@ DRIVER_UNLOAD       HidKmdfUnload;
 #endif
 
 NTSTATUS
-DriverEntry (
+DriverEntry(
     _In_ PDRIVER_OBJECT  DriverObject,
     _In_ PUNICODE_STRING RegistryPath
-    )
+)
 /*++
 
 Routine Description:
@@ -137,7 +137,7 @@ Return Value:
     // Register with hidclass
     //
     status = HidRegisterMinidriver(&hidMinidriverRegistration);
-    if (!NT_SUCCESS(status) ){
+    if (!NT_SUCCESS(status)) {
         KdPrint(("HidRegisterMinidriver FAILED, returnCode=%x\n", status));
     }
 
@@ -149,7 +149,7 @@ NTSTATUS
 HidKmdfAddDevice(
     _In_ PDRIVER_OBJECT DriverObject,
     _In_ PDEVICE_OBJECT FunctionalDeviceObject
-    )
+)
 /*++
 
 Routine Description:
@@ -185,7 +185,7 @@ NTSTATUS
 HidKmdfPassThrough(
     _In_    PDEVICE_OBJECT  DeviceObject,
     _Inout_ PIRP            Irp
-    )
+)
 /*++
 
 Routine Description:
@@ -217,7 +217,7 @@ NTSTATUS
 HidKmdfPowerPassThrough(
     _In_    PDEVICE_OBJECT  DeviceObject,
     _Inout_ PIRP            Irp
-    )
+)
 /*++
 
 Routine Description:
@@ -253,7 +253,7 @@ Return Value:
 VOID
 HidKmdfUnload(
     _In_ PDRIVER_OBJECT DriverObject
-    )
+)
 /*++
 
 Routine Description:
@@ -272,7 +272,7 @@ Return Value:
 {
     UNREFERENCED_PARAMETER(DriverObject);
 
-    PAGED_CODE ();
+    PAGED_CODE();
 
     return;
 }

@@ -15,23 +15,23 @@ goto build64
 
 :build32
 echo %DATE% %TIME%: Cleaning vJoy (x86) 
-"%BUILDER%"  vjoy.sln  /maxcpucount:1 /t:clean /p:Platform=Win32;Configuration=%BuildMode%
+"%BUILDER%" vJoyAll.sln  /maxcpucount:1 /t:clean /p:Platform=Win32;Configuration=%BuildMode%
 set BUILD_STATUS=%ERRORLEVEL%
 if not %BUILD_STATUS%==0 goto fail
 
 echo %DATE% %TIME%: Building vJoy (x86)
-"%BUILDER%"  vjoy.sln  /maxcpucount:4  /p:Platform=Win32;Configuration=%BuildMode%
+"%BUILDER%" vJoyAll.sln  /maxcpucount:4  /p:Platform=Win32;Configuration=%BuildMode%
 set BUILD_STATUS=%ERRORLEVEL%
 if not %BUILD_STATUS%==0 goto fail
 
 :build64
 echo %DATE% %TIME%: Cleaning vJoy (x64)
-"%BUILDER%"  vjoy.sln  /maxcpucount:1 /t:clean /p:Platform=x64;Configuration=%BuildMode%
+"%BUILDER%" vJoyAll.sln  /maxcpucount:1 /t:clean /p:Platform=x64;Configuration=%BuildMode%
 set BUILD_STATUS=%ERRORLEVEL%
 if not %BUILD_STATUS%==0 goto fail
 
 echo %DATE% %TIME%: Building vJoy (x64)
-"%BUILDER%"  vjoy.sln  /maxcpucount:4  /p:Platform=x64;Configuration=%BuildMode%
+"%BUILDER%" vJoyAll.sln  /maxcpucount:4  /p:Platform=x64;Configuration=%BuildMode%
 set BUILD_STATUS=%ERRORLEVEL%
 if not %BUILD_STATUS%==0 goto fail
 

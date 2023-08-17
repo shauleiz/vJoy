@@ -52,13 +52,13 @@ OutputBaseFilename=vJoySetup
 SetupIconFile=install.ico
 Compression=lzma/Max
 SolidCompression=true
-DefaultDirName={pf}\{#MyShortAppName}
+DefaultDirName={commonpf}\{#MyShortAppName}
 DefaultGroupName={#MyShortAppName}
 VersionInfoCompany=Shaul Eizikovich
 AppCopyright=Copyright (c) 2005-2016 by Shaul Eizikovich
-;6.1.7601: Windows 7 with Service Pack 1
-;or Windows Server 2008 R2 with Service Pack 1 
-MinVersion = 6.1.7601 
+;10.0.14393: Windows 10 Version 1607 (Anniversary Update)
+;or Windows Server 2016
+MinVersion = 10.0.14393
 
 ;SignTool=DigiCert sign /sha1 "6d 54 71 df 6b bf af a5 d5 90 0c 88 c0 8d f0 e9 c5 13 69 0a"  /noInput  $f
 ;SignTool=sig sign /a /v /i DigiCert /t http://timestamp.digicert.com $f

@@ -387,7 +387,7 @@ void CreateFfbDesc(std::vector<BYTE>* buffer, BYTE ReportId)
 // Mask: Bit-mask representing the effects required
 void ModifyFfbEffectDesc(std::vector<BYTE>* buffer, UINT16 Mask)
 {
-    int Effect[]{ HID_USAGE_CONST,
+    int Effect[] { HID_USAGE_CONST,
         HID_USAGE_RAMP,
         HID_USAGE_SQUR,
         HID_USAGE_SINE,
@@ -552,7 +552,7 @@ int CreateHidReportDesc(void** data, UINT nButtons, bool* axes, int nPovHatsCont
     if (nPovHatsDir>VJOY_NUMBER_OF_HAT)
         nPovHatsDir = VJOY_NUMBER_OF_HAT;
 
-    BYTE AxesHID[]{
+    BYTE AxesHID[] {
         HID_USAGE_X,
         HID_USAGE_Y,
         HID_USAGE_Z,
@@ -1025,7 +1025,7 @@ void ReportConfSingleDev(BYTE ReportId)
         STDN_Exist && SPRNG_Exist && DMPR_Exist && INRT_Exist &&FRIC_Exist;
     BOOL FFB_none =
         !(CONST_Exist || RAMP_Exist || SQUR_Exist || SINE_Exist || TRNG_Exist  || STUP_Exist ||
-            STDN_Exist || SPRNG_Exist || DMPR_Exist || INRT_Exist ||FRIC_Exist);
+          STDN_Exist || SPRNG_Exist || DMPR_Exist || INRT_Exist ||FRIC_Exist);
 
     if (!g_frmtCmd) {
         // Human readable Printout

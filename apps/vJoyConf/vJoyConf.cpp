@@ -122,9 +122,9 @@ void				FfbCBChanged(void);
 UINT16				GetFfbEffectMask(void);
 
 int APIENTRY _tWinMain(_In_ HINSTANCE hInstance,
-    _In_opt_ HINSTANCE hPrevInstance,
-    _In_ LPTSTR    lpCmdLine,
-    _In_ int       nCmdShow)
+                       _In_opt_ HINSTANCE hPrevInstance,
+                       _In_ LPTSTR    lpCmdLine,
+                       _In_ int       nCmdShow)
 {
     UNREFERENCED_PARAMETER(hPrevInstance);
     UNREFERENCED_PARAMETER(lpCmdLine);
@@ -986,7 +986,7 @@ int CreateHidReportDesc(void** data, UINT nButtons, bool* axes, int nPovHatsCont
     if (nPovHatsDir>VJOY_NUMBER_OF_HAT)
         nPovHatsDir = VJOY_NUMBER_OF_HAT;
 
-    BYTE AxesHID[]{
+    BYTE AxesHID[] {
         HID_USAGE_X,
         HID_USAGE_Y,
         HID_USAGE_Z,
@@ -1383,11 +1383,11 @@ HWND CreateToolTip(HWND hDlg, const int arr[], int size)
 
     // Create the tooltip.
     HWND hwndTip = CreateWindowEx(NULL, TOOLTIPS_CLASS, NULL,
-        WS_POPUP | TTS_ALWAYSTIP | TTS_BALLOON | WS_EX_TOOLWINDOW,
-        CW_USEDEFAULT, CW_USEDEFAULT,
-        CW_USEDEFAULT, CW_USEDEFAULT,
-        hDlg, NULL,
-        g_hInstance, NULL);
+                                  WS_POPUP | TTS_ALWAYSTIP | TTS_BALLOON | WS_EX_TOOLWINDOW,
+                                  CW_USEDEFAULT, CW_USEDEFAULT,
+                                  CW_USEDEFAULT, CW_USEDEFAULT,
+                                  hDlg, NULL,
+                                  g_hInstance, NULL);
 
     if (!hwndTip)
         hwndToolTip = (HWND)NULL;
@@ -1753,7 +1753,7 @@ void CreateFfbDesc(std::vector<BYTE>* buffer, BYTE ReportId)
 // Mask: Bit-mask representing the effects required
 void ModifyFfbEffectDesc(std::vector<BYTE>* buffer, UINT16 Mask)
 {
-    int Effect[]{ HID_USAGE_CONST,
+    int Effect[] { HID_USAGE_CONST,
         HID_USAGE_RAMP,
         HID_USAGE_SQUR,
         HID_USAGE_SINE,

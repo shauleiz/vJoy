@@ -1,5 +1,6 @@
 # vJoy
 Virtual Joystick
+---
 
 For much more go to vJoy web site: http://vjoystick.sourceforge.net
 
@@ -12,78 +13,73 @@ To build the project:
 3. Run batch file CreateSDK.bat to copy SDK files (in SDK/ directory)
 
 Caution:
-You will need to install Visual Studio 2019 Community (Free) + WDK and MFC/ATL libraires with Spectre mitigation and InnoSetup 6.0.
+You will need to install Visual Studio 2022 Community (Free) + WDK and MFC/ATL libraires with Spectre mitigation and InnoSetup 6.0.
 To build the entire project including the driver you need to install the SDK and puchase a license to sign drivers.
 
 Justin's notes are now at the end of this document.
 
-### Benjamin's notes:
+## Benjamin's compiling notes
 
-1. Install VS2019 Community + Runtime/MFC/ATL Spectre mitigated librairies,
+1. Install VS2022 Community + Runtime/MFC/ATL Spectre mitigated librairies,
 all for v142.
-2. Install last WDK (10.0.18362.0) and last Windows 10 SDK (10.0.18362.0).
-3. Install Inno Setup 6.
+2. Install last WDK (10.0.22621.0) and last Windows 10 SDK (10.0.22621.0).
+3. Install Inno Setup 6.x.
 4. DigiCert utility is provided in the git tree for now, but you need a valid EV
 certificate. If you want to testsign the software, creates a WDKTestCertificate 
-from VS2019 and register it in the certificate store (see chapter below)
+from VS2022 and register it in the certificate store (see chapter below)
 5. Open BuildAll.bat and make sure all paths are correct.
-6. Launch Developer Command Prompt for VS2019
+6. Launch Developer Command Prompt for VS2022
 7. Run BuildAll.bat from command line. This will compile all software and build
 the installer.
 8. To build the SDK, run SDK\CreateSdk.bat from command line.
 
-#### When install failed (notes from Shaul's vJoy website)
+## When install failed (notes from Shaul's vJoy website):
 
 In case the installation failed, please post your problem in the forum. Attach two log files:
 
-The log file for the Inno Setup wrapper is called Setup Log 2011-11-01 #xxx.txt and is located under %TEMP% folder. (xxx can be any number in the range 001-999).
-The log file for the executable is called vJoyInstall.log and located in the vJoy folder (C:/Program Files/vJoy).
+1) The log file for the Inno Setup wrapper is called Setup Log 2011-11-01 #xxx.txt and is located under %TEMP% folder. (xxx can be any number in the range 001-999).
 
-#### Updating the version
+2) The log file for the executable is called vJoyInstall.log and located in the vJoy folder (C:/Program Files/vJoy).
 
-The version is automatically retrieved by checkversion.exe (see C++ project) 
-which calls internally git describe --all to retrieve version from last
-annoted tag stored in the git tree. How to update the version:
-- commit your changes
-- perform an annoted tag with git : git tag -a v2.1.9.2 -m "v2.1.9.2". To
-perform an annoted tag operation with TortoiseGit, simply add a message like 
-"v2.1.9.2" and Tortoise will automatically deduce it is an annoted tag.
-- **update the "vjoy.inx" file!!**: look for _%vjoy% = vjoy.Inst.Win7, 
-root\VID_1234&PID_0FFB&REV_0222_ and replace 0222 by the correct version.
-
-#### Know a bit more what is vJoy and how it works
+## Know a bit more what is vJoy and how it works
 
 Shaul wrote very good guides about vJoy's internal, please see:
 
-http://vjoystick.sourceforge.net/site/index.php/dev216/system-architecture
-Archived here:
+_[http://vjoystick.sourceforge.net/site/index.php/dev216/system-architecture]_
 https://web.archive.org/web/20190509030210/http://vjoystick.sourceforge.net/site/index.php/dev216/system-architecture
 
 
-http://vjoystick.sourceforge.net/site/index.php/dev216/internal-architecture
-
-How to remove completly vJoy when it is a complete mess:
-
-http://vjoystick.sourceforge.net/site/index.php/download-a-install/77-vjoy
-Archived here:
-http://vjoystick.sourceforge.net/site/index.php/download-a-install/77-vjoy
-
-Enter pnputil -e in the command-line window.
-Search for Shaul in the text you receive.
-If you don't find then vJoy is not installed
-If you find entries of the following type:
-[img]Driver store 2
-Write down the names of the OEM files (e.g. oem86.inf) associated with vJoy.
-Remove all OEM files associated with vJoy, one by one.
-To remove an OEM file  (e.g. oem86.inf) you need to enter pnputil -f -d oemXX.inf where XX stands for the appropriate number.
-(e.g pnputil -f -d oem86.inf)
-
-Notes on how the install process works:
-
-http://vjoystick.sourceforge.net/site/index.php/dev216/installer
+_[http://vjoystick.sourceforge.net/site/index.php/dev216/internal-architecture]_
+https://web.archive.org/web/20190509030210/http://vjoystick.sourceforge.net/site/index.php/dev216/internal-architecture
 
 
-#### Building a Debug or Release version for testing on a test computer
+### How to remove completly vJoy when it is a complete mess:
+
+Shaul's notes here:
+_[http://vjoystick.sourceforge.net/site/index.php/download-a-install/77-vjoy]_
+https://web.archive.org/web/20180602003145/http://vjoystick.sourceforge.net/site/index.php/download-a-install/77-vjoy
+
+This is an extract from the page :
+>1. Enter `pnputil -e` in the command-line window.
+>2. Search for `Shaul` in the text you receive. 
+>
+> &nbsp;
+> If you don't find then vJoy is not installed
+>
+> &nbsp;
+> If you find entries of the following type:
+>![Driver store 2](docs/readme/Driver_store_2.png)
+>
+>3. Write down the names of the OEM files (e.g. oem86.inf) associated with vJoy.
+>
+>4. Remove all OEM files associated with vJoy, one by one.
+>5. To remove an OEM file  (e.g. oem86.inf) you need to enter 
+>`pnputil -f -d oemXX.inf` where XX stands for the appropriate number.
+>(e.g `pnputil -f -d oem86.inf`)
+
+
+
+## Building a Debug or Release version for testing on a test computer
 
 Since you need a EV certificate to build the public driver (which is expensive),
 there is still a solution for developping, debugging and testing.
@@ -101,8 +97,7 @@ on a test computer with the test certificate.
 To build the solution, the easiest solution is to run the provided batch file 
 from either a cmd.exe prompt, or from within visual Studio, see:
 
-http://geekswithblogs.net/SoftwareDoneRight/archive/2010/01/28/running-batch-files-from-the-solution-explorer-in-visual-studio.aspx
-
+https://web.archive.org/web/20210119130340/http://geekswithblogs.net/SoftwareDoneRight/archive/2010/01/28/running-batch-files-from-the-solution-explorer-in-visual-studio.aspx
 
 The test computer must enable loading of test signed driver, see:
 
@@ -125,14 +120,53 @@ https://docs.microsoft.com/en-us/windows-hardware/drivers/develop/signing-a-driv
 
 https://docs.microsoft.com/en-us/windows-hardware/drivers/install/installing-a-test-certificate-on-a-test-computer
 
+## Updating the internal vJoy version
 
-#### Building a release version for public release
+The version is automatically retrieved from git tag by checkversion.exe (see C++ project) 
+which calls internally `git describe --all` to retrieve version from last
+annoted tag stored in the git tree. How to update the version:
+- commit your changes
+- perform an annoted tag with git : git tag -a v2.1.9.2 -m "v2.1.9.2". To
+perform an annoted tag operation with TortoiseGit, simply add a message like 
+"v2.1.9.2" and Tortoise will automatically deduce it is an annoted tag.
+- **update the "vjoy.inx" file!!**: look for _%vjoy% = vjoy.Inst.Win7, 
+root\VID_1234&PID_0FFB&REV_0222_ and replace 0222 by the correct version.
+
+## Building a release version for public release
 
 The same procedure as below, but you need a valid EV certificate and select 
 "Production Sign" in the Driver Signing page in each VS project file.
 
+### Compiling and redistibuting vJoy's internal apps - Installer
 
-#### Developping and debugging vJoy
+When updating your build system (like update from VSXX to VSYY), place
+the C++ dll dependencies in apps\External\DLL
+
+Shaul gave a detailled explanation how the installer works:
+_[http://vjoystick.sourceforge.net/site/index.php/dev216/installer]_
+https://web.archive.org/web/20190509030210/http://vjoystick.sourceforge.net/site/index.php/dev216/installer
+
+_[http://vjoystick.sourceforge.net/site/index.php/download-a-install/deployment216/vjoy-installer]_
+https://web.archive.org/web/20190509030211/http://vjoystick.sourceforge.net/site/index.php/download-a-install/deployment216/vjoy-installer
+
+### Apps documentation
+
+**vJoyConf:**
+https://web.archive.org/web/20190509030211/http://vjoystick.sourceforge.net/site/index.php/utilities-218/vjoyconf
+
+**vJoyConfig:**
+https://web.archive.org/web/20190509030211/http://vjoystick.sourceforge.net/site/index.php/utilities-218/vjoyconfig
+
+**Monitor:**
+https://web.archive.org/web/20190509030211/http://vjoystick.sourceforge.net/site/index.php/utilities-218/monitor
+
+**vJoyList:**
+https://web.archive.org/web/20190509030208/http://vjoyhttp://vjoystick.sourceforge.net/site/index.php/utilities-218/vjoyfeederstick.sourceforge.net/site/index.php/utilities-218/vjoylist
+
+**vJoyFeeder:**
+https://web.archive.org/web/20190509030211/http://vjoystick.sourceforge.net/site/index.php/utilities-218/vjoyfeeder
+
+## Developping and debugging vJoy
 
 Once you have configured your Visual Studio to use a test certificate, you
 can deploy and debug your driver in a targtet - or test - computer.
@@ -151,7 +185,7 @@ https://docs.microsoft.com/en-us/windows-hardware/drivers/gettingstarted/provisi
 
 https://docs.microsoft.com/en-us/windows-hardware/drivers/debugger/debug-universal-drivers---step-by-step-lab--echo-kernel-mode-
 
-For NET debugging, see also:
+For network kernel debugging (KDNET), see also:
 
 https://docs.microsoft.com/en-us/windows-hardware/drivers/debugger/setting-up-a-network-debugging-connection-automatically
 
@@ -164,7 +198,18 @@ A tutorial is given here:
 
 https://docs.microsoft.com/en-us/windows-hardware/drivers/debugger/getting-started-with-windbg--kernel-mode-
 
-##### Usefull WinDbg commands
+
+### Build in Debug mode and display traces messages
+
+To build in Debug mode, you need to change the BuildAll.bat script:
+
+```
+REM SET BuildMode=Release
+SET BuildMode=Debug
+```
+
+
+### Usefull WinDbg commands
 
 If you want to see the traces in the driver's code, you need to remove all 
 filtering in the debugger:
@@ -198,13 +243,7 @@ To get information about vJoy module, type :
 
 
 
-### Compiling and redistibuting vJoy's apps
-
-When updating your build system (like update from VSXX to VSYY), place
-the C++ dll dependencies in apps\External\DLL
-
-
-### Older Justin's notes:
+# Older Justin's notes:
 1. Install Visual Studio 2013
 2. Install Visual Studio 2015 Update 3
 3. Install Windows 10 SDK 1511

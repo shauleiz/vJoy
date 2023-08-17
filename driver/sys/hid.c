@@ -157,7 +157,7 @@ Return Value:
 
             if (!NT_SUCCESS(status)) {
                 TraceEvents(TRACE_LEVEL_ERROR, DBG_IOCTL,
-                    "WdfRequestForwardToIoQueue failed with status: 0x%x\n", status);
+                            "WdfRequestForwardToIoQueue failed with status: 0x%x\n", status);
 
                 WdfRequestComplete(Request, status);
             }
@@ -229,7 +229,7 @@ Return Value:
             status = WdfRequestForwardToIoQueue(Request, devContext->FfbWriteQ[id-1]);
             if (!NT_SUCCESS(status)) {
                 TraceEvents(TRACE_LEVEL_ERROR, DBG_IOCTL,
-                    "WdfRequestForwardToIoQueue (FfbWriteQ[%d]) failed with status: 0x%x\n", id - 1, status);
+                            "WdfRequestForwardToIoQueue (FfbWriteQ[%d]) failed with status: 0x%x\n", id - 1, status);
                 WdfRequestComplete(Request, status);
             }
             TraceEvents(TRACE_LEVEL_VERBOSE, DBG_IOCTL, "vJoyEvtInternalDeviceControl[IOCTL_HID_WRITE_REPORT]: forwarded to queue and leaving with stt=0x%x !\n", status);
@@ -382,7 +382,7 @@ vJoyGetFeature(
             ucTmp[4] = 1; // Load Error =1
         };
         TraceEvents(TRACE_LEVEL_VERBOSE, DBG_FFB, "vJoyGetFeature: Block Load ucTmp[1]=%x ucTmp[2]=%x ucTmp[3]=%x ucTmp[4]=%x\n",
-            transferPacket->reportBuffer[1], transferPacket->reportBuffer[2], transferPacket->reportBuffer[3], transferPacket->reportBuffer[4]);
+                    transferPacket->reportBuffer[1], transferPacket->reportBuffer[2], transferPacket->reportBuffer[3], transferPacket->reportBuffer[4]);
     }
 
     ////////////////////////////////////////
@@ -401,7 +401,7 @@ vJoyGetFeature(
             ucTmp[3] = (UCHAR)((devContext->FfbPIDData[id-1].PIDPool.MaxSimultaneousEffects)&0xFF);
             ucTmp[4] = (UCHAR)((devContext->FfbPIDData[id-1].PIDPool.MemoryManagement)&0xFF);
             TraceEvents(TRACE_LEVEL_VERBOSE, DBG_FFB, "vJoyGetFeature: PoolRep ucTmp[1]=%x ucTmp[2]=%x ucTmp[3]=%x ucTmp[4]=%x\n",
-                transferPacket->reportBuffer[1], transferPacket->reportBuffer[2], transferPacket->reportBuffer[3], transferPacket->reportBuffer[4]);
+                        transferPacket->reportBuffer[1], transferPacket->reportBuffer[2], transferPacket->reportBuffer[3], transferPacket->reportBuffer[4]);
         } else {
             // FFB Disabled
             ucTmp[1] = (UCHAR)(0);
@@ -414,7 +414,7 @@ vJoyGetFeature(
             return status;
         }
         TraceEvents(TRACE_LEVEL_VERBOSE, DBG_FFB, "vJoyGetFeature: Pool ucTmp[1]=%x ucTmp[2]=%x ucTmp[3]=%x ucTmp[4]=%x\n",
-            transferPacket->reportBuffer[1], transferPacket->reportBuffer[2], transferPacket->reportBuffer[3], transferPacket->reportBuffer[4]);
+                    transferPacket->reportBuffer[1], transferPacket->reportBuffer[2], transferPacket->reportBuffer[3], transferPacket->reportBuffer[4]);
     }
 
     ////////////////////////////////////////
@@ -435,7 +435,7 @@ vJoyGetFeature(
             ucTmp[2] = (UCHAR)(0);
         }
         TraceEvents(TRACE_LEVEL_VERBOSE, DBG_FFB, "vJoyGetFeature: State report ucTmp[1]=%x ucTmp[2]=%x\n",
-            transferPacket->reportBuffer[1], transferPacket->reportBuffer[2]);
+                    transferPacket->reportBuffer[1], transferPacket->reportBuffer[2]);
     }
 
     TraceEvents(TRACE_LEVEL_INFORMATION, DBG_IOCTL, "vJoyGetFeature: exiting with stt=%d\n", status);
@@ -2557,10 +2557,10 @@ VOID FfbTransferData(
         // Intercept Ffb Create New Effect and Free Effect
 
         TraceEvents(TRACE_LEVEL_VERBOSE, DBG_FFB, "FfbTransferData transferPacket DataSize=%d, id=%x len=%d  buf=",
-            DataSize, transferPacket->reportId, transferPacket->reportBufferLen);
+                    DataSize, transferPacket->reportId, transferPacket->reportBufferLen);
         for (ULONG i = 0; i<transferPacket->reportBufferLen; i++) {
             TraceEvents(TRACE_LEVEL_VERBOSE, DBG_FFB, "%x ",
-                transferPacket->reportBuffer[i]
+                        transferPacket->reportBuffer[i]
             );
         }
         TraceEvents(TRACE_LEVEL_VERBOSE, DBG_FFB, "\n");
@@ -2825,7 +2825,7 @@ BOOLEAN Ffb_ProcessPacket(
     PUCHAR packet = (PUCHAR)&buffer[2*sizeof(ULONG)];
     for (ULONG i = 0; i<(len-8); i++) {
         TraceEvents(TRACE_LEVEL_VERBOSE, DBG_INIT, "%x ",
-            packet[i]
+                    packet[i]
         );
     }
     TraceEvents(TRACE_LEVEL_VERBOSE, DBG_INIT, "\n");
@@ -2846,21 +2846,24 @@ BOOLEAN Ffb_ProcessPacket(
     switch (tp) {
         // Next are write reports
 
-        case HID_ID_CTRLREP: {
+        case HID_ID_CTRLREP:
+        {
             // Catch PID control report
             BYTE Control = packet[1];
             TraceEvents(TRACE_LEVEL_VERBOSE, DBG_FFB, "Ffb_ProcessPacket: PID DEVICE CONTROL=%d\n", Control);
             switch (Control) {
                 // CTRL_DEVRST
                 // Device Reset– Clears any device paused condition, enables all actuators and clears all effects from memory.
-                case 4: {
+                case 4:
+                {
                     Ffb_ResetPIDData(devContext, id);
                     TraceEvents(TRACE_LEVEL_VERBOSE, DBG_FFB, "Ffb_ProcessPacket: PID RESET !\n");
                 } break;
             }
         } break;
 
-        case HID_ID_BLKFRREP: {
+        case HID_ID_BLKFRREP:
+        {
             // Catch Block free report
             BYTE eid = packet[1];
             TraceEvents(TRACE_LEVEL_VERBOSE, DBG_FFB, "Ffb_ProcessPacket: BLOCK FREE eid=%d\n", eid);
@@ -2871,9 +2874,10 @@ BOOLEAN Ffb_ProcessPacket(
 
         } break;
 
-            // Next are Feature report
+        // Next are Feature report
 
-        case (HID_ID_NEWEFREP+0x10): {
+        case (HID_ID_NEWEFREP+0x10):
+        {
             // Catch New effect report
 
             // Find new effect block index. 0 will be returned in case of an error
@@ -2902,17 +2906,20 @@ BOOLEAN Ffb_ProcessPacket(
             TraceEvents(TRACE_LEVEL_VERBOSE, DBG_FFB, "Ffb_ProcessPacket: CREATE NEW EFFECT eid=%d\n", eid);
         } break;
 
-        case (HID_ID_BLKLDREP+0x10): {
+        case (HID_ID_BLKLDREP+0x10):
+        {
             // Handled in vJoyGetFeature()
             TraceEvents(TRACE_LEVEL_VERBOSE, DBG_FFB, "Ffb_ProcessPacket: BLOCK LOAD\n");
         } break;
 
-        case (HID_ID_POOLREP+0x10): {
+        case (HID_ID_POOLREP+0x10):
+        {
             // Handled in vJoyGetFeature()
             TraceEvents(TRACE_LEVEL_VERBOSE, DBG_FFB, "Ffb_ProcessPacket: POOL\n");
         } break;
 
-        case (HID_ID_STATEREP+0x10): {
+        case (HID_ID_STATEREP+0x10):
+        {
             // Handled in vJoyGetFeature()
             TraceEvents(TRACE_LEVEL_VERBOSE, DBG_FFB, "Ffb_ProcessPacket: STATE REPORT\n");
         } break;
@@ -2923,7 +2930,7 @@ BOOLEAN Ffb_ProcessPacket(
     packet = (PUCHAR)&buffer[2*sizeof(ULONG)];
     for (ULONG i = 0; i<(len-8); i++) {
         TraceEvents(TRACE_LEVEL_VERBOSE, DBG_FFB, "%x ",
-            packet[i]
+                    packet[i]
         );
     }
     TraceEvents(TRACE_LEVEL_VERBOSE, DBG_FFB, "\n");
