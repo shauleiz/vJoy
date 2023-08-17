@@ -923,7 +923,7 @@ begin
   // Merge file to registry
   if (not FileExists(ExpandConstant('{src}\'+FileName))) then
     begin
-      Log('InitFromRegistry(): File' + ExpandConstant('{src}\'+FileName) + ' not found');
+      Log('InitFromRegistry(): Default optional registry File' + ExpandConstant('{src}\'+FileName) + ' not found, continue without it');
       exit;
     end;
 
