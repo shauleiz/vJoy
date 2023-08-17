@@ -93,20 +93,13 @@ Return Value:
     // Initialize WPP Tracing
     //
     WPP_INIT_TRACING(DriverObject, RegistryPath);
-    // TraceEvents(TRACE_LEVEL_INFORMATION, DBG_INIT, "vJoy Driver Built %s %s\n", __DATE__, __TIME__);
-    // KdBreakPoint(); Break at the entry point to the driver
 
-    // Since there is only one control-device for all the instances
-    // of the physical device, we need an ability to get to particular instance
-    // of the device in our FilterEvtIoDeviceControlForControl. For that we
-    // will create a collection object and store filter device objects.        
-    // The collection object has the driver object as a default parent.
-    //
+    TraceEvents(TRACE_LEVEL_INFORMATION, DBG_INIT, "vJoy Driver Built %s %s\n", __DATE__, __TIME__);
+    // KdBreakPoint(); Break at the entry point to the driver, use for debug only
 
     // To build a single driver binary that runs both in Windows 8 and in earlier versions of Windows, use the POOL_NX_OPTIN opt-in mechanism. 
     ExInitializeDriverRuntime(DrvRtPoolNxOptIn);
 
-    
     //
     //// Create a framework driver object to represent our driver.
     //
@@ -127,23 +120,28 @@ Return Value:
     //attributes.ExecutionLevel = WdfExecutionLevelPassive;
 
     status = WdfDriverCreate(DriverObject,
-        RegistryPath,
-        /*&attributes*/ WDF_NO_OBJECT_ATTRIBUTES,
-        &config,
-        &hDriver);
+                             RegistryPath,
+                             /*&attributes*/ WDF_NO_OBJECT_ATTRIBUTES,
+                             &config,
+                             &hDriver);
     if (!NT_SUCCESS(status)) {
         KdPrint(("WdfDriverCreate failed with status 0x%x\n", status));
         LogEventWithStatus(ERRLOG_DRIVER_FAILED, L"WdfDriverCreate", DriverObject, status);
         return status;
     };
 
+    // Since there is only one control-device for all the instances
+    // of the physical device, we need an ability to get to particular instance
+    // of the device in our FilterEvtIoDeviceControlForControl. For that we
+    // will create a collection object and store filter device objects.        
+    // The collection object has the driver object as a default parent.
+    //
     status = WdfCollectionCreate(WDF_NO_OBJECT_ATTRIBUTES, &vJoyDeviceCollection);
     if (!NT_SUCCESS(status)) {
         KdPrint(("WdfCollectionCreate failed with status 0x%x\n", status));
         LogEventWithStatus(ERRLOG_DRIVER_FAILED, L"WdfCollectionCreate", DriverObject, status);
         return status;
     }
-
 
 
     status = WdfWaitLockCreate(WDF_NO_OBJECT_ATTRIBUTES, &vJoyDeviceCollectionLock);
@@ -673,7 +671,7 @@ vJoyWriteReport(
     WdfRequestCompleteWithInformation(FfbRequest, status, bytesReturned);
 
     return status;
-    }
+}
 
 
 #endif // 0
@@ -751,7 +749,7 @@ Return Value:
         status = WdfRequestRetrieveOutputBuffer(request, bytesToCopy, &HidReport, &bytesReturned);
         if (!NT_SUCCESS(status)) {
             TraceEvents(TRACE_LEVEL_ERROR, DBG_IOCTL,
-                "WdfRequestRetrieveOutputBuffer failed with status: 0x%x\n", status);
+                        "WdfRequestRetrieveOutputBuffer failed with status: 0x%x\n", status);
         } else {
             // Copy the data stored in the Device Context into the the output buffer
             if (vJoyGetPositionData(HidReport, pDevContext, id, bytesReturned) != STATUS_SUCCESS)
@@ -1215,9 +1213,9 @@ None.
         // is longer than the buffer.
         //
         status = RtlStringCbVPrintfA(debugMessageBuffer,
-            sizeof(debugMessageBuffer),
-            DebugMessage,
-            list);
+                                     sizeof(debugMessageBuffer),
+                                     DebugMessage,
+                                     list);
         if (!NT_SUCCESS(status)) {
 
             DbgPrint(_DRIVER_NAME_": RtlStringCbVPrintfA failed 0x%x\n", status);
@@ -1225,7 +1223,7 @@ None.
         }
         if (TraceEventsLevel <= TRACE_LEVEL_ERROR ||
             (TraceEventsLevel <= DebugLevel &&
-                ((TraceEventsFlag & DebugFlag) == TraceEventsFlag))) {
+             ((TraceEventsFlag & DebugFlag) == TraceEventsFlag))) {
             DbgPrint("%s%s", _DRIVER_NAME_, debugMessageBuffer);
         }
     }
@@ -1237,7 +1235,7 @@ None.
     UNREFERENCED_PARAMETER(TraceEventsFlag);
     UNREFERENCED_PARAMETER(DebugMessage);
 #endif
-    }
+}
 
 #endif
 
