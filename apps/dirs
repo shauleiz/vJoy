@@ -1,7 +1,0 @@
-DIRS= \
- 	 common \
-    vJoyClient \
-     vJoyInstall \
-	 vJoyConf \     
-	 vJoyFeeder \
-	 FfbMon \
