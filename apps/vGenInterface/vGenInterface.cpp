@@ -16,6 +16,8 @@
 #include "private.h"
 
 #pragma comment(lib, "vJoyInterfaceStat.lib")
+
+//Copy XOutputStatic_1_2.lib from vGen project output before compiling this
 #pragma comment(lib, "XOutputStatic_1_2.lib")
 
 extern "C" {
@@ -213,7 +215,7 @@ VGENINTERFACE_API BOOL UpdateVJD(UINT rID, PVOID pData)	// Update the position d
 			return TRUE;
 	}
 	else
-		 return vJoyNS::UpdateVJD(rID, pData);
+		 return vJoyNS::UpdateVJD(rID, (JOYSTICK_POSITION_V3*)pData);
 }
 
 VGENINTERFACE_API BOOL SetAxis(LONG Value, UINT rID, UINT Axis)		// Write Value to a given axis defined in the specified VDJ 
@@ -397,10 +399,10 @@ VGENINTERFACE_API BOOL 	FfbStart(UINT rID) { return  TRUE; }
 VGENINTERFACE_API VOID 	FfbStop(UINT rID) { return; }
 VGENINTERFACE_API BOOL 	IsDeviceFfb(UINT rID) { return  vJoyNS::IsDeviceFfb(rID); }
 VGENINTERFACE_API BOOL 	IsDeviceFfbEffect(UINT rID, UINT Effect) { return  vJoyNS::IsDeviceFfbEffect(rID, Effect); }
-VGENINTERFACE_API DWORD Ffb_h_DeviceID(const FFB_DATA * Packet, int *DeviceID) { return  vJoyNS::Ffb_h_DeviceID(Packet, DeviceID); }
+VGENINTERFACE_API DWORD Ffb_h_DeviceID(const FFB_DATA * Packet, UINT*DeviceID) { return  vJoyNS::Ffb_h_DeviceID(Packet, DeviceID); }
 VGENINTERFACE_API DWORD Ffb_h_Type(const FFB_DATA * Packet, FFBPType *Type) { return  vJoyNS::Ffb_h_Type(Packet, Type); }
-VGENINTERFACE_API DWORD Ffb_h_Packet(const FFB_DATA * Packet, WORD *Type, int *DataSize, BYTE *Data[]) { return  vJoyNS::Ffb_h_Packet(Packet, Type, DataSize, Data); }
-VGENINTERFACE_API DWORD Ffb_h_EBI(const FFB_DATA * Packet, int *Index) { return  vJoyNS::Ffb_h_EBI(Packet, Index); }
+VGENINTERFACE_API DWORD Ffb_h_Packet(const FFB_DATA * Packet, WORD *Type, UINT*DataSize, BYTE *Data[]) { return  vJoyNS::Ffb_h_Packet(Packet, Type, DataSize, Data); }
+VGENINTERFACE_API DWORD Ffb_h_EBI(const FFB_DATA * Packet, UINT*Index) { return  vJoyNS::Ffb_h_EBI(Packet, Index); }
 VGENINTERFACE_API DWORD Ffb_h_Eff_Report(const FFB_DATA * Packet, FFB_EFF_REPORT*  Effect) { return  vJoyNS::Ffb_h_Eff_Report(Packet, Effect); }
 //VGENINTERFACE_API DWORD Ffb_h_Eff_Const(const FFB_DATA * Packet, FFB_EFF_REPORT*  Effect) { return  vJoyNS::Ffb_h_Eff_Report(Packet, Effect); }
 VGENINTERFACE_API DWORD Ffb_h_Eff_Ramp(const FFB_DATA * Packet, FFB_EFF_RAMP*  RampEffect) { return  vJoyNS::Ffb_h_Eff_Ramp(Packet,   RampEffect); }
@@ -2123,7 +2125,7 @@ HDEVICE CreateDevice(DevType Type, UINT i)
 	pdev->Type = Type;
 	if (Type == vJoy)
 	{
-		pdev->PPosition.vJoyPos = new JOYSTICK_POSITION_V2;
+		pdev->PPosition.vJoyPos = new JOYSTICK_POSITION_V3;
 		h = i;
 	}
 	else
@@ -2226,7 +2228,7 @@ BOOL ConvertPosition_vJoy2vXbox(void *vJoyPos, void *vXboxPos)
 		return FALSE;
 
 	// Convert the input position
-	JOYSTICK_POSITION_V2 * inPos = (JOYSTICK_POSITION_V2 *)vJoyPos;
+	JOYSTICK_POSITION_V3 * inPos = (JOYSTICK_POSITION_V3 *)vJoyPos;
 
 	// Convert the output position
 	XINPUT_GAMEPAD * position = (XINPUT_GAMEPAD *)vXboxPos;

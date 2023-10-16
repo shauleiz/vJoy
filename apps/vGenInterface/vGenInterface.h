@@ -183,15 +183,18 @@ typedef struct _FFB_EFF_REPORT {
 	WORD		Duration;// Value in milliseconds. 0xFFFF means infinite
 	WORD		TrigerRpt;
 	WORD		SamplePrd;
+	WORD		StartDelay;
 	BYTE		Gain;
 	BYTE		TrigerBtn;
+	BYTE		AxesEnabledDirection;
+
 	BOOL		Polar; // How to interpret force direction Polar (0-360°) or Cartesian (X,Y)
 	union
 	{
-		BYTE	Direction; // Polar direction: (0x00-0xFF correspond to 0-360°)
-		BYTE	DirX; // X direction: Positive values are To the right of the center (X); Negative are Two's complement
+		WORD	Direction; // Polar direction: (0x00-0x7FFF correspond to 0-360°)
+		WORD	DirX; // X direction: Positive values are To the right of the center (X); Negative are Two's complement
 	};
-	BYTE		DirY; // Y direction: Positive values are below the center (Y); Negative are Two's complement
+	WORD		DirY; // Y direction: Positive values are below the center (Y); Negative are Two's complement
 } FFB_EFF_REPORT, *PFFB_EFF_REPORT;
 //} FFB_EFF_CONST, *PFFB_EFF_CONST;
 
@@ -331,10 +334,10 @@ extern "C" {
 	VGENINTERFACE_API BOOL		__cdecl	IsDeviceFfbEffect(UINT rID, UINT Effect);
 
 	//  Force Feedback (FFB) helper functions
-	VGENINTERFACE_API DWORD 	__cdecl	Ffb_h_DeviceID(const FFB_DATA * Packet, int *DeviceID);
+	VGENINTERFACE_API DWORD 	__cdecl	Ffb_h_DeviceID(const FFB_DATA * Packet, UINT*DeviceID);
 	VGENINTERFACE_API DWORD 	__cdecl Ffb_h_Type(const FFB_DATA * Packet, FFBPType *Type);
-	VGENINTERFACE_API DWORD 	__cdecl Ffb_h_Packet(const FFB_DATA * Packet, WORD *Type, int *DataSize, BYTE *Data[]);
-	VGENINTERFACE_API DWORD 	__cdecl Ffb_h_EBI(const FFB_DATA * Packet, int *Index);
+	VGENINTERFACE_API DWORD 	__cdecl Ffb_h_Packet(const FFB_DATA * Packet, WORD *Type, UINT*DataSize, BYTE *Data[]);
+	VGENINTERFACE_API DWORD 	__cdecl Ffb_h_EBI(const FFB_DATA * Packet, UINT*Index);
 	VGENINTERFACE_API DWORD 	__cdecl Ffb_h_Eff_Report(const FFB_DATA * Packet, FFB_EFF_REPORT*  Effect);
 	//__declspec(deprecated("** Ffb_h_Eff_Const function was deprecated - Use function Ffb_h_Eff_Report **")) \
 	//VGENINTERFACE_API DWORD 	__cdecl Ffb_h_Eff_Const(const FFB_DATA * Packet, FFB_EFF_REPORT*  Effect);

@@ -6,7 +6,7 @@
 #include <commctrl.h>
 //#include <richedit.h>
 #include "resource.h"
-#include "..\..\..\inc\public.h"
+#include <public.h>
 
 
 

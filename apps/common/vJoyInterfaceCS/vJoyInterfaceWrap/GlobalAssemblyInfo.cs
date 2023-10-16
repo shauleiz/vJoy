@@ -38,7 +38,7 @@ using System.Runtime.InteropServices;
 //      Minor Version 
 //      Revision
 //      Build
-[assembly: AssemblyInformationalVersionAttribute("0.2.1.6")]
-[assembly: AssemblyVersion("0.2.1.6")]
-[assembly: AssemblyFileVersion("2.1.6.999")]
+[assembly: AssemblyInformationalVersionAttribute("2.2.0.0")]
+[assembly: AssemblyVersion("2.2.0.0")]
+[assembly: AssemblyFileVersion("2.2.0.0")]
 //[assembly: AssemblyTitle("vJoyInterfaceWrap - Built 2015/10/15 12:24:44 from r813M")] // This is visible as the "File Description" on the Details tab of the Explorer pane

@@ -25,7 +25,7 @@ Environment:
     Kernel mode only.
 
 --*/
-	  
+
 #include <vjoy.h>
 #include "rawpdo.h"
 #include <Ntddk.h>
@@ -35,9 +35,9 @@ Environment:
 #endif
 
 #ifdef ALLOC_PRAGMA
-    #pragma alloc_text( PAGE, rawEvtCleanupCallback)
-    #pragma alloc_text( PAGE, vJoy_EvtDeviceFileCreate)
-    #pragma alloc_text( PAGE, vJoy_EvtFileCleanup)
+#pragma alloc_text( PAGE, rawEvtCleanupCallback)
+#pragma alloc_text( PAGE, vJoy_EvtDeviceFileCreate)
+#pragma alloc_text( PAGE, vJoy_EvtFileCleanup)
 #endif
 
 VOID
@@ -47,7 +47,7 @@ vJoy_EvtIoDeviceControlForRawPdo(
     IN size_t        OutputBufferLength,
     IN size_t        InputBufferLength,
     IN ULONG         IoControlCode
-    )
+)
 /*++
 
 Routine Description:
@@ -74,41 +74,41 @@ Return Value:
 
 --*/
 {
-    NTSTATUS status = STATUS_SUCCESS;
+    NTSTATUS            status = STATUS_SUCCESS;
     //WDFDEVICE parent;
     //WDF_REQUEST_FORWARD_OPTIONS forwardOptions;
-    PDEVICE_EXTENSION    pDevContext = NULL;
-	//WDFMEMORY  inMemory, outMemory;
-    PVOID  buffer;
-    size_t  bufSize;
-    WDFDEVICE            hRawDevice = WdfIoQueueGetDevice(Queue);
-	PRPDO_DEVICE_DATA pdoData = PdoGetData(hRawDevice);
-	//WDF_REQUEST_SEND_OPTIONS RequestOptions;
-	//WDFIOTARGET TargetOnParent;
+    PDEVICE_EXTENSION   pDevContext = NULL;
+    //WDFMEMORY  inMemory, outMemory;
+    PVOID               buffer;
+    size_t              bufSize;
+    WDFDEVICE           hRawDevice = WdfIoQueueGetDevice(Queue);
+    PRPDO_DEVICE_DATA   pdoData = PdoGetData(hRawDevice);
+    //WDF_REQUEST_SEND_OPTIONS RequestOptions;
+    //WDFIOTARGET TargetOnParent;
 
-	JOYSTICK_POSITION_V2 * iReport;
-	WDFFILEOBJECT FileObj;
-	USHORT id=0;
-	PFILEOBJECT_EXTENSION pExtension=NULL;
+    JOYSTICK_POSITION* iReport;
+    WDFFILEOBJECT       FileObj;
+    USHORT              id = 0;
+    PFILEOBJECT_EXTENSION pExtension = NULL;
 
     //WDFREQUEST				requestForceFeedback;
-	//PHID_XFER_PACKET		transferPacket = NULL;
-	//PVOID					ForceFeedbackBuffer = NULL;
-	PVOID					GenBuffer = NULL;
-	size_t					bytesReturned = 0;
-	WDF_REQUEST_PARAMETERS	Params;
-	//BOOLEAN					FfbStat = FALSE;
-	ULONG					bytesToCopy = 0;
-	BYTE					Byte_tmp;
+    //PHID_XFER_PACKET		transferPacket = NULL;
+    //PVOID					ForceFeedbackBuffer = NULL;
+    PVOID               GenBuffer = NULL;
+    size_t              bytesReturned = 0;
+    WDF_REQUEST_PARAMETERS  Params;
+    //BOOLEAN					FfbStat = FALSE;
+    ULONG               bytesToCopy = 0;
+    BYTE                Byte_tmp;
+    ULONG               reqSize = 0;
 
 
 
 
-    
     UNREFERENCED_PARAMETER(OutputBufferLength);
     UNREFERENCED_PARAMETER(InputBufferLength);
 
-	TraceEvents(TRACE_LEVEL_INFORMATION, DBG_INIT, "Entered vJoy_EvtIoDeviceControlForRawPdo\n");
+    TraceEvents(TRACE_LEVEL_INFORMATION, DBG_IOCTL, "vJoy_EvtIoDeviceControlForRawPdo: entering with ioctl=0x%x\n", IoControlCode);
 
     //
     // Process the ioctl and complete it when you are done.
@@ -116,558 +116,639 @@ Return Value:
     // not receive another ioctl request until you complete this one.
     //
 
-	  switch (IoControlCode) {
- 	case 1234: // TODO: Remove for production
-		//RequestOptions.Flags =	WDF_REQUEST_SEND_OPTION_TIMEOUT;
-		//RequestOptions.Size =	sizeof(WDF_REQUEST_SEND_OPTIONS);
-		//WDF_REQUEST_SEND_OPTIONS_SET_TIMEOUT(&RequestOptions,  WDF_REL_TIMEOUT_IN_SEC(1));
-		//status = WdfIoTargetSendInternalIoctlSynchronously(pdoData->IoTargetToParent, Request, IoControlCode , NULL, NULL, &RequestOptions, NULL);
-		break; // Testing 
-
-	case GET_DEV_STAT:
-		// Get information for a device by device ID
-		TraceEvents(TRACE_LEVEL_INFORMATION, DBG_INIT, "vJoy_EvtIoDeviceControlForRawPdo: Case GET_DEV_STAT\n");
-
-		// Get the buffer from the request
-		// Get the data from the request
-		WDF_REQUEST_PARAMETERS_INIT(&Params);
-		WdfRequestGetParameters(Request, &Params);
-		bytesToCopy = (ULONG)Params.Parameters.DeviceIoControl.OutputBufferLength;
-		if (bytesToCopy<5)
-		{
-			TraceEvents(TRACE_LEVEL_ERROR, DBG_INIT, "vJoy_EvtIoDeviceControlForRawPdo[GET_DEV_STAT]: failed - bytesToCopy=%d\n", bytesToCopy);
-			WdfRequestComplete(Request, STATUS_NO_SUCH_DEVICE);
-			return;
-		};
-
-		// Get the buffer
-		status = WdfRequestRetrieveOutputBuffer(Request, bytesToCopy, &GenBuffer, &bytesReturned);
-		if (!NT_SUCCESS(status))
-		{
-			TraceEvents(TRACE_LEVEL_ERROR, DBG_INIT, "vJoy_EvtIoDeviceControlForRawPdo[GET_DEV_STAT]: failed to retrieve output buffer\n");
-			WdfRequestComplete(Request, STATUS_NO_SUCH_DEVICE);
-			return;
-		};
-
-
-		if (bytesReturned<5)
-		{
-			TraceEvents(TRACE_LEVEL_ERROR, DBG_INIT, "vJoy_EvtIoDeviceControlForRawPdo[GET_DEV_STAT]: failed - bytesReturned=%d\n", bytesReturned);
-			WdfRequestComplete(Request, STATUS_NO_SUCH_DEVICE);
-			return;
-		};
-
-		// Get the id number from input buffer
-		status = WdfRequestRetrieveInputBuffer(Request, sizeof(BYTE), &buffer, &bufSize);
-		if (!NT_SUCCESS(status) || (bufSize!=1))
-		{
-			TraceEvents(TRACE_LEVEL_ERROR, DBG_INIT, "vJoy_EvtIoDeviceControlForRawPdo[GET_DEV_STAT]: failed to retrieve input buffer\n");
-			WdfRequestComplete(Request, STATUS_NO_SUCH_DEVICE);
-			return;
-		};
-
-		// Get target ID
-		id = *(BYTE *)buffer;
-		TraceEvents(TRACE_LEVEL_INFORMATION, DBG_INIT, "vJoy_EvtIoDeviceControlForRawPdo[GET_DEV_STAT]: id=%d\n", id);
-
-		// Put data into output buffer
-		// Byte 1:
-		// Bit 0: Implemented?
-		// Bit 1: FFB Device Enabled?
-		// Bit 2: File Object associated with this device?
-		pDevContext = GetDeviceContext(pdoData->hParentDevice);
-		Byte_tmp = 0;
-
-		// Implemented mask
-		if (pDevContext->DeviceImplemented[id - 1])
-			Byte_tmp |= 1;
-		else
-			Byte_tmp &= 0xFE;
-		TraceEvents(TRACE_LEVEL_INFORMATION, DBG_INIT, "vJoy_EvtIoDeviceControlForRawPdo[GET_DEV_STAT]: Dev Implemented=%x\n", pDevContext->DeviceImplemented[id - 1]);
-
-		// FFB mask
-		TraceEvents(TRACE_LEVEL_INFORMATION, DBG_INIT, "vJoy_EvtIoDeviceControlForRawPdo[GET_DEV_STAT]: Dev Enabled=%x\n", pDevContext->FfbEnable[id - 1]);
-		if (pDevContext->FfbEnable[id - 1])
-			Byte_tmp |= 2;
-		else
-			Byte_tmp &= 0xFD;
-
-		// File Object
-		if (pDevContext->DeviceFileObject[id - 1])
-			Byte_tmp |= 4;
-		else
-			Byte_tmp &= 0xFB;
-
-		((BYTE *)GenBuffer)[0] = Byte_tmp;
-		TraceEvents(TRACE_LEVEL_INFORMATION, DBG_INIT, "vJoy_EvtIoDeviceControlForRawPdo[GET_DEV_STAT]: Buffer[0]=%x\n", ((BYTE *)GenBuffer)[0]);
-
-		// Byte2-5: Process ID
-		// Get the context
-		FileObj = pDevContext->DeviceFileObject[id - 1];
-		if (FileObj)
-			*(DWORD *)(&((BYTE *)GenBuffer)[1]) = GetFileObjectContext(FileObj)->CallingProcessId;
-		else
-			*(DWORD *)(&((BYTE *)GenBuffer)[1]) =  0;
-		TraceEvents(TRACE_LEVEL_INFORMATION, DBG_INIT, "vJoy_EvtIoDeviceControlForRawPdo[GET_DEV_STAT]: ProcessID=%x\n", *(DWORD *)(&((BYTE *)GenBuffer)[1]));
-
-		// Complete the transaction
-		WdfRequestCompleteWithInformation(Request, status, bytesReturned);
-		return;
-
-
-
-	case GET_DRV_INFO:
-		// Get information for this driver
-		TraceEvents(TRACE_LEVEL_INFORMATION, DBG_INIT, "vJoy_EvtIoDeviceControlForRawPdo: [GET_DRV_INFO]\n");
-		// Get the buffer from the request
-		// Get the data from the request
-		WDF_REQUEST_PARAMETERS_INIT(&Params);
-		WdfRequestGetParameters(Request, &Params);
-
-		// Number of bytes to copy must be at least one byte
-		bytesToCopy = (ULONG)Params.Parameters.DeviceIoControl.OutputBufferLength;
-		if (bytesToCopy <1 )
-		{
-			TraceEvents(TRACE_LEVEL_ERROR, DBG_INIT, "vJoy_EvtIoDeviceControlForRawPdo: [GET_DRV_INFO] - bytesToCopy <1\n");
-			WdfRequestComplete(Request, STATUS_NO_SUCH_DEVICE);
-			return;
-		};
-
-
-		// Output buffer must be at least one byte
-		status = WdfRequestRetrieveOutputBuffer(Request, bytesToCopy, &GenBuffer, &bytesReturned);
-		if (!NT_SUCCESS(status))
-		{
-			TraceEvents(TRACE_LEVEL_ERROR, DBG_INIT, "vJoy_EvtIoDeviceControlForRawPdo[GET_DRV_INFO]: failed to retrieve output buffer\n");
-			WdfRequestComplete(Request, STATUS_NO_SUCH_DEVICE);
-			return;
-		};
-
-		if (bytesReturned<1)
-		{
-			TraceEvents(TRACE_LEVEL_ERROR, DBG_INIT, "vJoy_EvtIoDeviceControlForRawPdo: [GET_DRV_INFO] - bytesReturned <1\n");
-			WdfRequestComplete(Request, STATUS_NO_SUCH_DEVICE);
-			return;
-		};
-
-		pDevContext = GetDeviceContext(pdoData->hParentDevice);
-
-		// Return the data in the output buffer
-		// BYTE 0 //////////////////////////////
-		// Bit 0	: Supports FFB?
-		// Bit 1	: Reserved
-		// Bit 2	: Mode: Multi-device 
-		// Bit 3	: Mode: FFB 
-		// BYTE 1 //////////////////////////////
-		// Bits 0-7	: Maximum number of possible devices (16 ==> 255)  not regarding to mode
-		// BYTE 2 //////////////////////////////
-		// Bits 0-7	: Number of existing devices
-		// BYTE 3 //////////////////////////////
-		// Bits 0-7	: Number of devices that can still be implemented (This is the number of possible devices for the current mode minus the number of already existing devices).
-
-		//////////////////////////////////
-		// Byte 0
-		Byte_tmp = 0;
-		Byte_tmp |= 0x01; // FFB Supported
-		Byte_tmp |= 0x00; // Default Mode (TODO: Change to real mode when Implemented) Multi-Device=0x04; FFB=0x80
-		((BYTE *)GenBuffer)[0] = Byte_tmp;
-
-		// Byte 1
-		if (bytesToCopy >= 2 && bytesReturned >= 2)
-		{
-			((BYTE *)GenBuffer)[1] = MAX_N_DEVICES;
-			TraceEvents(TRACE_LEVEL_INFORMATION, DBG_INIT, "vJoy_EvtIoDeviceControlForRawPdo: [GET_DRV_INFO] - Data byte[1]=%02x\n", ((BYTE *)GenBuffer)[1]);
-		}
-
-		// Byte 2
-		if (bytesToCopy >= 3 && bytesReturned >= 3)
-		{
-			((BYTE *)GenBuffer)[2] = (BYTE)(pDevContext->nDevices);
-			TraceEvents(TRACE_LEVEL_INFORMATION, DBG_INIT, "vJoy_EvtIoDeviceControlForRawPdo: [GET_DRV_INFO] - Data byte[2]=%02x\n", ((BYTE *)GenBuffer)[2]);
-		}
-
-		// Byte 3 - TODO: Change according to mode
-		if (bytesToCopy >= 4 && bytesReturned >= 4)
-		{
-			((BYTE *)GenBuffer)[3] = MAX_N_DEVICES - (BYTE)(pDevContext->nDevices);
-			TraceEvents(TRACE_LEVEL_INFORMATION, DBG_INIT, "vJoy_EvtIoDeviceControlForRawPdo: [GET_DRV_INFO] - Data byte[3]=%02x\n", ((BYTE *)GenBuffer)[3]);
-		}
-		//////////////////////////////////
-
-		// Complete the transaction
-		WdfRequestCompleteWithInformation(Request, status, bytesReturned);
-		return;
-
-
-	case GET_DEV_INFO:
-		// Get information for this device (and for the driver)
-
-		// Get the buffer from the request
-		// Get the data from the request
-		WDF_REQUEST_PARAMETERS_INIT(&Params);
-		WdfRequestGetParameters(Request, &Params);
-		bytesToCopy = (ULONG)Params.Parameters.DeviceIoControl.OutputBufferLength;
-		if (bytesToCopy<6)
-		{
-			WdfRequestComplete(Request, STATUS_NO_SUCH_DEVICE);
-			return;
-		};
-
-		status = WdfRequestRetrieveOutputBuffer(Request, bytesToCopy, &GenBuffer, &bytesReturned);
-		if (!NT_SUCCESS(status))
-		{
-			TraceEvents(TRACE_LEVEL_ERROR, DBG_INIT, "vJoy_EvtIoDeviceControlForRawPdo[GET_DEV_INFO]: failed to retrieve output buffer\n");
-			WdfRequestComplete(Request, STATUS_NO_SUCH_DEVICE);
-			return;
-		};
-
-		if (bytesReturned<6)
-		{
-			WdfRequestComplete(Request, STATUS_NO_SUCH_DEVICE);
-			return;
-		};
-
-		// Get the context, id and the status
-		id = GetIdFromRawPdoRequest(Request, pExtension);
-
-		// Illegal ID
-		if (id == 0xFFFF)
-		{
-			WdfRequestComplete(Request, STATUS_NO_SUCH_DEVICE);
-			return;
-		};
-
-		// Copy the state to the buffer
-		pDevContext = GetDeviceContext(pdoData->hParentDevice);
-		((BYTE *)GenBuffer)[0] = (BYTE)id;
-		((BYTE *)GenBuffer)[1] = (BYTE)(pDevContext->nDevices);
-		((BYTE *)GenBuffer)[2] = pDevContext->DeviceImplemented ? 1:0;
-		((BYTE *)GenBuffer)[3] = MAX_N_DEVICES; 
- 		((BYTE *)GenBuffer)[4] = 1; // Driver does support FFB
-		((BYTE *)GenBuffer)[5] = pDevContext->FfbEnable[id - 1]; // Device support FFB
-
-		// Complete the transaction
-		WdfRequestCompleteWithInformation(Request, status, bytesReturned);
-		return;
-
-	case 0x910: // Backward compatibility value of 	LOAD_POSITIONS
-	case LOAD_POSITIONS:
-		// KdBreakPoint(); Break When loading position
-		status = WdfRequestRetrieveInputBuffer( Request, sizeof(JOYSTICK_POSITION), &buffer, &bufSize);
-		if(!NT_SUCCESS(status))
-			break;
-
-		// Get interface that this IRP came from,
-		// then get the implicated id of the top-level collection
-		id = GetIdFromRawPdoRequest(Request, pExtension);
-
-
-		// Illegal ID
-		if (id==0xFFFF)
-		{
-			WdfRequestComplete(Request, STATUS_NO_SUCH_DEVICE);
-			return;
-		};
-
-		// Get the incoming report and compare the id in the report
-		// to the implicated id of the top-level collection
-		// They should match
-		iReport = buffer;
-		if (iReport->bDevice != id)
-		{
-			WdfRequestComplete(Request, STATUS_CANCELLED);
-			return;
-		};
-
-		pDevContext = GetDeviceContext(pdoData->hParentDevice);
-		LoadPositions(iReport, pDevContext, bufSize);
-		status = vJoyCompleteReadReport(pdoData->hParentDevice, (BYTE)id);
-		break;   
-
-	case GET_POSITIONS:
-		/* Get position struct for the device */
-		TraceEvents(TRACE_LEVEL_INFORMATION, DBG_INIT, "vJoy_EvtIoDeviceControlForRawPdo: [GET_POSITIONS]\n");
-
-		// Get the context, id and the status
-		id = GetIdFromRawPdoRequest(Request, pExtension);
-
-		// Check for Illegal ID
-		if (id == 0xFFFF)
-		{
-			TraceEvents(TRACE_LEVEL_WARNING, DBG_INIT, "vJoy_EvtIoDeviceControlForRawPdo: Bad id=%d\n", id);
-
-			WdfRequestComplete(Request, STATUS_NO_SUCH_DEVICE);
-			return;
-		};
-
-		// Calculate the size of buffer needed
-		pDevContext = GetDeviceContext(pdoData->hParentDevice);
-		if (!pDevContext) break;
-		bytesToCopy = sizeof(JOYSTICK_POSITION_V2);
-		TraceEvents(TRACE_LEVEL_INFORMATION, DBG_INIT, "vJoy_EvtIoDeviceControlForRawPdo: bytesToCopy=%d\n", bytesToCopy);
-
-		// Retrieve the output buffer
-		status = WdfRequestRetrieveOutputBuffer(Request, 0, &GenBuffer, &bytesReturned);
-
-		//// Interprete the results of calling WdfRequestRetrieveOutputBuffer()
-		// If returned STATUS_SUCCESS then the buffer is OK
-		// If returned STATUS_BUFFER_TOO_SMALL and bytesReturned>=4 then this is a request for buffer size
-		// If returned STATUS_BUFFER_TOO_SMALL and bytesReturned<4 then this is an error
-
-		if (status == STATUS_SUCCESS && bytesReturned >= bytesToCopy)
-		{
-			//RtlCopyMemory(GenBuffer, pDevContext->positions[id - 1], bytesToCopy);
-			// Copy data to output buffer
-			GetPositions(GenBuffer, pDevContext, (UCHAR)id, bytesToCopy);
-			WdfRequestCompleteWithInformation(Request, status, bytesToCopy);
-			return;
-		}
-
-		if (status == STATUS_SUCCESS && bytesReturned >= sizeof(INT))
-		{
-			*(INT *)(GenBuffer) = bytesToCopy;
-			WdfRequestCompleteWithInformation(Request, status, sizeof(INT));
-			return;
-		}
-			
-		TraceEvents(TRACE_LEVEL_ERROR, DBG_INIT, "vJoy_EvtIoDeviceControlForRawPdo: GET_POSITION failed\n");
-		WdfRequestComplete(Request, STATUS_BUFFER_TOO_SMALL);
-		return;
-
-	case GET_FFB_STAT:
-		/* Get the status of the FFB mechanism */
-
-		// Get the buffer from the request
-		// Get the data from the request
-		WDF_REQUEST_PARAMETERS_INIT(&Params);
-		WdfRequestGetParameters(Request, &Params);
-		bytesToCopy = (ULONG)Params.Parameters.DeviceIoControl.OutputBufferLength;
-		status = WdfRequestRetrieveOutputBuffer(Request, bytesToCopy, &GenBuffer, &bytesReturned);
-		if (!NT_SUCCESS(status))
-		{
-			TraceEvents(TRACE_LEVEL_ERROR, DBG_INIT, "vJoy_EvtIoDeviceControlForRawPdo[GET_FFB_STAT]: failed to retrieve output buffer\n");
-			WdfRequestComplete(Request, STATUS_NO_SUCH_DEVICE);
-			return;
-		};
-		if (!bytesReturned)
-		{
-			WdfRequestComplete(Request, STATUS_NO_SUCH_DEVICE);
-			return;
-		};
-
-		// Get the context, id and the status
-		id = GetIdFromRawPdoRequest(Request, pExtension);
-
-
-		// Illegal ID
-		if (id == 0xFFFF)
-		{
-			WdfRequestComplete(Request, STATUS_NO_SUCH_DEVICE);
-			return;
-		};
-
-		// Copy the state to the buffer
-		pDevContext = GetDeviceContext(pdoData->hParentDevice);
-		((BYTE *)GenBuffer)[0] =  pDevContext->FfbEnable[id-1];
-
-		// Complete the transaction
-		WdfRequestCompleteWithInformation(Request, status, bytesReturned);
-		return;
-
-	case SET_FFB_STAT:
-		/*Set the status of the FFB mechanism - Obsolete*/
-
-		// Get the data from the request
-		WDF_REQUEST_PARAMETERS_INIT(&Params);
-		WdfRequestGetParameters(Request, &Params);
-
-		// Get interface that this IRP came from,
-		// then get the implicated id of the top-level collection
-		// Get the context, id and the status
-		id = GetIdFromRawPdoRequest(Request, pExtension);
-		// Illegal ID
-		if (id == 0xFFFF)
-		{
-			WdfRequestComplete(Request, STATUS_NO_SUCH_DEVICE);
-			return;
-		};
-
-
-		// Get the data, process the data and complete the transaction
-		//pDevContext = GetDeviceContext(pdoData->hParentDevice);	   - Obsolete
-		//FfbActiveSet(*(BOOLEAN *)Params.Parameters.DeviceIoControl.Type3InputBuffer, id, pDevContext);   - Obsolete
-		WdfRequestComplete(Request, status);
-		return;
-
-	case GET_FFB_DATA:
-		// Get interface that this IRP came from,
-		// then get the implicated id of the top-level collection
-		id = GetIdFromRawPdoRequest(Request, pExtension);
-
-
-		// If FFB is not active then just reject this request
-		pDevContext = GetDeviceContext(pdoData->hParentDevice);
-		if (id == 0xFFFF || !pDevContext->FfbEnable[id - 1])
-		{
-			WdfRequestComplete(Request, STATUS_NO_SUCH_DEVICE);
-			return;
-		};
-
-		// If FFB is active then forward this request to the ReadQ and return
-		status = WdfRequestForwardToIoQueue(Request, pDevContext->FfbReadQ[id - 1]);
-        if(!NT_SUCCESS(status)){
-            TraceEvents(TRACE_LEVEL_ERROR, DBG_IOCTL,
-				"WdfRequestForwardToIoQueue (FfbWriteQ[%d]) failed with status: 0x%x\n", id - 1, status);
+    switch (IoControlCode) {
+        case 1234: // TODO: Remove for production
+            //RequestOptions.Flags =	WDF_REQUEST_SEND_OPTION_TIMEOUT;
+            //RequestOptions.Size =	sizeof(WDF_REQUEST_SEND_OPTIONS);
+            //WDF_REQUEST_SEND_OPTIONS_SET_TIMEOUT(&RequestOptions,  WDF_REL_TIMEOUT_IN_SEC(1));
+            //status = WdfIoTargetSendInternalIoctlSynchronously(pdoData->IoTargetToParent, Request, IoControlCode , NULL, NULL, &RequestOptions, NULL);
+            break; // Testing 
+
+        case GET_DEV_STAT:
+            // Get information for a device by device ID
+            TraceEvents(TRACE_LEVEL_INFORMATION, DBG_IOCTL, "vJoy_EvtIoDeviceControlForRawPdo[GET_DEV_STAT]:\n");
+
+            // Get the buffer from the request
+            // Get the data from the request
+            WDF_REQUEST_PARAMETERS_INIT(&Params);
+            WdfRequestGetParameters(Request, &Params);
+            bytesToCopy = (ULONG)Params.Parameters.DeviceIoControl.OutputBufferLength;
+            if (bytesToCopy<5) {
+                TraceEvents(TRACE_LEVEL_ERROR, DBG_IOCTL, "vJoy_EvtIoDeviceControlForRawPdo[GET_DEV_STAT]: failed - bytesToCopy=%d\n", bytesToCopy);
+                WdfRequestComplete(Request, STATUS_NO_SUCH_DEVICE);
+                return;
+            };
+
+            // Get the buffer
+            status = WdfRequestRetrieveOutputBuffer(Request, bytesToCopy, &GenBuffer, &bytesReturned);
+            if (!NT_SUCCESS(status)) {
+                TraceEvents(TRACE_LEVEL_ERROR, DBG_IOCTL, "vJoy_EvtIoDeviceControlForRawPdo[GET_DEV_STAT]: failed to retrieve output buffer\n");
+                WdfRequestComplete(Request, STATUS_NO_SUCH_DEVICE);
+                return;
+            };
+
+
+            if (bytesReturned<5) {
+                TraceEvents(TRACE_LEVEL_ERROR, DBG_IOCTL, "vJoy_EvtIoDeviceControlForRawPdo[GET_DEV_STAT]: failed - bytesReturned=%d\n", bytesReturned);
+                WdfRequestComplete(Request, STATUS_NO_SUCH_DEVICE);
+                return;
+            };
+
+            // Get the id number from input buffer
+            status = WdfRequestRetrieveInputBuffer(Request, sizeof(BYTE), &buffer, &bufSize);
+            if (!NT_SUCCESS(status) || (bufSize!=1)) {
+                TraceEvents(TRACE_LEVEL_ERROR, DBG_IOCTL, "vJoy_EvtIoDeviceControlForRawPdo[GET_DEV_STAT]: failed to retrieve input buffer\n");
+                WdfRequestComplete(Request, STATUS_NO_SUCH_DEVICE);
+                return;
+            };
+
+            // Get target ID
+            id = *(BYTE*)buffer;
+            TraceEvents(TRACE_LEVEL_INFORMATION, DBG_IOCTL, "vJoy_EvtIoDeviceControlForRawPdo[GET_DEV_STAT]: id=%d\n", id);
+
+            // Put data into output buffer
+            // Byte 1:
+            // Bit 0: Implemented?
+            // Bit 1: FFB Device Enabled?
+            // Bit 2: File Object associated with this device?
+            pDevContext = GetDeviceContext(pdoData->hParentDevice);
+            Byte_tmp = 0;
+
+            // Implemented mask
+            if (pDevContext->DeviceImplemented[id - 1])
+                Byte_tmp |= 1;
+            else
+                Byte_tmp &= 0xFE;
+            TraceEvents(TRACE_LEVEL_INFORMATION, DBG_IOCTL, "vJoy_EvtIoDeviceControlForRawPdo[GET_DEV_STAT]: Dev Implemented=%x\n", pDevContext->DeviceImplemented[id - 1]);
+
+            // FFB mask
+            if (pDevContext->FfbEnable[id - 1])
+                Byte_tmp |= 2;
+            else
+                Byte_tmp &= 0xFD;
+            TraceEvents(TRACE_LEVEL_INFORMATION, DBG_IOCTL, "vJoy_EvtIoDeviceControlForRawPdo[GET_DEV_STAT]: Dev FFB Enabled=%x\n", pDevContext->FfbEnable[id - 1]);
+
+            // File Object
+            if (pDevContext->DeviceFileObject[id - 1])
+                Byte_tmp |= 4;
+            else
+                Byte_tmp &= 0xFB;
+            TraceEvents(TRACE_LEVEL_INFORMATION, DBG_IOCTL, "vJoy_EvtIoDeviceControlForRawPdo[GET_DEV_STAT]: Dev File Object ptr=%p\n", pDevContext->DeviceFileObject[id - 1]);
+
+            ((BYTE*)GenBuffer)[0] = Byte_tmp;
+            TraceEvents(TRACE_LEVEL_INFORMATION, DBG_IOCTL, "vJoy_EvtIoDeviceControlForRawPdo[GET_DEV_STAT]: buffer[0]=0x%02X (options bits)\n", ((BYTE*)GenBuffer)[0]);
+
+            // Byte2-5: Process ID
+            // Get the context
+            FileObj = pDevContext->DeviceFileObject[id - 1];
+            if (FileObj)
+                *(DWORD*)(&((BYTE*)GenBuffer)[1]) = GetFileObjectContext(FileObj)->CallingProcessId;
+            else
+                *(DWORD*)(&((BYTE*)GenBuffer)[1]) = 0;
+            TraceEvents(TRACE_LEVEL_INFORMATION, DBG_IOCTL, "vJoy_EvtIoDeviceControlForRawPdo[GET_DEV_STAT]: buffer[1-4]=%d (ProcessID)\n", *(DWORD*)(&((BYTE*)GenBuffer)[1]));
+
+            // Complete the transaction
+            WdfRequestCompleteWithInformation(Request, status, bytesReturned);
+            return;
+
+
+
+        case GET_DRV_INFO:
+            // Get information for this driver
+            TraceEvents(TRACE_LEVEL_INFORMATION, DBG_IOCTL, "vJoy_EvtIoDeviceControlForRawPdo[GET_DRV_INFO]\n");
+
+            // Get the buffer from the request
+            // Get the data from the request
+            WDF_REQUEST_PARAMETERS_INIT(&Params);
+            WdfRequestGetParameters(Request, &Params);
+
+            // Number of bytes to copy must be at least one byte
+            bytesToCopy = (ULONG)Params.Parameters.DeviceIoControl.OutputBufferLength;
+            if (bytesToCopy <1) {
+                TraceEvents(TRACE_LEVEL_ERROR, DBG_IOCTL, "vJoy_EvtIoDeviceControlForRawPdo[GET_DRV_INFO]: bytesToCopy <1\n");
+                WdfRequestComplete(Request, STATUS_NO_SUCH_DEVICE);
+                return;
+            };
+
+
+            // Output buffer must be at least one byte
+            status = WdfRequestRetrieveOutputBuffer(Request, bytesToCopy, &GenBuffer, &bytesReturned);
+            if (!NT_SUCCESS(status)) {
+                TraceEvents(TRACE_LEVEL_ERROR, DBG_IOCTL, "vJoy_EvtIoDeviceControlForRawPdo[GET_DRV_INFO]: failed to retrieve output buffer\n");
+                WdfRequestComplete(Request, STATUS_NO_SUCH_DEVICE);
+                return;
+            };
+
+            if (bytesReturned<1) {
+                TraceEvents(TRACE_LEVEL_ERROR, DBG_IOCTL, "vJoy_EvtIoDeviceControlForRawPdo[GET_DRV_INFO]: bytesReturned <1\n");
+                WdfRequestComplete(Request, STATUS_NO_SUCH_DEVICE);
+                return;
+            };
+
+            pDevContext = GetDeviceContext(pdoData->hParentDevice);
+
+            // Return the data in the output buffer
+            // BYTE 0 //////////////////////////////
+            // Bit 0	: Supports FFB?
+            // Bit 1	: Reserved
+            // Bit 2	: Mode: Multi-device 
+            // Bit 3	: Mode: FFB 
+            // BYTE 1 //////////////////////////////
+            // Bits 0-7	: Maximum number of possible devices (16 ==> 255)  not regarding to mode
+            // BYTE 2 //////////////////////////////
+            // Bits 0-7	: Number of existing devices
+            // BYTE 3 //////////////////////////////
+            // Bits 0-7	: Number of devices that can still be implemented (This is the number of possible devices for the current mode minus the number of already existing devices).
+
+            //////////////////////////////////
+            // Byte 0
+            Byte_tmp = 0;
+#ifdef VJOY_HAS_FFB
+            Byte_tmp |= 0x01; // FFB Supported by driver
+#endif
+            Byte_tmp |= 0x00; // Default Mode (TODO: Change to real mode when Implemented) Multi-Device=0x04; FFB=0x80
+            ((BYTE*)GenBuffer)[0] = Byte_tmp;
+            TraceEvents(TRACE_LEVEL_INFORMATION, DBG_IOCTL, "vJoy_EvtIoDeviceControlForRawPdo[GET_DRV_INFO]: buffer[0]=0x%02x (options bits: 0=support ffb?, 2=multidevice, 3=ffb)\n", ((BYTE*)GenBuffer)[0]);
+
+            // Byte 1
+            if (bytesToCopy >= 2 && bytesReturned >= 2) {
+                ((BYTE*)GenBuffer)[1] = VJOY_MAX_N_DEVICES;
+                TraceEvents(TRACE_LEVEL_INFORMATION, DBG_IOCTL, "vJoy_EvtIoDeviceControlForRawPdo[GET_DRV_INFO]: buffer[1]=0x%02x (max num.device)\n", ((BYTE*)GenBuffer)[1]);
+            }
+
+            // Byte 2
+            if (bytesToCopy >= 3 && bytesReturned >= 3) {
+                ((BYTE*)GenBuffer)[2] = (BYTE)(pDevContext->nDevices);
+                TraceEvents(TRACE_LEVEL_INFORMATION, DBG_IOCTL, "vJoy_EvtIoDeviceControlForRawPdo[GET_DRV_INFO]: buffer[2]=0x%02x (device used)\n", ((BYTE*)GenBuffer)[2]);
+            }
+
+            // Byte 3 - TODO: Change according to mode
+            if (bytesToCopy >= 4 && bytesReturned >= 4) {
+                ((BYTE*)GenBuffer)[3] = VJOY_MAX_N_DEVICES - (BYTE)(pDevContext->nDevices);
+                TraceEvents(TRACE_LEVEL_INFORMATION, DBG_IOCTL, "vJoy_EvtIoDeviceControlForRawPdo[GET_DRV_INFO]: buffer[3]=0x%02x (device free)\n", ((BYTE*)GenBuffer)[3]);
+            }
+            //////////////////////////////////
+
+            // Complete the transaction
+            WdfRequestCompleteWithInformation(Request, status, bytesReturned);
+            return;
+
+
+        case GET_DEV_INFO:
+            // Get information for this device (and for the driver)
+            TraceEvents(TRACE_LEVEL_INFORMATION, DBG_IOCTL, "vJoy_EvtIoDeviceControlForRawPdo: case GET_DEV_INFO\n");
+
+            // Get the buffer from the request
+            // Get the data from the request
+            WDF_REQUEST_PARAMETERS_INIT(&Params);
+            WdfRequestGetParameters(Request, &Params);
+            bytesToCopy = (ULONG)Params.Parameters.DeviceIoControl.OutputBufferLength;
+            if (bytesToCopy<6) {
+                TraceEvents(TRACE_LEVEL_ERROR, DBG_IOCTL, "vJoy_EvtIoDeviceControlForRawPdo[GET_DEV_INFO]: output buffer too small (%d should be >=6)\n", bytesToCopy);
+                WdfRequestComplete(Request, STATUS_NO_SUCH_DEVICE);
+                return;
+            };
+
+            status = WdfRequestRetrieveOutputBuffer(Request, bytesToCopy, &GenBuffer, &bytesReturned);
+            if (!NT_SUCCESS(status)) {
+                TraceEvents(TRACE_LEVEL_ERROR, DBG_IOCTL, "vJoy_EvtIoDeviceControlForRawPdo[GET_DEV_INFO]: failed to retrieve output buffer\n");
+                WdfRequestComplete(Request, STATUS_NO_SUCH_DEVICE);
+                return;
+            };
+
+            if (bytesReturned<6) {
+                TraceEvents(TRACE_LEVEL_ERROR, DBG_IOCTL, "vJoy_EvtIoDeviceControlForRawPdo[GET_DEV_INFO]: returned buffer too small (%d should be >=6)\n", bytesReturned);
+                WdfRequestComplete(Request, STATUS_NO_SUCH_DEVICE);
+                return;
+            };
+
+            // Get the context, id and the status
+            id = GetIdFromRawPdoRequest(Request, pExtension);
+
+            // Illegal ID
+            if (id == 0xFFFF) {
+                WdfRequestComplete(Request, STATUS_NO_SUCH_DEVICE);
+                return;
+            };
+
+            // Copy the state to the buffer
+            pDevContext = GetDeviceContext(pdoData->hParentDevice);
+            ((BYTE*)GenBuffer)[0] = (BYTE)id;
+            ((BYTE*)GenBuffer)[1] = (BYTE)(pDevContext->nDevices);
+            ((BYTE*)GenBuffer)[2] = pDevContext->DeviceImplemented ? 1 : 0;
+            ((BYTE*)GenBuffer)[3] = VJOY_MAX_N_DEVICES;
+#ifdef VJOY_HAS_FFB
+            ((BYTE*)GenBuffer)[4] = 1; // Driver does support FFB
+#else
+            ((BYTE*)GenBuffer)[4] = 0; // Driver does support FFB
+#endif
+            ((BYTE*)GenBuffer)[5] = pDevContext->FfbEnable[id - 1]; // Device support FFB
+
+            // Complete the transaction
+            WdfRequestCompleteWithInformation(Request, status, bytesReturned);
+            return;
+
+        case 0x910: // Backward compatibility value of 	LOAD_POSITIONS
+        case LOAD_POSITIONS:
+            TraceEvents(TRACE_LEVEL_INFORMATION, DBG_IOCTL, "vJoy_EvtIoDeviceControlForRawPdo[LOAD_POSITIONS]:\n");
+
+            // KdBreakPoint(); Break When loading position
+            status = WdfRequestRetrieveInputBuffer(Request, sizeof(JOYSTICK_POSITION), &buffer, &bufSize);
+            if (!NT_SUCCESS(status))
+                break;
+
+            // Get interface that this IRP came from,
+            // then get the implicated id of the top-level collection
+            id = GetIdFromRawPdoRequest(Request, pExtension);
+
+
+            // Illegal ID
+            if (id==0xFFFF) {
+                WdfRequestComplete(Request, STATUS_NO_SUCH_DEVICE);
+                return;
+            };
+
+            // Get the incoming report and compare the id in the report
+            // to the implicated id of the top-level collection
+            // They should match
+            iReport = buffer;
+            if (iReport->bDevice != id) {
+                WdfRequestComplete(Request, STATUS_CANCELLED);
+                return;
+            };
+
+            pDevContext = GetDeviceContext(pdoData->hParentDevice);
+            LoadPositions(iReport, pDevContext, bufSize);
+            status = vJoyCompleteReadReport(pdoData->hParentDevice, (BYTE)id);
+            break;
+
+        case GET_POSITIONS:
+            /* Get position struct for the device */
+            TraceEvents(TRACE_LEVEL_INFORMATION, DBG_IOCTL, "vJoy_EvtIoDeviceControlForRawPdo[GET_POSITIONS]:\n");
+
+            // Get the context, id and the status
+            id = GetIdFromRawPdoRequest(Request, pExtension);
+
+            // Check for Illegal ID
+            if (id == 0xFFFF) {
+                TraceEvents(TRACE_LEVEL_WARNING, DBG_IOCTL, "vJoy_EvtIoDeviceControlForRawPdo[GET_POSITIONS]: Bad id=%d\n", id);
+
+                WdfRequestComplete(Request, STATUS_NO_SUCH_DEVICE);
+                return;
+            };
+
+            // Calculate the size of buffer needed
+            pDevContext = GetDeviceContext(pdoData->hParentDevice);
+            if (!pDevContext)
+                break;
+            bytesToCopy = sizeof(JOYSTICK_POSITION);
+            TraceEvents(TRACE_LEVEL_INFORMATION, DBG_IOCTL, "vJoy_EvtIoDeviceControlForRawPdo[GET_POSITIONS]: bytesToCopy=%d\n", bytesToCopy);
+
+            // Retrieve the output buffer
+            status = WdfRequestRetrieveOutputBuffer(Request, 0, &GenBuffer, &bytesReturned);
+
+            //// Interprete the results of calling WdfRequestRetrieveOutputBuffer()
+            // If returned STATUS_SUCCESS then the buffer is OK
+            // If returned STATUS_BUFFER_TOO_SMALL and bytesReturned>=4 then this is a request for buffer size
+            // If returned STATUS_BUFFER_TOO_SMALL and bytesReturned<4 then this is an error
+
+            if (status == STATUS_SUCCESS && bytesReturned >= bytesToCopy) {
+                //RtlCopyMemory(GenBuffer, pDevContext->positions[id - 1], bytesToCopy);
+                // Copy data to output buffer
+                GetPositions(GenBuffer, pDevContext, (UCHAR)id, bytesToCopy);
+                WdfRequestCompleteWithInformation(Request, status, bytesToCopy);
+                return;
+            }
+
+            if (status == STATUS_SUCCESS && bytesReturned >= sizeof(INT)) {
+                *(INT*)(GenBuffer) = bytesToCopy;
+                WdfRequestCompleteWithInformation(Request, status, sizeof(INT));
+                return;
+            }
+
+            TraceEvents(TRACE_LEVEL_ERROR, DBG_IOCTL, "vJoy_EvtIoDeviceControlForRawPdo[GET_POSITIONS]: failed\n");
+            WdfRequestComplete(Request, STATUS_BUFFER_TOO_SMALL);
+            return;
+
+        case GET_FFB_STAT:
+            /* Get the status of the FFB mechanism */
+            TraceEvents(TRACE_LEVEL_INFORMATION, DBG_IOCTL, "vJoy_EvtIoDeviceControlForRawPdo[GET_FFB_STAT]:\n");
+
+            // Get the buffer from the request
+            // Get the data from the request
+            WDF_REQUEST_PARAMETERS_INIT(&Params);
+            WdfRequestGetParameters(Request, &Params);
+            bytesToCopy = (ULONG)Params.Parameters.DeviceIoControl.OutputBufferLength;
+            status = WdfRequestRetrieveOutputBuffer(Request, bytesToCopy, &GenBuffer, &bytesReturned);
+            if (!NT_SUCCESS(status)) {
+                TraceEvents(TRACE_LEVEL_ERROR, DBG_IOCTL, "vJoy_EvtIoDeviceControlForRawPdo[GET_FFB_STAT]: failed to retrieve output buffer\n");
+                WdfRequestComplete(Request, STATUS_NO_SUCH_DEVICE);
+                return;
+            };
+            if (!bytesReturned) {
+                WdfRequestComplete(Request, STATUS_NO_SUCH_DEVICE);
+                return;
+            };
+
+            // Get the context, id and the status
+            id = GetIdFromRawPdoRequest(Request, pExtension);
+
+
+            // Illegal ID
+            if (id == 0xFFFF) {
+                WdfRequestComplete(Request, STATUS_NO_SUCH_DEVICE);
+                return;
+            };
+
+            // Copy the state to the buffer
+            pDevContext = GetDeviceContext(pdoData->hParentDevice);
+            ((BYTE*)GenBuffer)[0] = pDevContext->FfbEnable[id-1];
+
+            // Complete the transaction
+            WdfRequestCompleteWithInformation(Request, status, bytesReturned);
+            return;
+
+        case SET_FFB_STAT:
+            /*Set the status of the FFB mechanism - Obsolete*/
+            TraceEvents(TRACE_LEVEL_INFORMATION, DBG_IOCTL, "vJoy_EvtIoDeviceControlForRawPdo[SET_FFB_STAT]:\n");
+
+            // Get the data from the request
+            WDF_REQUEST_PARAMETERS_INIT(&Params);
+            WdfRequestGetParameters(Request, &Params);
+
+            // Get interface that this IRP came from,
+            // then get the implicated id of the top-level collection
+            // Get the context, id and the status
+            id = GetIdFromRawPdoRequest(Request, pExtension);
+            // Illegal ID
+            if (id == 0xFFFF) {
+                WdfRequestComplete(Request, STATUS_NO_SUCH_DEVICE);
+                return;
+            };
+
+
+            // Get the data, process the data and complete the transaction
+            //pDevContext = GetDeviceContext(pdoData->hParentDevice);	   - Obsolete
+            //FfbActiveSet(*(BOOLEAN *)Params.Parameters.DeviceIoControl.Type3InputBuffer, id, pDevContext);   - Obsolete
             WdfRequestComplete(Request, status);
-        }
-        return;
+            return;
 
-	case GET_DRV_DEV_EN:
-		// Get the number of devices that are currently enabled
-		TraceEvents(TRACE_LEVEL_INFORMATION, DBG_INIT, "vJoy_EvtIoDeviceControlForRawPdo: Case GET_DRV_DEV_EN\n");
+        case GET_FFB_DATA:
+            TraceEvents(TRACE_LEVEL_INFORMATION, DBG_IOCTL, "vJoy_EvtIoDeviceControlForRawPdo[GET_FFB_DATA]:\n");
 
-		// Get the buffer from the request
-		// Get the data from the request
-		WDF_REQUEST_PARAMETERS_INIT(&Params);
-		WdfRequestGetParameters(Request, &Params);
-		bytesToCopy = (ULONG)Params.Parameters.DeviceIoControl.OutputBufferLength;
-		TraceEvents(TRACE_LEVEL_INFORMATION, DBG_INIT, "vJoy_EvtIoDeviceControlForRawPdo: bytesToCopy=%d\n", bytesToCopy);
-		if (bytesToCopy<1)
-		{
-			WdfRequestComplete(Request, STATUS_NO_SUCH_DEVICE);
-			return;
-		};
-
-		status = WdfRequestRetrieveOutputBuffer(Request, bytesToCopy, &GenBuffer, &bytesReturned);
-		TraceEvents(TRACE_LEVEL_INFORMATION, DBG_INIT, "vJoy_EvtIoDeviceControlForRawPdo: bytesReturned=%d\n", bytesReturned);
-		if (!NT_SUCCESS(status))
-		{
-			TraceEvents(TRACE_LEVEL_ERROR, DBG_INIT, "vJoy_EvtIoDeviceControlForRawPdo[GET_DRV_DEV_EN]: failed to retrieve output buffer\n");
-			WdfRequestComplete(Request, STATUS_NO_SUCH_DEVICE);
-			return;
-		};
-		if (bytesReturned<1)
-		{
-			WdfRequestComplete(Request, STATUS_NO_SUCH_DEVICE);
-			return;
-		};
-
-		if (!pdoData) break;
-		pDevContext = GetDeviceContext(pdoData->hParentDevice);
-		if (!pDevContext) break;
-		// The number of the max supported devices
-		((BYTE *)GenBuffer)[0] = (BYTE)(pDevContext->nDevices);
-
-		// Complete the transaction
-		WdfRequestCompleteWithInformation(Request, status, bytesReturned);
-		TraceEvents(TRACE_LEVEL_INFORMATION, DBG_INIT, "vJoy_EvtIoDeviceControlForRawPdo: GenBuffer[0]=%d\n", ((BYTE *)GenBuffer)[0]);
-		return;
-
-	case GET_DRV_DEV_MAX:
-		// Get the max possible number of devices that this driver supports
-		TraceEvents(TRACE_LEVEL_INFORMATION, DBG_INIT, "vJoy_EvtIoDeviceControlForRawPdo: Case GET_DRV_DEV_MAX\n");
-
-		// Get the buffer from the request
-		// Get the data from the request
-		WDF_REQUEST_PARAMETERS_INIT(&Params);
-		WdfRequestGetParameters(Request, &Params);
-		bytesToCopy = (ULONG)Params.Parameters.DeviceIoControl.OutputBufferLength;
-		TraceEvents(TRACE_LEVEL_INFORMATION, DBG_INIT, "vJoy_EvtIoDeviceControlForRawPdo: bytesToCopy=%d\n", bytesToCopy);
-		if (bytesToCopy<1)
-		{
-			WdfRequestComplete(Request, STATUS_NO_SUCH_DEVICE);
-			return;
-		};
-
-		status = WdfRequestRetrieveOutputBuffer(Request, bytesToCopy, &GenBuffer, &bytesReturned);
-		TraceEvents(TRACE_LEVEL_INFORMATION, DBG_INIT, "vJoy_EvtIoDeviceControlForRawPdo: bytesReturned=%d\n", bytesReturned);
-		if (!NT_SUCCESS(status))
-		{
-			TraceEvents(TRACE_LEVEL_ERROR, DBG_INIT, "vJoy_EvtIoDeviceControlForRawPdo[GET_DRV_DEV_MAX]: failed to retrieve output buffer\n");
-			WdfRequestComplete(Request, STATUS_NO_SUCH_DEVICE);
-			return;
-		};
-		if (bytesReturned<1)
-		{
-			WdfRequestComplete(Request, STATUS_NO_SUCH_DEVICE);
-			return;
-		};
-
-		// The number of the max supported devices
-		((BYTE *)GenBuffer)[0] = MAX_N_DEVICES;
-
-		// Complete the transaction
-		WdfRequestCompleteWithInformation(Request, status, bytesReturned);
-		TraceEvents(TRACE_LEVEL_INFORMATION, DBG_INIT, "vJoy_EvtIoDeviceControlForRawPdo: GenBuffer[0]=%d\n", ((BYTE *)GenBuffer)[0]);
-		return;
+            // Get interface that this IRP came from,
+            // then get the implicated id of the top-level collection
+            id = GetIdFromRawPdoRequest(Request, pExtension);
 
 
-	case IS_DRV_FFB_CAP:
-		// Test is this version of vJoy driver supports FFB
-		TraceEvents(TRACE_LEVEL_INFORMATION, DBG_INIT, "vJoy_EvtIoDeviceControlForRawPdo: Case IS_DRV_FFB_CAP\n");
+            // If FFB is not active then just reject this request
+            pDevContext = GetDeviceContext(pdoData->hParentDevice);
+            if (id == 0xFFFF || !pDevContext->FfbEnable[id - 1]) {
+                WdfRequestComplete(Request, STATUS_NO_SUCH_DEVICE);
+                return;
+            };
 
-		// Get the data from the request (Bytes to copy)
-		WDF_REQUEST_PARAMETERS_INIT(&Params);
-		WdfRequestGetParameters(Request, &Params);
-		bytesToCopy = (ULONG)Params.Parameters.DeviceIoControl.OutputBufferLength;
-		TraceEvents(TRACE_LEVEL_INFORMATION, DBG_INIT, "vJoy_EvtIoDeviceControlForRawPdo: bytesToCopy=%d\n", bytesToCopy);
-		if (bytesToCopy<1)
-		{
-			TraceEvents(TRACE_LEVEL_ERROR, DBG_INIT, "vJoy_EvtIoDeviceControlForRawPdo: bytesToCopy=%d (Failed)\n", bytesToCopy);
-			WdfRequestComplete(Request, STATUS_NO_SUCH_DEVICE);
-			return;
-		};
+            // If FFB is active then forward this request to the ReadQ and return
+            status = WdfRequestForwardToIoQueue(Request, pDevContext->FfbReadQ[id - 1]);
+            if (!NT_SUCCESS(status)) {
+                TraceEvents(TRACE_LEVEL_ERROR, DBG_IOCTL,
+                    "vJoy_EvtIoDeviceControlForRawPdo[GET_FFB_DATA]: WdfRequestForwardToIoQueue (FfbWriteQ[%d]) failed with status: 0x%x\n", id - 1, status);
+                WdfRequestComplete(Request, status);
+            }
+            return;
 
-		// Get the buffer from the request
-		status = WdfRequestRetrieveOutputBuffer(Request, bytesToCopy, &GenBuffer, &bytesReturned);
-		TraceEvents(TRACE_LEVEL_INFORMATION, DBG_INIT, "vJoy_EvtIoDeviceControlForRawPdo: bytesReturned=%d\n", bytesReturned);
-		if (!NT_SUCCESS(status))
-		{
-			TraceEvents(TRACE_LEVEL_ERROR, DBG_INIT, "vJoy_EvtIoDeviceControlForRawPdo[IS_DRV_FFB_CAP]: failed to retrieve output buffer\n");
-			WdfRequestComplete(Request, STATUS_NO_SUCH_DEVICE);
-			return;
-		};
-		if (bytesReturned<1)
-		{
-			TraceEvents(TRACE_LEVEL_ERROR, DBG_INIT, "vJoy_EvtIoDeviceControlForRawPdo: bytesReturned=%d (Failed)\n", bytesReturned);
-			WdfRequestComplete(Request, STATUS_NO_SUCH_DEVICE);
-			return;
-		};
 
-		// Yes, this driver supports FFB
-		((BYTE *)GenBuffer)[0] = 1;
+        case GET_FFB_PID_DATA:
+            /* Set the status of the FFB data like Block Index */
+            TraceEvents(TRACE_LEVEL_INFORMATION, DBG_IOCTL, "vJoy_EvtIoDeviceControlForRawPdo[GET_FFB_PID_DATA]: begin\n");
 
-		// Complete the transaction
-		WdfRequestCompleteWithInformation(Request, status, bytesReturned);
-		TraceEvents(TRACE_LEVEL_INFORMATION, DBG_INIT, "vJoy_EvtIoDeviceControlForRawPdo: GenBuffer[0]=%d\n", ((BYTE *)GenBuffer)[0]);
-		return;
-	case RESET_DEV:
-		/* Resets device(s) to predefined values */
-		TraceEvents(TRACE_LEVEL_INFORMATION, DBG_INIT, "vJoy_EvtIoDeviceControlForRawPdo: Case RESET_DEV\n");
+            //KdBreakPoint(); // Break When retrieving FFB PIB
+            reqSize = sizeof(FFB_DEVICE_PID);
+            // Get the buffer from the request
+            // Get the data from the request
+            WDF_REQUEST_PARAMETERS_INIT(&Params);
+            WdfRequestGetParameters(Request, &Params);
+            bytesToCopy = (ULONG)Params.Parameters.DeviceIoControl.OutputBufferLength;
+            TraceEvents(TRACE_LEVEL_VERBOSE, DBG_IOCTL, "vJoy_EvtIoDeviceControlForRawPdo: bytesToCopy=%d, expected=%d\n", bytesToCopy, reqSize);
+            if (bytesToCopy<reqSize) {
+                WdfRequestComplete(Request, STATUS_BUFFER_TOO_SMALL);
+                return;
+            }
 
-		// then get the implicated id of the top-level collection
-		id = GetIdFromRawPdoRequest(Request, pExtension);
-		TraceEvents(TRACE_LEVEL_INFORMATION, DBG_INIT, "vJoy_EvtIoDeviceControlForRawPdo: ID=%d\n", id);
+            status = WdfRequestRetrieveOutputBuffer(Request, bytesToCopy, &buffer, &bytesReturned);
+            if (!NT_SUCCESS(status)) {
+                TraceEvents(TRACE_LEVEL_ERROR, DBG_IOCTL, "vJoy_EvtIoDeviceControlForRawPdo[GET_FFB_PID_DATA]: failed to retrieve output buffer, stt=%x\n", status);
+                WdfRequestComplete(Request, STATUS_NO_SUCH_DEVICE);
+                return;
+            }
+            // Check size
+            if (bytesReturned<reqSize) {
+                WdfRequestComplete(Request, STATUS_BUFFER_TOO_SMALL);
+                return;
+            }
 
-		// Sanity check
-		if (id == 0xFFFF)
-		{
-			WdfRequestComplete(Request, STATUS_NO_SUCH_DEVICE);
-			return;
-		};
+            // Get the context, id and the status
+            id = GetIdFromRawPdoRequest(Request, pExtension);
+            // Illegal ID
+            if (id == 0xFFFF) {
+                WdfRequestComplete(Request, STATUS_NO_SUCH_DEVICE);
+                return;
+            }
 
-		// Get the context of vJoy device
-		pDevContext = GetDeviceContext(pdoData->hParentDevice);		
-		
-		// Reset device(s)
-		status = ResetDevice(id, pDevContext);
-		WdfRequestCompleteWithInformation(Request, status, 0);
-		return;
+            // Copy the state to the buffer
+            pDevContext = GetDeviceContext(pdoData->hParentDevice);
+            memcpy(buffer, &pDevContext->FfbPIDData[id-1], sizeof(pDevContext->FfbPIDData[id-1]));
+            TraceEvents(TRACE_LEVEL_VERBOSE, DBG_IOCTL, "vJoy_EvtIoDeviceControlForRawPdo[GET_FFB_PID_DATA]: done copying PID\n");
 
-	default:
-        break;
+
+            // Complete the transaction
+            WdfRequestCompleteWithInformation(Request, status, bytesReturned);
+            return;
+            break;
+
+        case SET_FFB_PID_DATA:
+            /* Set the status of the FFB data like Block Index */
+            TraceEvents(TRACE_LEVEL_INFORMATION, DBG_IOCTL, "vJoy_EvtIoDeviceControlForRawPdo[SET_FFB_PID_DATA]: begin\n");
+
+            //KdBreakPoint(); // Break When loading FFB PIB Block load
+            reqSize = sizeof(FFB_DEVICE_PID);
+            // Get input buffer
+            status = WdfRequestRetrieveInputBuffer(Request, reqSize, &buffer, &bufSize);
+            if (!NT_SUCCESS(status)) {
+                TraceEvents(TRACE_LEVEL_ERROR, DBG_IOCTL, "vJoy_EvtIoDeviceControlForRawPdo[SET_FFB_PID_DATA]: failed to retrieve input buffer, stt=%x\n", status);
+                WdfRequestComplete(Request, STATUS_NO_SUCH_DEVICE);
+                return;
+            }
+
+            // Check size
+            TraceEvents(TRACE_LEVEL_VERBOSE, DBG_IOCTL, "vJoy_EvtIoDeviceControlForRawPdo[SET_FFB_PID_DATA]: bytesReceived=%d, expected=%d\n", bufSize, reqSize);
+            if (bufSize<reqSize) {
+                WdfRequestComplete(Request, STATUS_BUFFER_TOO_SMALL);
+                return;
+            }
+
+            // Get interface that this IRP came from,
+            // then get the implicated id of the top-level collection
+            id = GetIdFromRawPdoRequest(Request, pExtension);
+            // Illegal ID
+            if (id==0xFFFF) {
+                TraceEvents(TRACE_LEVEL_ERROR, DBG_IOCTL, "vJoy_EvtIoDeviceControlForRawPdo[SET_FFB_PID_DATA]: failed with id=%d\n", id);
+                WdfRequestComplete(Request, STATUS_NO_SUCH_DEVICE);
+                return;
+            }
+
+            TraceEvents(TRACE_LEVEL_VERBOSE, DBG_IOCTL, "vJoy_EvtIoDeviceControlForRawPdo[SET_FFB_PID_DATA]: id=%d\n", id);
+
+            // Get device context for this id
+            pDevContext = GetDeviceContext(pdoData->hParentDevice);
+            // Copy PID data
+            memcpy(&pDevContext->FfbPIDData[id-1], buffer, sizeof(pDevContext->FfbPIDData[id-1]));
+            TraceEvents(TRACE_LEVEL_VERBOSE, DBG_IOCTL, "vJoy_EvtIoDeviceControlForRawPdo[SET_FFB_PID_DATA]: done copying PID with saved BlockIndex=%d\n", pDevContext->FfbPIDData[id-1].PIDBlockLoad.EffectBlockIndex);
+
+            // WdfRequestComplete(Request, status) will be done after the switch()
+            // so we just break.
+            break;
+
+        case GET_DRV_DEV_EN:
+            // Get the number of devices that are currently enabled
+            TraceEvents(TRACE_LEVEL_INFORMATION, DBG_IOCTL, "vJoy_EvtIoDeviceControlForRawPdo: Case GET_DRV_DEV_EN\n");
+
+            // Get the buffer from the request
+            // Get the data from the request
+            WDF_REQUEST_PARAMETERS_INIT(&Params);
+            WdfRequestGetParameters(Request, &Params);
+            bytesToCopy = (ULONG)Params.Parameters.DeviceIoControl.OutputBufferLength;
+            TraceEvents(TRACE_LEVEL_VERBOSE, DBG_IOCTL, "vJoy_EvtIoDeviceControlForRawPdo: bytesToCopy=%d\n", bytesToCopy);
+            if (bytesToCopy<1) {
+                WdfRequestComplete(Request, STATUS_NO_SUCH_DEVICE);
+                return;
+            };
+
+            status = WdfRequestRetrieveOutputBuffer(Request, bytesToCopy, &buffer, &bytesReturned);
+            TraceEvents(TRACE_LEVEL_VERBOSE, DBG_IOCTL, "vJoy_EvtIoDeviceControlForRawPdo: bytesReturned=%d\n", bytesReturned);
+            if (!NT_SUCCESS(status)) {
+                TraceEvents(TRACE_LEVEL_ERROR, DBG_IOCTL, "vJoy_EvtIoDeviceControlForRawPdo[GET_DRV_DEV_EN]: failed to retrieve output buffer\n");
+                WdfRequestComplete(Request, STATUS_NO_SUCH_DEVICE);
+                return;
+            };
+            if (bytesReturned<1) {
+                WdfRequestComplete(Request, STATUS_NO_SUCH_DEVICE);
+                return;
+            };
+
+            if (!pdoData) break;
+            pDevContext = GetDeviceContext(pdoData->hParentDevice);
+            if (!pDevContext) break;
+            // The number of the max supported devices
+            ((BYTE*)buffer)[0] = (BYTE)(pDevContext->nDevices);
+
+            // Complete the transaction
+            WdfRequestCompleteWithInformation(Request, status, bytesReturned);
+            TraceEvents(TRACE_LEVEL_VERBOSE, DBG_IOCTL, "vJoy_EvtIoDeviceControlForRawPdo: GenBuffer[0]=%d\n", ((BYTE*)GenBuffer)[0]);
+            return;
+
+        case GET_DRV_DEV_MAX:
+            // Get the max possible number of devices that this driver supports
+            TraceEvents(TRACE_LEVEL_INFORMATION, DBG_IOCTL, "vJoy_EvtIoDeviceControlForRawPdo: Case GET_DRV_DEV_MAX\n");
+
+            // Get the buffer from the request
+            // Get the data from the request
+            WDF_REQUEST_PARAMETERS_INIT(&Params);
+            WdfRequestGetParameters(Request, &Params);
+            bytesToCopy = (ULONG)Params.Parameters.DeviceIoControl.OutputBufferLength;
+            TraceEvents(TRACE_LEVEL_VERBOSE, DBG_IOCTL, "vJoy_EvtIoDeviceControlForRawPdo: bytesToCopy=%d\n", bytesToCopy);
+            if (bytesToCopy<1) {
+                WdfRequestComplete(Request, STATUS_NO_SUCH_DEVICE);
+                return;
+            };
+
+            status = WdfRequestRetrieveOutputBuffer(Request, bytesToCopy, &GenBuffer, &bytesReturned);
+            TraceEvents(TRACE_LEVEL_VERBOSE, DBG_IOCTL, "vJoy_EvtIoDeviceControlForRawPdo: bytesReturned=%d\n", bytesReturned);
+            if (!NT_SUCCESS(status)) {
+                TraceEvents(TRACE_LEVEL_ERROR, DBG_IOCTL, "vJoy_EvtIoDeviceControlForRawPdo[GET_DRV_DEV_MAX]: failed to retrieve output buffer\n");
+                WdfRequestComplete(Request, STATUS_NO_SUCH_DEVICE);
+                return;
+            };
+            if (bytesReturned<1) {
+                WdfRequestComplete(Request, STATUS_NO_SUCH_DEVICE);
+                return;
+            };
+
+            // The number of the max supported devices
+            ((BYTE*)GenBuffer)[0] = VJOY_MAX_N_DEVICES;
+
+            // Complete the transaction
+            WdfRequestCompleteWithInformation(Request, status, bytesReturned);
+            TraceEvents(TRACE_LEVEL_VERBOSE, DBG_IOCTL, "vJoy_EvtIoDeviceControlForRawPdo: GenBuffer[0]=%d\n", ((BYTE*)GenBuffer)[0]);
+            return;
+
+
+        case IS_DRV_FFB_CAP:
+            // Test is this version of vJoy driver supports FFB
+            TraceEvents(TRACE_LEVEL_INFORMATION, DBG_IOCTL, "vJoy_EvtIoDeviceControlForRawPdo: Case IS_DRV_FFB_CAP\n");
+
+            // Get the data from the request (Bytes to copy)
+            WDF_REQUEST_PARAMETERS_INIT(&Params);
+            WdfRequestGetParameters(Request, &Params);
+            bytesToCopy = (ULONG)Params.Parameters.DeviceIoControl.OutputBufferLength;
+            TraceEvents(TRACE_LEVEL_VERBOSE, DBG_IOCTL, "vJoy_EvtIoDeviceControlForRawPdo: bytesToCopy=%d\n", bytesToCopy);
+            if (bytesToCopy<1) {
+                TraceEvents(TRACE_LEVEL_ERROR, DBG_IOCTL, "vJoy_EvtIoDeviceControlForRawPdo: bytesToCopy=%d (Failed)\n", bytesToCopy);
+                WdfRequestComplete(Request, STATUS_NO_SUCH_DEVICE);
+                return;
+            };
+
+            // Get the buffer from the request
+            status = WdfRequestRetrieveOutputBuffer(Request, bytesToCopy, &GenBuffer, &bytesReturned);
+            TraceEvents(TRACE_LEVEL_VERBOSE, DBG_IOCTL, "vJoy_EvtIoDeviceControlForRawPdo: bytesReturned=%d\n", bytesReturned);
+            if (!NT_SUCCESS(status)) {
+                TraceEvents(TRACE_LEVEL_ERROR, DBG_IOCTL, "vJoy_EvtIoDeviceControlForRawPdo[IS_DRV_FFB_CAP]: failed to retrieve output buffer\n");
+                WdfRequestComplete(Request, STATUS_NO_SUCH_DEVICE);
+                return;
+            };
+            if (bytesReturned<1) {
+                TraceEvents(TRACE_LEVEL_ERROR, DBG_IOCTL, "vJoy_EvtIoDeviceControlForRawPdo: bytesReturned=%d (Failed)\n", bytesReturned);
+                WdfRequestComplete(Request, STATUS_NO_SUCH_DEVICE);
+                return;
+            };
+
+            // Yes, this driver supports FFB
+            ((BYTE*)GenBuffer)[0] = 1;
+
+            // Complete the transaction
+            WdfRequestCompleteWithInformation(Request, status, bytesReturned);
+            TraceEvents(TRACE_LEVEL_VERBOSE, DBG_IOCTL, "vJoy_EvtIoDeviceControlForRawPdo: GenBuffer[0]=%d\n", ((BYTE*)GenBuffer)[0]);
+            return;
+        case RESET_DEV:
+            /* Resets device(s) to predefined values */
+            TraceEvents(TRACE_LEVEL_INFORMATION, DBG_IOCTL, "vJoy_EvtIoDeviceControlForRawPdo: Case RESET_DEV\n");
+
+            // then get the implicated id of the top-level collection
+            id = GetIdFromRawPdoRequest(Request, pExtension);
+            TraceEvents(TRACE_LEVEL_VERBOSE, DBG_IOCTL, "vJoy_EvtIoDeviceControlForRawPdo[RESET_DEV]: ID=%d\n", id);
+
+            // Sanity check
+            if (id == 0xFFFF) {
+                WdfRequestComplete(Request, STATUS_NO_SUCH_DEVICE);
+                return;
+            };
+
+            // Get the context of vJoy device
+            pDevContext = GetDeviceContext(pdoData->hParentDevice);
+
+            // Reset device(s)
+            status = ResetDevice(id, pDevContext);
+            WdfRequestCompleteWithInformation(Request, status, 0);
+            return;
+
+        default:
+            break;
     }
-	  WdfRequestComplete(Request, status);
+
+    // Default catch-up code for cases that did not return immediatly
+    WdfRequestComplete(Request, status);
+
+    TraceEvents(TRACE_LEVEL_INFORMATION, DBG_IOCTL, "vJoy_EvtIoDeviceControlForRawPdo: exiting with stt=0x%x\n", status);
 
     return;
 }
@@ -678,7 +759,7 @@ NTSTATUS
 vJoy_CreateRawPdo(
     WDFDEVICE       Device,
     ULONG           InstanceNo
-    )
+)
 /*++
 
 Routine Description:
@@ -692,7 +773,7 @@ Return Value:
     NT Status code.
 
 --*/
-{   
+{
     NTSTATUS                    status;
     PWDFDEVICE_INIT             pDeviceInit = NULL;
     PRPDO_DEVICE_DATA           pdoData = NULL;
@@ -703,29 +784,29 @@ Return Value:
     WDFQUEUE                    queue;
     WDF_DEVICE_STATE            deviceState;
     PDEVICE_EXTENSION			devExt;
-    DECLARE_CONST_UNICODE_STRING(deviceId,VJOY_RAW_DEVICE_ID );
+    DECLARE_CONST_UNICODE_STRING(deviceId, VJOY_RAW_DEVICE_ID);
     //DECLARE_CONST_UNICODE_STRING(hardwareId,VJOY_HARDWARE_ID );
-    DECLARE_CONST_UNICODE_STRING(deviceLocation,L"vJoy Raw Device\0" );
+    DECLARE_CONST_UNICODE_STRING(deviceLocation, L"vJoy Raw Device\0");
     DECLARE_UNICODE_STRING_SIZE(buffer, MAX_ID_LEN);
-	PDEVICE_OBJECT				RawPdoDeviceObject;
-	PDEVICE_OBJECT				ParentDeviceObject;
-	//DECLARE_CONST_UNICODE_STRING(
-	//	SDDL_DEVOBJ_SYS_ALL_ADM_RWX_WORLD_R_RES_R,
-	//	L"D:P(A;;GA;;;SY)(A;;GRGWGX;;;BA)(A;;GR;;;WD)(A;;GR;;;RC)"
-	//	);
-	DECLARE_CONST_UNICODE_STRING(
-		SDDL_DEVOBJ_SYS_ALL_ADM_RWX_WORLD_RWX_RES_R,
-		L"D:P(A;;GA;;;SY)(A;;GRGWGX;;;BA)(A;;GRGWGX;;;WD)(A;;GR;;;RC)"
-		);
+    PDEVICE_OBJECT				RawPdoDeviceObject;
+    PDEVICE_OBJECT				ParentDeviceObject;
+    //DECLARE_CONST_UNICODE_STRING(
+    //	SDDL_DEVOBJ_SYS_ALL_ADM_RWX_WORLD_R_RES_R,
+    //	L"D:P(A;;GA;;;SY)(A;;GRGWGX;;;BA)(A;;GR;;;WD)(A;;GR;;;RC)"
+    //	);
+    DECLARE_CONST_UNICODE_STRING(
+    SDDL_DEVOBJ_SYS_ALL_ADM_RWX_WORLD_RWX_RES_R,
+        L"D:P(A;;GA;;;SY)(A;;GRGWGX;;;BA)(A;;GRGWGX;;;WD)(A;;GR;;;RC)"
+        );
 
-	int iInterface;
-	WCHAR RefStr[20];
-	UNICODE_STRING RefStr2;
-	WDF_FILEOBJECT_CONFIG FileObjInit;
-	WDF_OBJECT_ATTRIBUTES       FileObjAttributes;
+    int iInterface;
+    WCHAR RefStr[20];
+    UNICODE_STRING RefStr2;
+    WDF_FILEOBJECT_CONFIG FileObjInit;
+    WDF_OBJECT_ATTRIBUTES       FileObjAttributes;
 
 
-	TraceEvents(TRACE_LEVEL_INFORMATION, DBG_INIT, "Entered vJoy_CreateRawPdo\n");
+    TraceEvents(TRACE_LEVEL_INFORMATION, DBG_INIT, "vJoy_CreateRawPdo: entering\n");
 
 
     //
@@ -736,7 +817,7 @@ Return Value:
 
     if (pDeviceInit == NULL) {
         status = STATUS_INSUFFICIENT_RESOURCES;
-		LogEventWithStatus(ERRLOG_RAW_DEV_FAILED ,L"WdfPdoInitAllocate", WdfDriverWdmGetDriverObject(WdfGetDriver()), status);
+        LogEventWithStatus(ERRLOG_RAW_DEV_FAILED, L"WdfPdoInitAllocate", WdfDriverWdmGetDriverObject(WdfGetDriver()), status);
         goto Cleanup;
     }
 
@@ -748,16 +829,16 @@ Return Value:
     //
     status = WdfPdoInitAssignRawDevice(pDeviceInit, &GUID_DEVINTERFACE_VJOY);
     if (!NT_SUCCESS(status)) {
-		LogEventWithStatus(ERRLOG_RAW_DEV_FAILED ,L"WdfPdoInitAssignRawDevice", WdfDriverWdmGetDriverObject(WdfGetDriver()), status);
+        LogEventWithStatus(ERRLOG_RAW_DEV_FAILED, L"WdfPdoInitAssignRawDevice", WdfDriverWdmGetDriverObject(WdfGetDriver()), status);
         goto Cleanup;
     }
 
-	// TODO: Assign correct SDDL
+    // TODO: Assign correct SDDL
     ////
     status = WdfDeviceInitAssignSDDLString(pDeviceInit,
-                                           &SDDL_DEVOBJ_SYS_ALL_ADM_RWX_WORLD_RWX_RES_R);
+        &SDDL_DEVOBJ_SYS_ALL_ADM_RWX_WORLD_RWX_RES_R);
     if (!NT_SUCCESS(status)) {
-		LogEventWithStatus(ERRLOG_RAW_DEV_FAILED ,L"WdfDeviceInitAssignSDDLString", WdfDriverWdmGetDriverObject(WdfGetDriver()), status);
+        LogEventWithStatus(ERRLOG_RAW_DEV_FAILED, L"WdfDeviceInitAssignSDDLString", WdfDriverWdmGetDriverObject(WdfGetDriver()), status);
         goto Cleanup;
     }
 
@@ -767,7 +848,7 @@ Return Value:
     //
     status = WdfPdoInitAssignDeviceID(pDeviceInit, &deviceId);
     if (!NT_SUCCESS(status)) {
-		LogEventWithStatus(ERRLOG_RAW_DEV_FAILED ,L"WdfPdoInitAssignDeviceID", WdfDriverWdmGetDriverObject(WdfGetDriver()), status);
+        LogEventWithStatus(ERRLOG_RAW_DEV_FAILED, L"WdfPdoInitAssignDeviceID", WdfDriverWdmGetDriverObject(WdfGetDriver()), status);
         goto Cleanup;
     }
 
@@ -777,15 +858,15 @@ Return Value:
     // to multiple instances of keyboard, so we must provide a
     // BusQueryInstanceID. If we don't, system will throw CA bugcheck.
     //
-    status =  RtlUnicodeStringPrintf(&buffer, VJOY_DEVICE_INSTANCE, InstanceNo);
+    status = RtlUnicodeStringPrintf(&buffer, VJOY_DEVICE_INSTANCE, InstanceNo);
     if (!NT_SUCCESS(status)) {
- 		LogEventWithStatus(ERRLOG_RAW_DEV_FAILED ,L"RtlUnicodeStringPrintf (1)", WdfDriverWdmGetDriverObject(WdfGetDriver()), status);
-       goto Cleanup;
+        LogEventWithStatus(ERRLOG_RAW_DEV_FAILED, L"RtlUnicodeStringPrintf (1)", WdfDriverWdmGetDriverObject(WdfGetDriver()), status);
+        goto Cleanup;
     }
 
     status = WdfPdoInitAssignInstanceID(pDeviceInit, &buffer);
     if (!NT_SUCCESS(status)) {
- 		LogEventWithStatus(ERRLOG_RAW_DEV_FAILED ,L"WdfPdoInitAssignInstanceID", WdfDriverWdmGetDriverObject(WdfGetDriver()), status);
+        LogEventWithStatus(ERRLOG_RAW_DEV_FAILED, L"WdfPdoInitAssignInstanceID", WdfDriverWdmGetDriverObject(WdfGetDriver()), status);
         goto Cleanup;
     }
 
@@ -797,9 +878,9 @@ Return Value:
     // Since our device is raw device and we don't provide any hardware ID
     // to match with an INF, this text will be displayed in the device manager.
     //
-    status = RtlUnicodeStringPrintf(&buffer,VJOY_DEVICE_TEXT_409 ); // English - United States
+    status = RtlUnicodeStringPrintf(&buffer, VJOY_DEVICE_TEXT_409); // English - United States
     if (!NT_SUCCESS(status)) {
- 		LogEventWithStatus(ERRLOG_RAW_DEV_FAILED ,L"RtlUnicodeStringPrintf (2)", WdfDriverWdmGetDriverObject(WdfGetDriver()), status);
+        LogEventWithStatus(ERRLOG_RAW_DEV_FAILED, L"RtlUnicodeStringPrintf (2)", WdfDriverWdmGetDriverObject(WdfGetDriver()), status);
         goto Cleanup;
     }
 
@@ -812,64 +893,64 @@ Return Value:
     // WdfPdoInitSetDefaultLocale.
     //
     status = WdfPdoInitAddDeviceText(pDeviceInit,
-                                        &buffer,
-                                        &deviceLocation,
-                                        0x409 // English - United States
-                                        );
+        &buffer,
+        &deviceLocation,
+        0x409 // English - United States
+    );
     if (!NT_SUCCESS(status)) {
- 		LogEventWithStatus(ERRLOG_RAW_DEV_FAILED ,L"WdfPdoInitAddDeviceText (1)", WdfDriverWdmGetDriverObject(WdfGetDriver()), status);
+        LogEventWithStatus(ERRLOG_RAW_DEV_FAILED, L"WdfPdoInitAddDeviceText (1)", WdfDriverWdmGetDriverObject(WdfGetDriver()), status);
         goto Cleanup;
     }
 
 #if 0
-	// Hebrew (No real ned - just for fun)
-	status = RtlUnicodeStringPrintf(&buffer,VJOY_DEVICE_TEXT_40D, InstanceNo ); // Hebrew
-	if (!NT_SUCCESS(status)) {
-		LogEventWithStatus(ERRLOG_RAW_DEV_FAILED ,L"RtlUnicodeStringPrintf (3)", WdfDriverWdmGetDriverObject(WdfGetDriver()), status);
-		goto Cleanup;
-	}
+    // Hebrew (No real ned - just for fun)
+    status = RtlUnicodeStringPrintf(&buffer, VJOY_DEVICE_TEXT_40D, InstanceNo); // Hebrew
+    if (!NT_SUCCESS(status)) {
+        LogEventWithStatus(ERRLOG_RAW_DEV_FAILED, L"RtlUnicodeStringPrintf (3)", WdfDriverWdmGetDriverObject(WdfGetDriver()), status);
+        goto Cleanup;
+    }
 
-	status = WdfPdoInitAddDeviceText(pDeviceInit,
-		&buffer,
-		&deviceLocation,
-		0x40D // Hebrew
-		);
-	if (!NT_SUCCESS(status)) {
-		LogEventWithStatus(ERRLOG_RAW_DEV_FAILED ,L"WdfPdoInitAddDeviceText (2)", WdfDriverWdmGetDriverObject(WdfGetDriver()), status);
-		goto Cleanup;
-	}
+    status = WdfPdoInitAddDeviceText(pDeviceInit,
+        &buffer,
+        &deviceLocation,
+        0x40D // Hebrew
+    );
+    if (!NT_SUCCESS(status)) {
+        LogEventWithStatus(ERRLOG_RAW_DEV_FAILED, L"WdfPdoInitAddDeviceText (2)", WdfDriverWdmGetDriverObject(WdfGetDriver()), status);
+        goto Cleanup;
+    }
 
 #endif // 0
 
 
     WdfPdoInitSetDefaultLocale(pDeviceInit, 0x409); // English - United States
 
-	WdfDeviceInitSetExclusive(pDeviceInit, FALSE);
-	
-	// Create a WDFFILEOBJECT
-	WDF_OBJECT_ATTRIBUTES_INIT(&FileObjAttributes);
-	WDF_OBJECT_ATTRIBUTES_SET_CONTEXT_TYPE(&FileObjAttributes, FILEOBJECT_EXTENSION);
-	WDF_FILEOBJECT_CONFIG_INIT(&FileObjInit,  vJoy_EvtDeviceFileCreate, WDF_NO_EVENT_CALLBACK, vJoy_EvtFileCleanup);
-	WdfDeviceInitSetFileObjectConfig(pDeviceInit, &FileObjInit, &FileObjAttributes);
+    WdfDeviceInitSetExclusive(pDeviceInit, FALSE);
 
-    
+    // Create a WDFFILEOBJECT
+    WDF_OBJECT_ATTRIBUTES_INIT(&FileObjAttributes);
+    WDF_OBJECT_ATTRIBUTES_SET_CONTEXT_TYPE(&FileObjAttributes, FILEOBJECT_EXTENSION);
+    WDF_FILEOBJECT_CONFIG_INIT(&FileObjInit, vJoy_EvtDeviceFileCreate, WDF_NO_EVENT_CALLBACK, vJoy_EvtFileCleanup);
+    WdfDeviceInitSetFileObjectConfig(pDeviceInit, &FileObjInit, &FileObjAttributes);
+
+
     //
     // Initialize the attributes to specify the size of PDO device extension.
     // All the state information private to the PDO will be tracked here.
     //
     WDF_OBJECT_ATTRIBUTES_INIT_CONTEXT_TYPE(&pdoAttributes, RPDO_DEVICE_DATA);
-	pdoAttributes.EvtCleanupCallback = rawEvtCleanupCallback;
+    pdoAttributes.EvtCleanupCallback = rawEvtCleanupCallback;
 
     //
     // Set up our queue to allow forwarding of requests to the parent
     // This is done so that the cached data can be retrieved
     //
     //WdfPdoInitAllowForwardingRequestToParent(pDeviceInit);
-	// TODO: Replace the above because it is needed for WdfRequestForwardToParentDeviceIoQueue()
+    // TODO: Replace the above because it is needed for WdfRequestForwardToParentDeviceIoQueue()
 
     status = WdfDeviceCreate(&pDeviceInit, &pdoAttributes, &RawPdoDevice);
     if (!NT_SUCCESS(status)) {
-  		LogEventWithStatus(ERRLOG_RAW_DEV_FAILED ,L"WdfDeviceCreate", WdfDriverWdmGetDriverObject(WdfGetDriver()), status);
+        LogEventWithStatus(ERRLOG_RAW_DEV_FAILED, L"WdfDeviceCreate", WdfDriverWdmGetDriverObject(WdfGetDriver()), status);
         goto Cleanup;
     }
 
@@ -877,17 +958,17 @@ Return Value:
     // Get the device context.
     //
     pdoData = PdoGetData(RawPdoDevice);
-	pdoData->InstanceNo = InstanceNo;
-	pdoData->hParentDevice = Device;
+    pdoData->InstanceNo = InstanceNo;
+    pdoData->hParentDevice = Device;
 
     //
     // Save the I/O target handle and adjust the I/O stack size:
     //
     devExt = GetDeviceContext(Device);
     pdoData->IoTargetToParent = devExt->IoTargetToSelf;
-	RawPdoDeviceObject = WdfDeviceWdmGetDeviceObject(RawPdoDevice);
-	ParentDeviceObject = WdfDeviceWdmGetDeviceObject(Device);
-	RawPdoDeviceObject->StackSize = ParentDeviceObject->StackSize+1;
+    RawPdoDeviceObject = WdfDeviceWdmGetDeviceObject(RawPdoDevice);
+    ParentDeviceObject = WdfDeviceWdmGetDeviceObject(Device);
+    RawPdoDeviceObject->StackSize = ParentDeviceObject->StackSize+1;
 
     //
     // Configure the default queue associated with the control device object
@@ -897,19 +978,19 @@ Return Value:
     //
 
     WDF_IO_QUEUE_CONFIG_INIT_DEFAULT_QUEUE(&ioQueueConfig,
-                                    WdfIoQueueDispatchSequential);
+        WdfIoQueueDispatchSequential);
 
     ioQueueConfig.EvtIoDeviceControl = vJoy_EvtIoDeviceControlForRawPdo;
 
     status = WdfIoQueueCreate(RawPdoDevice,
-                                        &ioQueueConfig,
-                                        WDF_NO_OBJECT_ATTRIBUTES,
-                                        &queue // pointer to default queue
-                                        );
+        &ioQueueConfig,
+        WDF_NO_OBJECT_ATTRIBUTES,
+        &queue // pointer to default queue
+    );
     if (!NT_SUCCESS(status)) {
-		TraceEvents(TRACE_LEVEL_ERROR, DBG_INIT, "WdfIoQueueCreate failed 0x%x\n", status);
-   		LogEventWithStatus(ERRLOG_RAW_DEV_FAILED ,L"WdfIoQueueCreate", WdfDriverWdmGetDriverObject(WdfGetDriver()), status);
-       goto Cleanup;
+        TraceEvents(TRACE_LEVEL_ERROR, DBG_INIT, "WdfIoQueueCreate failed 0x%x\n", status);
+        LogEventWithStatus(ERRLOG_RAW_DEV_FAILED, L"WdfIoQueueCreate", WdfDriverWdmGetDriverObject(WdfGetDriver()), status);
+        goto Cleanup;
     }
 
     //
@@ -917,9 +998,9 @@ Return Value:
     //
     WDF_DEVICE_PNP_CAPABILITIES_INIT(&pnpCaps);
 
-    pnpCaps.Removable         = WdfTrue; // Remove Icon from " Devices and Printers"
+    pnpCaps.Removable = WdfTrue; // Remove Icon from " Devices and Printers"
     pnpCaps.SurpriseRemovalOK = WdfTrue;
-    pnpCaps.NoDisplayInUI     = WdfTrue;
+    pnpCaps.NoDisplayInUI = WdfTrue;
 
     // pnpCaps.Address  = InstanceNo;
     pnpCaps.UINumber = 0;
@@ -936,37 +1017,38 @@ Return Value:
     deviceState.DontDisplayInUI = WdfTrue; // Remove Icon from Device manager
     WdfDeviceSetDeviceState(RawPdoDevice, &deviceState);
 
-	//
-	// Create 16 interfaces
-	//
-	for (iInterface=1 ; iInterface <= MAX_N_DEVICES; iInterface++)
-	{
-		RtlStringCchPrintfW((NTSTRSAFE_PWSTR)RefStr, 20, VJOY_INTERFACE L"%03d", iInterface);
-		RtlInitUnicodeString(&RefStr2, (PCWSTR)RefStr);
-		status = WdfDeviceCreateDeviceInterface(RawPdoDevice,&GUID_DEVINTERFACE_VJOY,&RefStr2);
+    //
+    // Create 16 interfaces
+    //
+    for (iInterface = 1; iInterface <= VJOY_MAX_N_DEVICES; iInterface++) {
+        RtlStringCchPrintfW((NTSTRSAFE_PWSTR)RefStr, 20, VJOY_INTERFACE L"%03d", iInterface);
+        RtlInitUnicodeString(&RefStr2, (PCWSTR)RefStr);
+        status = WdfDeviceCreateDeviceInterface(RawPdoDevice, &GUID_DEVINTERFACE_VJOY, &RefStr2);
 
-		if (!NT_SUCCESS (status)) {
-			TraceEvents(TRACE_LEVEL_ERROR, DBG_INIT, "WdfDeviceCreateDeviceInterface number %d failed 0x%x\n", iInterface, status);
-   			LogEventWithStatus(ERRLOG_RAW_DEV_FAILED ,L"WdfDeviceCreateDeviceInterface", WdfDriverWdmGetDriverObject(WdfGetDriver()), status);
-			goto Cleanup;
-		}
-	};
+        if (!NT_SUCCESS(status)) {
+            TraceEvents(TRACE_LEVEL_ERROR, DBG_INIT, "WdfDeviceCreateDeviceInterface number %d failed 0x%x\n", iInterface, status);
+            LogEventWithStatus(ERRLOG_RAW_DEV_FAILED, L"WdfDeviceCreateDeviceInterface", WdfDriverWdmGetDriverObject(WdfGetDriver()), status);
+            goto Cleanup;
+        }
+    };
 
-	// Mark all interfaces as unused
-	pdoData->UsedInterfacesMask=0;
+    // Mark all interfaces as unused
+    pdoData->UsedInterfacesMask = 0;
 
 
-	//
-	// Add this device to the FDO's collection of children.
+    //
+    // Add this device to the FDO's collection of children.
     // After the child device is added to the static collection successfully,
     // driver must call WdfPdoMarkMissing to get the device deleted. It
     // shouldn't delete the child device directly by calling WdfObjectDelete.
     //
     status = WdfFdoAddStaticChild(Device, RawPdoDevice);
     if (!NT_SUCCESS(status)) {
-   		LogEventWithStatus(ERRLOG_RAW_DEV_FAILED ,L"WdfFdoAddStaticChild", WdfDriverWdmGetDriverObject(WdfGetDriver()), status);
+        LogEventWithStatus(ERRLOG_RAW_DEV_FAILED, L"WdfFdoAddStaticChild", WdfDriverWdmGetDriverObject(WdfGetDriver()), status);
         goto Cleanup;
     }
+
+    TraceEvents(TRACE_LEVEL_INFORMATION, DBG_INIT, "vJoy_CreateRawPdo: exiting\n");
 
     return STATUS_SUCCESS;
 
@@ -982,7 +1064,7 @@ Cleanup:
         WdfDeviceInitFree(pDeviceInit);
     }
 
-    if(RawPdoDevice) {
+    if (RawPdoDevice) {
         WdfObjectDelete(RawPdoDevice);
     }
 
@@ -993,331 +1075,340 @@ Cleanup:
 VOID
 rawEvtCleanupCallback(
     IN WDFDEVICE Device
-    )
-{
-	UNREFERENCED_PARAMETER(Device);
-	PAGED_CODE();
-	//NTSTATUS status;
-
-	//status = WdfPdoMarkMissing(Device);
-}
-
-// handles operations that must be performed when an application requests access to a device.
-VOID vJoy_EvtDeviceFileCreate(
-  __in  WDFDEVICE Device,
-  __in  WDFREQUEST Request,
-  __in  WDFFILEOBJECT FileObject
 )
 {
-		WDFFILEOBJECT FileObj;
-		PCUNICODE_STRING pName;
-		UNICODE_STRING TmpUstr;
-		NTSTATUS status = STATUS_SUCCESS;
-		ULONG  id=0;
-		WCHAR RefStr[100];
-		PFILEOBJECT_EXTENSION pExtension=NULL;
-		PDEVICE_EXTENSION    pDevContext = NULL;
-		PRPDO_DEVICE_DATA	pPdoData=NULL;
-		size_t len;
-		DWORD_PTR ProcessId;
+    UNREFERENCED_PARAMETER(Device);
+    PAGED_CODE();
+    //NTSTATUS status;
 
-	    PAGED_CODE ();
-		TraceEvents(TRACE_LEVEL_INFORMATION, DBG_INIT, "Entered vJoy_EvtDeviceFileCreate\n");
+    //status = WdfPdoMarkMissing(Device);
+}
 
 
-		// Get file object then get its filename
-		FileObj = WdfRequestGetFileObject(Request);
-		if (!FileObj)
-			goto going_out;
-		pName = WdfFileObjectGetFileName(FileObj);
-		if (!pName)
-			goto going_out;
+/*
+ handles operations that must be performed when an application requests access to a device.
+ */
+VOID vJoy_EvtDeviceFileCreate(
+    __in  WDFDEVICE Device,
+    __in  WDFREQUEST Request,
+    __in  WDFFILEOBJECT FileObject
+)
+{
+    WDFFILEOBJECT FileObj;
+    PCUNICODE_STRING pName;
+    UNICODE_STRING TmpUstr;
+    NTSTATUS status = STATUS_SUCCESS;
+    ULONG  id = 0;
+    WCHAR RefStr[100];
+    PFILEOBJECT_EXTENSION pExtension = NULL;
+    PDEVICE_EXTENSION    pDevContext = NULL;
+    PRPDO_DEVICE_DATA	pPdoData = NULL;
+    size_t len;
+    DWORD_PTR ProcessId;
 
-		TraceEvents(TRACE_LEVEL_INFORMATION, DBG_INIT, "vJoy_EvtDeviceFileCreate: File name=%wZ\n", pName);
-
-		// Extract id from interface number
-		status = RtlStringCchLengthW(VJOY_INTERFACE, 100, &len);
-		if (!NT_SUCCESS(status))
-			goto going_out;
-		status = RtlStringCchCopyNW(RefStr, 100, pName->Buffer+len+1,4);	// Copy the numeric part of the string (000)
-		if (!NT_SUCCESS(status))
-			goto going_out;
-		RtlInitUnicodeString(&TmpUstr, RefStr);								// Convert "000" to UNICODE_STRING
-		status = RtlUnicodeStringToInteger(&TmpUstr, 10, &id);				// Convert "000" to integer (0)
-		if (!NT_SUCCESS(status))
-			goto going_out;
-
-		if (id>0)
-		{
-			// Verify that this interface has a corresponding device
-			TraceEvents(TRACE_LEVEL_INFORMATION, DBG_INIT, "vJoy_EvtDeviceFileCreate: ID=%d\n", id);
-			pPdoData = PdoGetData(Device);
-			pDevContext = GetDeviceContext(pPdoData->hParentDevice);
-			if (!pDevContext)
-				goto going_out;
-			if (!pDevContext->positions[id - 1])
-				goto going_out;
-
-			// Get the file object context space
-			// Test that this interface is not in use
-			// and store there the parent (Raw PDO) context
-			pExtension = GetFileObjectContext(FileObject);
-			if (!pExtension)
-				goto going_out;
-			pExtension->pParentRawDeviceContext = pPdoData;
-			if (pPdoData->UsedInterfacesMask & (1 << (id - 1)))
-			{
-				WdfRequestComplete(Request, STATUS_ACCESS_DENIED);
-				ProcessId = (DWORD_PTR)PsGetCurrentProcessId();
-				TraceEvents(TRACE_LEVEL_INFORMATION, DBG_INIT, "vJoy_EvtDeviceFileCreate: PID=%d Failed (Access Denied)\n", ProcessId);
-				return;
-			}
-
-			///// This is a successful file creation - Now record the file details
-
-			// vJoy Device ID
-			else
-				pPdoData->UsedInterfacesMask |= 1 << (id - 1);
-
-			// Put id in file object context space 
-			pExtension->id = id; // Update
-
-			// Get the id of the calling process
-			ProcessId = (DWORD_PTR)PsGetCurrentProcessId();
-			pExtension->CallingProcessId = (DWORD)(ProcessId & 0xFFFFFFFF);
-			TraceEvents(TRACE_LEVEL_WARNING, DBG_INIT, "vJoy_EvtDeviceFileCreate: PID=%d\n", pExtension->CallingProcessId);
-
-			// Put the file object in the FDO extension
-			pDevContext->DeviceFileObject[id - 1] = FileObject;
-
-			// Activate FFB Queues
-			FfbActiveSet(TRUE, id, pDevContext);
+    PAGED_CODE();
+    TraceEvents(TRACE_LEVEL_INFORMATION, DBG_INIT, "vJoy_EvtDeviceFileCreate: entering\n");
 
 
-			WdfRequestComplete(Request, status);
-			return;
+    // Get file object then get its filename
+    FileObj = WdfRequestGetFileObject(Request);
+    if (!FileObj)
+        goto going_out;
+    pName = WdfFileObjectGetFileName(FileObj);
+    if (!pName)
+        goto going_out;
 
-		} // if (id>0)
+    TraceEvents(TRACE_LEVEL_INFORMATION, DBG_INIT, "vJoy_EvtDeviceFileCreate: File name=%wZ\n", pName);
 
-		// Case of General purpose and non device-specific Interface
-		else // if (id<1)
-		{
-			TraceEvents(TRACE_LEVEL_INFORMATION, DBG_INIT, "vJoy_EvtDeviceFileCreate(2nd case): ID=%d\n", id);
+    // Extract id from interface number
+    status = RtlStringCchLengthW(VJOY_INTERFACE, 100, &len);
+    if (!NT_SUCCESS(status))
+        goto going_out;
+    status = RtlStringCchCopyNW(RefStr, 100, pName->Buffer+len+1, 4);	// Copy the numeric part of the string (000)
+    if (!NT_SUCCESS(status))
+        goto going_out;
+    RtlInitUnicodeString(&TmpUstr, RefStr);								// Convert "000" to UNICODE_STRING
+    status = RtlUnicodeStringToInteger(&TmpUstr, 10, &id);				// Convert "000" to integer (0)
+    if (!NT_SUCCESS(status))
+        goto going_out;
+
+    if (id>0) {
+        // Verify that this interface has a corresponding device
+        TraceEvents(TRACE_LEVEL_INFORMATION, DBG_INIT, "vJoy_EvtDeviceFileCreate: ID=%d\n", id);
+        pPdoData = PdoGetData(Device);
+        pDevContext = GetDeviceContext(pPdoData->hParentDevice);
+        if (!pDevContext)
+            goto going_out;
+        if (!pDevContext->positions[id - 1])
+            goto going_out;
+
+        // Get the file object context space
+        // Test that this interface is not in use
+        // and store there the parent (Raw PDO) context
+        pExtension = GetFileObjectContext(FileObject);
+        if (!pExtension)
+            goto going_out;
+        pExtension->pParentRawDeviceContext = pPdoData;
+        if (pPdoData->UsedInterfacesMask & (1 << (id - 1))) {
+            WdfRequestComplete(Request, STATUS_ACCESS_DENIED);
+            ProcessId = (DWORD_PTR)PsGetCurrentProcessId();
+            TraceEvents(TRACE_LEVEL_INFORMATION, DBG_INIT, "vJoy_EvtDeviceFileCreate: PID=%d Failed (Access Denied)\n", ProcessId);
+            return;
+        }
+
+        ///// This is a successful file creation - Now record the file details
+
+        // vJoy Device ID
+        else
+            pPdoData->UsedInterfacesMask |= 1 << (id - 1);
+
+        // Put id in file object context space 
+        pExtension->id = id; // Update
+
+        // Get the id of the calling process
+        ProcessId = (DWORD_PTR)PsGetCurrentProcessId();
+        pExtension->CallingProcessId = (DWORD)(ProcessId & 0xFFFFFFFF);
+        TraceEvents(TRACE_LEVEL_WARNING, DBG_INIT, "vJoy_EvtDeviceFileCreate: PID=%d\n", pExtension->CallingProcessId);
+
+        // Put the file object in the FDO extension
+        pDevContext->DeviceFileObject[id - 1] = FileObject;
+
+        // Activate FFB Queues
+        FfbActiveSet(TRUE, id, pDevContext);
+
+
+        WdfRequestComplete(Request, status);
+        TraceEvents(TRACE_LEVEL_INFORMATION, DBG_INIT, "vJoy_EvtDeviceFileCreate: exiting with stt=0x%x\n", status);
+        return;
+
+    } // if (id>0)
+
+    // Case of General purpose and non device-specific Interface
+    else // if (id<1)
+    {
+        TraceEvents(TRACE_LEVEL_INFORMATION, DBG_INIT, "vJoy_EvtDeviceFileCreate(2nd case): ID=%d\n", id);
 #if 0
-			pPdoData = PdoGetData(Device);
-			pDevContext = GetDeviceContext(pPdoData->hParentDevice);
-			if (!pDevContext)
-				goto going_out;
+        pPdoData = PdoGetData(Device);
+        pDevContext = GetDeviceContext(pPdoData->hParentDevice);
+        if (!pDevContext)
+            goto going_out;
 
-			TraceEvents(TRACE_LEVEL_INFORMATION, DBG_INIT, "vJoy_EvtDeviceFileCreate(2nd case): Completing Request\n");
+        TraceEvents(TRACE_LEVEL_INFORMATION, DBG_INIT, "vJoy_EvtDeviceFileCreate(2nd case): Completing Request\n");
 
 #endif // 0
-			WdfRequestComplete(Request, status);
-			return;
-		}; // if (id<1)
+        WdfRequestComplete(Request, status);
+        TraceEvents(TRACE_LEVEL_INFORMATION, DBG_INIT, "vJoy_EvtDeviceFileCreate: exiting with stt=0x%x\n", status);
+        return;
+    } // if (id<1)
 
-	going_out:
-		ProcessId = (DWORD_PTR)PsGetCurrentProcessId();
-		TraceEvents(TRACE_LEVEL_INFORMATION, DBG_INIT, "vJoy_EvtDeviceFileCreate: PID=%d Failed (Invalid Handle)\n", ProcessId);
-		WdfRequestComplete(Request, STATUS_INVALID_HANDLE);
+going_out:
+    ProcessId = (DWORD_PTR)PsGetCurrentProcessId();
+    TraceEvents(TRACE_LEVEL_INFORMATION, DBG_INIT, "vJoy_EvtDeviceFileCreate: PID=%d Failed (Invalid Handle)\n", ProcessId);
+    WdfRequestComplete(Request, STATUS_INVALID_HANDLE);
 }
 
 VOID vJoy_EvtFileCleanup(
-  __in  WDFFILEOBJECT FileObject
+    __in  WDFFILEOBJECT FileObject
 )
 {
-		PFILEOBJECT_EXTENSION	pExtension=NULL;
-		PRPDO_DEVICE_DATA		pParentRawDeviceContext=NULL;
-		PDEVICE_EXTENSION		pDevContext = NULL;
+    PFILEOBJECT_EXTENSION	pExtension = NULL;
+    PRPDO_DEVICE_DATA		pParentRawDeviceContext = NULL;
+    PDEVICE_EXTENSION		pDevContext = NULL;
 
-		PAGED_CODE()
+    PAGED_CODE()
 
-		pExtension = GetFileObjectContext(FileObject);
-		TraceEvents(TRACE_LEVEL_INFORMATION, DBG_INIT, "vJoy_EvtFileCleanup: DevID=%d PID=%d\n", pExtension->id, pExtension->CallingProcessId);
+        pExtension = GetFileObjectContext(FileObject);
+    TraceEvents(TRACE_LEVEL_INFORMATION, DBG_INIT, "vJoy_EvtFileCleanup: entering with DevID=%d PID=%d\n", pExtension->id, pExtension->CallingProcessId);
 
-		// Remove id in file object context space
-		if (pExtension && pExtension->id)
-			pExtension->pParentRawDeviceContext->UsedInterfacesMask &= ~(1<< (pExtension->id-1));
+    // Remove id in file object context space
+    if (pExtension && pExtension->id)
+        pExtension->pParentRawDeviceContext->UsedInterfacesMask &= ~(1<< (pExtension->id-1));
 
-		// Reset the ID of the calling process
-		if (pExtension)
-			pExtension->CallingProcessId = 0;
+    // Reset the ID of the calling process
+    if (pExtension)
+        pExtension->CallingProcessId = 0;
 
-		// Get the parent device context
-		if (pExtension)
-		{
-			pParentRawDeviceContext = pExtension->pParentRawDeviceContext;
-			if (!pParentRawDeviceContext)
-				return;
-		};
-		
-		if (pParentRawDeviceContext) {
-			pDevContext = GetDeviceContext(pParentRawDeviceContext->hParentDevice);
-			if (!pDevContext)
-				return;
-		};
-		
+    // Get the parent device context
+    if (pExtension) {
+        pParentRawDeviceContext = pExtension->pParentRawDeviceContext;
+        if (!pParentRawDeviceContext)
+            return;
+    }
 
-		if (pDevContext && pExtension && pExtension->id)
-		{
-			// set FFB to false
-			FfbActiveSet(FALSE, pExtension->id, pDevContext);
+    if (pParentRawDeviceContext) {
+        pDevContext = GetDeviceContext(pParentRawDeviceContext->hParentDevice);
+        if (!pDevContext)
+            return;
+    }
 
-			// Remove record of this file object
-			pDevContext->DeviceFileObject[pExtension->id - 1] = NULL;  
-		};
+
+    if (pDevContext && pExtension && pExtension->id) {
+        // set FFB to false
+        FfbActiveSet(FALSE, pExtension->id, pDevContext);
+
+        // Remove record of this file object
+        pDevContext->DeviceFileObject[pExtension->id - 1] = NULL;
+    }
+
+    TraceEvents(TRACE_LEVEL_INFORMATION, DBG_INIT, "vJoy_EvtFileCleanup: exiting\n");
 }
 
+
 VOID FfbActiveSet(
-	BOOLEAN active,
-	int id,
-	PDEVICE_EXTENSION    pDevContext
-	)
+    BOOLEAN active,
+    int id,
+    PDEVICE_EXTENSION    pDevContext
+)
 {
 
-	int szarry, szelement;
-	int sz;
+    int szarry, szelement;
+    int sz;
 
-	// Check id
-	szarry    = sizeof(pDevContext->FfbEnable);
-	szelement = sizeof(pDevContext->FfbEnable[0]);
-	sz = szarry/szelement;
-	if (id<1 || id>sz)
-		return;
+    TraceEvents(TRACE_LEVEL_INFORMATION, DBG_FFB, "FfbActiveSet: entering with id=%d active=%d\n", id, active);
+
+    // Check id
+    szarry = sizeof(pDevContext->FfbEnable);
+    szelement = sizeof(pDevContext->FfbEnable[0]);
+    sz = szarry/szelement;
+    if (id<1 || id>sz) {
+        TraceEvents(TRACE_LEVEL_ERROR, DBG_FFB, "FfbActiveSet: wrong id=%d\n", id);
+        return;
+    }
 
 
-	// Has there been a change? if not do nothing
-	// NO
-	if (active == pDevContext->FfbEnable[id-1])
-		return;
+    // Has there been a change? if not do nothing
+    // NO
+    if (active == pDevContext->FfbEnable[id-1]) {
+        TraceEvents(TRACE_LEVEL_VERBOSE, DBG_FFB, "FfbActiveSet: no changes, leaving\n");
+        return;
+    }
 
-	// YES
-	if (active)
-	{ // FFB Activated
-		////////////  ReadQ /////////////////////////////////////////
-		// Start queue
-		WdfIoQueueStart(pDevContext->FfbReadQ[id - 1]);
+    // YES
+    if (active) { // FFB Activated
+        ////////////  ReadQ /////////////////////////////////////////
+        // Start queue
+        WdfIoQueueStart(pDevContext->FfbReadQ[id - 1]);
 
-		////////////  WriteQ /////////////////////////////////////////
-		// Start queue
-		WdfIoQueueStart(pDevContext->FfbWriteQ[id - 1]);
+        ////////////  WriteQ /////////////////////////////////////////
+        // Start queue
+        WdfIoQueueStart(pDevContext->FfbWriteQ[id - 1]);
 
-		// Mark FFB as active
-		pDevContext->FfbEnable[id-1] = TRUE;
-	}
-	else
-	{ // FFB Deactivated
-		pDevContext->FfbEnable[id-1] = FALSE;
+        // Mark FFB as active
+        pDevContext->FfbEnable[id-1] = TRUE;
+        TraceEvents(TRACE_LEVEL_VERBOSE, DBG_FFB, "FfbActiveSet: FFB enabled for id=%d\n", id);
+    } else { // FFB Deactivated
+        pDevContext->FfbEnable[id-1] = FALSE;
 
-		// Purge queues
-		WdfIoQueuePurge(pDevContext->FfbWriteQ[id - 1], NULL, NULL);
-		WdfIoQueuePurge(pDevContext->FfbReadQ[id - 1], NULL, NULL);
-	};
+        // Purge queues
+        WdfIoQueuePurge(pDevContext->FfbWriteQ[id - 1], NULL, NULL);
+        WdfIoQueuePurge(pDevContext->FfbReadQ[id - 1], NULL, NULL);
+        TraceEvents(TRACE_LEVEL_VERBOSE, DBG_FFB, "FfbActiveSet: FFB disabled for id=%d\n", id);
+    }
 
+    TraceEvents(TRACE_LEVEL_INFORMATION, DBG_FFB, "FfbActiveSet: exiting\n");
 }
 
 
 BOOLEAN FfbActiveGet(
-	int    			   	 id,
-	PDEVICE_EXTENSION    pDevContext
-	)
+    int    			   	 id,
+    PDEVICE_EXTENSION    pDevContext
+)
 {
-	int szarry, szelement;
-	int sz;
+    int szarry, szelement;
+    int sz;
 
-	// Check id
-	szarry = sizeof(pDevContext->FfbEnable);
-	szelement = sizeof(pDevContext->FfbEnable[0]);
-	sz = szarry / szelement;
-	if (id<1 || id>sz)
-		return FALSE;
+    TraceEvents(TRACE_LEVEL_INFORMATION, DBG_FFB, "FfbActiveGet: entering with id=%d\n", id);
 
-	return pDevContext->FfbEnable[id - 1];
+    // Check id
+    szarry = sizeof(pDevContext->FfbEnable);
+    szelement = sizeof(pDevContext->FfbEnable[0]);
+    sz = szarry / szelement;
+    if (id<1 || id>sz) {
+        TraceEvents(TRACE_LEVEL_ERROR, DBG_FFB, "FfbActiveSet: wrong id=%d\n", id);
+        return FALSE;
+    }
+
+
+    BOOLEAN ffbEnabled = pDevContext->FfbEnable[id - 1];
+    TraceEvents(TRACE_LEVEL_INFORMATION, DBG_FFB, "FfbActiveGet: exiting id=%d enabled=%d\n", id, ffbEnabled);
+
+    return ffbEnabled;
 }
 
 
-// Exstact the device id of the current device from the request
+// Extract the device id of the current device from the request
 // Return id
 // Returns 0xFFFF if error or id out of range
 USHORT GetIdFromRawPdoRequest(
-	WDFREQUEST    Request,
-	PVOID pExt
-	)
+    WDFREQUEST    Request,
+    PVOID pExt
+)
 {
-	WDFFILEOBJECT FileObj = NULL;
-	PFILEOBJECT_EXTENSION pExtension = (PFILEOBJECT_EXTENSION)pExt;
-	USHORT id = 0xFFFF;
+    WDFFILEOBJECT FileObj = NULL;
+    PFILEOBJECT_EXTENSION pExtension = (PFILEOBJECT_EXTENSION)pExt;
+    USHORT id = 0xFFFF;
 
-	// Get the context, id and the status
-	FileObj = WdfRequestGetFileObject(Request);
-	if (FileObj)
-	{
-		pExtension = GetFileObjectContext(FileObj);
-		if (pExtension)
-			id = (UCHAR)pExtension->id;
-		//else
-		//	id = 0;
-	}
-	//else
-	//	id = 0;
+    // Get the context, id and the status
+    FileObj = WdfRequestGetFileObject(Request);
+    if (FileObj) {
+        pExtension = GetFileObjectContext(FileObj);
+        if (pExtension)
+            id = (UCHAR)pExtension->id;
+        //else
+        //	id = 0;
+    }
+    //else
+    //	id = 0;
 
-	//if (id > MAX_N_DEVICES)
-	//	id = 0;
+    //if (id > MAX_N_DEVICES)
+    //	id = 0;
 
-	return id;
+    return id;
 }
 
 /*
-	If id>0 then resets the values of the device's controls
-	If id=0 then resets the values of the controls of all existing devices
+    If id>0 then resets the values of the device's controls
+    If id=0 then resets the values of the controls of all existing devices
 */
 NTSTATUS  ResetDevice(USHORT id, PDEVICE_EXTENSION pDevContext)
 {
-	DEVICE_INIT_VALS data_buf;
-	USHORT index;
+    DEVICE_INIT_VALS data_buf;
+    USHORT index;
 
-	// Sanity check
-	TraceEvents(TRACE_LEVEL_INFORMATION, DBG_INIT, "ResetDevice: DevID=%d\n", id);
-	if ((id > MAX_N_DEVICES) || (id < 0))
-	{
-		TraceEvents(TRACE_LEVEL_ERROR, DBG_INIT, "ResetDevice: failed - id=%d out of range\n", id);
-		return 	STATUS_NO_SUCH_DEVICE;
-	};
+    // Sanity check
+    TraceEvents(TRACE_LEVEL_INFORMATION, DBG_INIT, "ResetDevice: DevID=%d\n", id);
+    if ((id > VJOY_MAX_N_DEVICES) || (id < 0)) {
+        TraceEvents(TRACE_LEVEL_ERROR, DBG_INIT, "ResetDevice: failed - id=%d out of range\n", id);
+        return 	STATUS_NO_SUCH_DEVICE;
+    };
 
-	// Test the Device context
-	if (!pDevContext)
-	{
-		TraceEvents(TRACE_LEVEL_ERROR, DBG_INIT, "ResetDevice: failed - pDevContext is NULL\n");
-		return STATUS_UNSUCCESSFUL;
-	};
+    // Test the Device context
+    if (!pDevContext) {
+        TraceEvents(TRACE_LEVEL_ERROR, DBG_INIT, "ResetDevice: failed - pDevContext is NULL\n");
+        return STATUS_UNSUCCESSFUL;
+    };
 
-	// If the device is the hard-coded device then call InitializeDefaultDev(devContext)
-	// If this is a user configured se of devices call InitializeDev with a mask
-	if (pDevContext->isHardcodedDevice)
-	{ 
-		TraceEvents(TRACE_LEVEL_INFORMATION, DBG_INIT, "ResetDevice: Initializing hard-coded device\n");
-		CalcInitValue(0, &data_buf);
-		if (id)
-			ResetDeviceControls(id, pDevContext, &data_buf);
-		else
-			for (index = 0; index<MAX_N_DEVICES; index++)
-				ResetDeviceControls(index+1, pDevContext, &data_buf);
-	}
-	else
-	{
-		TraceEvents(TRACE_LEVEL_INFORMATION, DBG_INIT, "ResetDevice: Initializing device:%d\n", id);
-		if (id)
-		{
-			CalcInitValue(id, &data_buf);
-			ResetDeviceControls(id, pDevContext, &data_buf);
-		}
-		else
-			for (index = 0; index < MAX_N_DEVICES; index++)
-			{
-				CalcInitValue(index + 1, &data_buf);
-				ResetDeviceControls(index + 1, pDevContext, &data_buf);
-			}
-	};
+    // If the device is the hard-coded device then call InitializeDefaultDev(devContext)
+    // If this is a user configured se of devices call InitializeDev with a mask
+    if (pDevContext->isHardcodedDevice) {
+        TraceEvents(TRACE_LEVEL_INFORMATION, DBG_INIT, "ResetDevice: Initializing hard-coded device\n");
+        CalcInitValue(0, &data_buf);
+        if (id)
+            ResetDeviceControls(id, pDevContext, &data_buf);
+        else
+            for (index = 0; index<VJOY_MAX_N_DEVICES; index++)
+                ResetDeviceControls(index+1, pDevContext, &data_buf);
+    } else {
+        TraceEvents(TRACE_LEVEL_INFORMATION, DBG_INIT, "ResetDevice: Initializing device:%d\n", id);
+        if (id) {
+            CalcInitValue(id, &data_buf);
+            ResetDeviceControls(id, pDevContext, &data_buf);
+        } else
+            for (index = 0; index < VJOY_MAX_N_DEVICES; index++) {
+                CalcInitValue(index + 1, &data_buf);
+                ResetDeviceControls(index + 1, pDevContext, &data_buf);
+            }
+    };
 
-	return 	STATUS_SUCCESS;
+    return 	STATUS_SUCCESS;
 }

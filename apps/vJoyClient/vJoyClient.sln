@@ -1,9 +1,9 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 2013
-VisualStudioVersion = 12.0.31101.0
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.29905.134
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "vJoyClient", "vJoyClient.vcxproj", "{A3C0D9FE-F4A3-45F9-874A-AC2E6806477C}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "vJoyClient", "vJoyClient.vcxproj", "{465FC5FD-4AC4-4E20-9FB0-DD428B7A5C3A}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -11,12 +11,15 @@ Global
 		Release|Win32 = Release|Win32
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{A3C0D9FE-F4A3-45F9-874A-AC2E6806477C}.Debug|Win32.ActiveCfg = Debug|Win32
-		{A3C0D9FE-F4A3-45F9-874A-AC2E6806477C}.Debug|Win32.Build.0 = Debug|Win32
-		{A3C0D9FE-F4A3-45F9-874A-AC2E6806477C}.Release|Win32.ActiveCfg = Release|Win32
-		{A3C0D9FE-F4A3-45F9-874A-AC2E6806477C}.Release|Win32.Build.0 = Release|Win32
+		{465FC5FD-4AC4-4E20-9FB0-DD428B7A5C3A}.Debug|Win32.ActiveCfg = Debug|Win32
+		{465FC5FD-4AC4-4E20-9FB0-DD428B7A5C3A}.Debug|Win32.Build.0 = Debug|Win32
+		{465FC5FD-4AC4-4E20-9FB0-DD428B7A5C3A}.Release|Win32.ActiveCfg = Release|Win32
+		{465FC5FD-4AC4-4E20-9FB0-DD428B7A5C3A}.Release|Win32.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {4C0CE7E9-A94E-46B6-8924-C94D47A4B9FD}
 	EndGlobalSection
 EndGlobal
