@@ -7,18 +7,18 @@
 #define MyAppURL "http://vjoystick.sourceforge.net"
 #define AppGUID "{{8E31F76F-74C3-47F1-9550-E041EEDC5FBB}"
 
-#define vJoyInstx86 "..\Win32\Release\Package"
+;#define vJoyInstx86 "..\Win32\Release\Package"
 #define vJoyInstx64 "..\x64\Release\Package"
-#define vJoyLibx86 "..\Win32\Release"
+;#define vJoyLibx86 "..\Win32\Release"
 #define vJoyLibx64 "..\x64\Release"
 
-#define vJoyAppsx86 "..\Win32\Release"
+;#define vJoyAppsx86 "..\Win32\Release"
 #define vJoyAppsx64 "..\x64\Release"
 
-#define vJoyMonDirx86 "..\apps\External\JoyMonitor\x86"
+;#define vJoyMonDirx86 "..\apps\External\JoyMonitor\x86"
 #define vJoyMonDirx64 "..\apps\External\JoyMonitor\x64"
 #define vJoyDllDirx64 "..\apps\External\DLL\x64"
-#define vJoyDllDirx86 "..\apps\External\DLL\x86"
+;#define vJoyDllDirx86 "..\apps\External\DLL\x86"
 #define vJoyIconFile ".\Joystick-icon.ico"
 
 #define DestSubDirX86 "x86"
@@ -52,11 +52,13 @@ OutputBaseFilename=vJoySetup
 SetupIconFile=install.ico
 Compression=lzma/Max
 SolidCompression=true
-DefaultDirName={pf}\{#MyShortAppName}
+DefaultDirName={commonpf}\{#MyShortAppName}
 DefaultGroupName={#MyShortAppName}
 VersionInfoCompany=Shaul Eizikovich
 AppCopyright=Copyright (c) 2005-2016 by Shaul Eizikovich
-MinVersion = 6.0.6000
+;10.0.14393: Windows 10 Version 1607 (Anniversary Update)
+;or Windows Server 2016
+MinVersion = 10.0.14393
 
 ;SignTool=DigiCert sign /sha1 "6d 54 71 df 6b bf af a5 d5 90 0c 88 c0 8d f0 e9 c5 13 69 0a"  /noInput  $f
 ;SignTool=sig sign /a /v /i DigiCert /t http://timestamp.digicert.com $f
@@ -80,46 +82,48 @@ Uninstallable=yes
 
 [Files]
 ;Driver
-Source: "{#vJoyInstx86}\*"; DestDir: "{app}"; Flags: promptifolder; Check: IsX86
+;Source: "{#vJoyInstx86}\*"; DestDir: "{app}"; Flags: promptifolder; Check: IsX86
 Source: "{#vJoyInstx64}\*"; DestDir: "{app}"; Flags: promptifolder; Check: IsX64
 ; DLLs used by applications
-Source: "{#vJoyLibx86}\*.dll"; DestDir: "{app}\{#DestSubDirX86}"
+;Source: "{#vJoyLibx86}\*.dll"; DestDir: "{app}\{#DestSubDirX86}"
 Source: "{#vJoyLibx64}\*.dll"; DestDir: "{app}\{#DestSubDirX64}"; Check: IsX64
-Source: "{#vJoyDllDirx86}\*.dll"; DestDir: "{app}\{#DestSubDirX86}"
+;Source: "{#vJoyDllDirx86}\*.dll"; DestDir: "{app}\{#DestSubDirX86}"
 Source: "{#vJoyDllDirx64}\*.dll"; DestDir: "{app}\{#DestSubDirX64}"; Check: IsX64
 ;Installer
-Source: "{#vJoyAppsx86}\vJoyInstall.exe"; DestDir: "{app}"; Check: IsX86
+;Source: "{#vJoyAppsx86}\vJoyInstall.exe"; DestDir: "{app}"; Check: IsX86
 Source: "{#vJoyAppsx64}\vJoyInstall.exe"; DestDir: "{app}"; Check: IsX64
 ;Configuration application
-Source: "{#vJoyAppsx86}\vJoyConf.exe"; DestDir: "{app}\{#DestSubDirX86}"; Components: Apps\vJoyConf; Check: IsX86
+;Source: "{#vJoyAppsx86}\vJoyConf.exe"; DestDir: "{app}\{#DestSubDirX86}"; Components: Apps\vJoyConf; Check: IsX86
 Source: "{#vJoyAppsx64}\vJoyConf.exe"; DestDir: "{app}\{#DestSubDirX64}"; Components: Apps\vJoyConf; Check: IsX64
-Source: "{#vJoyAppsx86}\vJoyConfig.exe"; DestDir: "{app}\{#DestSubDirX86}"; Components: Apps\vJoyConf; Check: IsX86
+;Source: "{#vJoyAppsx86}\vJoyConfig.exe"; DestDir: "{app}\{#DestSubDirX86}"; Components: Apps\vJoyConf; Check: IsX86
 Source: "{#vJoyAppsx64}\vJoyConfig.exe"; DestDir: "{app}\{#DestSubDirX64}"; Components: Apps\vJoyConf; Check: IsX64
 ;Demo feeder
-Source: "{#vJoyAppsx86}\vJoyFeeder.exe"; DestDir: "{app}\{#DestSubDirX86}"; Components: Apps\vJoyFeeder ; Check: IsX86
+;Source: "{#vJoyAppsx86}\vJoyFeeder.exe"; DestDir: "{app}\{#DestSubDirX86}"; Components: Apps\vJoyFeeder ; Check: IsX86
 Source: "{#vJoyAppsx64}\vJoyFeeder.exe"; DestDir: "{app}\{#DestSubDirX64}"; Components: Apps\vJoyFeeder ; Check: IsX64
-Source: "{#vJoyAppsx86}\LBIndustrialCtrls.dll"; DestDir: "{app}\{#DestSubDirX86}"; Components: Apps\vJoyFeeder ; Check: IsX86
+;Source: "{#vJoyAppsx86}\LBIndustrialCtrls.dll"; DestDir: "{app}\{#DestSubDirX86}"; Components: Apps\vJoyFeeder ; Check: IsX86
 Source: "{#vJoyAppsx64}\LBIndustrialCtrls.dll"; DestDir: "{app}\{#DestSubDirX64}"; Components: Apps\vJoyFeeder ; Check: IsX64
 ; Monitor
-Source: "{#vJoyMonDirx86}\JoyMonitor.exe"; DestDir: "{app}\{#DestSubDirX86}"; Components: Apps\vJoyMon; Check: IsX86
+;Source: "{#vJoyMonDirx86}\JoyMonitor.exe"; DestDir: "{app}\{#DestSubDirX86}"; Components: Apps\vJoyMon; Check: IsX86
 Source: "{#vJoyMonDirx64}\JoyMonitor.exe"; DestDir: "{app}\{#DestSubDirX64}"; Components: Apps\vJoyMon; Check: IsX64
+;Source: "{#vJoyMonDirx86}\*.dll"; DestDir: "{app}\{#DestSubDirX86}"; Components: Apps\vJoyMon; Check: IsX86
+Source: "{#vJoyMonDirx64}\*.dll"; DestDir: "{app}\{#DestSubDirX64}"; Components: Apps\vJoyMon; Check: IsX64
 ; vJoyList
-Source: "{#vJoyAppsx86}\vJoyList.exe"; DestDir: "{app}\{#DestSubDirX86}"; Components: Apps\vJoyList; Check: IsX86
+;Source: "{#vJoyAppsx86}\vJoyList.exe"; DestDir: "{app}\{#DestSubDirX86}"; Components: Apps\vJoyList; Check: IsX86
 Source: "{#vJoyAppsx64}\vJoyList.exe"; DestDir: "{app}\{#DestSubDirX64}"; Components: Apps\vJoyList; Check: IsX64
 
 
 [Icons]
 Name: "{group}\Uninstall vJoy"; Filename: "{uninstallexe}"
-Name: "{group}\Monitor vJoy"; Filename: "{app}\{#DestSubDirX86}\JoyMonitor.exe"; Components: Apps\vJoyMon  ; Check: IsX86
-Name: "{group}\Configure vJoy"; Filename: "{app}\{#DestSubDirX86}\vJoyConf.exe"; Components: Apps\vJoyConf ; Check: IsX86
-Name: "{group}\vJoy Feeder (Demo)"; Filename: "{app}\{#DestSubDirX86}\vJoyFeeder.exe"; Components: Apps\vJoyFeeder ; Check: IsX86
+;Name: "{group}\Monitor vJoy"; Filename: "{app}\{#DestSubDirX86}\JoyMonitor.exe"; Components: Apps\vJoyMon  ; Check: IsX86
 Name: "{group}\Monitor vJoy"; Filename: "{app}\{#DestSubDirX64}\JoyMonitor.exe"; Components: Apps\vJoyMon  ; Check: IsX64
+;Name: "{group}\Configure vJoy"; Filename: "{app}\{#DestSubDirX86}\vJoyConf.exe"; Components: Apps\vJoyConf ; Check: IsX86
 Name: "{group}\Configure vJoy"; Filename: "{app}\{#DestSubDirX64}\vJoyConf.exe"; Components: Apps\vJoyConf ; Check: IsX64
+;Name: "{group}\vJoy Feeder (Demo)"; Filename: "{app}\{#DestSubDirX86}\vJoyFeeder.exe"; Components: Apps\vJoyFeeder ; Check: IsX86
 Name: "{group}\vJoy Feeder (Demo)"; Filename: "{app}\{#DestSubDirX64}\vJoyFeeder.exe"; Components: Apps\vJoyFeeder ; Check: IsX64
+;Name: "{group}\vJoy Device List"; Filename: "{app}\{#DestSubDirX86}\vJoyList.exe"; Components: Apps\vJoyList ; Check: IsX86
+Name: "{group}\vJoy Device List"; Filename: "{app}\{#DestSubDirX64}\vJoyList.exe"; Components: Apps\vJoyList ; Check: IsX64
 Name: "{group}\vJoy Home"; Filename: "http://vjoystick.sourceforge.net/site"; Comment: "vJoy site"; IconFilename:  "{#vJoyIconFile}"
 Name: "{group}\vJoy SDK"; Filename: "http://vjoystick.sourceforge.net/redirect_download_vJoy2SDK.php"; Comment: "vJoy SDK"; IconFilename:  "{#vJoyIconFile}"
-Name: "{group}\vJoy Device List"; Filename: "{app}\{#DestSubDirX64}\vJoyList.exe"; Components: Apps\vJoyList ; Check: IsX64
-Name: "{group}\vJoy Device List"; Filename: "{app}\{#DestSubDirX86}\vJoyList.exe"; Components: Apps\vJoyList ; Check: IsX86
 
 [Registry]
 Root: HKCU; Subkey: "System\CurrentControlSet\Control\MediaProperties\PrivateProperties\Joystick\OEM\VID_1234&PID_BEAD"; ValueName: "OEMName";  ValueType: none; Flags:deletevalue  uninsdeletevalue
@@ -919,7 +923,7 @@ begin
   // Merge file to registry
   if (not FileExists(ExpandConstant('{src}\'+FileName))) then
     begin
-      Log('InitFromRegistry(): File' + ExpandConstant('{src}\'+FileName) + ' not found');
+      Log('InitFromRegistry(): Default optional registry File' + ExpandConstant('{src}\'+FileName) + ' not found, continue without it');
       exit;
     end;
 

@@ -15,7 +15,7 @@
 #include <winioctl.h>
 #include <map>
 
-#include <../../../inc/public.h>
+#include <public.h>
 
 #define WHILE(constant) \
 __pragma(warning(disable: 4127)) while(constant); __pragma(warning(default: 4127))

@@ -38,6 +38,7 @@ Environment:
 #define GET_NEXT_DEVICE_OBJECT(DO) \
     (((PHID_DEVICE_EXTENSION)(DO)->DeviceExtension)->NextDeviceObject)
 
+
 //
 // This type of function declaration is for Prefast for drivers. 
 // Because this declaration specifies the function type, PREfast for Drivers
@@ -51,15 +52,10 @@ Environment:
 //
 DRIVER_INITIALIZE   DriverEntry;
 DRIVER_ADD_DEVICE   HidKmdfAddDevice;
-#if (KMDF_MINOR_VERSION != 005 &&  KMDF_MINOR_VERSION != 007)
-__drv_dispatchType_other
-#endif
+_Dispatch_type_(IRP_MJ_OTHER)
 DRIVER_DISPATCH     HidKmdfPassThrough;
-#if (KMDF_MINOR_VERSION != 005 &&  KMDF_MINOR_VERSION != 007)
-__drv_dispatchType(IRP_MJ_POWER)
-#endif
+_Dispatch_type_(IRP_MJ_POWER)
 DRIVER_DISPATCH     HidKmdfPowerPassThrough;
-
 DRIVER_UNLOAD       HidKmdfUnload;
 
 #ifdef ALLOC_PRAGMA
@@ -69,10 +65,10 @@ DRIVER_UNLOAD       HidKmdfUnload;
 #endif
 
 NTSTATUS
-DriverEntry (
-    __in PDRIVER_OBJECT  DriverObject,
-    __in PUNICODE_STRING RegistryPath
-    )
+DriverEntry(
+    _In_ PDRIVER_OBJECT  DriverObject,
+    _In_ PUNICODE_STRING RegistryPath
+)
 /*++
 
 Routine Description:
@@ -113,6 +109,7 @@ Return Value:
     //
     DriverObject->MajorFunction[IRP_MJ_POWER] = HidKmdfPowerPassThrough;
 
+
     DriverObject->DriverExtension->AddDevice = HidKmdfAddDevice;
     DriverObject->DriverUnload = HidKmdfUnload;
 
@@ -140,7 +137,7 @@ Return Value:
     // Register with hidclass
     //
     status = HidRegisterMinidriver(&hidMinidriverRegistration);
-    if (!NT_SUCCESS(status) ){
+    if (!NT_SUCCESS(status)) {
         KdPrint(("HidRegisterMinidriver FAILED, returnCode=%x\n", status));
     }
 
@@ -150,9 +147,9 @@ Return Value:
 
 NTSTATUS
 HidKmdfAddDevice(
-    __in PDRIVER_OBJECT DriverObject,
-    __in PDEVICE_OBJECT FunctionalDeviceObject
-    )
+    _In_ PDRIVER_OBJECT DriverObject,
+    _In_ PDEVICE_OBJECT FunctionalDeviceObject
+)
 /*++
 
 Routine Description:
@@ -178,6 +175,7 @@ Return Value:
 
     UNREFERENCED_PARAMETER(DriverObject);
 
+
     FunctionalDeviceObject->Flags &= ~DO_DEVICE_INITIALIZING;
 
     return STATUS_SUCCESS;
@@ -185,9 +183,9 @@ Return Value:
 
 NTSTATUS
 HidKmdfPassThrough(
-    __in PDEVICE_OBJECT DeviceObject,
-    __in PIRP Irp
-    )
+    _In_    PDEVICE_OBJECT  DeviceObject,
+    _Inout_ PIRP            Irp
+)
 /*++
 
 Routine Description:
@@ -217,9 +215,9 @@ Return Value:
 
 NTSTATUS
 HidKmdfPowerPassThrough(
-    __in PDEVICE_OBJECT DeviceObject,
-    __in PIRP Irp
-    )
+    _In_    PDEVICE_OBJECT  DeviceObject,
+    _Inout_ PIRP            Irp
+)
 /*++
 
 Routine Description:
@@ -254,8 +252,8 @@ Return Value:
 
 VOID
 HidKmdfUnload(
-    __in PDRIVER_OBJECT DriverObject
-    )
+    _In_ PDRIVER_OBJECT DriverObject
+)
 /*++
 
 Routine Description:
@@ -274,7 +272,7 @@ Return Value:
 {
     UNREFERENCED_PARAMETER(DriverObject);
 
-    PAGED_CODE ();
+    PAGED_CODE();
 
     return;
 }

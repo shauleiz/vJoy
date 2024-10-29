@@ -10,6 +10,7 @@ private:
 	VjdStat	status;
 	int ButtonNumber, DiscPovNumber, ContPovNumber;
 	BOOL X_Exist, Y_Exist, Z_Exist, RX_Exist, RY_Exist, RZ_Exist, SL0_Exist, SL1_Exist;
+	BOOL Wheel_Exist, Accelerator_Exist, Brake_Exist, Clutch_Exist, Steering_Exist, Throttle_Exist, Rudder_Exist, Aileron_Exist;
 protected:
 	// Get current status of the vJoy device and initialize status variables accordingly
 	BOOL GetStatus(int id);

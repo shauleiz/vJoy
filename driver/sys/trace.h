@@ -48,6 +48,7 @@ Environment:
 #define DBG_INIT                0x00000001
 #define DBG_PNP                 0x00000002
 #define DBG_IOCTL               0x00000004
+#define DBG_FFB                 0x00000008
 
 VOID
 TraceEvents    (

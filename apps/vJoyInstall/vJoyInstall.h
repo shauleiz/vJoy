@@ -1,4 +1,4 @@
-#include "../../inc/public.h"
+#include "public.h"
 #include <conio.h>
 #include <stdio.h>
 #include <time.h>

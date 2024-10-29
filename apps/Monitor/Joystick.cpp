@@ -558,8 +558,8 @@ BOOL CALLBACK EnumObjectsCallback( const DIDEVICEOBJECTINSTANCE* pdidoi,
         }
     }
 
-	if( pdidoi->guidType == GUID_Button )
-		EnableWindow( GetDlgItem( hDlg, IDC_BUTTON1 + DIDFT_GETINSTANCE(pdidoi->dwType)), TRUE );
+    if( pdidoi->guidType == GUID_Button )
+        EnableWindow( GetDlgItem( hDlg, IDC_BUTTON1 + DIDFT_GETINSTANCE(pdidoi->dwType)), TRUE );
 
 
 
@@ -651,15 +651,15 @@ HRESULT UpdateInputState( HWND hDlg )
 
     SetWindowText( GetDlgItem( hDlg, IDC_BUTTONS ), strText );
 #else
-	// Buttons
-	BOOL Checked;
-	for( int i = 0; i < 32; i++ )
-	{
-		if( js.rgbButtons[i] & 0x80 )
-			Checked = CheckDlgButton(hDlg, IDC_BUTTON1 + i, BST_CHECKED);
-		else
-			Checked = CheckDlgButton(hDlg, IDC_BUTTON1 + i, BST_UNCHECKED);
-	};
+    // Buttons
+    BOOL Checked;
+    for( int i = 0; i < 32; i++ )
+    {
+        if( js.rgbButtons[i] & 0x80 )
+            Checked = CheckDlgButton(hDlg, IDC_BUTTON1 + i, BST_CHECKED);
+        else
+            Checked = CheckDlgButton(hDlg, IDC_BUTTON1 + i, BST_UNCHECKED);
+    };
 #endif
     return S_OK;
 }
